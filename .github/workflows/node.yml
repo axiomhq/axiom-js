@@ -4,9 +4,11 @@ on:
   push:
     tags:
       - "*"
-    branches: [ $default-branch]
+    branches:
+      - main
   pull_request:
-    branches: [ $default-branch]
+    branches:
+      - main
 
 jobs:
   build:
