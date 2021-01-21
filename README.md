@@ -1,2 +1,3 @@
-# axiom-node
-Axiom API NodeJS bindings.
+# Axiom Node
+
+> Axiom API TypeScript bindings.

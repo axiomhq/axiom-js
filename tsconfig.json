@@ -1,0 +1,19 @@
+{
+    "compilerOptions": {
+        "module": "esnext",
+        "target": "es2015",
+        "baseUrl": "lib",
+        "moduleResolution": "node",
+        "outDir": "./dist",
+        "declaration": true,
+        "strict": true
+    },
+    "exclude": [
+        ".git",
+        ".github",
+        "node_modules"
+    ],
+    "include": [
+        "lib/**/*"
+    ]
+}

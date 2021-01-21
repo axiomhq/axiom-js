@@ -1,0 +1,36 @@
+name: node
+
+on:
+  push:
+    tags:
+      - "*"
+    branches:
+      - $default-branch
+  pull_request:
+    branches:
+      - $default-branch
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [10.x, 12.x, 14.x, 15.x]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Install dependencies
+        run: yarn --frozen-lockfile
+
+      - name: Lint
+        run: yarn lint
+
+      - name: Build
+        run: yarn build
