@@ -15,8 +15,7 @@
     "scripts": {
         "build": "tsc",
         "lint": "eslint '*/**/*.{js,ts}' --quiet --fix",
-        "prepublish": "yarn build",
-        "test": "echo \"Error: no test specified\" && exit 1"
+        "prepublish": "yarn build"
     },
     "repository": {
         "type": "git",

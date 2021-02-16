@@ -1,3 +1,6 @@
 .github
+examples/
 lib/
+node_modules/
+test/
 tsconfig.json
