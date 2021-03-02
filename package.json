@@ -15,7 +15,9 @@
     "scripts": {
         "build": "tsc",
         "lint": "eslint '*/**/*.{js,ts}' --quiet --fix",
-        "prepublish": "yarn build"
+        "prepublish": "yarn build",
+        "test": "mocha -r ts-node/register tests/**/*.test.ts",
+        "cover": "nyc -r text -e .ts -x 'tests/*.test.ts' yarn test"
     },
     "repository": {
         "type": "git",
@@ -35,12 +37,18 @@
         "axios": "^0.21.1"
     },
     "devDependencies": {
+        "@types/chai": "^4.2.15",
+        "@types/mocha": "^8.2.1",
         "@typescript-eslint/eslint-plugin": "^4.14.0",
         "@typescript-eslint/parser": "^4.14.0",
+        "chai": "^4.3.0",
         "eslint": "^7.18.0",
         "eslint-config-prettier": "^7.2.0",
         "eslint-plugin-prettier": "^3.3.1",
+        "mocha": "^8.3.0",
+        "nyc": "^15.1.0",
         "prettier": "^2.2.1",
-        "typescript": "^4.1.3"
+        "ts-node": "^9.1.1",
+        "typescript": "^4.2.2"
     }
 }

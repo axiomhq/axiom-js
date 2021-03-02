@@ -1,10 +1,10 @@
-import { Client } from './client';
+import HTTPClient from './httpClient';
 
 export interface Version {
     currentVersion?: string;
 }
 
-export class VersionService extends Client {
+export default class VersionService extends HTTPClient {
     localPath = '/api/v1/version';
 
     get = (): Promise<Version> =>
