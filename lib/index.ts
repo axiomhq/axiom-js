@@ -1,9 +1,4 @@
-// Default client
-import AxiomClient from './client';
-export default AxiomClient;
+import Client from './client';
+export default Client;
 
-// Some constants
 export { CloudURL } from './client';
-
-// Request/Response types of services
-export { Version } from './version';

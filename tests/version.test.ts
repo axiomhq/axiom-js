@@ -2,9 +2,9 @@ import { expect } from 'chai';
 import nock from 'nock';
 
 import { CloudURL } from '../lib';
-import VersionService from '../lib/version';
+import VersionsService from '../lib/version';
 
-describe('VersionService', () => {
+describe('VersionsService', () => {
     beforeEach(() => {
         const response = {
             currentVersion: 'v1.5.0-20210303T0900+a238738bf',
@@ -13,7 +13,7 @@ describe('VersionService', () => {
         nock(CloudURL).get('/api/v1/version').reply(200, response);
     });
 
-    const client = new VersionService(CloudURL, '');
+    const client = new VersionsService(CloudURL, '');
     expect(client).not.equal('undefined');
 
     it('Get', async () => {

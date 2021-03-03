@@ -20,7 +20,7 @@ export enum Type {
     Webhook = 'webhook',
 }
 
-export default class NotifierService extends HTTPClient {
+export default class NotifiersService extends HTTPClient {
     private readonly localPath = '/api/v1/notifiers';
 
     list = (): Promise<[Notifier]> =>

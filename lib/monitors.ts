@@ -26,7 +26,7 @@ export enum Comparison {
     AboveOrEqual = 'AboveOrEqual',
 }
 
-export default class MonitorService extends HTTPClient {
+export default class MonitorsService extends HTTPClient {
     private readonly localPath = '/api/v1/monitors';
 
     list = (): Promise<[Monitor]> =>

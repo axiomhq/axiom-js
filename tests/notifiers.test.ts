@@ -2,9 +2,9 @@ import { expect } from 'chai';
 import nock from 'nock';
 
 import { CloudURL } from '../lib';
-import NotifierService, { Type } from '../lib/notifiers';
+import NotifiersService, { Type } from '../lib/notifiers';
 
-describe('NotifierService', () => {
+describe('NotifiersService', () => {
     beforeEach(() => {
         const notifiers = [
             {
@@ -42,12 +42,12 @@ describe('NotifierService', () => {
 
         scope.get('/api/v1/notifiers').reply(200, notifiers);
         scope.get('/api/v1/notifiers/aqIqAfZJVTXlaSiD6r').reply(200, notifiers[0]);
-        scope.post('/api/v1/notifiers').reply(200, notifiers[0]);
-        scope.put('/api/v1/notifiers/aqIqAfZJVTXlaSiD6r').reply(200, notifiers[0]);
-        scope.delete('/api/v1/notifiers/aqIqAfZJVTXlaSiD6r').reply(204);
+        scope.post('/api/v1/notifiers').reply(200, notifiers[1]);
+        scope.put('/api/v1/notifiers/d5I2Yv3Pg2Jx9Ne2Ay').reply(200, notifiers[1]);
+        scope.delete('/api/v1/notifiers/d5I2Yv3Pg2Jx9Ne2Ay').reply(204);
     });
 
-    const client = new NotifierService(CloudURL, '');
+    const client = new NotifiersService(CloudURL, '');
     expect(client).not.equal('undefined');
 
     it('List', async () => {
@@ -66,8 +66,8 @@ describe('NotifierService', () => {
 
     it('Create', async () => {
         const notifier = {
-            id: 'aqIqAfZJVTXlaSiD6r',
-            name: 'Test',
+            id: 'd5I2Yv3Pg2Jx9Ne2Ay',
+            name: 'Notify Me',
             type: Type.Pagerduty,
             created: '2020-12-03T16:42:07.326658202Z',
             modified: '2020-12-03T16:42:07.326658202Z',
@@ -76,30 +76,30 @@ describe('NotifierService', () => {
 
         const response = await client.create(notifier);
         expect(response).not.equal('undefined');
-        expect(response.id).equal('aqIqAfZJVTXlaSiD6r');
-        expect(response.name).equal('Cool Kids');
+        expect(response.id).equal('d5I2Yv3Pg2Jx9Ne2Ay');
+        expect(response.name).equal('Notify Me');
         expect(response.properties).not.empty;
     });
 
     it('Update', async () => {
         const notifier = {
-            id: 'aqIqAfZJVTXlaSiD6r',
-            name: 'Test',
+            id: 'd5I2Yv3Pg2Jx9Ne2Ay',
+            name: 'Notify Me',
             type: Type.Webhook,
             created: '2020-12-03T16:42:07.326658202Z',
             modified: '2020-12-03T16:42:07.326658202Z',
             version: 1607013727326658202,
         };
 
-        const response = await client.update('aqIqAfZJVTXlaSiD6r', notifier);
+        const response = await client.update('d5I2Yv3Pg2Jx9Ne2Ay', notifier);
         expect(response).not.equal('undefined');
-        expect(response.id).equal('aqIqAfZJVTXlaSiD6r');
-        expect(response.name).equal('Cool Kids');
+        expect(response.id).equal('d5I2Yv3Pg2Jx9Ne2Ay');
+        expect(response.name).equal('Notify Me');
         expect(response.properties).not.empty;
     });
 
     it('Delete', async () => {
-        const response = await client.delete('aqIqAfZJVTXlaSiD6r');
+        const response = await client.delete('d5I2Yv3Pg2Jx9Ne2Ay');
         expect(response).not.equal('undefined');
         expect(response.status).equal(204);
     });
