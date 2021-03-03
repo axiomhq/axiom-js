@@ -6,7 +6,8 @@
         "moduleResolution": "node",
         "outDir": "./dist",
         "declaration": true,
-        "strict": true
+        "strict": true,
+        "esModuleInterop": true
     },
     "exclude": [
         ".git",

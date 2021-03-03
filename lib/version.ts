@@ -5,7 +5,7 @@ export interface Version {
 }
 
 export default class VersionService extends HTTPClient {
-    localPath = '/api/v1/version';
+    private readonly localPath = '/api/v1/version';
 
     get = (): Promise<Version> =>
         this.client.get<Version>(this.localPath).then((response) => {

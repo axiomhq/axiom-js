@@ -1,4 +1,5 @@
 import { expect } from 'chai';
+
 import AxiomClient from '../lib/client';
 
 describe('AxiomClient', () => {
