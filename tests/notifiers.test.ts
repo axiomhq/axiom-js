@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import nock from 'nock';
 
 import { CloudURL } from '../lib';
-import NotifierService, { Notifier, Type } from '../lib/notifiers';
+import NotifierService, { Type } from '../lib/notifiers';
 
 describe('NotifierService', () => {
     beforeEach(() => {
@@ -38,15 +38,12 @@ describe('NotifierService', () => {
             },
         ];
 
-        const updateResponse = notifiers[0];
-        updateResponse.type = Type.Webhook;
-
         const scope = nock(CloudURL);
 
         scope.get('/api/v1/notifiers').reply(200, notifiers);
         scope.get('/api/v1/notifiers/aqIqAfZJVTXlaSiD6r').reply(200, notifiers[0]);
         scope.post('/api/v1/notifiers').reply(200, notifiers[0]);
-        scope.put('/api/v1/notifiers/aqIqAfZJVTXlaSiD6r').reply(200, updateResponse);
+        scope.put('/api/v1/notifiers/aqIqAfZJVTXlaSiD6r').reply(200, notifiers[0]);
         scope.delete('/api/v1/notifiers/aqIqAfZJVTXlaSiD6r').reply(204);
     });
 
