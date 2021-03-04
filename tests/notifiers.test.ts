@@ -2,9 +2,11 @@ import { expect } from 'chai';
 import nock from 'nock';
 
 import { CloudURL } from '../lib';
-import NotifiersService, { Type } from '../lib/notifiers';
+import NotifiersService, { Notifier, Type } from '../lib/notifiers';
 
 describe('NotifiersService', () => {
+    const client = new NotifiersService(CloudURL, '');
+
     beforeEach(() => {
         const notifiers = [
             {
@@ -47,9 +49,6 @@ describe('NotifiersService', () => {
         scope.delete('/api/v1/notifiers/d5I2Yv3Pg2Jx9Ne2Ay').reply(204);
     });
 
-    const client = new NotifiersService(CloudURL, '');
-    expect(client).not.equal('undefined');
-
     it('List', async () => {
         const response = await client.list();
         expect(response).not.equal('undefined');
@@ -65,13 +64,10 @@ describe('NotifiersService', () => {
     });
 
     it('Create', async () => {
-        const notifier = {
+        const notifier: Notifier = {
             id: 'd5I2Yv3Pg2Jx9Ne2Ay',
             name: 'Notify Me',
             type: Type.Pagerduty,
-            created: '2020-12-03T16:42:07.326658202Z',
-            modified: '2020-12-03T16:42:07.326658202Z',
-            version: 1607013727326658202,
         };
 
         const response = await client.create(notifier);
@@ -82,13 +78,10 @@ describe('NotifiersService', () => {
     });
 
     it('Update', async () => {
-        const notifier = {
+        const notifier: Notifier = {
             id: 'd5I2Yv3Pg2Jx9Ne2Ay',
             name: 'Notify Me',
             type: Type.Webhook,
-            created: '2020-12-03T16:42:07.326658202Z',
-            modified: '2020-12-03T16:42:07.326658202Z',
-            version: 1607013727326658202,
         };
 
         const response = await client.update('d5I2Yv3Pg2Jx9Ne2Ay', notifier);

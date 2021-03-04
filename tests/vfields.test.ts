@@ -2,9 +2,11 @@ import { expect } from 'chai';
 import nock from 'nock';
 
 import { CloudURL } from '../lib';
-import VirtualFieldsService from '../lib/vfields';
+import VirtualFieldsService, { VirtualField } from '../lib/vfields';
 
 describe('VirtualFieldsService', () => {
+    const client = new VirtualFieldsService(CloudURL, '');
+
     beforeEach(() => {
         const vfields = [
             {
@@ -34,9 +36,6 @@ describe('VirtualFieldsService', () => {
         scope.delete('/api/v1/vfields/FmgciXxL3njoNgzWVR').reply(204);
     });
 
-    const client = new VirtualFieldsService(CloudURL, '');
-    expect(client).not.equal('undefined');
-
     it('List', async () => {
         const response = await client.list();
         expect(response).not.equal('undefined');
@@ -51,7 +50,7 @@ describe('VirtualFieldsService', () => {
     });
 
     it('Create', async () => {
-        const vfield = {
+        const vfield: VirtualField = {
             dataset: 'test',
             name: 'Failed Requests',
             description: 'Statuses >= 400',
@@ -67,7 +66,7 @@ describe('VirtualFieldsService', () => {
     });
 
     it('Update', async () => {
-        const vfield = {
+        const vfield: VirtualField = {
             dataset: 'test',
             name: 'Failed Requests',
             description: 'Statuses >= 400',

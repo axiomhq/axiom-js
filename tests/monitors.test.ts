@@ -2,9 +2,11 @@ import { expect } from 'chai';
 import nock from 'nock';
 
 import { CloudURL } from '../lib';
-import MonitorsService, { Comparison } from '../lib/monitors';
+import MonitorsService, { Comparison, Monitor } from '../lib/monitors';
 
 describe('MonitorsService', () => {
+    const client = new MonitorsService(CloudURL, '');
+
     beforeEach(() => {
         const monitors = [
             {
@@ -52,9 +54,6 @@ describe('MonitorsService', () => {
         scope.delete('/api/v1/monitors/lrR66wmzYm9NKtq0rz').reply(204);
     });
 
-    const client = new MonitorsService(CloudURL, '');
-    expect(client).not.equal('undefined');
-
     it('List', async () => {
         const response = await client.list();
         expect(response).not.equal('undefined');
@@ -71,7 +70,7 @@ describe('MonitorsService', () => {
     });
 
     it('Create', async () => {
-        const monitor = {
+        const monitor: Monitor = {
             id: 'lrR66wmzYm9NKtq0rz',
             name: 'Test',
             description: 'A test monitor',
@@ -91,7 +90,7 @@ describe('MonitorsService', () => {
     });
 
     it('Update', async () => {
-        const monitor = {
+        const monitor: Monitor = {
             id: 'lrR66wmzYm9NKtq0rz',
             name: 'Test',
             description: 'A test monitor',
