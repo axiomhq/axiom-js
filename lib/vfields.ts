@@ -24,13 +24,13 @@ export default class VirtualFieldsService extends HTTPClient {
             return response.data;
         });
 
-    create = (notifier: VirtualField): Promise<VirtualField> =>
-        this.client.post<VirtualField>(this.localPath, notifier).then((response) => {
+    create = (virtualField: VirtualField): Promise<VirtualField> =>
+        this.client.post<VirtualField>(this.localPath, virtualField).then((response) => {
             return response.data;
         });
 
-    update = (id: string, notifier: VirtualField): Promise<VirtualField> =>
-        this.client.put<VirtualField>(this.localPath + '/' + id, notifier).then((response) => {
+    update = (id: string, virtualField: VirtualField): Promise<VirtualField> =>
+        this.client.put<VirtualField>(this.localPath + '/' + id, virtualField).then((response) => {
             return response.data;
         });
 
