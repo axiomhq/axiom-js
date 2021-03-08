@@ -71,7 +71,6 @@ describe('MonitorsService', () => {
 
     it('Create', async () => {
         const monitor: Monitor = {
-            id: 'lrR66wmzYm9NKtq0rz',
             name: 'Test',
             description: 'A test monitor',
             dataset: 'test',
@@ -91,7 +90,6 @@ describe('MonitorsService', () => {
 
     it('Update', async () => {
         const monitor: Monitor = {
-            id: 'lrR66wmzYm9NKtq0rz',
             name: 'Test',
             description: 'A test monitor',
             dataset: 'test',

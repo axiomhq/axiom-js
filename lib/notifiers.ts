@@ -3,7 +3,7 @@ import { AxiosResponse } from 'axios';
 import HTTPClient from './httpClient';
 
 export interface Notifier {
-    id: string;
+    id?: string;
     name: string;
     type?: Type;
     properties?: any; // eslint-disable-line @typescript-eslint/no-explicit-any

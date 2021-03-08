@@ -65,7 +65,6 @@ describe('NotifiersService', () => {
 
     it('Create', async () => {
         const notifier: Notifier = {
-            id: 'd5I2Yv3Pg2Jx9Ne2Ay',
             name: 'Notify Me',
             type: Type.Pagerduty,
         };
@@ -79,7 +78,6 @@ describe('NotifiersService', () => {
 
     it('Update', async () => {
         const notifier: Notifier = {
-            id: 'd5I2Yv3Pg2Jx9Ne2Ay',
             name: 'Notify Me',
             type: Type.Webhook,
         };

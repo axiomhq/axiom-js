@@ -3,7 +3,7 @@ import { AxiosResponse } from 'axios';
 import HTTPClient from './httpClient';
 
 export interface Token {
-    id: string;
+    id?: string;
     name: string;
     description?: string;
     scopes: Array<string>;

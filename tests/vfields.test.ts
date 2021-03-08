@@ -56,7 +56,6 @@ describe('VirtualFieldsService', () => {
             description: 'Statuses >= 400',
             alias: 'status_failed',
             expression: 'response >= 400',
-            id: 'FmgciXxL3njoNgzWVR',
         };
 
         const response = await client.create(vfield);
@@ -72,7 +71,6 @@ describe('VirtualFieldsService', () => {
             description: 'Statuses >= 400',
             alias: 'status_failed',
             expression: 'response >= 400',
-            id: 'FmgciXxL3njoNgzWVR',
         };
 
         const response = await client.update('FmgciXxL3njoNgzWVR', vfield);

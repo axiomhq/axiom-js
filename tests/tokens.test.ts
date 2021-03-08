@@ -58,7 +58,6 @@ describe('TokensService', () => {
 
     it('Create', async () => {
         const token: Token = {
-            id: 'FIXME!',
             name: 'Test',
             description: 'A test token',
             scopes: ['*'],
@@ -72,7 +71,6 @@ describe('TokensService', () => {
 
     it('Update', async () => {
         const token: Token = {
-            id: 'FIXME!',
             name: 'Test',
             description: 'A test token',
             scopes: ['*'],
