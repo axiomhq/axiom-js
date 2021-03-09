@@ -1,3 +1,4 @@
+import DatasetsService from './datasets';
 import MonitorsService from './monitors';
 import NotifiersService from './notifiers';
 import StarredQueriesService from './starred';
@@ -10,6 +11,7 @@ import VirtualFieldsService from './vfields';
 export const CloudURL = 'https://cloud.axiom.co';
 
 export default class Client {
+    datasets: DatasetsService;
     monitors: MonitorsService;
     notifiers: NotifiersService;
     starred: StarredQueriesService;
@@ -23,6 +25,7 @@ export default class Client {
     virtualFields: VirtualFieldsService;
 
     constructor(basePath: string, accessToken: string) {
+        this.datasets = new DatasetsService(basePath, accessToken);
         this.monitors = new MonitorsService(basePath, accessToken);
         this.notifiers = new NotifiersService(basePath, accessToken);
         this.starred = new StarredQueriesService(basePath, accessToken);

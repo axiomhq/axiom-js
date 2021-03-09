@@ -7,6 +7,7 @@ describe('Client', () => {
     expect(client).not.equal('undefined');
 
     it('Services', () => {
+        expect(client.datasets).not.empty;
         expect(client.monitors).not.empty;
         expect(client.notifiers).not.empty;
         expect(client.starred).not.empty;
