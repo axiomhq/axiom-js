@@ -2,5 +2,5 @@
 examples/
 lib/
 node_modules/
-test/
+tests/
 tsconfig.json
