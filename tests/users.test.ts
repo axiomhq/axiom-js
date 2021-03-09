@@ -76,14 +76,14 @@ describe('UsersService', () => {
     });
 
     it('Create', async () => {
-        const user: CreateRequest = {
+        const request: CreateRequest = {
             name: 'Michael Doe',
             email: 'michael@example.com',
             role: Role.Owner,
             teamIds: [],
         };
 
-        const response = await client.create(user);
+        const response = await client.create(request);
         expect(response).not.equal('undefined');
         expect(response.id).equal('e9cffaad-60e7-4b04-8d27-185e1808c38c');
         expect(response.name).equal('Michael Doe');

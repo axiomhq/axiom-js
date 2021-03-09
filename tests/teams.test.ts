@@ -48,12 +48,12 @@ describe('TeamsService', () => {
     });
 
     it('Create', async () => {
-        const team: CreateRequest = {
+        const request: CreateRequest = {
             name: 'Server Team',
             datasets: ['test'],
         };
 
-        const response = await client.create(team);
+        const response = await client.create(request);
         expect(response).not.equal('undefined');
         expect(response.id).equal('4miTfZKp29VByAQgTd');
         expect(response.name).equal('Server Team');

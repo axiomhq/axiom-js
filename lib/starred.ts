@@ -8,7 +8,7 @@ export interface StarredQuery {
     name: string;
     dataset: string;
     kind: QueryKind;
-    // query: any;
+    // query: QueryRequest; //FIXME(lukasmalkmus): Add QueryRequest type
     who?: string;
     metadata: { [key: string]: string };
     created?: string;
