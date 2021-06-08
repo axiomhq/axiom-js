@@ -175,6 +175,14 @@ export default class StarredQueriesService extends HTTPClient {
                 return response.data;
             });
 
+    ingestBuffer = (
+        id: string,
+        buffer: Buffer,
+        contentType: ContentType,
+        contentEncoding: ContentEncoding,
+        options?: IngestOptions,
+    ): Promise<IngestStatus> => this.ingest(id, Readable.from(buffer), contentType, contentEncoding, options);
+
     ingestString = (
         id: string,
         data: string,
