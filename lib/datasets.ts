@@ -1,4 +1,5 @@
 import { AxiosResponse } from 'axios';
+import { Stream } from 'stream';
 
 import HTTPClient from './httpClient';
 import { QueryKind } from './starred';
@@ -6,6 +7,17 @@ import { QueryKind } from './starred';
 const toTime = require('to-time'); // eslint-disable-line @typescript-eslint/no-var-requires
 
 export const TimestampField = '_time';
+
+export enum ContentType {
+    JSON = 'application/json',
+    NDJSON = 'application/x-ndjson',
+    CSV = 'text/csv',
+}
+
+export enum ContentEncoding {
+    Identity = '',
+    GZIP = 'gzip',
+}
 
 export interface Dataset {
     id: number;
@@ -67,6 +79,26 @@ export interface UpdateRequest {
     description: string;
 }
 
+export interface IngestOptions {
+    timestampField?: string;
+    timestampFormat?: string;
+    csvDelimiter?: string;
+}
+
+export interface IngestStatus {
+    ingested: number;
+    failed: number;
+    failures?: Array<IngestFailure>;
+    processedBytes: number;
+    blocksCreated: number;
+    walLength: number;
+}
+
+export interface IngestFailure {
+    timestamp: string;
+    error: string;
+}
+
 interface TrimRequest {
     maxDuration: number;
 }
@@ -119,4 +151,27 @@ export default class StarredQueriesService extends HTTPClient {
         this.client.get<HistoryQuery>(this.localPath + '/_history/' + id).then((response) => {
             return response.data;
         });
+
+    ingest = (
+        id: string,
+        stream: Stream,
+        contentType: ContentType,
+        contentEncoding: ContentEncoding,
+        options?: IngestOptions,
+    ): Promise<IngestStatus> =>
+        this.client
+            .post<IngestStatus>(this.localPath + '/' + id + '/ingest', stream, {
+                headers: {
+                    'Content-Type': contentType,
+                    'Content-Encoding': contentEncoding,
+                },
+                params: {
+                    'timestamp-field': options?.timestampField,
+                    'timestamp-format': options?.timestampFormat,
+                    'csv-delimiter': options?.csvDelimiter,
+                },
+            })
+            .then((response) => {
+                return response.data;
+            });
 }

@@ -1,8 +1,9 @@
 import { expect } from 'chai';
 import nock from 'nock';
+import { Readable, Stream } from 'stream';
 
 import { CloudURL } from '../lib';
-import DatasetsService, { CreateRequest, UpdateRequest } from '../lib/datasets';
+import DatasetsService, { CreateRequest, UpdateRequest, ContentEncoding, ContentType } from '../lib/datasets';
 import { QueryKind } from '../lib/starred';
 
 describe('DatasetsService', () => {
@@ -118,6 +119,15 @@ describe('DatasetsService', () => {
             created: '2020-12-08T13:28:52.78954814Z',
         };
 
+        const ingestStatus = {
+            ingested: 2,
+            failed: 0,
+            failures: [],
+            processedBytes: 630,
+            blocksCreated: 0,
+            walLength: 2,
+        };
+
         const scope = nock(CloudURL);
 
         scope.get('/api/v1/datasets/_stats').reply(200, stats);
@@ -131,6 +141,12 @@ describe('DatasetsService', () => {
             numDeleted: 1,
         });
         scope.get('/api/v1/datasets/_history/test').reply(200, historyQuery);
+        scope.post('/api/v1/datasets/test/ingest').reply(function (_, body, cb) {
+            expect(this.req.headers).to.have.property('content-type');
+            expect(body).to.deep.equal([{ foo: 'bar' }, { foo: 'baz' }]);
+
+            cb(null, [200, ingestStatus]);
+        });
     });
 
     it('Stats', async () => {
@@ -202,5 +218,13 @@ describe('DatasetsService', () => {
         expect(response).not.equal('undefined');
         expect(response.id).equal('GHP2ufS7OYwMeBhXHj');
         expect(response.kind).equal(QueryKind.Analytics);
+    });
+
+    it('Ingest', async () => {
+        const stream = Readable.from(`[{"foo": "bar"}, {"foo": "baz"}]`);
+        const response = await client.ingest('test', stream, ContentType.JSON, ContentEncoding.Identity);
+        expect(response).not.equal('undefined');
+        expect(response.ingested).equal(2);
+        expect(response.failed).equal(0);
     });
 });
