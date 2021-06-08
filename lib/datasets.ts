@@ -1,5 +1,5 @@
 import { AxiosResponse } from 'axios';
-import { Stream } from 'stream';
+import { Readable, Stream } from 'stream';
 
 import HTTPClient from './httpClient';
 import { QueryKind } from './starred';
@@ -174,4 +174,12 @@ export default class StarredQueriesService extends HTTPClient {
             .then((response) => {
                 return response.data;
             });
+
+    ingestString = (
+        id: string,
+        data: string,
+        contentType: ContentType,
+        contentEncoding: ContentEncoding,
+        options?: IngestOptions,
+    ): Promise<IngestStatus> => this.ingest(id, Readable.from(data), contentType, contentEncoding, options);
 }

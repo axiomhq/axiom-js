@@ -220,9 +220,9 @@ describe('DatasetsService', () => {
         expect(response.kind).equal(QueryKind.Analytics);
     });
 
-    it('Ingest', async () => {
-        const stream = Readable.from(`[{"foo": "bar"}, {"foo": "baz"}]`);
-        const response = await client.ingest('test', stream, ContentType.JSON, ContentEncoding.Identity);
+    it('IngestString', async () => {
+        const data = `[{"foo": "bar"}, {"foo": "baz"}]`;
+        const response = await client.ingestString('test', data, ContentType.JSON, ContentEncoding.Identity);
         expect(response).not.equal('undefined');
         expect(response.ingested).equal(2);
         expect(response.failed).equal(0);
