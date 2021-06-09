@@ -1,6 +1,5 @@
 import { expect } from 'chai';
 import nock from 'nock';
-import { Readable, Stream } from 'stream';
 
 import { CloudURL } from '../lib';
 import DatasetsService, { CreateRequest, UpdateRequest, ContentEncoding, ContentType } from '../lib/datasets';
