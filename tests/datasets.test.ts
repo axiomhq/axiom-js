@@ -128,6 +128,56 @@ describe('DatasetsService', () => {
             walLength: 2,
         };
 
+        const queryResult = {
+            status: {
+                elapsedTime: 542114,
+                blocksExamined: 4,
+                rowsExamined: 142655,
+                rowsMatched: 142655,
+                numGroups: 0,
+                isPartial: false,
+                cacheStatus: 1,
+                minBlockTime: '2020-11-19T11:06:31.569475746Z',
+                maxBlockTime: '2020-11-27T12:06:38.966791794Z',
+            },
+            matches: [
+                {
+                    _time: '2020-11-19T11:06:31.569475746Z',
+                    _sysTime: '2020-11-19T11:06:31.581384524Z',
+                    _rowId: 'c776x1uafkpu-4918f6cb9000095-0',
+                    data: {
+                        agent: 'Debian APT-HTTP/1.3 (0.8.16~exp12ubuntu10.21)',
+                        bytes: 0,
+                        referrer: '-',
+                        remote_ip: '93.180.71.3',
+                        remote_user: '-',
+                        request: 'GET /downloads/product_1 HTTP/1.1',
+                        response: 304,
+                        time: '17/May/2015:08:05:32 +0000',
+                    },
+                },
+                {
+                    _time: '2020-11-19T11:06:31.569479846Z',
+                    _sysTime: '2020-11-19T11:06:31.581384524Z',
+                    _rowId: 'c776x1uafnvq-4918f6cb9000095-1',
+                    data: {
+                        agent: 'Debian APT-HTTP/1.3 (0.8.16~exp12ubuntu10.21)',
+                        bytes: 0,
+                        referrer: '-',
+                        remote_ip: '93.180.71.3',
+                        remote_user: '-',
+                        request: 'GET /downloads/product_1 HTTP/1.1',
+                        response: 304,
+                        time: '17/May/2015:08:05:23 +0000',
+                    },
+                },
+            ],
+            buckets: {
+                series: [],
+                totals: [],
+            },
+        };
+
         const scope = nock(CloudURL);
 
         scope.get('/api/v1/datasets/_stats').reply(200, stats);
@@ -147,6 +197,7 @@ describe('DatasetsService', () => {
 
             cb(null, [200, ingestStatus]);
         });
+        scope.post('/api/v1/datasets/test/query').reply(200, queryResult);
     });
 
     it('Stats', async () => {
@@ -226,5 +277,16 @@ describe('DatasetsService', () => {
         expect(response).not.equal('undefined');
         expect(response.ingested).equal(2);
         expect(response.failed).equal(0);
+    });
+
+    it('IngestString', async () => {
+        const query = {
+            startTime: '2020-11-26T11:18:00Z',
+            endTime: '2020-11-17T11:18:00Z',
+            resolution: 'auto',
+        };
+        const response = await client.query('test', query);
+        expect(response).not.equal('undefined');
+        expect(response.matches).length(2);
     });
 });

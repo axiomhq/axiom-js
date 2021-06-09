@@ -99,6 +99,154 @@ export interface IngestFailure {
     error: string;
 }
 
+export interface QueryOptions {
+    streamingDuration: string;
+    noCache: boolean;
+
+    // StreamingDuration time.Duration `url:"streaming-duration,omitempty"`
+    // NoCache bool `url:"no-cache,omitempty"`
+}
+export interface Query {
+    aggregations?: Array<Aggregation>;
+    continuationToken?: string;
+    cursor?: string;
+    endTime: string;
+    filter?: Filter;
+    groupBy?: Array<string>;
+    includeCursor?: boolean;
+    limit?: number;
+    order?: Array<Order>;
+    project?: Array<Projection>;
+    resolution: string;
+    startTime: string;
+    virtualFields?: Array<VirtualColumn>;
+}
+
+export interface Aggregation {
+    argument?: any;
+    field: string;
+    op: AggregationOp;
+}
+
+export enum AggregationOp {
+    Count = 'count',
+    Distinct = 'distinct',
+    Sum = 'sum',
+    Avg = 'avg',
+    Min = 'min',
+    Max = 'max',
+    Topk = 'topk',
+    Percentiles = 'percentiles',
+    Histogram = 'histogram',
+}
+
+export interface Filter {
+    caseSensitive?: boolean;
+    children?: Array<Filter>;
+    field: string;
+    op: FilterOp;
+    value?: any;
+}
+
+export enum FilterOp {
+    And = 'and',
+    Or = 'or',
+    Not = 'not',
+    Eq = 'eq',
+    NotEqual = '!=',
+    Ne = 'ne',
+    Exists = 'exists',
+    NotExists = 'not-exists',
+    GreaterThan = '>',
+    GreaterThanOrEqualTo = '>=',
+    LessThan = '<',
+    LessThanOrEqualTo = '<=',
+    Gt = 'gt',
+    Gte = 'gte',
+    Lt = 'lt',
+    Lte = 'lte',
+    StartsWith = 'starts-with',
+    NotStartsWith = 'not-starts-with',
+    EndsWith = 'ends-with',
+    NotEndsWith = 'not-ends-with',
+    Contains = 'contains',
+    NotContains = 'not-contains',
+    Regexp = 'regexp',
+    NotRegexp = 'not-regexp',
+}
+
+export interface Order {
+    desc: boolean;
+    field: string;
+}
+
+export interface Projection {
+    alias?: string;
+    field: string;
+}
+
+export interface VirtualColumn {
+    alias: string;
+    expr: string;
+}
+
+export interface QueryResult {
+    buckets: Timeseries;
+    matches?: Array<Entry>;
+    status: Status;
+}
+
+export interface Timeseries {
+    series?: Array<Interval>;
+    totals?: Array<EntryGroup>;
+}
+
+export interface Interval {
+    endTime: string;
+    groups?: Array<EntryGroup>;
+    startTime: string;
+}
+
+export interface EntryGroup {
+    aggregations?: Array<EntryGroupAgg>;
+    group: { [key: string]: any };
+    id: number;
+}
+
+export interface EntryGroupAgg {
+    op: string;
+    value: any;
+}
+
+export interface Entry {
+    _rowId: string;
+    _sysTime: string;
+    _time: string;
+    data: { [key: string]: any };
+}
+
+export interface Status {
+    blocksExamined: number;
+    cacheStatus: number;
+    continuationToken?: string;
+    elapsedTime: number;
+    isEstimate?: boolean;
+    isPartial: boolean;
+    maxBlockTime: string;
+    messages?: Array<Message>;
+    minBlockTime: string;
+    numGroups: number;
+    rowsExamined: number;
+    rowsMatched: number;
+}
+
+export interface Message {
+    code?: string;
+    count: number;
+    msg: string;
+    priority: string;
+}
+
 interface TrimRequest {
     maxDuration: number;
 }
@@ -190,4 +338,16 @@ export default class StarredQueriesService extends HTTPClient {
         contentEncoding: ContentEncoding,
         options?: IngestOptions,
     ): Promise<IngestStatus> => this.ingest(id, Readable.from(data), contentType, contentEncoding, options);
+
+    query = (id: string, query: Query, options?: QueryOptions): Promise<QueryResult> =>
+        this.client
+            .post<QueryResult>(this.localPath + '/' + id + '/query', query, {
+                params: {
+                    'streaming-duration': options?.streamingDuration,
+                    'no-cache': options?.noCache,
+                },
+            })
+            .then((response) => {
+                return response.data;
+            });
 }
