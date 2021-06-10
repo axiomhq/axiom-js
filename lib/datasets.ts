@@ -102,9 +102,6 @@ export interface IngestFailure {
 export interface QueryOptions {
     streamingDuration: string;
     noCache: boolean;
-
-    // StreamingDuration time.Duration `url:"streaming-duration,omitempty"`
-    // NoCache bool `url:"no-cache,omitempty"`
 }
 export interface Query {
     aggregations?: Array<Aggregation>;

@@ -197,6 +197,7 @@ describe('DatasetsService', () => {
             cb(null, [200, ingestStatus]);
         });
         scope.post('/api/v1/datasets/test/query').reply(200, queryResult);
+        scope.post('/api/v1/datasets/test/query?streaming-duration=1m&no-cache=true').reply(200, queryResult);
     });
 
     it('Stats', async () => {
@@ -278,14 +279,31 @@ describe('DatasetsService', () => {
         expect(response.failed).equal(0);
     });
 
-    it('IngestString', async () => {
-        const query = {
-            startTime: '2020-11-26T11:18:00Z',
-            endTime: '2020-11-17T11:18:00Z',
-            resolution: 'auto',
-        };
-        const response = await client.query('test', query);
-        expect(response).not.equal('undefined');
-        expect(response.matches).length(2);
+    it('Query', async () => {
+        it('works without options', async () => {
+            const query = {
+                startTime: '2020-11-26T11:18:00Z',
+                endTime: '2020-11-17T11:18:00Z',
+                resolution: 'auto',
+            };
+            const response = await client.query('test', query);
+            expect(response).not.equal('undefined');
+            expect(response.matches).length(2);
+        });
+
+        it('works with options', async () => {
+            const query = {
+                startTime: '2020-11-26T11:18:00Z',
+                endTime: '2020-11-17T11:18:00Z',
+                resolution: 'auto',
+            };
+            const options = {
+                streamingDuration: '1m',
+                noCache: true,
+            };
+            const response = await client.query('test', query, options);
+            expect(response).not.equal('undefined');
+            expect(response.matches).length(2);
+        });
     });
 });
