@@ -102,4 +102,4 @@ jobs:
         env:
           AXM_ACCESS_TOKEN: ${{ secrets.TESTING_AZURE_1_STAGING_ACCESS_TOKEN }}
           AXM_DEPLOYMENT_URL: ${{ secrets.TESTING_AZURE_1_STAGING_DEPLOYMENT_URL }}
-          DATASET_SUFFIX: ${{ GITHUB_RUN_ID }}
+          DATASET_SUFFIX: ${{ github.run_id }}
