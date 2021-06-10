@@ -2,12 +2,12 @@ import { expect } from 'chai';
 
 import DatasetsService from '../../lib/datasets';
 
-const deploymentURL = process.env.AXM_DEPLOYMENT_URL!;
-const accessToken = process.env.AXM_ACCESS_TOKEN!;
+const deploymentURL = process.env.AXIOM_DEPLOYMENT_URL!;
+const accessToken = process.env.AXIOM_ACCESS_TOKEN!;
 const datasetSuffix = process.env.DATASET_SUFFIX || 'local';
 
 describe('DatasetsService', () => {
-    let datasetName = `test-integration-axiom-node-${datasetSuffix}`;
+    const datasetName = `test-integration-axiom-node-${datasetSuffix}`;
     const client = new DatasetsService(deploymentURL, accessToken);
 
     before(async () => {

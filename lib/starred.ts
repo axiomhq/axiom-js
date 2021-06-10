@@ -34,11 +34,9 @@ export default class StarredQueriesService extends HTTPClient {
     private readonly localPath = '/api/v1/starred';
 
     list = (options: ListOptions): Promise<[StarredQuery]> =>
-        this.client
-            .get<[StarredQuery]>(this.localPath, { params: options })
-            .then((response) => {
-                return response.data;
-            });
+        this.client.get<[StarredQuery]>(this.localPath, { params: options }).then((response) => {
+            return response.data;
+        });
 
     get = (id: string): Promise<StarredQuery> =>
         this.client.get<StarredQuery>(this.localPath + '/' + id).then((response) => {
