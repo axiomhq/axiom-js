@@ -3,12 +3,12 @@ import { gzip } from 'zlib';
 
 import DatasetsService, { ContentEncoding, ContentType } from '../../lib/datasets';
 
-const deploymentURL = process.env.AXM_DEPLOYMENT_URL!;
-const accessToken = process.env.AXM_ACCESS_TOKEN!;
-const datasetSuffix = process.env.DATASET_SUFFIX || 'local';
+const deploymentURL = process.env.AXM_DEPLOYMENT_URL || '';
+const accessToken = process.env.AXM_ACCESS_TOKEN || '';
+const datasetSuffix = process.env.AXM_DATASET_SUFFIX || 'local';
 
 describe('DatasetsService', () => {
-    let datasetName = `test-integration-axiom-node-${datasetSuffix}`;
+    const datasetName = `test-axiom-node-${datasetSuffix}`;
     const client = new DatasetsService(deploymentURL, accessToken);
 
     before(async () => {
@@ -66,35 +66,15 @@ baz`,
             expect(status.failures?.length).to.equal(0);
         });
 
-        it('works with a CSV payload', async () => {
-            const status = await client.ingestString(
-                datasetName,
-                `foo
-bar
-baz`,
-                ContentType.CSV,
-                ContentEncoding.Identity,
-            );
-            expect(status.ingested).to.equal(2);
-            expect(status.failures?.length).to.equal(0);
-        });
-
         it('works with gzip', async () => {
             const encoded: Buffer = await new Promise((resolve, reject) => {
-                gzip(
-                    `{"foo":"bar"}
-{"bar":"baz"}`,
-                    (err: Error | null, content: Buffer) => {
-                        if (err) {
-                            reject(err);
-                        } else {
-                            resolve(content);
-                        }
-                    },
-                );
+                gzip(`[{"foo":"bar"},{"bar":"baz"}]`, (err: Error | null, content: Buffer) => {
+                    if (err) reject(err);
+                    else resolve(content);
+                });
             });
 
-            const status = await client.ingestBuffer(datasetName, encoded, ContentType.NDJSON, ContentEncoding.GZIP);
+            const status = await client.ingestBuffer(datasetName, encoded, ContentType.JSON, ContentEncoding.GZIP);
             expect(status.ingested).to.equal(2);
             expect(status.failures?.length).to.equal(0);
         });

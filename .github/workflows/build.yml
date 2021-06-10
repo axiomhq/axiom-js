@@ -37,6 +37,7 @@ jobs:
   lint:
     name: Lint
     runs-on: ubuntu-latest
+    needs: build
     strategy:
       matrix:
         node-version: [10.x, 12.x, 14.x, 15.x]
@@ -59,6 +60,7 @@ jobs:
   test:
     name: Test
     runs-on: ubuntu-latest
+    needs: build
     strategy:
       matrix:
         node-version: [10.x, 12.x, 14.x, 15.x]
@@ -81,6 +83,7 @@ jobs:
   integration:
     name: Integration
     runs-on: ubuntu-latest
+    needs: build
     strategy:
       matrix:
         node-version: [10.x, 12.x, 14.x, 15.x]
@@ -98,8 +101,8 @@ jobs:
           key: ${{ runner.os }}-yarn-${{ matrix.node-version }}-${{ hashFiles('**/yarn.lock') }}
           restore-keys: ${{ runner.os }}-yarn-${{ matrix.node-version }}-
       - run: yarn --frozen-lockfile
-      - run: yarn integration
-        env:
+      - env:
           AXM_ACCESS_TOKEN: ${{ secrets.TESTING_AZURE_1_STAGING_ACCESS_TOKEN }}
           AXM_DEPLOYMENT_URL: ${{ secrets.TESTING_AZURE_1_STAGING_DEPLOYMENT_URL }}
-          DATASET_SUFFIX: ${{ github.run_id }}
+          AXM_DATASET_SUFFIX: ${{ github.run_id }}-${{ matrix.node-version }}
+        run: yarn integration
