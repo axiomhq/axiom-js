@@ -14,5 +14,17 @@ export default abstract class HTTPClient {
             },
             timeout: 30000,
         });
+
+        this.client.interceptors.response.use(
+            (response) => response,
+            (error) => {
+                const message = error.response.data.message;
+                if (message) {
+                    return Promise.reject(new Error(message));
+                }
+
+                return Promise.reject(error);
+            },
+        );
     }
 }
