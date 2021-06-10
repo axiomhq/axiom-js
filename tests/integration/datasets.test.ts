@@ -3,9 +3,9 @@ import { gzip } from 'zlib';
 
 import DatasetsService, { ContentEncoding, ContentType } from '../../lib/datasets';
 
-const deploymentURL = process.env.AXM_DEPLOYMENT_URL || '';
-const accessToken = process.env.AXM_ACCESS_TOKEN || '';
-const datasetSuffix = process.env.AXM_DATASET_SUFFIX || 'local';
+const deploymentURL = process.env.AXIOM_DEPLOYMENT_URL || '';
+const accessToken = process.env.AXIOM_ACCESS_TOKEN || '';
+const datasetSuffix = process.env.AXIOM_DATASET_SUFFIX || 'local';
 
 describe('DatasetsService', () => {
     const datasetName = `test-axiom-node-${datasetSuffix}`;

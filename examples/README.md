@@ -3,8 +3,8 @@
 ## Usage
 
 ```shell
-$ export AXM_DEPLOYMENT_URL="..."
-$ export AXM_ACCESS_TOKEN="..."
+$ export AXIOM_DEPLOYMENT_URL="..."
+$ export AXIOM_ACCESS_TOKEN="..."
 $ yarn ts-node <example-file.ts>
 ```
 
