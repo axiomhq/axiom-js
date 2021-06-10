@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 
-import Client from '../lib/client';
+import Client from '../../lib/client';
 
 describe('Client', () => {
     const client = new Client('', '');

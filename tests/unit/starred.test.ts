@@ -1,8 +1,8 @@
 import { expect } from 'chai';
 import nock from 'nock';
 
-import { CloudURL } from '../lib';
-import StarredQueriesService, { StarredQuery, ListOptions, QueryKind, OwnerKind } from '../lib/starred';
+import { CloudURL } from '../../lib';
+import StarredQueriesService, { StarredQuery, ListOptions, QueryKind, OwnerKind } from '../../lib/starred';
 
 describe('StarredQueriesService', () => {
     const client = new StarredQueriesService(CloudURL, '');

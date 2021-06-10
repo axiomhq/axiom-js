@@ -1,8 +1,8 @@
 import { expect } from 'chai';
 import nock from 'nock';
 
-import { CloudURL } from '../lib';
-import UsersService, { Role, CreateRequest } from '../lib/users';
+import { CloudURL } from '../../lib';
+import UsersService, { Role, CreateRequest } from '../../lib/users';
 
 describe('UsersService', () => {
     const client = new UsersService(CloudURL, '');

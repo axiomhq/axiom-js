@@ -1,8 +1,8 @@
 import { expect } from 'chai';
 import nock from 'nock';
 
-import { CloudURL } from '../lib';
-import TeamsService, { Team, CreateRequest } from '../lib/teams';
+import { CloudURL } from '../../lib';
+import TeamsService, { Team, CreateRequest } from '../../lib/teams';
 
 describe('TeamsService', () => {
     const client = new TeamsService(CloudURL, '');

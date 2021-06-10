@@ -1,8 +1,8 @@
 import { expect } from 'chai';
 import nock from 'nock';
 
-import { CloudURL } from '../lib';
-import { PersonalTokensService, Token } from '../lib/tokens';
+import { CloudURL } from '../../lib';
+import { PersonalTokensService, Token } from '../../lib/tokens';
 
 // HINT(lukasmalkmus): The tests below just test against the "personal"
 // endpoint. However, the "ingest" implementation is the same. Under the hood,

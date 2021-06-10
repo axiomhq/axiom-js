@@ -16,8 +16,9 @@
         "build": "tsc",
         "lint": "eslint '*/**/*.{js,ts}' --quiet --fix",
         "prepublish": "yarn build",
-        "test": "mocha -r ts-node/register tests/**/*.test.ts",
-        "cover": "nyc -r text -e .ts -x 'tests/*.test.ts' yarn test"
+        "test": "mocha -r ts-node/register tests/unit/**/*.test.ts",
+        "cover": "nyc -r text -e .ts -x 'tests/unit/**/*.test.ts' yarn test",
+        "integration": "mocha -r ts-node/register tests/integration/**/*.test.ts"
     },
     "repository": {
         "type": "git",

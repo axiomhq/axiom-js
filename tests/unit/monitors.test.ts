@@ -1,8 +1,8 @@
 import { expect } from 'chai';
 import nock from 'nock';
 
-import { CloudURL } from '../lib';
-import MonitorsService, { Comparison, Monitor } from '../lib/monitors';
+import { CloudURL } from '../../lib';
+import MonitorsService, { Comparison, Monitor } from '../../lib/monitors';
 
 describe('MonitorsService', () => {
     const client = new MonitorsService(CloudURL, '');

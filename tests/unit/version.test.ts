@@ -1,8 +1,8 @@
 import { expect } from 'chai';
 import nock from 'nock';
 
-import { CloudURL } from '../lib';
-import VersionsService from '../lib/version';
+import { CloudURL } from '../../lib';
+import VersionsService from '../../lib/version';
 
 describe('VersionsService', () => {
     const client = new VersionsService(CloudURL, '');

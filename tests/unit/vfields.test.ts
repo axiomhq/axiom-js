@@ -1,8 +1,8 @@
 import { expect } from 'chai';
 import nock from 'nock';
 
-import { CloudURL } from '../lib';
-import VirtualFieldsService, { VirtualField } from '../lib/vfields';
+import { CloudURL } from '../../lib';
+import VirtualFieldsService, { VirtualField } from '../../lib/vfields';
 
 describe('VirtualFieldsService', () => {
     const client = new VirtualFieldsService(CloudURL, '');

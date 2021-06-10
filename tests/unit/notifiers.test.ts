@@ -1,8 +1,8 @@
 import { expect } from 'chai';
 import nock from 'nock';
 
-import { CloudURL } from '../lib';
-import NotifiersService, { Notifier, Type } from '../lib/notifiers';
+import { CloudURL } from '../../lib';
+import NotifiersService, { Notifier, Type } from '../../lib/notifiers';
 
 describe('NotifiersService', () => {
     const client = new NotifiersService(CloudURL, '');

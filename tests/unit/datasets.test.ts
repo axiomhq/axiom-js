@@ -1,9 +1,9 @@
 import { expect } from 'chai';
 import nock from 'nock';
 
-import { CloudURL } from '../lib';
-import DatasetsService, { CreateRequest, UpdateRequest, ContentEncoding, ContentType } from '../lib/datasets';
-import { QueryKind } from '../lib/starred';
+import { CloudURL } from '../../lib';
+import DatasetsService, { CreateRequest, UpdateRequest, ContentEncoding, ContentType } from '../../lib/datasets';
+import { QueryKind } from '../../lib/starred';
 
 describe('DatasetsService', () => {
     const client = new DatasetsService(CloudURL, '');
