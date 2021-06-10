@@ -2,9 +2,9 @@ import fs from 'fs';
 import Client from '../lib';
 import { ContentEncoding, ContentType } from '../lib/datasets';
 
-const depylomentURL = process.env.AXM_DEPLOYMENT_URL || '';
-const accessToken = process.env.AXM_ACCESS_TOKEN || '';
-const client = new Client(depylomentURL, accessToken);
+const deploymentURL = process.env.AXM_DEPLOYMENT_URL;
+const accessToken = process.env.AXM_ACCESS_TOKEN;
+const client = new Client(deploymentURL, accessToken);
 
 async function ingestFile() {
     const stream = fs.createReadStream('logs.json');
