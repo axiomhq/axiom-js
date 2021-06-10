@@ -101,7 +101,7 @@ describe('UsersService', () => {
     });
 
     it('UpdateRole', async () => {
-        const response = await client.update('e9cffaad-60e7-4b04-8d27-185e1808c38c', Role.Owner);
+        const response = await client.updateRole('e9cffaad-60e7-4b04-8d27-185e1808c38c', Role.Owner);
         expect(response).not.equal('undefined');
         expect(response.id).equal('e9cffaad-60e7-4b04-8d27-185e1808c38c');
         expect(response.name).equal('Michael Doe');

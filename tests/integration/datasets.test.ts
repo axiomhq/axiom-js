@@ -1,13 +1,23 @@
 import { expect } from 'chai';
+import { gzip } from 'zlib';
 
-import DatasetsService from '../../lib/datasets';
+import DatasetsService, { ContentEncoding, ContentType } from '../../lib/datasets';
 
+<<<<<<< HEAD
 const deploymentURL = process.env.AXIOM_DEPLOYMENT_URL!;
 const accessToken = process.env.AXIOM_ACCESS_TOKEN!;
 const datasetSuffix = process.env.DATASET_SUFFIX || 'local';
 
 describe('DatasetsService', () => {
     const datasetName = `test-integration-axiom-node-${datasetSuffix}`;
+=======
+const deploymentURL = process.env.AXM_DEPLOYMENT_URL || '';
+const accessToken = process.env.AXM_ACCESS_TOKEN || '';
+const datasetSuffix = process.env.AXM_DATASET_SUFFIX || 'local';
+
+describe('DatasetsService', () => {
+    const datasetName = `test-axiom-node-${datasetSuffix}`;
+>>>>>>> main
     const client = new DatasetsService(deploymentURL, accessToken);
 
     before(async () => {
@@ -21,11 +31,61 @@ describe('DatasetsService', () => {
         await client.delete(datasetName);
     });
 
-    describe('Stats', () => {
+    describe('stats', () => {
         it('returns a valid response', async () => {
-            const response = await client.stats();
-            expect(response).not.to.equal('undefined');
-            expect(response.datasets?.length).to.be.greaterThan(0);
+            const stats = await client.stats();
+            expect(stats.datasets?.length).to.be.greaterThan(0);
+        });
+    });
+
+    describe('ingest', () => {
+        it('works with a JSON payload', async () => {
+            const status = await client.ingestString(
+                datasetName,
+                `[{"foo":"bar"},{"bar":"baz"}]`,
+                ContentType.JSON,
+                ContentEncoding.Identity,
+            );
+            expect(status.ingested).to.equal(2);
+            expect(status.failures?.length).to.equal(0);
+        });
+
+        it('works with a NDJSON payload', async () => {
+            const status = await client.ingestString(
+                datasetName,
+                `{"foo":"bar"}
+{"bar":"baz"}`,
+                ContentType.NDJSON,
+                ContentEncoding.Identity,
+            );
+            expect(status.ingested).to.equal(2);
+            expect(status.failures?.length).to.equal(0);
+        });
+
+        it('works with a CSV payload', async () => {
+            const status = await client.ingestString(
+                datasetName,
+                `foo
+bar
+baz`,
+                ContentType.CSV,
+                ContentEncoding.Identity,
+            );
+            expect(status.ingested).to.equal(2);
+            expect(status.failures?.length).to.equal(0);
+        });
+
+        it('works with gzip', async () => {
+            const encoded: Buffer = await new Promise((resolve, reject) => {
+                gzip(`[{"foo":"bar"},{"bar":"baz"}]`, (err: Error | null, content: Buffer) => {
+                    if (err) reject(err);
+                    else resolve(content);
+                });
+            });
+
+            const status = await client.ingestBuffer(datasetName, encoded, ContentType.JSON, ContentEncoding.GZIP);
+            expect(status.ingested).to.equal(2);
+            expect(status.failures?.length).to.equal(0);
         });
     });
 });

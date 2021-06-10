@@ -9,7 +9,6 @@ export default abstract class HTTPClient {
             headers: {
                 accept: 'application/json',
                 authorization: 'Bearer ' + accessToken,
-                'content-type': 'application/json',
                 'user-agent': 'axiom-node',
             },
             timeout: 30000,
