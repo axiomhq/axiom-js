@@ -68,7 +68,7 @@ The documentation is divided into several sections:
 - [Axiom API](https://docs.axiom.co/reference/api/)
 - [Axiom CLI](https://github.com/axiomhq/cli)
 - [Getting Support](https://www.axiom.co/support/)
-- [Data SHippers we support](https://docs.axiom.co/data-shippers/elastic-beats/)
+- [Data Shippers we support](https://docs.axiom.co/data-shippers/elastic-beats/)
 
 ## Contributing
 
