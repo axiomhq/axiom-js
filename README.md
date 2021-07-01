@@ -22,8 +22,8 @@ API.
 ## Installation 
 
 ```
-$ git clone https://github.com/axiomhq/axiom-node
-$ cd axiom-node
+ git clone https://github.com/axiomhq/axiom-node
+ cd axiom-node
 
 ```
 
