@@ -15,14 +15,14 @@ When reporting a bug, please try and provide as much context as possible such as
 [Fork](https://github.com/axiomhq/axiom-node), then clone this repository:
 
 ```
- git clone https://github.com/axiomhq/axiom-node
- cd axiom-node
+git clone https://github.com/axiomhq/axiom-node
+cd axiom-node
 ```
 
 ### Install development dependencies
 
 ```
- npm install
+npm install
 
 ```
 
@@ -35,9 +35,8 @@ When reporting a bug, please try and provide as much context as possible such as
 3. Make sure that the tests and the linters pass by running:
 
 ```
- npm run test
-
- npm run lint
+npm run test
+npm run lint
 
 ```
 
