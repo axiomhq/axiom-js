@@ -3,9 +3,9 @@
 ## Usage
 
 ```shell
- export AXIOM_DEPLOYMENT_URL="..."
- export AXIOM_ACCESS_TOKEN="..."
- yarn ts-node <example-file.ts>
+export AXIOM_DEPLOYMENT_URL="..."
+export AXIOM_ACCESS_TOKEN="..."
+yarn ts-node <example-file.ts>
 ```
 
 ## Examples
