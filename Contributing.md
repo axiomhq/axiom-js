@@ -23,7 +23,6 @@ cd axiom-node
 
 ```
 npm install
-
 ```
 
 ## Submitting Modifications
@@ -37,7 +36,6 @@ npm install
 ```
 npm run test
 npm run lint
-
 ```
 
 4. Do your best to have [well-formated](https://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html) commit messages for each change. This provides consistency throughout the project and ensures that commit messages are able to be formatted properly by various git tools.
