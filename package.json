@@ -15,9 +15,9 @@
     "scripts": {
         "build": "tsc",
         "lint": "eslint '*/**/*.{js,ts}' --quiet --fix",
-        "prepublish": "yarn build",
+        "prepublish": "npm run build",
         "test": "mocha -r ts-node/register tests/unit/**/*.test.ts",
-        "cover": "nyc -r text -e .ts -x 'tests/unit/**/*.test.ts' yarn test",
+        "cover": "nyc -r text -e .ts -x 'tests/unit/**/*.test.ts' npm run test",
         "integration": "mocha -r ts-node/register tests/integration/**/*.test.ts"
     },
     "repository": {
