@@ -44,8 +44,8 @@ access or ingest token.
 ```ts
 import Client from '../lib/client';
 
-const depylomentURL = process.env.AXIOM_DEPLOYMENT_URL || '';
-const accessToken = process.env.AXIOM_ACCESS_TOKEN || '';
+const depylomentURL = process.env.AXIOM_URL || '';
+const accessToken = process.env.AXIOM_TOKEN || '';
 
 const client = new Client(depylomentURL, accessToken);
 

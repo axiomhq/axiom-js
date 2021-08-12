@@ -2,8 +2,8 @@ import fs from 'fs';
 import Client from '../lib';
 import { ContentEncoding, ContentType } from '../lib/datasets';
 
-const deploymentURL = process.env.AXIOM_DEPLOYMENT_URL;
-const accessToken = process.env.AXIOM_ACCESS_TOKEN;
+const deploymentURL = process.env.AXIOM_URL;
+const accessToken = process.env.AXIOM_TOKEN;
 const client = new Client(deploymentURL, accessToken);
 
 async function ingestFile() {
