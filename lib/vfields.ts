@@ -1,6 +1,7 @@
 import { AxiosResponse } from 'axios';
 
 import HTTPClient from './httpClient';
+import GlobalListOptions from './options';
 
 export interface VirtualField {
     id?: string;
@@ -11,11 +12,15 @@ export interface VirtualField {
     expression: string;
 }
 
+export interface ListOptions extends GlobalListOptions {
+    dataset: string;
+}
+
 export default class VirtualFieldsService extends HTTPClient {
     private readonly localPath = '/api/v1/vfields';
 
-    list = (): Promise<[VirtualField]> =>
-        this.client.get<[VirtualField]>(this.localPath).then((response) => {
+    list = (options: ListOptions): Promise<[VirtualField]> =>
+        this.client.get<[VirtualField]>(this.localPath, { params: options }).then((response) => {
             return response.data;
         });
 

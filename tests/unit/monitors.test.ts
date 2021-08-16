@@ -66,7 +66,7 @@ describe('MonitorsService', () => {
         expect(response.id).equal('nGxDh3TGuidQJgJW3s');
         expect(response.name).equal('Test');
         expect(response.description).equal('A test monitor');
-        // expect(response.query).not.empty;
+        expect(response.query).not.empty;
     });
 
     it('Create', async () => {
@@ -75,6 +75,11 @@ describe('MonitorsService', () => {
             description: 'A test monitor',
             dataset: 'test',
             comparison: Comparison.Below,
+            query: {
+                startTime: '2018-01-01T00:00:00.000Z',
+                endTime: '2028-01-01T00:00:00.000Z',
+                resolution: 'auto',
+            },
             threshold: 0,
             frequencyMinutes: 0,
             durationMinutes: 0,
@@ -94,6 +99,11 @@ describe('MonitorsService', () => {
             description: 'A test monitor',
             dataset: 'test',
             comparison: Comparison.Below,
+            query: {
+                startTime: '2018-01-01T00:00:00.000Z',
+                endTime: '2028-01-01T00:00:00.000Z',
+                resolution: 'auto',
+            },
             threshold: 0,
             frequencyMinutes: 0,
             durationMinutes: 0,
@@ -104,7 +114,7 @@ describe('MonitorsService', () => {
         expect(response.id).equal('lrR66wmzYm9NKtq0rz');
         expect(response.name).equal('Test');
         expect(response.description).equal('A test monitor');
-        // expect(response.query).not.empty;
+        expect(response.query).not.empty;
     });
 
     it('Delete', async () => {

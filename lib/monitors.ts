@@ -1,6 +1,7 @@
 import { AxiosResponse } from 'axios';
 
 import HTTPClient from './httpClient';
+import { Query } from './datasets';
 
 export interface Monitor {
     id?: string;
@@ -8,8 +9,8 @@ export interface Monitor {
     description?: string;
     dataset: string;
     disabledUntil?: string;
-    // query: QueryRequest; //FIXME(lukasmalkmus): Add QueryRequest type
-    threshold: number;
+    query: Query;
+    threshold?: number;
     comparison: Comparison;
     noDataCloseWaitMinutes?: number;
     frequencyMinutes: number;

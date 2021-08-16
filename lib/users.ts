@@ -20,7 +20,7 @@ export interface CreateRequest {
     name: string;
     email: string;
     role: Role;
-    teamIds: Array<string>;
+    teamIds?: Array<string>;
 }
 
 export enum Role {
