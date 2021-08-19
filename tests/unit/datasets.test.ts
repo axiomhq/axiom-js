@@ -198,6 +198,8 @@ describe('DatasetsService', () => {
         });
         scope.post('/api/v1/datasets/test/query').reply(200, queryResult);
         scope.post('/api/v1/datasets/test/query?streaming-duration=1m&no-cache=true').reply(200, queryResult);
+        scope.post('/api/v1/datasets/_apl').reply(200, queryResult);
+        scope.post('/api/v1/datasets/_apl?streaming-duration=1m&no-cache=true').reply(200, queryResult);
     });
 
     it('Stats', async () => {
@@ -302,6 +304,24 @@ describe('DatasetsService', () => {
                 noCache: true,
             };
             const response = await client.query('test', query, options);
+            expect(response).not.equal('undefined');
+            expect(response.matches).length(2);
+        });
+    });
+
+    it('APL Query', async () => {
+        it('works without options', async () => {
+            const response = await client.aplQuery('test | where response == 304');
+            expect(response).not.equal('undefined');
+            expect(response.matches).length(2);
+        });
+
+        it('works with options', async () => {
+            const options = {
+                streamingDuration: '1m',
+                noCache: true,
+            };
+            const response = await client.aplQuery('test | where response == 304', options);
             expect(response).not.equal('undefined');
             expect(response.matches).length(2);
         });

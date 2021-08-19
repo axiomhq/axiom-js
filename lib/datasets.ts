@@ -248,6 +248,12 @@ interface TrimRequest {
     maxDuration: string;
 }
 
+interface APLQueryRequest {
+    apl: string;
+    startTime?: string;
+    endTime?: string;
+}
+
 export default class StarredQueriesService extends HTTPClient {
     private readonly localPath = '/api/v1/datasets';
 
@@ -347,4 +353,18 @@ export default class StarredQueriesService extends HTTPClient {
             .then((response) => {
                 return response.data;
             });
+
+    aplQuery = (apl: string, options?: QueryOptions): Promise<QueryResult> => {
+        const req: APLQueryRequest = { apl };
+        return this.client
+            .post<QueryResult>(this.localPath + '/_apl', req, {
+                params: {
+                    'streaming-duration': options?.streamingDuration,
+                    'no-cache': options?.noCache,
+                },
+            })
+            .then((response) => {
+                return response.data;
+            });
+    };
 }
