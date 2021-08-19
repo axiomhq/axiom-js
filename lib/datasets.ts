@@ -105,6 +105,12 @@ export interface QueryOptions {
     streamingDuration: string;
     noCache: boolean;
 }
+
+export interface APLQueryOptions extends QueryOptions {
+    startTime?: string;
+    endTime?: string;
+}
+
 export interface Query {
     aggregations?: Array<Aggregation>;
     continuationToken?: string;
@@ -245,14 +251,14 @@ export interface Message {
     priority: string;
 }
 
-interface TrimRequest {
-    maxDuration: string;
-}
-
-interface APLQueryRequest {
+interface APLQuery {
     apl: string;
     startTime?: string;
     endTime?: string;
+}
+
+interface TrimRequest {
+    maxDuration: string;
 }
 
 export default class StarredQueriesService extends HTTPClient {
@@ -355,8 +361,8 @@ export default class StarredQueriesService extends HTTPClient {
                 return response.data;
             });
 
-    aplQuery = (apl: string, options?: QueryOptions): Promise<QueryResult> => {
-        const req: APLQueryRequest = { apl };
+    aplQuery = (apl: string, options?: APLQueryOptions): Promise<QueryResult> => {
+        const req: APLQuery = { apl: apl, startTime: options?.startTime, endTime: options?.endTime };
         return this.client
             .post<QueryResult>(this.localPath + '/_apl', req, {
                 params: {

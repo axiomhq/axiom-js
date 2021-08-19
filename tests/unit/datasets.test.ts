@@ -315,7 +315,7 @@ describe('DatasetsService', () => {
 
     it('APL Query', async () => {
         it('works without options', async () => {
-            const response = await client.aplQuery('test | where response == 304');
+            const response = await client.aplQuery("['test'] | where response == 304");
             expect(response).not.equal('undefined');
             expect(response.matches).length(2);
         });
@@ -325,7 +325,7 @@ describe('DatasetsService', () => {
                 streamingDuration: '1m',
                 noCache: true,
             };
-            const response = await client.aplQuery('test | where response == 304', options);
+            const response = await client.aplQuery("['test'] | where response == 304", options);
             expect(response).not.equal('undefined');
             expect(response.matches).length(2);
         });
