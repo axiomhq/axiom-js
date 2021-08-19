@@ -1,0 +1,30 @@
+name: Dependent PRs
+
+on:
+  issues:
+    types:
+      - opened
+      - edited
+      - reopened
+  pull_request_target:
+    types:
+      - opened
+      - edited
+      - reopened
+      - synchronize
+  schedule:
+    - cron: "0 0 * * *"
+
+jobs:
+  check:
+    name: Check
+    runs-on: ubuntu-latest
+    if: github.repository_owner == 'axiomhq'
+    steps:
+      - uses: z0al/dependent-issues@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          GITHUB_READ_TOKEN: ${{ secrets.AXIOM_AUTOMATION_TOKEN }}
+        with:
+          label: dependent
+          keywords: depends on, blocked by, needs
