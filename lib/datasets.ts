@@ -245,7 +245,7 @@ export interface Message {
 }
 
 interface TrimRequest {
-    maxDuration: number;
+    maxDuration: string;
 }
 
 export default class StarredQueriesService extends HTTPClient {
@@ -286,7 +286,7 @@ export default class StarredQueriesService extends HTTPClient {
     trim = (id: string, maxDurationStr: string): Promise<TrimResult> => {
         // Go's 'time.Duration' uses nanoseconds as its base unit. So parse the
         // duration string and convert to nanoseconds. 1ms = 1000000ns.
-        const req: TrimRequest = { maxDuration: toTime(maxDurationStr).ms() * 1000000 };
+        const req: TrimRequest = { maxDuration: maxDurationStr };
         return this.client.post<TrimResult>(this.localPath + '/' + id + '/trim', req).then((response) => {
             return response.data;
         });

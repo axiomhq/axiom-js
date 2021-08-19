@@ -29,7 +29,7 @@ describe('VirtualFieldsService', () => {
 
         const scope = nock(CloudURL);
 
-        scope.get('/api/v1/vfields').reply(200, vfields);
+        scope.get('/api/v1/vfields?dataset=test').reply(200, vfields);
         scope.get('/api/v1/vfields/PiGheBIFBc4Khn4dBZ').reply(200, vfields[0]);
         scope.post('/api/v1/vfields').reply(200, vfields[1]);
         scope.put('/api/v1/vfields/FmgciXxL3njoNgzWVR').reply(200, vfields[1]);
@@ -37,7 +37,9 @@ describe('VirtualFieldsService', () => {
     });
 
     it('List', async () => {
-        const response = await client.list();
+        const response = await client.list({
+            dataset: 'test',
+        });
         expect(response).not.equal('undefined');
         expect(response).length(2);
     });

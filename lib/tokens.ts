@@ -15,7 +15,7 @@ export interface RawToken {
 }
 
 class TokensService extends HTTPClient {
-    private readonly localPath: string;
+    protected readonly localPath: string;
 
     constructor(basePath: string, accessToken: string, localPath: string) {
         super(basePath, accessToken);
@@ -55,6 +55,11 @@ export class IngestTokensService extends TokensService {
     constructor(basePath: string, accessToken: string) {
         super(basePath, accessToken, '/api/v1/tokens/ingest');
     }
+
+    validate = (): Promise<boolean> =>
+        this.client.get(this.localPath + '/validate').then((response) => {
+            return response.status === 204;
+        });
 }
 
 export class PersonalTokensService extends TokensService {

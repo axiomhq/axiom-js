@@ -1,7 +1,7 @@
 import { AxiosResponse } from 'axios';
 
 import HTTPClient from './httpClient';
-import GlobalListOptions from 'options';
+import GlobalListOptions from './options';
 
 export interface StarredQuery {
     id?: string;
@@ -10,7 +10,7 @@ export interface StarredQuery {
     kind: QueryKind;
     // query: QueryRequest; //FIXME(lukasmalkmus): Add QueryRequest type
     who?: string;
-    metadata: { [key: string]: string };
+    metadata?: { [key: string]: string };
     created?: string;
 }
 
@@ -26,8 +26,8 @@ export enum OwnerKind {
 
 export interface ListOptions extends GlobalListOptions {
     kind: QueryKind;
-    dataset: string;
-    who: OwnerKind;
+    dataset?: string;
+    who?: OwnerKind;
 }
 
 export default class StarredQueriesService extends HTTPClient {
