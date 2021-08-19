@@ -44,6 +44,7 @@ describe('DatasetsService', () => {
                             type: 'integer',
                         },
                     ],
+                    who: 'f83e245a-afdc-47ad-a765-4addd1994333',
                     created: '2020-11-18T21:30:20.623322799Z',
                 },
                 {
@@ -79,6 +80,7 @@ describe('DatasetsService', () => {
                             type: 'integer',
                         },
                     ],
+                    who: 'f83e245a-afdc-47ad-a765-4addd1994333',
                     created: '2020-11-18T21:30:20.623322799Z',
                 },
             ],
@@ -95,12 +97,14 @@ describe('DatasetsService', () => {
                 id: 'test',
                 name: 'test',
                 description: 'Test dataset',
+                who: 'f83e245a-afdc-47ad-a765-4addd1994333',
                 created: '2020-11-17T22:29:00.521238198Z',
             },
             {
                 id: 'test1',
                 name: 'test1',
                 description: 'This is a test description',
+                who: 'f83e245a-afdc-47ad-a765-4addd1994333',
                 created: '2020-11-17T22:29:00.521238198Z',
             },
         ];

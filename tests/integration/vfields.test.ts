@@ -24,10 +24,9 @@ describe('VirtualFieldsService', () => {
 
         vfield = await client.create({
             dataset: dataset.id.toString(),
-            name: 'Failed Requests',
-            description: 'Statuses >= 400',
-            alias: 'status_failed',
-            expression: 'response >= 400',
+            name: 'status_failed',
+            description: 'Failed Requests',
+            expression: 'response > 399',
         });
     });
 
@@ -41,13 +40,12 @@ describe('VirtualFieldsService', () => {
         it('should update a vfield', async () => {
             const updatedVirtualField = await client.update(vfield.id!, {
                 dataset: dataset.id.toString(),
-                name: 'Failed Requests',
-                description: 'Statuses > 399',
-                alias: 'status_failed',
-                expression: 'response > 399',
+                name: 'status_failed',
+                description: 'Updated Failed Requests',
+                expression: 'response >= 400',
             });
 
-            expect(updatedVirtualField.description).to.equal('Statuses > 399');
+            expect(updatedVirtualField.description).to.equal('Updated Failed Requests');
 
             vfield = updatedVirtualField;
         });

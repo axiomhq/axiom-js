@@ -4,8 +4,6 @@ import { Readable, Stream } from 'stream';
 import HTTPClient from './httpClient';
 import { QueryKind } from './starred';
 
-const toTime = require('to-time'); // eslint-disable-line @typescript-eslint/no-var-requires
-
 export const TimestampField = '_time';
 
 export enum ContentType {
@@ -29,8 +27,10 @@ export interface Dataset {
 
 export interface Field {
     name: string;
+    description: string;
     type: string;
-    typeHint: string;
+    unit: string;
+    hidden: boolean;
 }
 
 export interface Info {
@@ -46,6 +46,7 @@ export interface Info {
     maxTime?: string;
     minTime?: string;
     created: string;
+    who: string;
 }
 
 export interface Stats {

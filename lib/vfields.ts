@@ -7,7 +7,6 @@ export interface VirtualField {
     id?: string;
     name: string;
     description: string;
-    alias: string;
     dataset: string;
     expression: string;
 }

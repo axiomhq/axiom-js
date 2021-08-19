@@ -11,29 +11,27 @@ describe('VirtualFieldsService', () => {
         const vfields = [
             {
                 dataset: 'test',
-                name: 'Successful Requests',
-                description: 'Statuses <= x < 400',
-                alias: 'status_success',
-                expression: 'response <= 200 && response < 400',
-                id: 'PiGheBIFBc4Khn4dBZ',
+                name: 'status_success',
+                description: 'Successful Requests',
+                expression: 'response < 400',
+                id: 'test.status_success',
             },
             {
                 dataset: 'test',
-                name: 'Failed Requests',
-                description: 'Statuses >= 400',
-                alias: 'status_failed',
-                expression: 'response >= 400',
-                id: 'FmgciXxL3njoNgzWVR',
+                name: 'status_failed',
+                description: 'Failed Requests',
+                expression: 'response > 399',
+                id: 'test.status_failed',
             },
         ];
 
         const scope = nock(CloudURL);
 
         scope.get('/api/v1/vfields?dataset=test').reply(200, vfields);
-        scope.get('/api/v1/vfields/PiGheBIFBc4Khn4dBZ').reply(200, vfields[0]);
+        scope.get('/api/v1/vfields/test.status_success').reply(200, vfields[0]);
         scope.post('/api/v1/vfields').reply(200, vfields[1]);
-        scope.put('/api/v1/vfields/FmgciXxL3njoNgzWVR').reply(200, vfields[1]);
-        scope.delete('/api/v1/vfields/FmgciXxL3njoNgzWVR').reply(204);
+        scope.put('/api/v1/vfields/test.status_failed').reply(200, vfields[1]);
+        scope.delete('/api/v1/vfields/test.status_failed').reply(204);
     });
 
     it('List', async () => {
@@ -45,44 +43,45 @@ describe('VirtualFieldsService', () => {
     });
 
     it('Get', async () => {
-        const response = await client.get('PiGheBIFBc4Khn4dBZ');
+        const response = await client.get('test.status_success');
         expect(response).not.equal('undefined');
-        expect(response.id).equal('PiGheBIFBc4Khn4dBZ');
-        expect(response.name).equal('Successful Requests');
+        expect(response.id).equal('test.status_success');
+        expect(response.name).equal('status_success');
+        expect(response.description).equal('Successful Requests');
     });
 
     it('Create', async () => {
         const vfield: VirtualField = {
             dataset: 'test',
-            name: 'Failed Requests',
-            description: 'Statuses >= 400',
-            alias: 'status_failed',
-            expression: 'response >= 400',
+            name: 'status_failed',
+            description: 'Failed Requests',
+            expression: 'response > 399',
         };
 
         const response = await client.create(vfield);
         expect(response).not.equal('undefined');
-        expect(response.id).equal('FmgciXxL3njoNgzWVR');
-        expect(response.name).equal('Failed Requests');
+        expect(response.id).equal('test.status_failed');
+        expect(response.name).equal('status_failed');
+        expect(response.description).equal('Failed Requests');
     });
 
     it('Update', async () => {
         const vfield: VirtualField = {
             dataset: 'test',
-            name: 'Failed Requests',
-            description: 'Statuses >= 400',
-            alias: 'status_failed',
-            expression: 'response >= 400',
+            name: 'status_failed',
+            description: 'Failed Requests',
+            expression: 'response == 400',
         };
 
-        const response = await client.update('FmgciXxL3njoNgzWVR', vfield);
+        const response = await client.update('test.status_failed', vfield);
         expect(response).not.equal('undefined');
-        expect(response.id).equal('FmgciXxL3njoNgzWVR');
-        expect(response.name).equal('Failed Requests');
+        expect(response.id).equal('test.status_failed');
+        expect(response.name).equal('status_failed');
+        expect(response.description).equal('Failed Requests');
     });
 
     it('Delete', async () => {
-        const response = await client.delete('FmgciXxL3njoNgzWVR');
+        const response = await client.delete('test.status_failed');
         expect(response).not.equal('undefined');
         expect(response.status).equal(204);
     });
