@@ -3,10 +3,12 @@
 ## Usage
 
 ```shell
-export AXIOM_DEPLOYMENT_URL="..."
-export AXIOM_ACCESS_TOKEN="..."
+export AXIOM_URL="..."
+export AXIOM_TOKEN="..."
 npx ts-node <example-file.ts>
 ```
+
+If not set, `AXIOM_URL` defaults to `https://cloud.axiom.co`
 
 ## Examples
 

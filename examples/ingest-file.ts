@@ -1,8 +1,8 @@
 import fs from 'fs';
-import Client from '../lib';
+import Client, { CloudURL } from '../lib';
 import { ContentEncoding, ContentType } from '../lib/datasets';
 
-const deploymentURL = process.env.AXIOM_URL;
+const deploymentURL = process.env.AXIOM_URL || CloudURL;
 const accessToken = process.env.AXIOM_TOKEN;
 const client = new Client(deploymentURL, accessToken);
 
