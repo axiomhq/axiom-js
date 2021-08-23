@@ -201,9 +201,9 @@ describe('DatasetsService', () => {
             cb(null, [200, ingestStatus]);
         });
         scope.post('/api/v1/datasets/test/query').reply(200, queryResult);
-        scope.post('/api/v1/datasets/test/query?streaming-duration=1m&no-cache=true').reply(200, queryResult);
+        scope.post('/api/v1/datasets/test/query?streaming-duration=1m&nocache=true').reply(200, queryResult);
         scope.post('/api/v1/datasets/_apl').reply(200, queryResult);
-        scope.post('/api/v1/datasets/_apl?streaming-duration=1m&no-cache=true').reply(200, queryResult);
+        scope.post('/api/v1/datasets/_apl?streaming-duration=1m&nocache=true').reply(200, queryResult);
     });
 
     it('Stats', async () => {

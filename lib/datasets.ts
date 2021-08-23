@@ -354,7 +354,7 @@ export default class StarredQueriesService extends HTTPClient {
             .post<QueryResult>(this.localPath + '/' + id + '/query', query, {
                 params: {
                     'streaming-duration': options?.streamingDuration,
-                    'no-cache': options?.noCache,
+                    nocache: options?.noCache,
                 },
             })
             .then((response) => {
@@ -367,7 +367,8 @@ export default class StarredQueriesService extends HTTPClient {
             .post<QueryResult>(this.localPath + '/_apl', req, {
                 params: {
                     'streaming-duration': options?.streamingDuration,
-                    'no-cache': options?.noCache,
+                    nocache: options?.noCache,
+                    format: 'legacy',
                 },
             })
             .then((response) => {
