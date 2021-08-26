@@ -1,5 +1,5 @@
 {
-    "name": "axiom-node",
+    "name": "@axiomhq/axiom-node",
     "description": "TypeScript bindings for the Axiom API.",
     "version": "0.1.0",
     "author": "Axiom, Inc.",
