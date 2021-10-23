@@ -5,7 +5,7 @@ import { CloudURL } from '../../lib';
 import VirtualFieldsService, { VirtualField } from '../../lib/vfields';
 
 describe('VirtualFieldsService', () => {
-    const client = new VirtualFieldsService(CloudURL, '');
+    const client = new VirtualFieldsService('http://axiom-node.dev.local');
 
     beforeEach(() => {
         const vfields = [
@@ -25,7 +25,7 @@ describe('VirtualFieldsService', () => {
             },
         ];
 
-        const scope = nock(CloudURL);
+        const scope = nock('http://axiom-node.dev.local');
 
         scope.get('/api/v1/vfields?dataset=test').reply(200, vfields);
         scope.get('/api/v1/vfields/test.status_success').reply(200, vfields[0]);

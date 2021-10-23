@@ -5,7 +5,7 @@ import { CloudURL } from '../../lib';
 import StarredQueriesService, { StarredQuery, ListOptions, QueryKind, OwnerKind } from '../../lib/starred';
 
 describe('StarredQueriesService', () => {
-    const client = new StarredQueriesService(CloudURL, '');
+    const client = new StarredQueriesService('http://axiom-node.dev.local');
 
     beforeEach(() => {
         const starred = [
@@ -49,7 +49,7 @@ describe('StarredQueriesService', () => {
             },
         ];
 
-        const scope = nock(CloudURL);
+        const scope = nock('http://axiom-node.dev.local');
 
         scope.get('/api/v1/starred?dataset=test&kind=analytics&who=user').reply(200, starred);
         scope.get('/api/v1/starred/NBYj9rO5p4F5CtYEy6').reply(200, starred[0]);

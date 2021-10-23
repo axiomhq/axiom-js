@@ -1,17 +1,14 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { expect } from 'chai';
 
 import DatasetsService, { Dataset } from '../../lib/datasets';
 import StarredQueriesService, { StarredQuery, QueryKind } from '../../lib/starred';
 
-const deploymentURL = process.env.AXIOM_URL || '';
-const accessToken = process.env.AXIOM_TOKEN || '';
 const datasetSuffix = process.env.AXIOM_DATASET_SUFFIX || 'local';
 
 describe('StarredQueriesService', () => {
     const datasetName = `test-axiom-node-starred-queries-${datasetSuffix}`;
-    const datasetsClient = new DatasetsService(deploymentURL, accessToken);
-    const client = new StarredQueriesService(deploymentURL, accessToken);
+    const datasetsClient = new DatasetsService();
+    const client = new StarredQueriesService();
 
     let dataset: Dataset;
     let query: StarredQuery;

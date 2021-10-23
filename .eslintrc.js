@@ -4,7 +4,7 @@ module.exports = {
         ecmaVersion: 2015,
         sourceType: 'module',
     },
-    extends: ['plugin:@typescript-eslint/recommended', 'prettier/@typescript-eslint', 'plugin:prettier/recommended'],
+    extends: ['prettier'],
     rules: {
         // "@typescript-eslint/explicit-function-return-type": "off",
     },

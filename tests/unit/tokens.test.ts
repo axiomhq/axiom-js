@@ -10,7 +10,7 @@ import { PersonalTokensService, Token } from '../../lib/tokens';
 // implementation works against both endpoints.
 
 describe('TokensService', () => {
-    const client = new PersonalTokensService(CloudURL, '');
+    const client = new PersonalTokensService('http://axiom-node.dev.local');
 
     beforeEach(() => {
         const tokens = [
@@ -26,7 +26,7 @@ describe('TokensService', () => {
             scopes: ['*'],
         };
 
-        const scope = nock(CloudURL);
+        const scope = nock('http://axiom-node.dev.local');
 
         scope.get('/api/v1/tokens/personal').reply(200, tokens);
         scope.get('/api/v1/tokens/personal/08fceb797a467c3c23151f3584c31cfa').reply(200, tokens[0]);

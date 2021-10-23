@@ -1,17 +1,14 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { expect } from 'chai';
 
 import DatasetsService from '../../lib/datasets';
 import MonitorsService, { Comparison, Monitor } from '../../lib/monitors';
 
-const deploymentURL = process.env.AXIOM_URL || '';
-const accessToken = process.env.AXIOM_TOKEN || '';
 const datasetSuffix = process.env.AXIOM_DATASET_SUFFIX || 'local';
 
 describe('MonitorsService', () => {
     const datasetName = `test-axiom-node-monitors-${datasetSuffix}`;
-    const datasetsClient = new DatasetsService(deploymentURL, accessToken);
-    const client = new MonitorsService(deploymentURL, accessToken);
+    const datasetsClient = new DatasetsService();
+    const client = new MonitorsService();
 
     let monitor: Monitor;
 

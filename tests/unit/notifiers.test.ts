@@ -1,11 +1,10 @@
 import { expect } from 'chai';
 import nock from 'nock';
 
-import { CloudURL } from '../../lib';
 import NotifiersService, { Notifier, Type } from '../../lib/notifiers';
 
 describe('NotifiersService', () => {
-    const client = new NotifiersService(CloudURL, '');
+    const client = new NotifiersService('http://axiom-node.dev.local');
 
     beforeEach(() => {
         const notifiers = [
@@ -40,7 +39,7 @@ describe('NotifiersService', () => {
             },
         ];
 
-        const scope = nock(CloudURL);
+        const scope = nock('http://axiom-node.dev.local');
 
         scope.get('/api/v1/notifiers').reply(200, notifiers);
         scope.get('/api/v1/notifiers/aqIqAfZJVTXlaSiD6r').reply(200, notifiers[0]);

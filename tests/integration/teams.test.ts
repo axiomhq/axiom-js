@@ -1,13 +1,9 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { expect } from 'chai';
 
 import TeamsService, { Team } from '../../lib/teams';
 
-const deploymentURL = process.env.AXIOM_URL || '';
-const accessToken = process.env.AXIOM_TOKEN || '';
-
 describe('TeamsService', () => {
-    const client = new TeamsService(deploymentURL, accessToken);
+    const client = new TeamsService();
 
     let team: Team;
 

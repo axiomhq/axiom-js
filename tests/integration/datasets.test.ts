@@ -3,13 +3,11 @@ import { gzip } from 'zlib';
 
 import DatasetsService, { ContentEncoding, ContentType } from '../../lib/datasets';
 
-const deploymentURL = process.env.AXIOM_URL || '';
-const accessToken = process.env.AXIOM_TOKEN || '';
 const datasetSuffix = process.env.AXIOM_DATASET_SUFFIX || 'local';
 
 describe('DatasetsService', () => {
     const datasetName = `test-axiom-node-dataset-${datasetSuffix}`;
-    const client = new DatasetsService(deploymentURL, accessToken);
+    const client = new DatasetsService();
 
     before(async () => {
         await client.create({

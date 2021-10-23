@@ -1,12 +1,11 @@
 import { expect } from 'chai';
 import nock from 'nock';
 
-import { CloudURL } from '../../lib';
 import DatasetsService, { CreateRequest, UpdateRequest, ContentEncoding, ContentType } from '../../lib/datasets';
 import { QueryKind } from '../../lib/starred';
 
 describe('DatasetsService', () => {
-    const client = new DatasetsService(CloudURL, '');
+    const client = new DatasetsService('http://axiom-node.dev.local');
 
     beforeEach(() => {
         const stats = {
@@ -181,7 +180,7 @@ describe('DatasetsService', () => {
             },
         };
 
-        const scope = nock(CloudURL);
+        const scope = nock('http://axiom-node.dev.local');
 
         scope.get('/api/v1/datasets/_stats').reply(200, stats);
         scope.get('/api/v1/datasets').reply(200, datasets);

@@ -1,13 +1,9 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { expect } from 'chai';
 
 import NotifiersService, { Notifier, Type } from '../../lib/notifiers';
 
-const deploymentURL = process.env.AXIOM_URL || '';
-const accessToken = process.env.AXIOM_TOKEN || '';
-
 describe('NotifiersService', () => {
-    const client = new NotifiersService(deploymentURL, accessToken);
+    const client = new NotifiersService();
 
     let notifier: Notifier;
 

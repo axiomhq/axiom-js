@@ -5,7 +5,7 @@ import { CloudURL } from '../../lib';
 import UsersService, { Role, CreateRequest } from '../../lib/users';
 
 describe('UsersService', () => {
-    const client = new UsersService(CloudURL, '');
+    const client = new UsersService('http://axiom-node.dev.local');
 
     beforeEach(() => {
         const currentUser = {
@@ -44,7 +44,7 @@ describe('UsersService', () => {
             },
         ];
 
-        const scope = nock(CloudURL);
+        const scope = nock('http://axiom-node.dev.local');
 
         scope.get('/api/v1/user').reply(200, currentUser);
         scope.get('/api/v1/users').reply(200, users);

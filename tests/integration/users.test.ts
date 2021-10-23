@@ -1,13 +1,9 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { expect } from 'chai';
 
 import UsersService, { User, Role } from '../../lib/users';
 
-const deploymentURL = process.env.AXIOM_URL || '';
-const accessToken = process.env.AXIOM_TOKEN || '';
-
 describe('UsersService', () => {
-    const client = new UsersService(deploymentURL, accessToken);
+    const client = new UsersService();
 
     let user: User;
 

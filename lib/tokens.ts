@@ -17,8 +17,8 @@ export interface RawToken {
 class TokensService extends HTTPClient {
     protected readonly localPath: string;
 
-    constructor(basePath: string, accessToken: string, localPath: string) {
-        super(basePath, accessToken);
+    constructor(localPath: string, basePath?: string, accessToken?: string, orgID?: string) {
+        super(basePath, accessToken, orgID);
 
         this.localPath = localPath;
     }
@@ -52,8 +52,8 @@ class TokensService extends HTTPClient {
 }
 
 export class IngestTokensService extends TokensService {
-    constructor(basePath: string, accessToken: string) {
-        super(basePath, accessToken, '/api/v1/tokens/ingest');
+    constructor(basePath?: string, accessToken?: string, orgID?: string) {
+        super('/api/v1/tokens/ingest', basePath, accessToken, orgID);
     }
 
     validate = (): Promise<boolean> =>
@@ -63,7 +63,7 @@ export class IngestTokensService extends TokensService {
 }
 
 export class PersonalTokensService extends TokensService {
-    constructor(basePath: string, accessToken: string) {
-        super(basePath, accessToken, '/api/v1/tokens/personal');
+    constructor(basePath?: string, accessToken?: string, orgID?: string) {
+        super('/api/v1/tokens/personal', basePath, accessToken, orgID);
     }
 }

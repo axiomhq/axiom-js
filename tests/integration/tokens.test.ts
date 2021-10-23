@@ -1,13 +1,9 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { expect } from 'chai';
 
 import { IngestTokensService, PersonalTokensService, Token } from '../../lib/tokens';
 
-const deploymentURL = process.env.AXIOM_URL || '';
-const accessToken = process.env.AXIOM_TOKEN || '';
-
 describe('IngestTokensService', () => {
-    const client = new IngestTokensService(deploymentURL, accessToken);
+    const client = new IngestTokensService();
 
     let token: Token;
 
@@ -69,7 +65,7 @@ describe('IngestTokensService', () => {
 });
 
 describe('PersonalTokensService', () => {
-    const client = new PersonalTokensService(deploymentURL, accessToken);
+    const client = new PersonalTokensService();
 
     let token: Token;
 

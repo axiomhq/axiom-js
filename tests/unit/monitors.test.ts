@@ -1,11 +1,10 @@
 import { expect } from 'chai';
 import nock from 'nock';
 
-import { CloudURL } from '../../lib';
 import MonitorsService, { Comparison, Monitor } from '../../lib/monitors';
 
 describe('MonitorsService', () => {
-    const client = new MonitorsService(CloudURL, '');
+    const client = new MonitorsService('http://axiom-node.dev.local');
 
     beforeEach(() => {
         const monitors = [
@@ -45,7 +44,7 @@ describe('MonitorsService', () => {
             },
         ];
 
-        const scope = nock(CloudURL);
+        const scope = nock('http://axiom-node.dev.local');
 
         scope.get('/api/v1/monitors').reply(200, monitors);
         scope.get('/api/v1/monitors/nGxDh3TGuidQJgJW3s').reply(200, monitors[0]);

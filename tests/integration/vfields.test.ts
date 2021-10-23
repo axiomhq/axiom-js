@@ -1,17 +1,14 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { expect } from 'chai';
 
 import DatasetsService, { Dataset } from '../../lib/datasets';
 import VirtualFieldsService, { VirtualField } from '../../lib/vfields';
 
-const deploymentURL = process.env.AXIOM_URL || '';
-const accessToken = process.env.AXIOM_TOKEN || '';
 const datasetSuffix = process.env.AXIOM_DATASET_SUFFIX || 'local';
 
 describe('VirtualFieldsService', () => {
     const datasetName = `test-axiom-node-monitors-${datasetSuffix}`;
-    const datasetsClient = new DatasetsService(deploymentURL, accessToken);
-    const client = new VirtualFieldsService(deploymentURL, accessToken);
+    const datasetsClient = new DatasetsService();
+    const client = new VirtualFieldsService();
 
     let dataset: Dataset;
     let vfield: VirtualField;

@@ -5,14 +5,14 @@ import { CloudURL } from '../../lib';
 import VersionsService from '../../lib/version';
 
 describe('VersionsService', () => {
-    const client = new VersionsService(CloudURL, '');
+    const client = new VersionsService('http://axiom-node.dev.local');
 
     beforeEach(() => {
         const response = {
             currentVersion: 'v1.5.0-20210303T0900+a238738bf',
         };
 
-        nock(CloudURL).get('/api/v1/version').reply(200, response);
+        nock('http://axiom-node.dev.local').get('/api/v1/version').reply(200, response);
     });
 
     it('Get', async () => {

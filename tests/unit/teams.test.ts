@@ -5,7 +5,7 @@ import { CloudURL } from '../../lib';
 import TeamsService, { Team, CreateRequest } from '../../lib/teams';
 
 describe('TeamsService', () => {
-    const client = new TeamsService(CloudURL, '');
+    const client = new TeamsService('http://axiom-node.dev.local');
 
     beforeEach(() => {
         const teams = [
@@ -23,7 +23,7 @@ describe('TeamsService', () => {
             },
         ];
 
-        const scope = nock(CloudURL);
+        const scope = nock('http://axiom-node.dev.local');
 
         scope.get('/api/v1/teams').reply(200, teams);
         scope.get('/api/v1/teams/CcXzGSwIFeshgnHTmD').reply(200, teams[0]);

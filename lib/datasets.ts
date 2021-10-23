@@ -128,7 +128,7 @@ export interface Query {
 }
 
 export interface Aggregation {
-    argument?: any; // eslint-disable-line @typescript-eslint/no-explicit-any
+    argument?: any;
     field: string;
     op: AggregationOp;
 }
@@ -150,7 +150,7 @@ export interface Filter {
     children?: Array<Filter>;
     field: string;
     op: FilterOp;
-    value?: any; // eslint-disable-line @typescript-eslint/no-explicit-any
+    value?: any;
 }
 
 export enum FilterOp {
@@ -214,20 +214,20 @@ export interface Interval {
 
 export interface EntryGroup {
     aggregations?: Array<EntryGroupAgg>;
-    group: { [key: string]: any }; // eslint-disable-line @typescript-eslint/no-explicit-any
+    group: { [key: string]: any };
     id: number;
 }
 
 export interface EntryGroupAgg {
     op: string;
-    value: any; // eslint-disable-line @typescript-eslint/no-explicit-any
+    value: any;
 }
 
 export interface Entry {
     _rowId: string;
     _sysTime: string;
     _time: string;
-    data: { [key: string]: any }; // eslint-disable-line @typescript-eslint/no-explicit-any
+    data: { [key: string]: any };
 }
 
 export interface Status {

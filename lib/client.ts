@@ -24,18 +24,18 @@ export default class Client {
     version: VersionService;
     virtualFields: VirtualFieldsService;
 
-    constructor(basePath: string, accessToken: string) {
-        this.datasets = new DatasetsService(basePath, accessToken);
-        this.monitors = new MonitorsService(basePath, accessToken);
-        this.notifiers = new NotifiersService(basePath, accessToken);
-        this.starred = new StarredQueriesService(basePath, accessToken);
-        this.teams = new TeamsService(basePath, accessToken);
+    constructor(basePath?: string, accessToken?: string, orgID?: string) {
+        this.datasets = new DatasetsService(basePath, accessToken, orgID);
+        this.monitors = new MonitorsService(basePath, accessToken, orgID);
+        this.notifiers = new NotifiersService(basePath, accessToken, orgID);
+        this.starred = new StarredQueriesService(basePath, accessToken, orgID);
+        this.teams = new TeamsService(basePath, accessToken, orgID);
         this.tokens = {
-            ingest: new IngestTokensService(basePath, accessToken),
-            personal: new PersonalTokensService(basePath, accessToken),
+            ingest: new IngestTokensService(basePath, accessToken, orgID),
+            personal: new PersonalTokensService(basePath, accessToken, orgID),
         };
-        this.users = new UsersService(basePath, accessToken);
-        this.version = new VersionService(basePath, accessToken);
-        this.virtualFields = new VirtualFieldsService(basePath, accessToken);
+        this.users = new UsersService(basePath, accessToken, orgID);
+        this.version = new VersionService(basePath, accessToken, orgID);
+        this.virtualFields = new VirtualFieldsService(basePath, accessToken, orgID);
     }
 }

@@ -6,7 +6,7 @@ export interface Notifier {
     id?: string;
     name: string;
     type?: Type;
-    properties?: any; // eslint-disable-line @typescript-eslint/no-explicit-any
+    properties?: any;
     disabledUntil?: string;
     metaCreated?: string;
     metaModified?: string;
