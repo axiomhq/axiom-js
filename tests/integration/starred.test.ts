@@ -54,13 +54,13 @@ describe('StarredQueriesService', () => {
     //     });
     // });
 
-    describe('list', () => {
-        it('should list starred', async () => {
-            const starred = await client.list({
-                kind: QueryKind.Analytics,
-            });
+    // describe('list', () => {
+    //     it('should list starred', async () => {
+    //         const starred = await client.list({
+    //             kind: QueryKind.Analytics,
+    //         });
 
-            expect(starred.length).to.be.greaterThan(0);
-        });
-    });
+    //         expect(starred.length).to.be.greaterThan(0);
+    //     });
+    // });
 });
