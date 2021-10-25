@@ -1,6 +1,6 @@
 import axios, { AxiosInstance } from 'axios';
 
-import { CloudURL } from './client';
+export const CloudURL = 'https://cloud.axiom.co';
 
 export default abstract class HTTPClient {
     protected readonly client: AxiosInstance;

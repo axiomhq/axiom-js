@@ -8,8 +8,6 @@ import UsersService from './users';
 import VersionService from './version';
 import VirtualFieldsService from './vfields';
 
-export const CloudURL = 'https://cloud.axiom.co';
-
 export default class Client {
     datasets: DatasetsService;
     monitors: MonitorsService;
