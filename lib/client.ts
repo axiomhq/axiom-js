@@ -1,39 +1,39 @@
-import DatasetsService from './datasets';
-import MonitorsService from './monitors';
-import NotifiersService from './notifiers';
-import StarredQueriesService from './starred';
-import TeamsService from './teams';
-import { IngestTokensService, PersonalTokensService } from './tokens';
-import UsersService from './users';
-import VersionService from './version';
-import VirtualFieldsService from './vfields';
+import { datasets } from './datasets';
+import { monitors } from './monitors';
+import { notifiers } from './notifiers';
+import { starred } from './starred';
+import { teams } from './teams';
+import { tokens } from './tokens';
+import { users } from './users';
+import { version } from './version';
+import { vfields } from './vfields';
 
 export default class Client {
-    datasets: DatasetsService;
-    monitors: MonitorsService;
-    notifiers: NotifiersService;
-    starred: StarredQueriesService;
-    teams: TeamsService;
+    datasets: datasets.Service;
+    monitors: monitors.Service;
+    notifiers: notifiers.Service;
+    starred: starred.Service;
+    teams: teams.Service;
     tokens: {
-        ingest: IngestTokensService;
-        personal: PersonalTokensService;
+        ingest: tokens.IngestService;
+        personal: tokens.PersonalService;
     };
-    users: UsersService;
-    version: VersionService;
-    virtualFields: VirtualFieldsService;
+    users: users.Service;
+    version: version.Service;
+    virtualFields: vfields.Service;
 
     constructor(basePath?: string, accessToken?: string, orgID?: string) {
-        this.datasets = new DatasetsService(basePath, accessToken, orgID);
-        this.monitors = new MonitorsService(basePath, accessToken, orgID);
-        this.notifiers = new NotifiersService(basePath, accessToken, orgID);
-        this.starred = new StarredQueriesService(basePath, accessToken, orgID);
-        this.teams = new TeamsService(basePath, accessToken, orgID);
+        this.datasets = new datasets.Service(basePath, accessToken, orgID);
+        this.monitors = new monitors.Service(basePath, accessToken, orgID);
+        this.notifiers = new notifiers.Service(basePath, accessToken, orgID);
+        this.starred = new starred.Service(basePath, accessToken, orgID);
+        this.teams = new teams.Service(basePath, accessToken, orgID);
         this.tokens = {
-            ingest: new IngestTokensService(basePath, accessToken, orgID),
-            personal: new PersonalTokensService(basePath, accessToken, orgID),
+            ingest: new tokens.IngestService(basePath, accessToken, orgID),
+            personal: new tokens.PersonalService(basePath, accessToken, orgID),
         };
-        this.users = new UsersService(basePath, accessToken, orgID);
-        this.version = new VersionService(basePath, accessToken, orgID);
-        this.virtualFields = new VirtualFieldsService(basePath, accessToken, orgID);
+        this.users = new users.Service(basePath, accessToken, orgID);
+        this.version = new version.Service(basePath, accessToken, orgID);
+        this.virtualFields = new vfields.Service(basePath, accessToken, orgID);
     }
 }
