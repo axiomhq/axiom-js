@@ -18,7 +18,7 @@
         "prepublish": "npm run build",
         "test": "mocha -r ts-node/register tests/unit/**/*.test.ts",
         "cover": "nyc -r text -e .ts -x 'tests/unit/**/*.test.ts' npm run test",
-        "integration": "mocha -r ts-node/register tests/integration/**/*.test.ts"
+        "integration": "mocha -r ts-node/register tests/integration/**/*.test.ts ----timeout 10000"
     },
     "repository": {
         "type": "git",
