@@ -2,6 +2,7 @@ import { AxiosResponse } from 'axios';
 
 import HTTPClient from './httpClient';
 import GlobalListOptions from './options';
+
 export namespace starred {
     export interface StarredQuery {
         id?: string;
