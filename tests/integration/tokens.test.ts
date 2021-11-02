@@ -1,11 +1,11 @@
 import { expect } from 'chai';
 
-import { IngestTokensService, PersonalTokensService, Token } from '../../lib/tokens';
+import { tokens } from '../../lib/tokens';
 
 describe('IngestTokensService', () => {
-    const client = new IngestTokensService();
+    const client = new tokens.IngestService();
 
-    let token: Token;
+    let token: tokens.Token;
 
     before(async () => {
         token = await client.create({
@@ -65,9 +65,9 @@ describe('IngestTokensService', () => {
 });
 
 describe('PersonalTokensService', () => {
-    const client = new PersonalTokensService();
+    const client = new tokens.PersonalService();
 
-    let token: Token;
+    let token: tokens.Token;
 
     before(async () => {
         token = await client.create({

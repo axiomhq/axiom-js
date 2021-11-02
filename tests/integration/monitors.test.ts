@@ -1,16 +1,16 @@
 import { expect } from 'chai';
 
-import DatasetsService from '../../lib/datasets';
-import MonitorsService, { Comparison, Monitor } from '../../lib/monitors';
+import { datasets } from '../../lib/datasets';
+import { monitors } from '../../lib/monitors';
 
 const datasetSuffix = process.env.AXIOM_DATASET_SUFFIX || 'local';
 
 describe('MonitorsService', () => {
     const datasetName = `test-axiom-node-monitors-${datasetSuffix}`;
-    const datasetsClient = new DatasetsService();
-    const client = new MonitorsService();
+    const datasetsClient = new datasets.Service();
+    const client = new monitors.Service();
 
-    let monitor: Monitor;
+    let monitor: monitors.Monitor;
 
     before(async () => {
         const dataset = await datasetsClient.create({
@@ -22,7 +22,7 @@ describe('MonitorsService', () => {
             name: 'Test Monitor',
             description: 'A test monitor',
             dataset: dataset.name,
-            comparison: Comparison.AboveOrEqual,
+            comparison: monitors.Comparison.AboveOrEqual,
             query: {
                 startTime: '2018-01-01T00:00:00.000Z',
                 endTime: '2028-01-01T00:00:00.000Z',
@@ -45,7 +45,7 @@ describe('MonitorsService', () => {
                 name: 'Updated Test Monitor',
                 description: 'A very good test monitor',
                 dataset: datasetName,
-                comparison: Comparison.AboveOrEqual,
+                comparison: monitors.Comparison.AboveOrEqual,
                 query: {
                     startTime: '2018-01-01T00:00:00.000Z',
                     endTime: '2028-01-01T00:00:00.000Z',

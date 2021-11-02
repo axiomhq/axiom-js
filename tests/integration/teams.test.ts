@@ -1,11 +1,11 @@
 import { expect } from 'chai';
 
-import TeamsService, { Team } from '../../lib/teams';
+import { teams } from '../../lib/teams';
 
 describe('TeamsService', () => {
-    const client = new TeamsService();
+    const client = new teams.Service();
 
-    let team: Team;
+    let team: teams.Team;
 
     before(async () => {
         team = await client.create({

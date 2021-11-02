@@ -1,9 +1,9 @@
 import { expect } from 'chai';
 
-import VersionService from '../../lib/version';
+import { version } from '../../lib/version';
 
 describe('VersionService', () => {
-    const client = new VersionService();
+    const client = new version.Service();
 
     describe('get', () => {
         it('should get a version', async () => {

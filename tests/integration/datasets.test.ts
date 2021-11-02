@@ -1,13 +1,13 @@
 import { expect } from 'chai';
 import { gzip } from 'zlib';
 
-import DatasetsService, { ContentEncoding, ContentType } from '../../lib/datasets';
+import { datasets } from '../../lib/datasets';
 
 const datasetSuffix = process.env.AXIOM_DATASET_SUFFIX || 'local';
 
 describe('DatasetsService', () => {
     const datasetName = `test-axiom-node-dataset-${datasetSuffix}`;
-    const client = new DatasetsService();
+    const client = new datasets.Service();
 
     before(async () => {
         await client.create({
@@ -51,8 +51,8 @@ describe('DatasetsService', () => {
             const status = await client.ingestString(
                 datasetName,
                 `[{"foo":"bar"},{"bar":"baz"}]`,
-                ContentType.JSON,
-                ContentEncoding.Identity,
+                datasets.ContentType.JSON,
+                datasets.ContentEncoding.Identity,
             );
 
             expect(status.ingested).to.equal(2);
@@ -64,8 +64,8 @@ describe('DatasetsService', () => {
                 datasetName,
                 `{"foo":"bar"}
 {"bar":"baz"}`,
-                ContentType.NDJSON,
-                ContentEncoding.Identity,
+                datasets.ContentType.NDJSON,
+                datasets.ContentEncoding.Identity,
             );
 
             expect(status.ingested).to.equal(2);
@@ -78,8 +78,8 @@ describe('DatasetsService', () => {
                 `foo
 bar
 baz`,
-                ContentType.CSV,
-                ContentEncoding.Identity,
+                datasets.ContentType.CSV,
+                datasets.ContentEncoding.Identity,
             );
 
             expect(status.ingested).to.equal(2);
@@ -94,7 +94,12 @@ baz`,
                 });
             });
 
-            const status = await client.ingestBuffer(datasetName, encoded, ContentType.JSON, ContentEncoding.GZIP);
+            const status = await client.ingestBuffer(
+                datasetName,
+                encoded,
+                datasets.ContentType.JSON,
+                datasets.ContentEncoding.GZIP,
+            );
 
             expect(status.ingested).to.equal(2);
             expect(status.failures?.length).to.equal(0);

@@ -1,17 +1,17 @@
 import { expect } from 'chai';
 
-import DatasetsService, { Dataset } from '../../lib/datasets';
-import VirtualFieldsService, { VirtualField } from '../../lib/vfields';
+import { datasets } from '../../lib/datasets';
+import { vfields } from '../../lib/vfields';
 
 const datasetSuffix = process.env.AXIOM_DATASET_SUFFIX || 'local';
 
 describe('VirtualFieldsService', () => {
     const datasetName = `test-axiom-node-monitors-${datasetSuffix}`;
-    const datasetsClient = new DatasetsService();
-    const client = new VirtualFieldsService();
+    const datasetsClient = new datasets.Service();
+    const client = new vfields.Service();
 
-    let dataset: Dataset;
-    let vfield: VirtualField;
+    let dataset: datasets.Dataset;
+    let vfield: vfields.VirtualField;
 
     before(async () => {
         dataset = await datasetsClient.create({

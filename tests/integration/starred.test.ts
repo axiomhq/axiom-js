@@ -1,17 +1,17 @@
 import { expect } from 'chai';
 
-import DatasetsService, { Dataset } from '../../lib/datasets';
-import StarredQueriesService, { StarredQuery, QueryKind } from '../../lib/starred';
+import { datasets } from '../../lib/datasets';
+import { starred } from '../../lib/starred';
 
 const datasetSuffix = process.env.AXIOM_DATASET_SUFFIX || 'local';
 
 describe('StarredQueriesService', () => {
     const datasetName = `test-axiom-node-starred-queries-${datasetSuffix}`;
-    const datasetsClient = new DatasetsService();
-    const client = new StarredQueriesService();
+    const datasetsClient = new datasets.Service();
+    const client = new starred.Service();
 
-    let dataset: Dataset;
-    let query: StarredQuery;
+    let dataset: datasets.Dataset;
+    let query: starred.StarredQuery;
 
     before(async () => {
         dataset = await datasetsClient.create({
@@ -21,7 +21,7 @@ describe('StarredQueriesService', () => {
 
         query = await client.create({
             name: 'Test Query',
-            kind: QueryKind.Stream,
+            kind: starred.QueryKind.Stream,
             dataset: dataset.id.toString(),
         });
     });
@@ -36,7 +36,7 @@ describe('StarredQueriesService', () => {
         it('should update a query', async () => {
             const updatedQuery = await client.update(query.id!, {
                 name: 'Updated Test Query',
-                kind: QueryKind.Stream,
+                kind: starred.QueryKind.Stream,
                 dataset: dataset.id.toString(),
             });
 

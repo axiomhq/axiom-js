@@ -1,17 +1,17 @@
 import { expect } from 'chai';
 
-import UsersService, { User, Role } from '../../lib/users';
+import { users } from '../../lib/users';
 
 describe('UsersService', () => {
-    const client = new UsersService();
+    const client = new users.Service();
 
-    let user: User;
+    let user: users.User;
 
     before(async () => {
         user = await client.create({
             name: 'John Doe',
             email: 'john.doe@example.com',
-            role: Role.User,
+            role: users.Role.User,
         });
     });
 
