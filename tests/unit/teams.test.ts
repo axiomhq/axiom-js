@@ -2,10 +2,10 @@ import { expect } from 'chai';
 import nock from 'nock';
 
 import { CloudURL } from '../../lib';
-import TeamsService, { Team, CreateRequest } from '../../lib/teams';
+import { teams } from '../../lib/teams';
 
 describe('TeamsService', () => {
-    const client = new TeamsService('http://axiom-node.dev.local');
+    const client = new teams.Service('http://axiom-node.dev.local');
 
     beforeEach(() => {
         const teams = [
@@ -48,7 +48,7 @@ describe('TeamsService', () => {
     });
 
     it('Create', async () => {
-        const request: CreateRequest = {
+        const request: teams.CreateRequest = {
             name: 'Server Team',
             datasets: ['test'],
         };
@@ -62,7 +62,7 @@ describe('TeamsService', () => {
     });
 
     it('Update', async () => {
-        const team: Team = {
+        const team: teams.Team = {
             name: 'Server Team',
             members: [],
             datasets: ['test'],

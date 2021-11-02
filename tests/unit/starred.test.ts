@@ -2,10 +2,10 @@ import { expect } from 'chai';
 import nock from 'nock';
 
 import { CloudURL } from '../../lib';
-import StarredQueriesService, { StarredQuery, ListOptions, QueryKind, OwnerKind } from '../../lib/starred';
+import { starred } from '../../lib/starred';
 
 describe('StarredQueriesService', () => {
-    const client = new StarredQueriesService('http://axiom-node.dev.local');
+    const client = new starred.Service('http://axiom-node.dev.local');
 
     beforeEach(() => {
         const starred = [
@@ -59,10 +59,10 @@ describe('StarredQueriesService', () => {
     });
 
     it('List', async () => {
-        const options: ListOptions = {
+        const options: starred.ListOptions = {
             dataset: 'test',
-            kind: QueryKind.Analytics,
-            who: OwnerKind.User,
+            kind: starred.QueryKind.Analytics,
+            who: starred.OwnerKind.User,
         };
 
         const response = await client.list(options);
@@ -79,8 +79,8 @@ describe('StarredQueriesService', () => {
     });
 
     it('Create', async () => {
-        const starred: StarredQuery = {
-            kind: QueryKind.Analytics,
+        const starreds: starred.StarredQuery = {
+            kind: starred.QueryKind.Analytics,
             dataset: 'test',
             name: 'Everything',
             // query: {
@@ -93,7 +93,7 @@ describe('StarredQueriesService', () => {
             },
         };
 
-        const response = await client.create(starred);
+        const response = await client.create(starreds);
         expect(response).not.equal('undefined');
         expect(response.id).equal('NBYj9rO5p4F5CtYEy6');
         expect(response.name).equal('Everything');
@@ -101,8 +101,8 @@ describe('StarredQueriesService', () => {
     });
 
     it('Update', async () => {
-        const starred: StarredQuery = {
-            kind: QueryKind.Analytics,
+        const starreds: starred.StarredQuery = {
+            kind: starred.QueryKind.Analytics,
             dataset: 'test',
             name: 'Everything',
             // query: {
@@ -115,7 +115,7 @@ describe('StarredQueriesService', () => {
             },
         };
 
-        const response = await client.update('NBYj9rO5p4F5CtYEy6', starred);
+        const response = await client.update('NBYj9rO5p4F5CtYEy6', starreds);
         expect(response).not.equal('undefined');
         expect(response.id).equal('NBYj9rO5p4F5CtYEy6');
         expect(response.name).equal('Everything');

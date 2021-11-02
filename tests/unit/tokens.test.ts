@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import nock from 'nock';
 
 import { CloudURL } from '../../lib';
-import { PersonalTokensService, Token } from '../../lib/tokens';
+import { tokens } from '../../lib/tokens';
 
 // HINT(lukasmalkmus): The tests below just test against the "personal"
 // endpoint. However, the "ingest" implementation is the same. Under the hood,
@@ -10,7 +10,7 @@ import { PersonalTokensService, Token } from '../../lib/tokens';
 // implementation works against both endpoints.
 
 describe('TokensService', () => {
-    const client = new PersonalTokensService('http://axiom-node.dev.local');
+    const client = new tokens.PersonalService('http://axiom-node.dev.local');
 
     beforeEach(() => {
         const tokens = [
@@ -57,7 +57,7 @@ describe('TokensService', () => {
     });
 
     it('Create', async () => {
-        const token: Token = {
+        const token: tokens.Token = {
             name: 'Test',
             description: 'A test token',
             scopes: ['*'],
@@ -70,7 +70,7 @@ describe('TokensService', () => {
     });
 
     it('Update', async () => {
-        const token: Token = {
+        const token: tokens.Token = {
             name: 'Test',
             description: 'A test token',
             scopes: ['*'],

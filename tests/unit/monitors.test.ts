@@ -1,10 +1,10 @@
 import { expect } from 'chai';
 import nock from 'nock';
 
-import MonitorsService, { Comparison, Monitor } from '../../lib/monitors';
+import { monitors } from '../../lib/monitors';
 
 describe('MonitorsService', () => {
-    const client = new MonitorsService('http://axiom-node.dev.local');
+    const client = new monitors.Service('http://axiom-node.dev.local');
 
     beforeEach(() => {
         const monitors = [
@@ -69,11 +69,11 @@ describe('MonitorsService', () => {
     });
 
     it('Create', async () => {
-        const monitor: Monitor = {
+        const monitor: monitors.Monitor = {
             name: 'Test',
             description: 'A test monitor',
             dataset: 'test',
-            comparison: Comparison.Below,
+            comparison: monitors.Comparison.Below,
             query: {
                 startTime: '2018-01-01T00:00:00.000Z',
                 endTime: '2028-01-01T00:00:00.000Z',
@@ -93,11 +93,11 @@ describe('MonitorsService', () => {
     });
 
     it('Update', async () => {
-        const monitor: Monitor = {
+        const monitor: monitors.Monitor = {
             name: 'Test',
             description: 'A test monitor',
             dataset: 'test',
-            comparison: Comparison.Below,
+            comparison: monitors.Comparison.Below,
             query: {
                 startTime: '2018-01-01T00:00:00.000Z',
                 endTime: '2028-01-01T00:00:00.000Z',

@@ -2,10 +2,10 @@ import { expect } from 'chai';
 import nock from 'nock';
 
 import { CloudURL } from '../../lib';
-import UsersService, { Role, CreateRequest } from '../../lib/users';
+import { users } from '../../lib/users';
 
 describe('UsersService', () => {
-    const client = new UsersService('http://axiom-node.dev.local');
+    const client = new users.Service('http://axiom-node.dev.local');
 
     beforeEach(() => {
         const currentUser = {
@@ -72,14 +72,14 @@ describe('UsersService', () => {
         expect(response).not.equal('undefined');
         expect(response.id).equal('20475220-20e4-4080-b2f4-68315e21f5ec');
         expect(response.name).equal('John Doe');
-        expect(response.role).equal(Role.Owner);
+        expect(response.role).equal(users.Role.Owner);
     });
 
     it('Create', async () => {
-        const request: CreateRequest = {
+        const request: users.CreateRequest = {
             name: 'Michael Doe',
             email: 'michael@example.com',
-            role: Role.Owner,
+            role: users.Role.Owner,
             teamIds: [],
         };
 
@@ -87,7 +87,7 @@ describe('UsersService', () => {
         expect(response).not.equal('undefined');
         expect(response.id).equal('e9cffaad-60e7-4b04-8d27-185e1808c38c');
         expect(response.name).equal('Michael Doe');
-        expect(response.role).equal(Role.Owner);
+        expect(response.role).equal(users.Role.Owner);
         expect(response.permissions).length(12);
     });
 
@@ -96,16 +96,16 @@ describe('UsersService', () => {
         expect(response).not.equal('undefined');
         expect(response.id).equal('e9cffaad-60e7-4b04-8d27-185e1808c38c');
         expect(response.name).equal('Michael Doe');
-        expect(response.role).equal(Role.Owner);
+        expect(response.role).equal(users.Role.Owner);
         expect(response.permissions).length(12);
     });
 
     it('UpdateRole', async () => {
-        const response = await client.updateRole('e9cffaad-60e7-4b04-8d27-185e1808c38c', Role.Owner);
+        const response = await client.updateRole('e9cffaad-60e7-4b04-8d27-185e1808c38c', users.Role.Owner);
         expect(response).not.equal('undefined');
         expect(response.id).equal('e9cffaad-60e7-4b04-8d27-185e1808c38c');
         expect(response.name).equal('Michael Doe');
-        expect(response.role).equal(Role.Owner);
+        expect(response.role).equal(users.Role.Owner);
         expect(response.permissions).length(12);
     });
 

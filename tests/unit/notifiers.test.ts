@@ -1,10 +1,10 @@
 import { expect } from 'chai';
 import nock from 'nock';
 
-import NotifiersService, { Notifier, Type } from '../../lib/notifiers';
+import { notifiers } from '../../lib/notifiers';
 
 describe('NotifiersService', () => {
-    const client = new NotifiersService('http://axiom-node.dev.local');
+    const client = new notifiers.Service('http://axiom-node.dev.local');
 
     beforeEach(() => {
         const notifiers = [
@@ -63,9 +63,9 @@ describe('NotifiersService', () => {
     });
 
     it('Create', async () => {
-        const notifier: Notifier = {
+        const notifier: notifiers.Notifier = {
             name: 'Notify Me',
-            type: Type.Pagerduty,
+            type: notifiers.Type.Pagerduty,
         };
 
         const response = await client.create(notifier);
@@ -76,9 +76,9 @@ describe('NotifiersService', () => {
     });
 
     it('Update', async () => {
-        const notifier: Notifier = {
+        const notifier: notifiers.Notifier = {
             name: 'Notify Me',
-            type: Type.Webhook,
+            type: notifiers.Type.Webhook,
         };
 
         const response = await client.update('d5I2Yv3Pg2Jx9Ne2Ay', notifier);

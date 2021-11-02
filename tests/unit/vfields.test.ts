@@ -2,10 +2,10 @@ import { expect } from 'chai';
 import nock from 'nock';
 
 import { CloudURL } from '../../lib';
-import VirtualFieldsService, { VirtualField } from '../../lib/vfields';
+import { vfields } from '../../lib/vfields';
 
 describe('VirtualFieldsService', () => {
-    const client = new VirtualFieldsService('http://axiom-node.dev.local');
+    const client = new vfields.Service('http://axiom-node.dev.local');
 
     beforeEach(() => {
         const vfields = [
@@ -51,7 +51,7 @@ describe('VirtualFieldsService', () => {
     });
 
     it('Create', async () => {
-        const vfield: VirtualField = {
+        const vfield: vfields.VirtualField = {
             dataset: 'test',
             name: 'status_failed',
             description: 'Failed Requests',
@@ -66,7 +66,7 @@ describe('VirtualFieldsService', () => {
     });
 
     it('Update', async () => {
-        const vfield: VirtualField = {
+        const vfield: vfields.VirtualField = {
             dataset: 'test',
             name: 'status_failed',
             description: 'Failed Requests',

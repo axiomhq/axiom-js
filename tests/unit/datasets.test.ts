@@ -1,11 +1,11 @@
 import { expect } from 'chai';
 import nock from 'nock';
 
-import DatasetsService, { CreateRequest, UpdateRequest, ContentEncoding, ContentType } from '../../lib/datasets';
-import { QueryKind } from '../../lib/starred';
+import { datasets } from '../../lib/datasets';
+import { starred } from '../../lib/starred';
 
 describe('DatasetsService', () => {
-    const client = new DatasetsService('http://axiom-node.dev.local');
+    const client = new datasets.Service('http://axiom-node.dev.local');
 
     beforeEach(() => {
         const stats = {
@@ -227,7 +227,7 @@ describe('DatasetsService', () => {
     });
 
     it('Create', async () => {
-        const request: CreateRequest = {
+        const request: datasets.CreateRequest = {
             name: 'test1',
             description: 'This is a test description',
         };
@@ -239,7 +239,7 @@ describe('DatasetsService', () => {
     });
 
     it('Update', async () => {
-        const req: UpdateRequest = {
+        const req: datasets.UpdateRequest = {
             description: 'This is a test description',
         };
 
@@ -273,12 +273,17 @@ describe('DatasetsService', () => {
         const response = await client.history('test');
         expect(response).not.equal('undefined');
         expect(response.id).equal('GHP2ufS7OYwMeBhXHj');
-        expect(response.kind).equal(QueryKind.Analytics);
+        expect(response.kind).equal(starred.QueryKind.Analytics);
     });
 
     it('IngestString', async () => {
         const data = `[{"foo": "bar"}, {"foo": "baz"}]`;
-        const response = await client.ingestString('test', data, ContentType.JSON, ContentEncoding.Identity);
+        const response = await client.ingestString(
+            'test',
+            data,
+            datasets.ContentType.JSON,
+            datasets.ContentEncoding.Identity,
+        );
         expect(response).not.equal('undefined');
         expect(response.ingested).equal(2);
         expect(response.failed).equal(0);
