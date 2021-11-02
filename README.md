@@ -58,7 +58,7 @@ for.
 // Export `AXIOM_TOKEN` and `AXIOM_ORG_ID` for Axiom Cloud
 // Export `AXIOM_URL` and `AXIOM_TOKEN` for Axiom Selfhost
 
-import Client from '../lib/client';
+import Client from '@axiomhq/axiom-node';
 
 const client = new Client();
 
