@@ -1,5 +1,5 @@
 import fs from 'fs';
-import Client, { CloudURL, datasets } from '../lib';
+import Client, { CloudURL, datasets } from '@axiomhq/axiom-node';
 
 const deploymentURL = process.env.AXIOM_URL || CloudURL;
 const accessToken = process.env.AXIOM_TOKEN;
