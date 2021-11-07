@@ -4,6 +4,8 @@
 [![Latest Release][release_badge]][release]
 [![License][license_badge]][license]
 
+![Alt](https://repobeats.axiom.co/api/embed/40b1a942132e3f515d5374bde5e47fb0750eb411.svg "Repobeats analytics image")
+
 ---
 
 ## Table of Contents
