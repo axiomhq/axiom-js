@@ -36,12 +36,14 @@
     "homepage": "https://github.com/axiomhq/axiom-node",
     "dependencies": {
         "axios": "^0.23.0",
-        "to-time": "^1.0.2"
+        "to-time": "^1.0.2",
+        "uuid": "^8.3.2"
     },
     "devDependencies": {
         "@types/chai": "^4.2.22",
         "@types/mocha": "^9.0.0",
         "@types/node": "^16.11.4",
+        "@types/uuid": "^8.3.4",
         "@typescript-eslint/eslint-plugin": "^5.1.0",
         "@typescript-eslint/parser": "^5.1.0",
         "chai": "^4.3.4",
