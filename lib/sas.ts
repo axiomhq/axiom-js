@@ -1,17 +1,9 @@
-import { createHmac, Hmac, KeyObject } from 'crypto';
+import { createHmac } from 'crypto';
 import { parse as uuidParse } from 'uuid';
 
 import { datasets } from './datasets';
 
 export namespace sas {
-    export interface Filter {
-        op: datasets.FilterOp; // op = Operation
-        fd: string; // fd = Field
-        vl: any; // vl = Value
-        cs: boolean; // cs = Case Sensitive
-        ch?: Array<Filter>; // ch = Children
-    }
-
     export interface Options {
         organizationId: string;
         dataset: string;
@@ -25,7 +17,6 @@ export namespace sas {
             const key = new Uint8Array(uuidParse(keyStr));
 
             const params = optionsToURLSearchParams(options);
-            console.log(params);
 
             // Signature payload is the newline delimited concatenation of the
             // options fields in the order they appear.
@@ -37,11 +28,21 @@ export namespace sas {
 
             const token = createHmac('sha256', key).update(signaturePayload).digest('base64url');
 
-            params.append('tk', token);
+            params.append('tk', base64AddPadding(token));
             params.sort();
 
             return params.toString();
         }
+    }
+
+    // No need to export filter as this is just in place to produce shorter json
+    // field names.
+    interface Filter {
+        op: datasets.FilterOp; // op = Operation
+        fd: string; // fd = Field
+        vl: any; // vl = Value
+        cs: boolean; // cs = Case Sensitive
+        ch?: Array<Filter>; // ch = Children
     }
 
     function filterFromDatasetsFilter(filter: datasets.Filter): Filter {
@@ -64,5 +65,9 @@ export namespace sas {
             mst: options.minStartTime,
             met: options.maxEndTime,
         });
+    }
+
+    function base64AddPadding(str: string): string {
+        return str + Array((4 - str.length % 4) % 4 + 1).join('=');
     }
 }
