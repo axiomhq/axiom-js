@@ -59,15 +59,17 @@ export namespace sas {
         return new URLSearchParams({
             oi: options.organizationId,
             dt: options.dataset,
-            fl:
-                typeof options.filter === "string" ? options.filter as string :
-                    JSON.stringify(filterFromDatasetsFilter(options.filter as datasets.Filter)),
+            fl: isFilter(options.filter) ? JSON.stringify(filterFromDatasetsFilter(options.filter)) : options.filter,
             mst: options.minStartTime,
             met: options.maxEndTime,
         });
     }
 
+    function isFilter(filter: datasets.Filter | string): filter is datasets.Filter {
+        return Object.prototype.hasOwnProperty.call(filter, 'op');
+    }
+
     function base64AddPadding(str: string): string {
-        return str + Array((4 - str.length % 4) % 4 + 1).join('=');
+        return str + Array(((4 - (str.length % 4)) % 4) + 1).join('=');
     }
 }
