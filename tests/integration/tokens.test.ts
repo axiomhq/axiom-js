@@ -2,15 +2,16 @@ import { expect } from 'chai';
 
 import { tokens } from '../../lib/tokens';
 
-describe('IngestTokensService', () => {
-    const client = new tokens.IngestService();
+describe('APITokensService', () => {
+    const client = new tokens.APIService();
 
     let token: tokens.Token;
 
     before(async () => {
         token = await client.create({
             name: 'Test Token',
-            scopes: [],
+            scopes: ['*'],
+            permissions: ['CanIngest'],
         });
     });
 
@@ -22,10 +23,13 @@ describe('IngestTokensService', () => {
         it('should update a token', async () => {
             const updatedToken = await client.update(token.id!, {
                 name: 'Updated Test Token',
-                scopes: [],
+                scopes: ['*'],
+                permissions: ['CanQuery'],
             });
 
             expect(updatedToken.name).to.equal('Updated Test Token');
+            expect(updatedToken.permissions).to.contain('CanQuery');
+            expect(updatedToken.permissions).to.not.contain('CanIngest');
 
             token = updatedToken;
         });
@@ -52,14 +56,6 @@ describe('IngestTokensService', () => {
             const tokens = await client.list();
 
             expect(tokens.length).to.be.greaterThan(0);
-        });
-    });
-
-    describe('validate', () => {
-        it('should validate token', async () => {
-            const valid = await client.validate();
-
-            expect(valid).to.be.true;
         });
     });
 });

@@ -12,7 +12,7 @@ describe('Client', () => {
         expect(client.notifiers).not.empty;
         expect(client.starred).not.empty;
         expect(client.teams).not.empty;
-        expect(client.tokens.ingest).not.empty;
+        expect(client.tokens.api).not.empty;
         expect(client.tokens.personal).not.empty;
         expect(client.users).not.empty;
         expect(client.version).not.empty;

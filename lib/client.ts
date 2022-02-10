@@ -15,7 +15,7 @@ export default class Client {
     starred: starred.Service;
     teams: teams.Service;
     tokens: {
-        ingest: tokens.IngestService;
+        api: tokens.APIService;
         personal: tokens.PersonalService;
     };
     users: users.Service;
@@ -29,7 +29,7 @@ export default class Client {
         this.starred = new starred.Service(basePath, accessToken, orgID);
         this.teams = new teams.Service(basePath, accessToken, orgID);
         this.tokens = {
-            ingest: new tokens.IngestService(basePath, accessToken, orgID),
+            api: new tokens.APIService(basePath, accessToken, orgID),
             personal: new tokens.PersonalService(basePath, accessToken, orgID),
         };
         this.users = new users.Service(basePath, accessToken, orgID);

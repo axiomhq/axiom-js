@@ -6,12 +6,14 @@ export namespace tokens {
         id?: string;
         name: string;
         description?: string;
-        scopes: Array<string>;
+        scopes?: Array<string>; // Only for API tokens
+        permissions?: Array<string>; // Only for API tokens
     }
 
     export interface RawToken {
         token: string;
         scopes: Array<string>;
+        permissions: Array<string>;
     }
 
     class Service extends HTTPClient {
@@ -51,15 +53,10 @@ export namespace tokens {
         delete = (id: string): Promise<AxiosResponse> => this.client.delete<AxiosResponse>(this.localPath + '/' + id);
     }
 
-    export class IngestService extends Service {
+    export class APIService extends Service {
         constructor(basePath?: string, accessToken?: string, orgID?: string) {
-            super('/api/v1/tokens/ingest', basePath, accessToken, orgID);
+            super('/api/v1/tokens/api', basePath, accessToken, orgID);
         }
-
-        validate = (): Promise<boolean> =>
-            this.client.get(this.localPath + '/validate').then((response) => {
-                return response.status === 204;
-            });
     }
 
     export class PersonalService extends Service {

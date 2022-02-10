@@ -1,9 +1,7 @@
 import fs from 'fs';
-import Client, { CloudURL, datasets } from '@axiomhq/axiom-node';
+import Client, { datasets } from '@axiomhq/axiom-node';
 
-const deploymentURL = process.env.AXIOM_URL || CloudURL;
-const accessToken = process.env.AXIOM_TOKEN;
-const client = new Client(deploymentURL, accessToken);
+const client = new Client();
 
 async function ingestFile() {
     const stream = fs.createReadStream('logs.json');
