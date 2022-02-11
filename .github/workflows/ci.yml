@@ -15,11 +15,10 @@ jobs:
     strategy:
       matrix:
         node:
-          - 12.x
-          - 13.x
           - 14.x
           - 15.x
           - 16.x
+          - 17.x
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
@@ -40,11 +39,10 @@ jobs:
     strategy:
       matrix:
         node:
-          - 12.x
-          - 13.x
           - 14.x
           - 15.x
           - 16.x
+          - 17.x
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
@@ -65,11 +63,10 @@ jobs:
     strategy:
       matrix:
         node:
-          - 12.x
-          - 13.x
           - 14.x
           - 15.x
           - 16.x
+          - 17.x
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
@@ -91,11 +88,10 @@ jobs:
     strategy:
       matrix:
         node:
-          - 12.x
-          - 13.x
           - 14.x
           - 15.x
           - 16.x
+          - 17.x
       max-parallel: 1
       fail-fast: false
     steps:
