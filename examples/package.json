@@ -1,0 +1,8 @@
+{
+  "name": "examples",
+  "version": "1.0.0",
+  "description": "examples on using axiom-node",
+  "dependencies": {
+    "@axiomhq/axiom-node": "../lib"
+  }
+}
