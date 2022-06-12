@@ -349,6 +349,19 @@ export namespace datasets {
             options?: IngestOptions,
         ): Promise<IngestStatus> => this.ingest(id, Readable.from(data), contentType, contentEncoding, options);
 
+        ingestEvents = (
+            id: string,
+            events: Array<Event> | Event,
+            options?: IngestOptions,
+        ): Promise<IngestStatus> => this.ingestString(
+            id,
+            JSON.stringify(
+                Array.isArray(events) ? events : [events]),
+            ContentType.JSON,
+            ContentEncoding.GZIP,
+            options
+        );
+
         query = (id: string, query: Query, options?: QueryOptions): Promise<QueryResult> =>
             this.client
                 .post<QueryResult>(this.localPath + '/' + id + '/query', query, {
