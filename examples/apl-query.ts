@@ -8,7 +8,7 @@ async function aplQuery() {
     const aplQuery = "['datasetName']" // dataset name e.g: test
 
     const res = await client.datasets.aplQuery(aplQuery);
-    if (res.matches.length === 0) {
+    if (!res.matches || res.matches.length === 0) {
         console.warn('no matches found');
         return;
     }

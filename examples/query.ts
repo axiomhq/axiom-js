@@ -17,7 +17,7 @@ async function query() {
     };
 
     const res = await client.datasets.query('id', query, queryOptions);
-    if (res.matches.length === 0) {
+    if (!res.matches || res.matches?.length === 0) {
         console.warn('no matches found');
         return;
     }
