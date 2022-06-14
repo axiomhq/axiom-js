@@ -5,7 +5,7 @@ import Client from '@axiomhq/axiom-node';
 const client = new Client();
 
 async function aplQuery() {
-    const aplQuery = "['datasetName']" // dataset name e.g: test
+    const aplQuery = "['my-dataset'] | where status == 500"
 
     const res = await client.datasets.aplQuery(aplQuery);
     if (!res.matches || res.matches.length === 0) {
