@@ -1,4 +1,5 @@
 import axios, { AxiosInstance } from 'axios';
+import axiosRetry from 'axios-retry';
 
 export const CloudURL = 'https://cloud.axiom.co';
 
@@ -21,6 +22,14 @@ export default abstract class HTTPClient {
         if (orgID) {
             this.client.defaults.headers.common['X-Axiom-Org-Id'] = orgID;
         }
+
+        // We should only retry in the case the status code is >= 500, anything below isn't worth retrying.
+        axiosRetry(this.client, {
+            retryDelay: axiosRetry.exponentialDelay,
+            retryCondition: (error: any) => {
+                return error.response.status >= 500;
+            },
+        })
 
         this.client.interceptors.response.use(
             (response) => response,
