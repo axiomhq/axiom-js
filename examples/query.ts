@@ -9,14 +9,10 @@ async function query() {
     const query = {
         startTime: startTime,
         endTime: endTime,
-        resolution: '*',
-    };
-    const queryOptions = {
-        streamingDuration: '5m',
-        noCache: false,
+        resolution: 'auto',
     };
 
-    const res = await client.datasets.query('id', query, queryOptions);
+    const res = await client.datasets.query('id', query);
     if (!res.matches || res.matches?.length === 0) {
         console.warn('no matches found');
         return;
