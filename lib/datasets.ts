@@ -1,3 +1,5 @@
+import { gzip } from 'zlib';
+import { promisify } from 'util';
 import { AxiosResponse } from 'axios';
 import { Readable, Stream } from 'stream';
 
@@ -349,18 +351,16 @@ export namespace datasets {
             options?: IngestOptions,
         ): Promise<IngestStatus> => this.ingest(id, Readable.from(data), contentType, contentEncoding, options);
 
-        ingestEvents = (
+        ingestEvents = async (
             id: string,
-            events: Array<Event> | Event,
+            events: Array<object> | object,
             options?: IngestOptions,
-        ): Promise<IngestStatus> => this.ingestString(
-            id,
-            JSON.stringify(
-                Array.isArray(events) ? events : [events]),
-            ContentType.JSON,
-            ContentEncoding.GZIP,
-            options
-        );
+        ): Promise<IngestStatus> => {
+            const array = Array.isArray(events) ? events : [events];
+            const json = array.map(v => JSON.stringify(v)).join("\n");
+            const encoded = await promisify(gzip)(json);
+            return this.ingestBuffer(id, encoded, ContentType.NDJSON, ContentEncoding.GZIP, options)
+        };
 
         query = (id: string, query: Query, options?: QueryOptions): Promise<QueryResult> =>
             this.client
