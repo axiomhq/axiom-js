@@ -123,7 +123,7 @@ baz`,
             const info = await client.info(datasetName);
 
             expect(info.name).to.equal(datasetName);
-            expect(info.numEvents).to.equal(8);
+            expect(info.numEvents).to.equal(11);
             expect(info.fields?.length).to.equal(4);
         });
     });
@@ -145,9 +145,9 @@ baz`,
             });
 
             // expect(result.status.blocksExamined).to.equal(1);
-            expect(result.status.rowsExamined).to.equal(8);
-            expect(result.status.rowsMatched).to.equal(8);
-            expect(result.matches?.length).to.equal(8);
+            expect(result.status.rowsExamined).to.equal(11);
+            expect(result.status.rowsMatched).to.equal(11);
+            expect(result.matches?.length).to.equal(11);
         });
     });
 
@@ -156,9 +156,9 @@ baz`,
             const result = await client.aplQuery("['" + datasetName + "']");
 
             // expect(result.status.blocksExamined).to.equal(1);
-            expect(result.status.rowsExamined).to.equal(8);
-            expect(result.status.rowsMatched).to.equal(8);
-            expect(result.matches?.length).to.equal(8);
+            expect(result.status.rowsExamined).to.equal(11);
+            expect(result.status.rowsMatched).to.equal(11);
+            expect(result.matches?.length).to.equal(11);
         });
     });
 
