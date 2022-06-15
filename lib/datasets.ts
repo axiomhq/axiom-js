@@ -84,6 +84,12 @@ export namespace datasets {
         description: string;
     }
 
+    export interface UpdateFieldRequest {
+        description?: string;
+        unit?: string;
+        hidden?: boolean;
+    }
+
     export interface IngestOptions {
         timestampField?: string;
         timestampFormat?: string;
@@ -288,6 +294,11 @@ export namespace datasets {
 
         update = (id: string, req: UpdateRequest): Promise<Dataset> =>
             this.client.put<Dataset>(this.localPath + '/' + id, req).then((response) => {
+                return response.data;
+            });
+
+        updateField = (id: string, field: string, req: UpdateFieldRequest): Promise<Field> =>
+            this.client.put<Field>(this.localPath + '/' + id + '/fields/' + field, req).then((response) => {
                 return response.data;
             });
 
