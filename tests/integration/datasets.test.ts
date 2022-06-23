@@ -34,6 +34,8 @@ describe('DatasetsService', () => {
         it('should update field description of the dataset', async () => {
             const dataset = await client.updateField(datasetName, 'foo', {
                 description: 'HTTP status code returned as part of the response',
+                unit: '',
+                hidden: false
             });
 
             expect(dataset.description).to.equal('HTTP status code returned as part of the response');

@@ -258,10 +258,9 @@ describe('DatasetsService', () => {
         };
 
         const response = await client.updateField('test1', 'response', req);
+        console.log(response);
         expect(response).not.equal('undefined');
-        expect(response.unit).equal('');
         expect(response.description).equal('This is a test description');
-        expect(response.hidden).equal(false);
     });
 
     it('Delete', async () => {

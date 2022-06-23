@@ -85,9 +85,9 @@ export namespace datasets {
     }
 
     export interface UpdateFieldRequest {
-        description?: string;
-        unit?: string;
-        hidden?: boolean;
+        description: string;
+        unit: string;
+        hidden: boolean;
     }
 
     export interface IngestOptions {
