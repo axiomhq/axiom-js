@@ -27,7 +27,7 @@ export default abstract class HTTPClient {
         axiosRetry(this.client, {
             retryDelay: axiosRetry.exponentialDelay,
             retryCondition: (error: any) => {
-                return isNetworkError(error) || isRetryableError(error) || (error.response && error.response.status >= 500);
+                return isNetworkError(error) || isRetryableError(error);
             },
         })
 
