@@ -1,5 +1,5 @@
 import axios, { AxiosInstance } from 'axios';
-import axiosRetry, { isNetworkOrIdempotentRequestError } from 'axios-retry';
+import axiosRetry, { isNetworkError, isRetryableError } from 'axios-retry';
 
 export const CloudURL = 'https://cloud.axiom.co';
 
@@ -27,7 +27,7 @@ export default abstract class HTTPClient {
         axiosRetry(this.client, {
             retryDelay: axiosRetry.exponentialDelay,
             retryCondition: (error: any) => {
-                return isNetworkOrIdempotentRequestError(error) || (error.response && error.response.status >= 500);
+                return isNetworkError(error) || isRetryableError(error) || (error.response && error.response.status >= 500);
             },
         })
 
