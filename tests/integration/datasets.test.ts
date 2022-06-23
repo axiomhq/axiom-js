@@ -30,18 +30,6 @@ describe('DatasetsService', () => {
         });
     });
 
-    describe('updateField', () => {
-        it('should update field description of the dataset', async () => {
-            const dataset = await client.updateField(datasetName, 'foo', {
-                description: 'HTTP status code returned as part of the response',
-                unit: '',
-                hidden: false
-            });
-
-            expect(dataset.description).to.equal('HTTP status code returned as part of the response');
-        });
-    });
-
     describe('get', () => {
         it('should get the dataset', async () => {
             const dataset = await client.get(datasetName);
@@ -137,6 +125,18 @@ baz`,
             expect(info.name).to.equal(datasetName);
             expect(info.numEvents).to.equal(11);
             expect(info.fields?.length).to.equal(4);
+        });
+    });
+
+    describe('updateField', () => {
+        it('should update field description of the dataset', async () => {
+            const dataset = await client.updateField(datasetName, 'foo', {
+                description: 'HTTP status code returned as part of the response',
+                unit: '',
+                hidden: false
+            });
+
+            expect(dataset.description).to.equal('HTTP status code returned as part of the response');
         });
     });
 
