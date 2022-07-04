@@ -57,14 +57,14 @@ export function parseLimitFromResponse(response: AxiosResponse): Limit {
 // parseLimitFromHeaders parses the named headers from a `*http.Response`.
 function parseLimitFromHeaders(response: AxiosResponse, headerScope: string, headerLimit: string, headerRemaining: string, headerReset: string): Limit {
 	let limit: Limit = {
-        scope: LimitScope.unknown,
+        scope: LimitScope.anonymous,
         type: LimitType.rate,
         value: 0,
         remaining: 0,
         reset: 0,
     }
 
-    const scope: string = response.headers[headerScope.toLowerCase()] || "unknown";
+    const scope: string = response.headers[headerScope.toLowerCase()] || LimitScope.anonymous;
     limit.scope = LimitScope[scope as keyof typeof LimitScope];
     
     const limitValue = response.headers[headerLimit.toLowerCase()];
@@ -83,7 +83,6 @@ function parseLimitFromHeaders(response: AxiosResponse, headerScope: string, hea
     const resetValue = response.headers[headerReset.toLowerCase()];
     const resetValueInt = parseInt(resetValue, 10);
     if(!isNaN(resetValueInt)) {
-        // const reset = new Date(resetValueInt);
         limit.reset = resetValueInt;
     }
 

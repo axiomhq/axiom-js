@@ -122,7 +122,7 @@ describe('Client', () => {
         } catch(err: any) {
             expect(err.response.status).eq(499);
             expect(err.response.headers['X-IngestLimit-Remaining'] == 0);
-            expect(err.response.data).eq('unknown ingest limit exceeded, not making remote request')
+            expect(err.response.data).eq('anonymous ingest limit exceeded, not making remote request')
         }
     });
 
@@ -150,7 +150,7 @@ describe('Client', () => {
         } catch(err: any) {
             expect(err.response.status).eq(499);
             expect(err.response.headers[headerQueryRemaining.toLowerCase()] == 0);
-            expect(err.response.data).eq('unknown query limit exceeded, not making remote request')
+            expect(err.response.data).eq('anonymous query limit exceeded, not making remote request')
         }
     });
 });
