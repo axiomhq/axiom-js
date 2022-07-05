@@ -2,9 +2,9 @@ import { AxiosResponse } from "axios";
 
 export const headerRateScope     = "X-RateLimit-Scope"
 
-export const headerRateLimit     = "X-RateLimit-Limit"
-export const headerRateRemaining = "X-RateLimit-Remaining"
-export const headerRateReset     = "X-RateLimit-Reset"
+export const headerAPILimit     = "X-RateLimit-Limit"
+export const headerAPIRateRemaining = "X-RateLimit-Remaining"
+export const headerAPIRateReset     = "X-RateLimit-Reset"
 
 export const headerQueryLimit     = "X-QueryLimit-Limit"
 export const headerQueryRemaining = "X-QueryLimit-Remaining"
@@ -21,18 +21,18 @@ export enum LimitScope {
     anonymous = "anonymous",
 }
 export enum LimitType {
-    rate = "rate",
+    api = "api",
     query = "query",
     ingest = "ingest",
 }
 
 export class Limit {
     constructor(
-        public scope: LimitScope,
-        public type: LimitType,
-        public value: number,
-        public remaining: number,
-        public reset: number,
+        public scope: LimitScope = LimitScope.unknown,
+        public type: LimitType = LimitType.api,
+        public value: number = 0,
+        public remaining: number = -1,
+        public reset: number = 0,
     ) {}
 }
 
@@ -47,24 +47,20 @@ export function parseLimitFromResponse(response: AxiosResponse): Limit {
 		limit = parseLimitFromHeaders(response, "", headerQueryLimit, headerQueryRemaining, headerQueryReset)
 		limit.type = LimitType.query
 	} else {
-		limit = parseLimitFromHeaders(response, headerRateScope, headerRateLimit, headerRateRemaining, headerRateReset)
-		limit.type = LimitType.rate
+		limit = parseLimitFromHeaders(response, headerRateScope, headerAPILimit, headerAPIRateRemaining, headerAPIRateReset)
+		limit.type = LimitType.api
 	}
 
     return limit;
 }
 
+export const limitKey = (type: LimitType, scope: LimitScope): string => `${type}:${scope}`;
+
 // parseLimitFromHeaders parses the named headers from a `*http.Response`.
 function parseLimitFromHeaders(response: AxiosResponse, headerScope: string, headerLimit: string, headerRemaining: string, headerReset: string): Limit {
-	let limit: Limit = {
-        scope: LimitScope.anonymous,
-        type: LimitType.rate,
-        value: 0,
-        remaining: 0,
-        reset: 0,
-    }
+	let limit: Limit = new Limit();
 
-    const scope: string = response.headers[headerScope.toLowerCase()] || LimitScope.anonymous;
+    const scope: string = response.headers[headerScope.toLowerCase()] || LimitScope.unknown;
     limit.scope = LimitScope[scope as keyof typeof LimitScope];
     
     const limitValue = response.headers[headerLimit.toLowerCase()];

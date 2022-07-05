@@ -1,11 +1,11 @@
 import { fail } from 'assert';
-import { AxiosError } from 'axios';
 import { expect } from 'chai';
 import nock from 'nock';
 
 import Client from '../../lib/client';
 import { datasets } from '../../lib/datasets';
-import { headerIngestLimit, headerIngestRemaining, headerIngestReset, headerQueryLimit, headerQueryRemaining, headerQueryReset, headerRateLimit, headerRateRemaining, headerRateReset, headerRateScope } from '../../lib/limit';
+import { AxiomTooManyRequestsError } from '../../lib/httpClient';
+import { headerIngestLimit, headerIngestRemaining, headerIngestReset, headerQueryLimit, headerQueryRemaining, headerQueryReset, headerAPILimit, headerAPIRateRemaining, headerAPIRateReset, headerRateScope } from '../../lib/limit';
 
 describe('Client', () => {
     const client = new Client('http://axiom-node-retries.dev.local');
@@ -57,38 +57,33 @@ describe('Client', () => {
         expect(resp.length).eq(1);
     });
 
-    it('Handles rate limits without sending remote request', async () => {
+    it('API rate limit shortcircuit without sending remote request', async () => {
         const scope = nock('http://axiom-node-retries.dev.local');
         const now = new Date();
         const timestampInSeconds = Math.floor(now.getTime() / 1000) + 10;
         const headers: nock.ReplyHeaders = {}
         headers[headerRateScope] = 'anonymous';
-        headers[headerRateLimit] = '1000';
-        headers[headerRateRemaining] = '0';
-        headers[headerRateReset] = timestampInSeconds.toString();
-        scope.get('/api/v1/datasets').reply(499, 'Rate Limit Exceeded', headers);
+        headers[headerAPILimit] = '1000';
+        headers[headerAPIRateRemaining] = '0';
+        headers[headerAPIRateReset] = timestampInSeconds.toString();
+        scope.get('/api/v1/datasets').reply(200, {}, headers);
+
+        await client.datasets.list();
+        expect(scope.isDone()).eq(true);
 
         try {
-            const resp = await client.datasets.list();
-            fail("request should return an error with status 499");
-        } catch (err: any) {
-            expect(scope.isDone()).eq(true);
-            expect(err.response.status).eq(499);
-            expect(err.response.headers[headerRateScope.toLowerCase()]).eq('anonymous');
-            expect(err.response.headers[headerRateRemaining.toLowerCase()]).eq('0');
-        }
-
-        try {
-            const resp = await client.datasets.list();
-            fail("request should return an error with status 499");
+            await client.datasets.list();
+            fail("request should return an error with status 429");
         } catch(err: any) {
-            expect(err.response.status).eq(499);
-            expect(err.response.headers['X-IngestLimit-Remaining'] == 0);
-            expect(err.response.data).eq('anonymous rate limit exceeded, not making remote request')
+            expect(err).instanceOf(AxiomTooManyRequestsError);
+            expect(err.message).eq('anonymous api limit exceeded, not making remote request')
+            expect(err.response.status).eq(429);
+            expect(err.response.statusText).eq('Too Many Requests');
+            expect(err.response.data).eq('');
         }
     });
 
-    it('Handles ingest rate limits without sending remote request', async () => {
+    it('Ingest rate limit shortcircuit without sending remote request', async () => {
         const scope = nock('http://axiom-node-retries.dev.local');
         const now = new Date();
         const timestampInSeconds = Math.floor(now.getTime() / 1000) + 10;
@@ -96,61 +91,90 @@ describe('Client', () => {
         headers[headerIngestLimit] = '1000';
         headers[headerIngestRemaining] = '0';
         headers[headerIngestReset] = timestampInSeconds.toString();
-        scope.post('/api/v1/datasets/test/ingest').reply(499, 'Rate Limit Exceeded', headers);
+        scope.post('/api/v1/datasets/test/ingest').reply(200, {}, headers);
+
+        await client.datasets.ingestString(
+            'test',
+            JSON.stringify([{ name: 'test' }]),
+            datasets.ContentType.JSON,
+            datasets.ContentEncoding.Identity,
+        );
 
         try {
-            const resp = await client.datasets.ingestString(
+            await client.datasets.ingestString(
                 'test',
                 JSON.stringify([{ name: 'test' }]),
                 datasets.ContentType.JSON,
                 datasets.ContentEncoding.Identity,
             );
-            fail("request should return an error with status 499");
-        } catch (err: any) {
-            expect(err.response.status).eq(499);
-            expect(err.response.headers[headerIngestRemaining.toLowerCase()]).eq('0');
-        }
-
-        try {
-            const resp = await client.datasets.ingestString(
-                'test',
-                JSON.stringify([{ name: 'test' }]),
-                datasets.ContentType.JSON,
-                datasets.ContentEncoding.Identity,
-            );
-            fail("request should return an error with status 499");
+            fail("request should return an error with status 429");
         } catch(err: any) {
-            expect(err.response.status).eq(499);
-            expect(err.response.headers['X-IngestLimit-Remaining'] == 0);
-            expect(err.response.data).eq('anonymous ingest limit exceeded, not making remote request')
+            expect(err).instanceOf(AxiomTooManyRequestsError);
+            expect(err.response.status).eq(429);
+            expect(err.response.statusText).eq('Too Many Requests');
+            expect(err.message).eq('ingest limit exceeded, not making remote request')
+            expect(err.response.data).eq('');
         }
     });
 
-    it.only('Handles query rate limits without sending remote request', async () => {
+    it('Query rate limit shortcircuit without sending remote request', async () => {
+        const scope = nock('http://axiom-node-retries.dev.local');
+        const resetTime = new Date();
+        resetTime.setHours(resetTime.getHours() + 2);
+        const resetTimestamp = Math.floor(resetTime.getTime() / 1000);
+        const headers: nock.ReplyHeaders = {}
+        headers[headerQueryLimit] = '1000';
+        headers[headerQueryRemaining] = '0';
+        headers[headerQueryReset] = resetTimestamp.toString();
+        scope.post('/api/v1/datasets/_apl?format=legacy').reply(200, {}, headers);
+
+        // make successful request and parse the limit headers
+        await client.datasets.aplQuery("['test']");
+        expect(scope.isDone()).eq(true);
+
+        // second request should fail without sending remote request
+        try {
+            await client.datasets.aplQuery("['test']");
+            fail("request should return an error with status 429");
+        } catch(err: any) {
+            expect(err).instanceOf(AxiomTooManyRequestsError);
+            expect(err.response.status).eq(429);
+            expect(err.response.statusText).eq('Too Many Requests');
+            expect(err.message).eq('query limit exceeded, not making remote request, try again in 59m1s')
+            expect(err.response.data).eq('');
+        }
+    });
+
+    it('No shortcircuit for ingest or query when there is api rate limit', async () => {
         const scope = nock('http://axiom-node-retries.dev.local');
         const now = new Date();
         const timestampInSeconds = Math.floor(now.getTime() / 1000) + 10;
         const headers: nock.ReplyHeaders = {}
-        headers[headerQueryLimit] = '1000';
-        headers[headerQueryRemaining] = '0';
-        headers[headerQueryReset] = timestampInSeconds.toString();
-        scope.post('/api/v1/datasets/_apl?format=legacy').reply(499, 'Rate Limit Exceeded', headers);
+        headers[headerRateScope] = 'anonymous';
+        headers[headerAPILimit] = '1000';
+        headers[headerAPIRateRemaining] = '0';
+        headers[headerAPIRateReset] = timestampInSeconds.toString();
+        scope.get('/api/v1/datasets').reply(429, 'Too Many Requests', headers);
+        scope.post('/api/v1/datasets/test/ingest').reply(200, {}, headers);
+        scope.post('/api/v1/datasets/_apl?format=legacy').reply(200, {}, headers);
 
+        // first api call should fail
         try {
-            const resp = await client.datasets.aplQuery("['test']");
-            fail("request should return an error with status 499");
-        } catch (err: any) {
-            expect(err.response.status).eq(499);
-            expect(err.response.headers[headerQueryRemaining.toLowerCase()]).eq('0');
-        }
-
-        try {
-            const resp = await client.datasets.aplQuery("['test']");
-            fail("request should return an error with status 499");
+            const resp = await client.datasets.list();
+            fail("request should return an error with status 429");
         } catch(err: any) {
-            expect(err.response.status).eq(499);
-            expect(err.response.headers[headerQueryRemaining.toLowerCase()] == 0);
-            expect(err.response.data).eq('anonymous query limit exceeded, not making remote request')
+            expect(err).instanceOf(AxiomTooManyRequestsError);
         }
-    });
+
+        // ingest and query should succeed
+        await client.datasets.ingestString(
+            'test',
+            JSON.stringify([{ name: 'test' }]),
+            datasets.ContentType.JSON,
+            datasets.ContentEncoding.Identity,
+        );
+
+
+        await client.datasets.aplQuery("['test']");
+    })
 });

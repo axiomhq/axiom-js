@@ -1,6 +1,6 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 import axiosRetry, { isNetworkError, isRetryableError } from 'axios-retry';
-import { Limit, LimitType, LimitScope, parseLimitFromResponse } from './limit';
+import { Limit, LimitType, LimitScope, parseLimitFromResponse, limitKey } from './limit';
 
 const Version = require('../package.json').version;
 
@@ -42,11 +42,21 @@ export default abstract class HTTPClient {
         });
 
         this.client.interceptors.response.use(
-            (response) => response,
+            (response) => {
+                const limit = parseLimitFromResponse(response);
+                const key = limitKey(limit.type, limit.scope);
+                this.limits[key] = limit;
+
+                return response;
+            },
             (error) => {
                 const limit = parseLimitFromResponse(error.response);
-                const limitKey = `${limit.scope}:${limit.type}`;
-                this.limits[limitKey] = limit;
+                const key = limitKey(limit.type, limit.scope);
+                this.limits[key] = limit;
+
+                if (error.response.status == 429 && !error.shortcircuit) {
+                    return Promise.reject(new AxiomTooManyRequestsError(limit, error.response));
+                }
 
                 const message = error.response.data.message;
                 if (message) {
@@ -60,50 +70,57 @@ export default abstract class HTTPClient {
 
     // https://github.com/axios/axios/issues/1666
     checkLimit(config: AxiosRequestConfig) {
-        let limitType = LimitType.rate;
+        let limitType = LimitType.api;
         if (config.url?.endsWith('/ingest')) {
             limitType = LimitType.ingest;
         } else if (config.url?.endsWith('/query') || config.url?.endsWith('/_apl')) {
             limitType = LimitType.query;
         }
 
-        let limit: Limit = {
-            scope: LimitScope.unknown,
-            type: limitType,
-            value: 0,
-            remaining: -1,
-            reset: 0,
-        };
+        let limit = new Limit();
         let foundLimit = false;
         for (let scope of Object.values(LimitScope)) {
-            const key = `${scope}:${limitType}`;
+            const key = limitKey(limitType, scope);
             if (this.limits[key]) {
                 limit = this.limits[key];
                 foundLimit = true;
                 break;
             }
-            
         }
 
         // create fake response
         const now = new Date();
-        const timestampInSeconds = Math.floor(now.getTime() / 1000);
-        if (foundLimit && limit.remaining == 0 && timestampInSeconds < limit.reset) {
+        const resetTimestap = Math.floor(now.getTime() / 1000);
+        if (foundLimit && limit.remaining == 0 && resetTimestap < limit.reset) {
             config.adapter = (config) =>
                 new Promise((_, reject) => {
                     const res: AxiosResponse = {
-                        data: `${limit.scope} ${limitType.toString()} limit exceeded, not making remote request`,
-                        status: 499,
-                        statusText: 'Rate Limit Exceeded',
+                        data: '',
+                        status: 429,
+                        statusText: 'Too Many Requests',
                         headers: { 'content-type': 'text/plain; charset=utf-8' },
                         config,
                         request: {},
                     };
 
-                    return reject({response: res});
+                    return reject(new AxiomTooManyRequestsError(limit, res, true));
                 });
         }
 
         return config;
+    }
+}
+
+export class AxiomTooManyRequestsError extends Error {
+    public message: string = '';
+
+    constructor(public limit: Limit, public response: AxiosResponse, public shortcircuit = false) {
+        super();
+        var diffMins = Math.round(((limit.reset % 86400000) % 3600000) / 60000); // minutes
+        var diffSecs = Math.round(diffMins / 60000); // minutes
+        this.message = `${limit.type} limit exceeded, not making remote request, try again in ${diffMins}m${diffSecs}s`;
+        if (limit.type == LimitType.api) {
+            this.message = `${limit.scope} ` + this.message
+        }
     }
 }
