@@ -36,7 +36,7 @@ export default abstract class HTTPClient {
         });
 
         // If we've hit the rate limit, don't make further requests before
-        // the reset time.
+        // the reset time and return limit error.
         this.client.interceptors.request.use((config) => {
             return this.checkLimit(config);
         });
@@ -50,11 +50,17 @@ export default abstract class HTTPClient {
                 return response;
             },
             (error) => {
+                // don't parse limit headers from shortcircut responses, as they
+                // are fake responses
+                if (error.shortcircuit) {
+                    return Promise.reject(error);
+                }
+                
                 const limit = parseLimitFromResponse(error.response);
                 const key = limitKey(limit.type, limit.scope);
                 this.limits[key] = limit;
 
-                if (error.response.status == 429 && !error.shortcircuit) {
+                if (error.response.status == 429) {
                     return Promise.reject(new AxiomTooManyRequestsError(limit, error.response));
                 }
 
@@ -68,7 +74,6 @@ export default abstract class HTTPClient {
         );
     }
 
-    // https://github.com/axios/axios/issues/1666
     checkLimit(config: AxiosRequestConfig) {
         let limitType = LimitType.api;
         if (config.url?.endsWith('/ingest')) {
