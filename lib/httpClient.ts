@@ -1,6 +1,8 @@
 import axios, { AxiosInstance } from 'axios';
 import axiosRetry, { isNetworkError, isRetryableError } from 'axios-retry';
 
+const Version = require('../package.json').version;
+
 export const CloudURL = 'https://cloud.axiom.co';
 
 export default abstract class HTTPClient {
@@ -17,7 +19,7 @@ export default abstract class HTTPClient {
         });
 
         this.client.defaults.headers.common['Accept'] = 'application/json';
-        this.client.defaults.headers.common['User-Agent'] = 'axiom-node';
+        this.client.defaults.headers.common['User-Agent'] = 'axiom-node/' + Version;
         this.client.defaults.headers.common['Authorization'] = 'Bearer ' + accessToken;
         if (orgID) {
             this.client.defaults.headers.common['X-Axiom-Org-Id'] = orgID;
