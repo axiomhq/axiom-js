@@ -55,7 +55,7 @@ export default abstract class HTTPClient {
                 if (error.shortcircuit) {
                     return Promise.reject(error);
                 }
-                
+
                 const limit = parseLimitFromResponse(error.response);
                 const key = limitKey(limit.type, limit.scope);
                 this.limits[key] = limit;
@@ -94,9 +94,8 @@ export default abstract class HTTPClient {
         }
 
         // create fake response
-        const now = new Date();
-        const resetTimestap = Math.floor(now.getTime() / 1000);
-        if (foundLimit && limit.remaining == 0 && resetTimestap < limit.reset) {
+        const currentTime = new Date().getTime();
+        if (foundLimit && limit.remaining == 0 && currentTime < limit.reset.getTime()) {
             config.adapter = (config) =>
                 new Promise((_, reject) => {
                     const res: AxiosResponse = {
@@ -121,11 +120,23 @@ export class AxiomTooManyRequestsError extends Error {
 
     constructor(public limit: Limit, public response: AxiosResponse, public shortcircuit = false) {
         super();
-        var diffMins = Math.round(((limit.reset % 86400000) % 3600000) / 60000); // minutes
-        var diffSecs = Math.round(diffMins / 60000); // minutes
-        this.message = `${limit.type} limit exceeded, not making remote request, try again in ${diffMins}m${diffSecs}s`;
+        const retryIn = this.timeUntil(limit.reset);
+        this.message = `${limit.type} limit exceeded, not making remote request, try again in ${retryIn.minutes}m${retryIn.seconds}s`;
         if (limit.type == LimitType.api) {
-            this.message = `${limit.scope} ` + this.message
+            this.message = `${limit.scope} ` + this.message;
         }
     }
+
+    timeUntil(endtime: Date){
+        const total = endtime.getTime() - new Date().getTime();
+        const seconds = Math.floor( (total/1000) % 60 );
+        const minutes = Math.floor( (total/1000/60) % 60 );
+      
+        return {
+          total,
+          minutes,
+          seconds
+        };
+      }
+      
 }

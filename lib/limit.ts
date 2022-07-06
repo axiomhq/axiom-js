@@ -32,7 +32,7 @@ export class Limit {
         public type: LimitType = LimitType.api,
         public value: number = 0,
         public remaining: number = -1,
-        public reset: number = 0,
+        public reset: Date = new Date(),
     ) {}
 }
 
@@ -79,7 +79,7 @@ function parseLimitFromHeaders(response: AxiosResponse, headerScope: string, hea
     const resetValue = response.headers[headerReset.toLowerCase()];
     const resetValueInt = parseInt(resetValue, 10);
     if(!isNaN(resetValueInt)) {
-        limit.reset = resetValueInt;
+        limit.reset = new Date(resetValueInt * 1000);
     }
 
 	return limit

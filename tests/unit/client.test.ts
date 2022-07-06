@@ -62,15 +62,16 @@ describe('Client', () => {
         expect(resp.length).eq(1);
     });
 
-    it('API rate limit shortcircuit without sending remote request', async () => {
+    it('shortcircuit API rate limit', async () => {
         const scope = nock('http://axiom-node-retries.dev.local');
-        const now = new Date();
-        const timestampInSeconds = Math.floor(now.getTime() / 1000) + 10;
+        const resetTime = new Date();
+        resetTime.setHours(resetTime.getHours() + 1);
+        const resetTimeInSeconds = Math.floor(resetTime.getTime() / 1000);
         const headers: nock.ReplyHeaders = {}
         headers[headerRateScope] = 'anonymous';
         headers[headerAPILimit] = '1000';
         headers[headerAPIRateRemaining] = '0';
-        headers[headerAPIRateReset] = timestampInSeconds.toString();
+        headers[headerAPIRateReset] = resetTimeInSeconds.toString();
         scope.get('/api/v1/datasets').reply(200, {}, headers);
 
         await client.datasets.list();
@@ -81,17 +82,18 @@ describe('Client', () => {
             fail("request should return an error with status 429");
         } catch(err: any) {
             expect(err).instanceOf(AxiomTooManyRequestsError);
-            // expect(err.message).eq('anonymous api limit exceeded, not making remote request')
+            expect(err.message).eq('anonymous api limit exceeded, not making remote request, try again in 59m59s')
             expect(err.response.status).eq(429);
             expect(err.response.statusText).eq('Too Many Requests');
             expect(err.response.data).eq('');
         }
     });
 
-    it('Ingest rate limit shortcircuit without sending remote request', async () => {
+    it('shortcircuit ingest rate limit', async () => {
         const scope = nock('http://axiom-node-retries.dev.local');
-        const now = new Date();
-        const timestampInSeconds = Math.floor(now.getTime() / 1000) + 10;
+        const resetTime = new Date();
+        resetTime.setHours(resetTime.getHours() + 1);
+        const timestampInSeconds = Math.floor(resetTime.getTime() / 1000);
         const headers: nock.ReplyHeaders = {}
         headers[headerIngestLimit] = '1000';
         headers[headerIngestRemaining] = '0';
@@ -117,20 +119,20 @@ describe('Client', () => {
             expect(err).instanceOf(AxiomTooManyRequestsError);
             expect(err.response.status).eq(429);
             expect(err.response.statusText).eq('Too Many Requests');
-            // expect(err.message).eq('ingest limit exceeded, not making remote request')
+            expect(err.message).eq('ingest limit exceeded, not making remote request, try again in 59m59s')
             expect(err.response.data).eq('');
         }
     });
 
-    it('Query rate limit shortcircuit without sending remote request', async () => {
+    it('shortcircuit query rate limit', async () => {
         const scope = nock('http://axiom-node-retries.dev.local');
         const resetTime = new Date();
-        resetTime.setHours(resetTime.getHours() + 2);
-        const resetTimestamp = Math.floor(resetTime.getTime() / 1000);
+        resetTime.setHours(resetTime.getHours() + 1);
+        const resetTimeInSeconds = Math.floor(resetTime.getTime() / 1000);
         const headers: nock.ReplyHeaders = {}
         headers[headerQueryLimit] = '1000';
         headers[headerQueryRemaining] = '0';
-        headers[headerQueryReset] = resetTimestamp.toString();
+        headers[headerQueryReset] = resetTimeInSeconds.toString();
         scope.post('/api/v1/datasets/_apl?format=legacy').reply(200, {}, headers);
 
         // make successful request and parse the limit headers
@@ -145,20 +147,19 @@ describe('Client', () => {
             expect(err).instanceOf(AxiomTooManyRequestsError);
             expect(err.response.status).eq(429);
             expect(err.response.statusText).eq('Too Many Requests');
-            // expect(err.message).eq('query limit exceeded, not making remote request, try again in 59m1s')
+            expect(err.message).eq('query limit exceeded, not making remote request, try again in 59m59s')
             expect(err.response.data).eq('');
         }
     });
 
     it('No shortcircuit for ingest or query when there is api rate limit', async () => {
         const scope = nock('http://axiom-node-retries.dev.local');
-        const now = new Date();
-        const timestampInSeconds = Math.floor(now.getTime() / 1000) + 10;
+        const resetTimeInSeconds = Math.floor(new Date().getTime() / 1000);
         const headers: nock.ReplyHeaders = {}
         headers[headerRateScope] = 'anonymous';
         headers[headerAPILimit] = '1000';
         headers[headerAPIRateRemaining] = '0';
-        headers[headerAPIRateReset] = timestampInSeconds.toString();
+        headers[headerAPIRateReset] = resetTimeInSeconds.toString();
         scope.get('/api/v1/datasets').reply(429, 'Too Many Requests', headers);
         scope.post('/api/v1/datasets/test/ingest').reply(200, {}, headers);
         scope.post('/api/v1/datasets/_apl?format=legacy').reply(200, {}, headers);
