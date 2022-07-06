@@ -82,14 +82,15 @@ describe('Client', () => {
             fail("request should return an error with status 429");
         } catch(err: any) {
             expect(err).instanceOf(AxiomTooManyRequestsError);
-            expect(err.message).eq('anonymous api limit exceeded, not making remote request, try again in 59m59s')
+            const untilReset = err.timeUntilReset();
+            expect(err.message).eq(`anonymous api limit exceeded, not making remote request, try again in ${untilReset.minutes}m${untilReset.seconds}s`)
             expect(err.response.status).eq(429);
             expect(err.response.statusText).eq('Too Many Requests');
             expect(err.response.data).eq('');
         }
     });
 
-    it('shortcircuit ingest rate limit', async () => {
+    it.only('shortcircuit ingest rate limit', async () => {
         const scope = nock('http://axiom-node-retries.dev.local');
         const resetTime = new Date();
         resetTime.setHours(resetTime.getHours() + 1);
@@ -119,7 +120,8 @@ describe('Client', () => {
             expect(err).instanceOf(AxiomTooManyRequestsError);
             expect(err.response.status).eq(429);
             expect(err.response.statusText).eq('Too Many Requests');
-            expect(err.message).eq('ingest limit exceeded, not making remote request, try again in 59m59s')
+            const untilReset = err.timeUntilReset();
+            expect(err.message).eq(`ingest limit exceeded, not making remote request, try again in ${untilReset.minutes}m${untilReset.seconds}s`)
             expect(err.response.data).eq('');
         }
     });
@@ -147,7 +149,8 @@ describe('Client', () => {
             expect(err).instanceOf(AxiomTooManyRequestsError);
             expect(err.response.status).eq(429);
             expect(err.response.statusText).eq('Too Many Requests');
-            expect(err.message).eq('query limit exceeded, not making remote request, try again in 59m59s')
+            const untilReset = err.timeUntilReset();
+            expect(err.message).eq(`query limit exceeded, not making remote request, try again in ${untilReset.minutes}m${untilReset.seconds}s`)
             expect(err.response.data).eq('');
         }
     });
