@@ -10,7 +10,8 @@ export namespace monitors {
         description?: string;
         dataset: string;
         disabledUntil?: string;
-        query: datasets.Query;
+        aplQuery: boolean;
+        query: datasets.Query | datasets.APLQuery;
         threshold?: number;
         comparison: Comparison;
         noDataCloseWaitMinutes?: number;

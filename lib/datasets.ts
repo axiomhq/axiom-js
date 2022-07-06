@@ -259,7 +259,7 @@ export namespace datasets {
         priority: string;
     }
 
-    interface APLQuery {
+    export interface APLQuery {
         apl: string;
         startTime?: string;
         endTime?: string;

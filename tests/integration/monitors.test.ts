@@ -11,6 +11,7 @@ describe('MonitorsService', () => {
     const client = new monitors.Service();
 
     let monitor: monitors.Monitor;
+    let aplMonitor: monitors.Monitor;
 
     before(async () => {
         const dataset = await datasetsClient.create({
@@ -23,6 +24,7 @@ describe('MonitorsService', () => {
             description: 'A test monitor',
             dataset: dataset.name,
             comparison: monitors.Comparison.AboveOrEqual,
+            aplQuery: false,
             query: {
                 startTime: '2018-01-01T00:00:00.000Z',
                 endTime: '2028-01-01T00:00:00.000Z',
@@ -31,10 +33,24 @@ describe('MonitorsService', () => {
             frequencyMinutes: 1,
             durationMinutes: 5,
         });
+
+        aplMonitor = await client.create({
+            name: 'Test APL Monitor',
+            description: 'A test APL monitor',
+            dataset: dataset.name,
+            comparison: monitors.Comparison.AboveOrEqual,
+            aplQuery: true,
+            query: {
+                apl: `['${dataset.name}'] | count`
+            },
+            frequencyMinutes: 1,
+            durationMinutes: 5,
+        });
     });
 
     after(async () => {
         await client.delete(monitor.id!);
+        await client.delete(aplMonitor.id!);
 
         await datasetsClient.delete(datasetName);
     });
@@ -46,6 +62,7 @@ describe('MonitorsService', () => {
                 description: 'A very good test monitor',
                 dataset: datasetName,
                 comparison: monitors.Comparison.AboveOrEqual,
+                aplQuery: false,
                 query: {
                     startTime: '2018-01-01T00:00:00.000Z',
                     endTime: '2028-01-01T00:00:00.000Z',
