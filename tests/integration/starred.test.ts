@@ -21,7 +21,7 @@ describe('StarredQueriesService', () => {
 
         query = await client.create({
             name: 'Test Query',
-            kind: starred.QueryKind.Stream,
+            kind: starred.QueryKind.Analytics,
             dataset: dataset.id.toString(),
             query: {
                 apl: "['" + datasetName + "']"
@@ -39,7 +39,7 @@ describe('StarredQueriesService', () => {
         it('should update a query', async () => {
             const updatedQuery = await client.update(query.id!, {
                 name: 'Updated Test Query',
-                kind: starred.QueryKind.Stream,
+                kind: starred.QueryKind.Analytics,
                 dataset: dataset.id.toString(),
                 query: {
                     apl: "['" + datasetName + "']"
@@ -63,10 +63,13 @@ describe('StarredQueriesService', () => {
     describe('list', () => {
         it('should list starred', async () => {
             const starredList = await client.list({
+                dataset: datasetName,
                 kind: starred.QueryKind.Analytics,
+                who: starred.OwnerKind.User,
             });
 
             expect(starredList.length).to.be.greaterThan(0);
+            expect(starredList[0].id).eq(query.id);
         });
     });
 });
