@@ -23,6 +23,9 @@ describe('StarredQueriesService', () => {
             name: 'Test Query',
             kind: starred.QueryKind.Stream,
             dataset: dataset.id.toString(),
+            query: {
+                apl: "['" + datasetName + "']"
+            }
         });
     });
 
@@ -38,6 +41,9 @@ describe('StarredQueriesService', () => {
                 name: 'Updated Test Query',
                 kind: starred.QueryKind.Stream,
                 dataset: dataset.id.toString(),
+                query: {
+                    apl: "['" + datasetName + "']"
+                }
             });
 
             expect(updatedQuery.name).to.equal('Updated Test Query');
@@ -46,21 +52,21 @@ describe('StarredQueriesService', () => {
         });
     });
 
-    // describe('get', () => {
-    //     it('should get a query', async () => {
-    //         const fetchedQuery = await client.get(query.id!);
+    describe('get', () => {
+        it('should get a query', async () => {
+            const fetchedQuery = await client.get(query.id!);
 
-    //         expect(fetchedQuery.name).to.equal(query.name);
-    //     });
-    // });
+            expect(fetchedQuery.name).to.equal(query.name);
+        });
+    });
 
-    // describe('list', () => {
-    //     it('should list starred', async () => {
-    //         const starred = await client.list({
-    //             kind: QueryKind.Analytics,
-    //         });
+    describe('list', () => {
+        it('should list starred', async () => {
+            const starredList = await client.list({
+                kind: starred.QueryKind.Analytics,
+            });
 
-    //         expect(starred.length).to.be.greaterThan(0);
-    //     });
-    // });
+            expect(starredList.length).to.be.greaterThan(0);
+        });
+    });
 });

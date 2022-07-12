@@ -83,11 +83,12 @@ describe('StarredQueriesService', () => {
             kind: starred.QueryKind.Analytics,
             dataset: 'test',
             name: 'Everything',
-            // query: {
-            //     startTime: '2020-11-24T16:23:15.000Z',
-            //     endTime: '2020-11-24T16:53:30.000Z',
-            //     limit: 1000,
-            // },
+            query: {
+                startTime: '2020-11-24T16:23:15.000Z',
+                endTime: '2020-11-24T16:53:30.000Z',
+                limit: 1000,
+                resolution: 'auto'
+            },
             metadata: {
                 quickRange: '7d',
             },
@@ -105,11 +106,12 @@ describe('StarredQueriesService', () => {
             kind: starred.QueryKind.Analytics,
             dataset: 'test',
             name: 'Everything',
-            // query: {
-            //     startTime: '2020-11-24T16:23:15.000Z',
-            //     endTime: '2020-11-24T16:53:30.000Z',
-            //     limit: 1000,
-            // },
+            query: {
+                startTime: '2020-11-24T16:23:15.000Z',
+                endTime: '2020-11-24T16:53:30.000Z',
+                limit: 1000,
+                resolution: 'auto'
+            },
             metadata: {
                 quickRange: '7d',
             },

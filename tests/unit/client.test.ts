@@ -90,7 +90,7 @@ describe('Client', () => {
         }
     });
 
-    it.only('shortcircuit ingest rate limit', async () => {
+    it('shortcircuit ingest rate limit', async () => {
         const scope = nock('http://axiom-node-retries.dev.local');
         const resetTime = new Date();
         resetTime.setHours(resetTime.getHours() + 1);

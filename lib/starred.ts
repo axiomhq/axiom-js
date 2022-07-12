@@ -1,4 +1,5 @@
 import { AxiosResponse } from 'axios';
+import { datasets } from 'datasets';
 
 import HTTPClient from './httpClient';
 import GlobalListOptions from './options';
@@ -9,7 +10,7 @@ export namespace starred {
         name: string;
         dataset: string;
         kind: QueryKind;
-        // query: QueryRequest; //FIXME(lukasmalkmus): Add QueryRequest type
+        query: datasets.Query | datasets.APLQuery
         who?: string;
         metadata?: { [key: string]: string };
         created?: string;
