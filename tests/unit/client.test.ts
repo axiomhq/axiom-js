@@ -18,8 +18,6 @@ describe('Client', () => {
 
     it('Services', () => {
         expect(client.datasets).not.empty;
-        expect(client.tokens.api).not.empty;
-        expect(client.tokens.personal).not.empty;
         expect(client.users).not.empty;
         expect(client.version).not.empty;
         expect(client.virtualFields).not.empty;
