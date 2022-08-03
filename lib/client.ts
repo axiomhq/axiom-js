@@ -1,5 +1,4 @@
 import { datasets } from './datasets';
-import { teams } from './teams';
 import { tokens } from './tokens';
 import { users } from './users';
 import { version } from './version';
@@ -7,7 +6,6 @@ import { vfields } from './vfields';
 
 export default class Client {
     datasets: datasets.Service;
-    teams: teams.Service;
     tokens: {
         api: tokens.APIService;
         personal: tokens.PersonalService;
@@ -18,7 +16,6 @@ export default class Client {
 
     constructor(basePath?: string, accessToken?: string, orgID?: string) {
         this.datasets = new datasets.Service(basePath, accessToken, orgID);
-        this.teams = new teams.Service(basePath, accessToken, orgID);
         this.tokens = {
             api: new tokens.APIService(basePath, accessToken, orgID),
             personal: new tokens.PersonalService(basePath, accessToken, orgID),
