@@ -20,7 +20,6 @@ describe('Client', () => {
         expect(client.datasets).not.empty;
         expect(client.users).not.empty;
         expect(client.version).not.empty;
-        expect(client.virtualFields).not.empty;
     });
 
     it('Retries failed 5xx requests', async () => {
