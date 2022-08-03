@@ -66,15 +66,6 @@ export namespace datasets {
         numDeleted: number;
     }
 
-    export interface HistoryQuery {
-        id: string;
-        dataset: string;
-        kind: starred.QueryKind;
-        query: datasets.Query | datasets.APLQuery
-        who: string;
-        created: string;
-    }
-
     export interface CreateRequest {
         name: string;
         description?: string;
@@ -317,11 +308,6 @@ export namespace datasets {
                 return response.data;
             });
         };
-
-        history = (id: string): Promise<HistoryQuery> =>
-            this.client.get<HistoryQuery>(this.localPath + '/_history/' + id).then((response) => {
-                return response.data;
-            });
 
         ingest = (
             id: string,

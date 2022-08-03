@@ -108,19 +108,6 @@ describe('DatasetsService', () => {
             },
         ];
 
-        const historyQuery = {
-            id: 'GHP2ufS7OYwMeBhXHj',
-            dataset: 'test',
-            kind: 'analytics',
-            query: {
-                startTime: '2020-11-18T13:00:00.000Z',
-                endTime: '2020-11-25T14:00:00.000Z',
-                limit: 100,
-            },
-            who: 'f83e245a-afdc-47ad-a765-4addd1994333',
-            created: '2020-12-08T13:28:52.78954814Z',
-        };
-
         const ingestStatus = {
             ingested: 2,
             failed: 0,
@@ -193,7 +180,6 @@ describe('DatasetsService', () => {
         scope.post('/api/v1/datasets/test1/trim').reply(200, {
             numDeleted: 1,
         });
-        scope.get('/api/v1/datasets/_history/test').reply(200, historyQuery);
         scope.post('/api/v1/datasets/test/ingest').reply(function (_, body, cb) {
             expect(this.req.headers).to.have.property('content-type');
             expect(body).to.deep.equal([{ foo: 'bar' }, { foo: 'baz' }]);
@@ -280,13 +266,6 @@ describe('DatasetsService', () => {
         const response = await client.trim('test1', '30m');
         expect(response).not.equal('undefined');
         expect(response.numDeleted).equal(1);
-    });
-
-    it('History', async () => {
-        const response = await client.history('test');
-        expect(response).not.equal('undefined');
-        expect(response.id).equal('GHP2ufS7OYwMeBhXHj');
-        expect(response.kind).equal(starred.QueryKind.Analytics);
     });
 
     it('IngestString', async () => {
