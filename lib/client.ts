@@ -1,6 +1,4 @@
 import { datasets } from './datasets';
-import { monitors } from './monitors';
-import { notifiers } from './notifiers';
 import { teams } from './teams';
 import { tokens } from './tokens';
 import { users } from './users';
@@ -9,8 +7,6 @@ import { vfields } from './vfields';
 
 export default class Client {
     datasets: datasets.Service;
-    monitors: monitors.Service;
-    notifiers: notifiers.Service;
     teams: teams.Service;
     tokens: {
         api: tokens.APIService;
@@ -22,8 +18,6 @@ export default class Client {
 
     constructor(basePath?: string, accessToken?: string, orgID?: string) {
         this.datasets = new datasets.Service(basePath, accessToken, orgID);
-        this.monitors = new monitors.Service(basePath, accessToken, orgID);
-        this.notifiers = new notifiers.Service(basePath, accessToken, orgID);
         this.teams = new teams.Service(basePath, accessToken, orgID);
         this.tokens = {
             api: new tokens.APIService(basePath, accessToken, orgID),
