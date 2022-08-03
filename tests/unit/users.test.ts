@@ -22,26 +22,6 @@ describe('UsersService', () => {
                 role: 'owner',
                 permissions: [],
             },
-            {
-                id: 'e9cffaad-60e7-4b04-8d27-185e1808c38c',
-                name: 'Michael Doe',
-                email: 'michael@example.com',
-                role: 'owner',
-                permissions: [
-                    'CanUpdate',
-                    'ChangeAccess',
-                    'ChangeApiKeys',
-                    'ChangeAuthentication',
-                    'ChangeDashboards',
-                    'ChangeIntegrations',
-                    'ChangeMonitorsAndNotifiers',
-                    'ChangeSavedQueries',
-                    'ChangeVirtualFields',
-                    'ManageBilling',
-                    'ManageDatasets',
-                    'ManageIngestTokens',
-                ],
-            },
         ];
 
         const scope = nock('http://axiom-node.dev.local');
