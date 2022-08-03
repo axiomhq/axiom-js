@@ -8,89 +8,6 @@ describe('DatasetsService', () => {
     const client = new datasets.Service('http://axiom-node.dev.local');
 
     beforeEach(() => {
-        const stats = {
-            datasets: [
-                {
-                    name: 'test',
-                    numBlocks: 1,
-                    numEvents: 68459,
-                    numFields: 8,
-                    inputBytes: 10383386,
-                    inputBytesHuman: '10 MB',
-                    compressedBytes: 2509224,
-                    compressedBytesHuman: '2.5 MB',
-                    minTime: '2020-11-17T22:30:59Z',
-                    maxTime: '2020-11-18T17:31:55Z',
-                    fields: [
-                        {
-                            name: '_sysTime',
-                            type: 'integer',
-                        },
-                        {
-                            name: '_time',
-                            type: 'integer',
-                        },
-                        {
-                            name: 'path',
-                            type: 'string',
-                        },
-                        {
-                            name: 'size',
-                            type: 'integer',
-                        },
-                        {
-                            name: 'status',
-                            type: 'integer',
-                        },
-                    ],
-                    who: 'f83e245a-afdc-47ad-a765-4addd1994333',
-                    created: '2020-11-18T21:30:20.623322799Z',
-                },
-                {
-                    name: 'test1',
-                    numBlocks: 1,
-                    numEvents: 68459,
-                    numFields: 8,
-                    inputBytes: 10383386,
-                    inputBytesHuman: '10 MB',
-                    compressedBytes: 2509224,
-                    compressedBytesHuman: '2.5 MB',
-                    minTime: '2020-11-17T22:30:59Z',
-                    maxTime: '2020-11-18T17:31:55Z',
-                    fields: [
-                        {
-                            name: '_sysTime',
-                            type: 'integer',
-                        },
-                        {
-                            name: '_time',
-                            type: 'integer',
-                        },
-                        {
-                            name: 'path',
-                            type: 'string',
-                        },
-                        {
-                            name: 'size',
-                            type: 'integer',
-                        },
-                        {
-                            name: 'status',
-                            type: 'integer',
-                        },
-                    ],
-                    who: 'f83e245a-afdc-47ad-a765-4addd1994333',
-                    created: '2020-11-18T21:30:20.623322799Z',
-                },
-            ],
-            numBlocks: 2,
-            numEvents: 136918,
-            inputBytes: 666337356,
-            inputBytesHuman: '666 MB',
-            compressedBytes: 19049348,
-            compressedBytesHuman: '19 MB',
-        };
-
         const datasets = [
             {
                 id: 'test',
@@ -169,14 +86,12 @@ describe('DatasetsService', () => {
 
         const scope = nock('http://axiom-node.dev.local');
 
-        scope.get('/api/v1/datasets/_stats').reply(200, stats);
         scope.get('/api/v1/datasets').reply(200, datasets);
         scope.get('/api/v1/datasets/test').reply(200, datasets[0]);
         scope.post('/api/v1/datasets').reply(200, datasets[1]);
         scope.put('/api/v1/datasets/test1').reply(200, datasets[1]);
         scope.put('/api/v1/datasets/test1/fields/response').reply(200, datasets[1]);
         scope.delete('/api/v1/datasets/test1').reply(204);
-        scope.get('/api/v1/datasets/test/info').reply(200, stats.datasets[0]);
         scope.post('/api/v1/datasets/test1/trim').reply(200, {
             numDeleted: 1,
         });
@@ -190,14 +105,6 @@ describe('DatasetsService', () => {
         scope.post('/api/v1/datasets/test/query?streaming-duration=1m&nocache=true').reply(200, queryResult);
         scope.post('/api/v1/datasets/_apl').reply(200, queryResult);
         scope.post('/api/v1/datasets/_apl?streaming-duration=1m&nocache=true').reply(200, queryResult);
-    });
-
-    it('Stats', async () => {
-        const response = await client.stats();
-        expect(response).not.equal('undefined');
-        expect(response.datasets).length(2);
-        expect(response.numBlocks).equal(2);
-        expect(response.numEvents).equal(136918);
     });
 
     it('List', async () => {
@@ -252,14 +159,6 @@ describe('DatasetsService', () => {
         const response = await client.delete('test1');
         expect(response).not.equal('undefined');
         expect(response.status).equal(204);
-    });
-
-    it('Info', async () => {
-        const response = await client.info('test');
-        expect(response).not.equal('undefined');
-        expect(response.name).equal('test');
-        expect(response.numBlocks).equal(1);
-        expect(response.numEvents).equal(68459);
     });
 
     it('Trim', async () => {

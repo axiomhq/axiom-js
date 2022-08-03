@@ -36,32 +36,6 @@ export namespace datasets {
         hidden: boolean;
     }
 
-    export interface Info {
-        name: string;
-        fields?: Array<Field>;
-        compressedBytes: number;
-        compressedBytesHuman: string;
-        inputBytes: number;
-        inputBytesHuman: string;
-        numBlocks: number;
-        numEvents: number;
-        numFields: number;
-        maxTime?: string;
-        minTime?: string;
-        created: string;
-        who: string;
-    }
-
-    export interface Stats {
-        datasets?: Array<Info>;
-        numBlocks: number;
-        numEvents: number;
-        inputBytes: number;
-        inputBytesHuman: string;
-        compressedBytes: number;
-        compressedBytesHuman: string;
-    }
-
     export interface TrimResult {
         numDeleted: number;
     }
@@ -263,11 +237,6 @@ export namespace datasets {
     export class Service extends HTTPClient {
         private readonly localPath = '/api/v1/datasets';
 
-        stats = (): Promise<Stats> =>
-            this.client.get<Stats>(this.localPath + '/_stats').then((response) => {
-                return response.data;
-            });
-
         list = (): Promise<[Dataset]> =>
             this.client.get<[Dataset]>(this.localPath).then((response) => {
                 return response.data;
@@ -294,11 +263,6 @@ export namespace datasets {
             });
 
         delete = (id: string): Promise<AxiosResponse> => this.client.delete<AxiosResponse>(this.localPath + '/' + id);
-
-        info = (id: string): Promise<Info> =>
-            this.client.get<Info>(this.localPath + '/' + id + '/info').then((response) => {
-                return response.data;
-            });
 
         trim = (id: string, maxDurationStr: string): Promise<TrimResult> => {
             // Go's 'time.Duration' uses nanoseconds as its base unit. So parse the

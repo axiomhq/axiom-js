@@ -118,16 +118,6 @@ baz`,
         })
     });
 
-    describe('info', () => {
-        it('should get the dataset info', async () => {
-            const info = await client.info(datasetName);
-
-            expect(info.name).to.equal(datasetName);
-            expect(info.numEvents).to.equal(11);
-            expect(info.fields?.length).to.equal(4);
-        });
-    });
-
     describe('updateField', () => {
         it('should update field description of the dataset', async () => {
             const dataset = await client.updateField(datasetName, 'foo', {
@@ -137,14 +127,6 @@ baz`,
             });
 
             expect(dataset.description).to.equal('HTTP status code returned as part of the response');
-        });
-    });
-
-    describe('stats', () => {
-        it('returns a valid response', async () => {
-            const stats = await client.stats();
-
-            expect(stats.datasets?.length).to.be.greaterThan(0);
         });
     });
 
