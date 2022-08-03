@@ -4,7 +4,6 @@ import { AxiosResponse } from 'axios';
 import { Readable, Stream } from 'stream';
 
 import HTTPClient from './httpClient';
-import { starred } from './starred';
 
 export namespace datasets {
     export const TimestampField = '_time';

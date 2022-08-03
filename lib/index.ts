@@ -4,7 +4,6 @@ export { CloudURL } from './httpClient';
 export { datasets } from './datasets';
 export { monitors } from './monitors';
 export { notifiers } from './notifiers';
-export { starred } from './starred';
 export { teams } from './teams';
 export { tokens } from './tokens';
 export { users } from './users';

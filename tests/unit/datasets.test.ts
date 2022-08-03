@@ -2,7 +2,6 @@ import { expect } from 'chai';
 import nock from 'nock';
 
 import { datasets } from '../../lib/datasets';
-import { starred } from '../../lib/starred';
 
 describe('DatasetsService', () => {
     const client = new datasets.Service('http://axiom-node.dev.local');
