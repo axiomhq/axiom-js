@@ -46,35 +46,9 @@ export namespace users {
                 return response.data;
             });
 
-        list = (): Promise<[User]> =>
-            this.client.get<[User]>(this.localPath).then((response) => {
-                return response.data;
-            });
-
         get = (id: string): Promise<User> =>
             this.client.get<User>(this.localPath + '/' + id).then((response) => {
                 return response.data;
             });
-
-        create = (user: CreateRequest): Promise<User> =>
-            this.client.post<User>(this.localPath, user).then((response) => {
-                return response.data;
-            });
-
-        update = (id: string, name: string): Promise<User> => {
-            const req: UpdateRequest = { name: name };
-            return this.client.put<User>(this.localPath + '/' + id, req).then((response) => {
-                return response.data;
-            });
-        };
-
-        updateRole = (id: string, role: Role): Promise<User> => {
-            const req: UpdateRoleRequest = { role: role };
-            return this.client.put<User>(this.localPath + '/' + id, req).then((response) => {
-                return response.data;
-            });
-        };
-
-        delete = (id: string): Promise<AxiosResponse> => this.client.delete<AxiosResponse>(this.localPath + '/' + id);
     }
 }
