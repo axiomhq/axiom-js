@@ -90,7 +90,6 @@ describe('DatasetsService', () => {
         scope.get('/api/v1/datasets/test').reply(200, datasets[0]);
         scope.post('/api/v1/datasets').reply(200, datasets[1]);
         scope.put('/api/v1/datasets/test1').reply(200, datasets[1]);
-        scope.put('/api/v1/datasets/test1/fields/response').reply(200, datasets[1]);
         scope.delete('/api/v1/datasets/test1').reply(204);
         scope.post('/api/v1/datasets/test1/trim').reply(200, {
             numDeleted: 1,
@@ -140,18 +139,6 @@ describe('DatasetsService', () => {
         const response = await client.update('test1', req);
         expect(response).not.equal('undefined');
         expect(response.id).equal('test1');
-        expect(response.description).equal('This is a test description');
-    });
-
-    it('UpdateField', async () => {
-        const req: datasets.UpdateFieldRequest = {
-            description: 'This is a test description',
-            unit: '',
-            hidden: false,
-        };
-
-        const response = await client.updateField('test1', 'response', req);
-        expect(response).not.equal('undefined');
         expect(response.description).equal('This is a test description');
     });
 
