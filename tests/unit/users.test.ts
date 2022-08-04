@@ -1,7 +1,6 @@
 import { expect } from 'chai';
 import nock from 'nock';
 
-import { CloudURL } from '../../lib';
 import { users } from '../../lib/users';
 
 describe('UsersService', () => {
@@ -35,13 +34,5 @@ describe('UsersService', () => {
         expect(response).not.equal('undefined');
         expect(response.name).equal('Lukas Malkmus');
         expect(response.emails).length(1);
-    });
-
-    it('Get', async () => {
-        const response = await client.get('20475220-20e4-4080-b2f4-68315e21f5ec');
-        expect(response).not.equal('undefined');
-        expect(response.id).equal('20475220-20e4-4080-b2f4-68315e21f5ec');
-        expect(response.name).equal('John Doe');
-        expect(response.role).equal(users.Role.Owner);
     });
 });
