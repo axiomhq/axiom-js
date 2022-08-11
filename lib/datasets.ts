@@ -208,6 +208,8 @@ export namespace datasets {
         numGroups: number;
         rowsExamined: number;
         rowsMatched: number;
+        maxCursor: string;
+        minCursor: string;
     }
 
     export interface Message {
