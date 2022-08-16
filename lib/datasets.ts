@@ -110,10 +110,13 @@ export namespace datasets {
         Topk = 'topk',
         Percentiles = 'percentiles',
         Histogram = 'histogram',
+        Variance = 'variance',
         Stdev = 'stdev',
-        Argmin = 'argmin',
-        Argmax = 'argmax',
-        Set = 'set'
+        ArgMin = 'argmin',
+        ArgMax = 'argmax',
+        Set = 'set',
+        CountIf = 'countif',
+        CountDistinctIf = 'distinctif'
     }
 
     export interface Filter {
