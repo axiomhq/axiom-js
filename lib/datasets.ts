@@ -115,6 +115,7 @@ export namespace datasets {
         ArgMin = 'argmin',
         ArgMax = 'argmax',
         MakeSet = 'makeset',
+        MakeSetIf = 'makesetif',
         CountIf = 'countif',
         CountDistinctIf = 'distinctif'
     }
