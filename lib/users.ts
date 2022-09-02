@@ -1,13 +1,11 @@
 import HTTPClient from './httpClient';
 
 export namespace users {
-
     export interface User {
         id: string;
         name: string;
         emails: Array<string>;
     }
-
 
     export class Service extends HTTPClient {
         private readonly localPath = '/api/v1/users';

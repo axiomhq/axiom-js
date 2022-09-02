@@ -8,7 +8,7 @@ export const CloudURL = 'https://cloud.axiom.co';
 
 export default abstract class HTTPClient {
     protected readonly client: AxiosInstance;
-    limits: {[key: string]: Limit} = {};
+    limits: { [key: string]: Limit } = {};
 
     constructor(
         basePath: string = process.env.AXIOM_URL || CloudURL,
@@ -127,16 +127,15 @@ export class AxiomTooManyRequestsError extends Error {
         }
     }
 
-    timeUntilReset(){
+    timeUntilReset() {
         const total = this.limit.reset.getTime() - new Date().getTime();
-        const seconds = Math.floor( (total/1000) % 60 );
-        const minutes = Math.floor( (total/1000/60) % 60 );
-      
+        const seconds = Math.floor((total / 1000) % 60);
+        const minutes = Math.floor((total / 1000 / 60) % 60);
+
         return {
-          total,
-          minutes,
-          seconds
+            total,
+            minutes,
+            seconds,
         };
-      }
-      
+    }
 }

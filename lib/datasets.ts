@@ -117,7 +117,7 @@ export namespace datasets {
         MakeSet = 'makeset',
         MakeSetIf = 'makesetif',
         CountIf = 'countif',
-        CountDistinctIf = 'distinctif'
+        CountDistinctIf = 'distinctif',
     }
 
     export interface Filter {
@@ -316,9 +316,9 @@ export namespace datasets {
             options?: IngestOptions,
         ): Promise<IngestStatus> => {
             const array = Array.isArray(events) ? events : [events];
-            const json = array.map(v => JSON.stringify(v)).join("\n");
+            const json = array.map((v) => JSON.stringify(v)).join('\n');
             const encoded = await promisify(gzip)(json);
-            return this.ingestBuffer(id, encoded, ContentType.NDJSON, ContentEncoding.GZIP, options)
+            return this.ingestBuffer(id, encoded, ContentType.NDJSON, ContentEncoding.GZIP, options);
         };
 
         query = (id: string, query: Query, options?: QueryOptions): Promise<QueryResult> =>
