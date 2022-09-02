@@ -56,17 +56,20 @@ export default abstract class HTTPClient {
                     return Promise.reject(error);
                 }
 
-                const limit = parseLimitFromResponse(error.response);
-                const key = limitKey(limit.type, limit.scope);
-                this.limits[key] = limit;
+                // Some errors don't have a response (i.e. when unit-testing)
+                if (error.response) {
+                    const limit = parseLimitFromResponse(error.response);
+                    const key = limitKey(limit.type, limit.scope);
+                    this.limits[key] = limit;
 
-                if (error.response.status == 429) {
-                    return Promise.reject(new AxiomTooManyRequestsError(limit, error.response));
-                }
+                    if (error.response.status == 429) {
+                        return Promise.reject(new AxiomTooManyRequestsError(limit, error.response));
+                    }
 
-                const message = error.response.data.message;
-                if (message) {
-                    return Promise.reject(new Error(message));
+                    const message = error.response.data.message;
+                    if (message) {
+                        return Promise.reject(new Error(message));
+                    }
                 }
 
                 return Promise.reject(error);

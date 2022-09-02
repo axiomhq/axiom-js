@@ -101,8 +101,8 @@ describe('DatasetsService', () => {
         });
         scope.post('/api/v1/datasets/test/query').reply(200, queryResult);
         scope.post('/api/v1/datasets/test/query?streaming-duration=1m&nocache=true').reply(200, queryResult);
-        scope.post('/api/v1/datasets/_apl').reply(200, queryResult);
-        scope.post('/api/v1/datasets/_apl?streaming-duration=1m&nocache=true').reply(200, queryResult);
+        scope.post('/api/v1/datasets/_apl?format=legacy').reply(200, queryResult);
+        scope.post('/api/v1/datasets/_apl?streaming-duration=1m&nocache=true&format=legacy').reply(200, queryResult);
     });
 
     it('List', async () => {
@@ -167,48 +167,44 @@ describe('DatasetsService', () => {
     });
 
     it('Query', async () => {
-        it('works without options', async () => {
-            const query = {
-                startTime: '2020-11-26T11:18:00Z',
-                endTime: '2020-11-17T11:18:00Z',
-                resolution: 'auto',
-            };
-            const response = await client.query('test', query);
-            expect(response).not.equal('undefined');
-            expect(response.matches).length(2);
-        });
+        // works without options
+        let query = {
+            startTime: '2020-11-26T11:18:00Z',
+            endTime: '2020-11-17T11:18:00Z',
+            resolution: 'auto',
+        };
+        let response = await client.query('test', query);
+        expect(response).not.equal('undefined');
+        expect(response.matches).length(2);
 
-        it('works with options', async () => {
-            const query = {
-                startTime: '2020-11-26T11:18:00Z',
-                endTime: '2020-11-17T11:18:00Z',
-                resolution: 'auto',
-            };
-            const options = {
-                streamingDuration: '1m',
-                noCache: true,
-            };
-            const response = await client.query('test', query, options);
-            expect(response).not.equal('undefined');
-            expect(response.matches).length(2);
-        });
+        // works with options
+        query = {
+            startTime: '2020-11-26T11:18:00Z',
+            endTime: '2020-11-17T11:18:00Z',
+            resolution: 'auto',
+        };
+        const options = {
+            streamingDuration: '1m',
+            noCache: true,
+        };
+        response = await client.query('test', query, options);
+        expect(response).not.equal('undefined');
+        expect(response.matches).length(2);
     });
 
     it('APL Query', async () => {
-        it('works without options', async () => {
-            const response = await client.aplQuery("['test'] | where response == 304");
-            expect(response).not.equal('undefined');
-            expect(response.matches).length(2);
-        });
+        // works without options
+        let response = await client.aplQuery("['test'] | where response == 304");
+        expect(response).not.equal('undefined');
+        expect(response.matches).length(2);
 
-        it('works with options', async () => {
-            const options = {
-                streamingDuration: '1m',
-                noCache: true,
-            };
-            const response = await client.aplQuery("['test'] | where response == 304", options);
-            expect(response).not.equal('undefined');
-            expect(response.matches).length(2);
-        });
+        // works with options
+        const options = {
+            streamingDuration: '1m',
+            noCache: true,
+        };
+        response = await client.aplQuery("['test'] | where response == 304", options);
+        expect(response).not.equal('undefined');
+        expect(response.matches).length(2);
     });
 });
