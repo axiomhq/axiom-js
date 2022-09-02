@@ -175,6 +175,15 @@ export namespace datasets {
         status: Status;
     }
 
+    export interface AplQueryResult {
+        request: Query;
+
+        // Copied from QueryResult
+        buckets: Timeseries;
+        matches?: Array<Entry>;
+        status: Status;
+    }
+
     export interface Timeseries {
         series?: Array<Interval>;
         totals?: Array<EntryGroup>;
@@ -333,10 +342,10 @@ export namespace datasets {
                     return response.data;
                 });
 
-        aplQuery = (apl: string, options?: APLQueryOptions): Promise<QueryResult> => {
+        aplQuery = (apl: string, options?: APLQueryOptions): Promise<AplQueryResult> => {
             const req: APLQuery = { apl: apl, startTime: options?.startTime, endTime: options?.endTime };
             return this.client
-                .post<QueryResult>(this.localPath + '/_apl', req, {
+                .post<AplQueryResult>(this.localPath + '/_apl', req, {
                     params: {
                         'streaming-duration': options?.streamingDuration,
                         nocache: options?.noCache,

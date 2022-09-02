@@ -83,6 +83,15 @@ describe('DatasetsService', () => {
             },
         };
 
+        const aplQueryResult = {
+            request: {
+                startTime: '2020-11-19T11:06:31.569475746Z',
+                endTime: '2020-11-27T12:06:38.966791794Z',
+                resolution: "auto"
+            },
+            ...queryResult,
+        }
+
         const scope = nock('http://axiom-node.dev.local');
 
         scope.get('/api/v1/datasets').reply(200, datasets);
@@ -101,8 +110,8 @@ describe('DatasetsService', () => {
         });
         scope.post('/api/v1/datasets/test/query').reply(200, queryResult);
         scope.post('/api/v1/datasets/test/query?streaming-duration=1m&nocache=true').reply(200, queryResult);
-        scope.post('/api/v1/datasets/_apl?format=legacy').reply(200, queryResult);
-        scope.post('/api/v1/datasets/_apl?streaming-duration=1m&nocache=true&format=legacy').reply(200, queryResult);
+        scope.post('/api/v1/datasets/_apl?format=legacy').reply(200, aplQueryResult);
+        scope.post('/api/v1/datasets/_apl?streaming-duration=1m&nocache=true&format=legacy').reply(200, aplQueryResult);
     });
 
     it('List', async () => {
