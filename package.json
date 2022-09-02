@@ -1,7 +1,7 @@
 {
     "name": "@axiomhq/axiom-node",
     "description": "TypeScript bindings for the Axiom API.",
-    "version": "0.5.0",
+    "version": "0.6.0",
     "author": "Axiom, Inc.",
     "license": "MIT",
     "contributors": [
