@@ -180,6 +180,7 @@ export namespace datasets {
 
         // Copied from QueryResult
         buckets: Timeseries;
+        datasetNames: string[];
         matches?: Array<Entry>;
         status: Status;
     }
