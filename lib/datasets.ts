@@ -36,7 +36,6 @@ export namespace datasets {
     }
 
     export interface TrimResult {
-        numDeleted: number;
     }
 
     export interface CreateRequest {

@@ -100,7 +100,6 @@ describe('DatasetsService', () => {
         scope.put('/api/v1/datasets/test1').reply(200, datasets[1]);
         scope.delete('/api/v1/datasets/test1').reply(204);
         scope.post('/api/v1/datasets/test1/trim').reply(200, {
-            numDeleted: 1,
         });
         scope.post('/api/v1/datasets/test/ingest').reply(function (_, body, cb) {
             expect(this.req.headers).to.have.property('content-type');
@@ -159,7 +158,6 @@ describe('DatasetsService', () => {
     it('Trim', async () => {
         const response = await client.trim('test1', '30m');
         expect(response).not.equal('undefined');
-        expect(response.numDeleted).equal(1);
     });
 
     it('IngestString', async () => {
