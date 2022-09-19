@@ -148,7 +148,7 @@ baz`,
         it('returns a valid response', async () => {
             const result = await client.trim(datasetName, '1s');
 
-            expect(result.numDeleted).to.equal(0);
+            expect(result).to.not.equal(null);
         });
     });
 });
