@@ -60,7 +60,7 @@ const client = new Client({
 ## Contributing
 
 The main aim of this repository is to continue developing and advancing
-axoim-node, making it faster and simpler to use. Kindly check our
+axiom-node, making it faster and simpler to use. Kindly check our
 [contributing guide](https://github.com/axiomhq/axiom-node/blob/main/Contributing.md)
 on how to propose bugfixes and improvements, and submitting pull requests to the
 project
