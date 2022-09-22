@@ -46,7 +46,7 @@ all that are supported.
 | `AXIOM_ORG_ID`       | Your Axiom org id, necessary for personal tokens                                         |
 | `AXIOM_URL`          | If you self-host Axiom, set this to your deployment url                                  |
 
-You can programatically override these by passing an options object to the 
+You can programmatically override these by passing an options object to the 
 `Client` constructor, here's an example with all values set:
 
 ```ts
