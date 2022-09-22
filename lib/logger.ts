@@ -2,21 +2,21 @@ import Transport, { TransportStreamOptions } from 'winston-transport';
 
 import Client from './client';
 
-export interface Options extends TransportStreamOptions {
+export interface WinstonOptions extends TransportStreamOptions {
     dataset?: string;
     token?: string;
     orgId?: string;
     url?: string;
 }
 
-export default class AxiomTransport extends Transport {
+export class WinstonTransport extends Transport {
     client: Client;
     dataset: string;
     batch: object[] = [];
     batchCallback: (err: Error | null) => void = () => {};
     batchTimeoutId?: NodeJS.Timeout;
 
-    constructor(opts?: Options) {
+    constructor(opts?: WinstonOptions) {
         super(opts);
         this.client = new Client(opts);
         this.dataset = opts?.dataset || process.env.AXIOM_DATASET || '';
