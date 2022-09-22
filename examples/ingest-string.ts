@@ -1,14 +1,10 @@
-const { Readable } = require("stream")
+const { Readable } = require('stream');
 import Client, { datasets } from '@axiomhq/axiom-node';
 
 const client = new Client();
 
 async function ingestString() {
-    const str = JSON.stringify([
-        {"foo": "bar"},
-        {"foo": "bar"},
-        {"bar": "baz"}
-    ]);
+    const str = JSON.stringify([{ foo: 'bar' }, { foo: 'bar' }, { bar: 'baz' }]);
     const stream = Readable.from(str);
     const res = await client.datasets.ingest(
         'test',

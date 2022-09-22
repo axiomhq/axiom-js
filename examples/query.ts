@@ -5,7 +5,7 @@ const client = new Client();
 
 async function query() {
     const endTime = new Date(Date.now()).toISOString();
-    const startTime = new Date(new Date().getTime() - (1 * 60 * 60)).toISOString(); // 1 minute
+    const startTime = new Date(new Date().getTime() - 1 * 60 * 60).toISOString(); // 1 minute
     const query = {
         startTime: startTime,
         endTime: endTime,
@@ -18,9 +18,9 @@ async function query() {
         return;
     }
 
-    for(let matched of res.matches) {
+    for (let matched of res.matches) {
         console.log(matched.data);
-    }   
+    }
 }
 
 query();
