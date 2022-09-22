@@ -57,6 +57,22 @@ const client = new Client({
 });
 ```
 
+## Logger support
+
+This library exports a transport for [winston](https://github.com/winstonjs/winston),
+which you can use like this:
+
+```ts
+import { WinstonTransport as AxiomTransport } from '@axiomhq/axiom-node';
+
+const logger = winston.createLogger({
+  // ...
+  transports: [
+    new AxiomTransport(),
+  ],
+});
+```
+
 ## Contributing
 
 The main aim of this repository is to continue developing and advancing
