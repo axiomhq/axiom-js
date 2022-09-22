@@ -38,7 +38,7 @@ describe('WinstonTransport', () => {
         });
 
         // Wait for the log to be sent
-        await new Promise((resolve) => setTimeout(resolve, 1000));
+        await new Promise((resolve) => setTimeout(resolve, 2000));
 
         const res = await client.datasets.aplQuery(`['${datasetName}']`);
         expect(res.matches).to.have.a.lengthOf(1);
