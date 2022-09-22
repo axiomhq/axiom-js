@@ -1,95 +1,66 @@
-# Axiom Node
-
-[![Workflow][workflow_badge]][workflow]
-[![Latest Release][release_badge]][release]
-[![License][license_badge]][license]
+# axiom-node [![Workflow][workflow_badge]][workflow] [![Latest Release][release_badge]][release] [![License][license_badge]][license]
 
 ![Alt](https://repobeats.axiom.co/api/embed/40b1a942132e3f515d5374bde5e47fb0750eb411.svg "Repobeats analytics image")
 
----
+The Node SDK for [Axiom](https://www.axiom.co/).
 
-## Table of Contents
+## Quickstart
 
-1. [Introduction](#introduction)
-1. [Installation](#installation)
-1. [Authentication](#authentication)
-1. [Usage](#usage)
-1. [Documentation](#documentation)
-1. [Contributing](#contributing)
-1. [License](#license)
-
-## Introduction
-
-Axiom Node is a NodeJS package for accessing the [Axiom](https://www.axiom.co/)
-API.
-
-## Installation 
-
-### Install using `npm`
+Install the package:
 
 ```shell
-npm i @axiomhq/axiom-node
+npm install @axiomhq/axiom-node
 ```
 
-### Install from source
-
-```shell
-git clone https://github.com/axiomhq/axiom-node
-cd axiom-node
-npm install
-```
-
-## Authentication
-
-The client is initialized with the url of the deployment and an access token
-when using Axiom Selfhost or an access token and the users organization id when
-using Axiom Cloud.
-
-The access token can be a personal token retrieved from the users profile page
-or an ingest token retrieved from the settings of the Axiom deployment.
-
-The personal access token grants access to all resources available to the user
-on his behalf.
-
-The ingest token just allows ingestion into the datasets the token is configured
-for.
-
-## Usage
+Then use it like this:
 
 ```ts
-// Export `AXIOM_TOKEN` and `AXIOM_ORG_ID` for Axiom Cloud
-// Export `AXIOM_URL` and `AXIOM_TOKEN` for Axiom Selfhost
-
 import Client from '@axiomhq/axiom-node';
 
+// Construct a client from environment variables
+// Export an API token in `AXIOM_TOKEN` for this to work
 const client = new Client();
 
-// ...
+// Ingest two events
+await client.datasets.ingestEvents('my-application', [
+  { 'method': 'GET', path: '/' },
+  { 'method': 'POST', path: '/login' }
+]);
+
+// Query the dataset
+const res = await client.datasets.aplQuery(`['my-application'] | summarize count() by bin_auto(_time)`);
+const count = res.buckets.totals![0].aggregations![0].value;
+console.log(`We have a count of ${count}`);
 ```
 
 For more sample code snippets, head over to the [examples](examples) directory.
 
-## Documentation
+## Advanced configuration
 
-You can find the Axiom and Axiom node documentation
-[on the docs website.](https://docs.axiom.co/)
+The quickstart example above creates a client by environment variables, here's 
+all that are supported.
 
-The documentation is divided into several sections:
+| Environment variable | Description                                                                              |
+|----------------------|------------------------------------------------------------------------------------------|
+| `AXIOM_TOKEN`        | An Axiom API or personal token. If it's a personal token you'll also need `AXIOM_ORG_ID` |
+| `AXIOM_ORG_ID`       | Your Axiom org id, necessary for personal tokens                                         |
+| `AXIOM_URL`          | If you self-host Axiom, set this to your deployment url                                  |
 
-- [Overview of Axiom](https://docs.axiom.co/usage/getting-started/)
-- **Installing Axiom:**
-  - [Axiom Cloud](https://docs.axiom.co/install/cloud/)
-  - [Desktop Demo](https://docs.axiom.co/install/demo/)
-  - [Runing Axiom on Kubernetes](https://docs.axiom.co/install/kubernetes/)
-- [Axiom API](https://docs.axiom.co/reference/api/)
-- [Axiom CLI](https://github.com/axiomhq/cli)
-- [Getting Support](https://www.axiom.co/support/)
-- [Data Shippers we support](https://docs.axiom.co/data-shippers/elastic-beats/)
+You can programatically override these by passing an options object to the 
+`Client` constructor, here's an example with all values set:
+
+```ts
+const client = new Client({
+  token: "xaat-xxxx",
+  orgId: "my-org",
+  url: "http://my-axiom.example.org"
+});
+```
 
 ## Contributing
 
-The main aim of this repository is to continue developing and advancing Axiom
-Node, making it faster and simpler to use. Kindly check our
+The main aim of this repository is to continue developing and advancing
+axoim-node, making it faster and simpler to use. Kindly check our
 [contributing guide](https://github.com/axiomhq/axiom-node/blob/main/Contributing.md)
 on how to propose bugfixes and improvements, and submitting pull requests to the
 project
