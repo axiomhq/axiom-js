@@ -1,11 +1,10 @@
 import { expect } from 'chai';
 import nock from 'nock';
 
-import { CloudURL } from '../../lib';
 import { version } from '../../lib/version';
 
 describe('VersionsService', () => {
-    const client = new version.Service('http://axiom-node.dev.local');
+    const client = new version.Service({ url: 'http://axiom-node.dev.local' });
 
     beforeEach(() => {
         const response = {

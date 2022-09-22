@@ -4,7 +4,7 @@ import nock from 'nock';
 import { users } from '../../lib/users';
 
 describe('UsersService', () => {
-    const client = new users.Service('http://axiom-node.dev.local');
+    const client = new users.Service({ url: 'http://axiom-node.dev.local' });
 
     beforeEach(() => {
         const currentUser = {

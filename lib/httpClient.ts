@@ -6,25 +6,31 @@ const Version = require('../package.json').version;
 
 export const CloudURL = 'https://cloud.axiom.co';
 
+export interface ClientOptions {
+    token?: string;
+    url?: string;
+    orgId?: string;
+}
+
 export default abstract class HTTPClient {
     protected readonly client: AxiosInstance;
     limits: { [key: string]: Limit } = {};
 
-    constructor(
-        basePath: string = process.env.AXIOM_URL || CloudURL,
-        accessToken: string = process.env.AXIOM_TOKEN || '',
-        orgID: string = process.env.AXIOM_ORG_ID || '',
-    ) {
+    constructor(options: ClientOptions = {}) {
+        const token = options.token || process.env.AXIOM_TOKEN || '';
+        const url = options.url || process.env.AXIOM_URL || CloudURL;
+        const orgId = options.orgId || process.env.AXIOM_ORG_ID || '';
+
         this.client = axios.create({
-            baseURL: basePath,
+            baseURL: url,
             timeout: 30000,
         });
 
         this.client.defaults.headers.common['Accept'] = 'application/json';
         this.client.defaults.headers.common['User-Agent'] = 'axiom-node/' + Version;
-        this.client.defaults.headers.common['Authorization'] = 'Bearer ' + accessToken;
-        if (orgID) {
-            this.client.defaults.headers.common['X-Axiom-Org-Id'] = orgID;
+        this.client.defaults.headers.common['Authorization'] = 'Bearer ' + token;
+        if (orgId) {
+            this.client.defaults.headers.common['X-Axiom-Org-Id'] = orgId;
         }
 
         // We should only retry in the case the status code is >= 500, anything below isn't worth retrying.

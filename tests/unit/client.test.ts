@@ -5,15 +5,26 @@ import nock from 'nock';
 import Client from '../../lib/client';
 import { datasets } from '../../lib/datasets';
 import { AxiomTooManyRequestsError } from '../../lib/httpClient';
-import { headerIngestLimit, headerIngestRemaining, headerIngestReset, headerQueryLimit, headerQueryRemaining, headerQueryReset, headerAPILimit, headerAPIRateRemaining, headerAPIRateReset, headerRateScope } from '../../lib/limit';
+import {
+    headerIngestLimit,
+    headerIngestRemaining,
+    headerIngestReset,
+    headerQueryLimit,
+    headerQueryRemaining,
+    headerQueryReset,
+    headerAPILimit,
+    headerAPIRateRemaining,
+    headerAPIRateReset,
+    headerRateScope,
+} from '../../lib/limit';
 
 describe('Client', () => {
-    let client = new Client('http://axiom-node-retries.dev.local');
+    let client = new Client({ url: 'http://axiom-node-retries.dev.local' });
     expect(client).not.equal('undefined');
 
     beforeEach(() => {
         // reset client to clear rate limits
-        client = new Client('http://axiom-node-retries.dev.local');
+        client = new Client({ url: 'http://axiom-node-retries.dev.local' });
     });
 
     it('Services', () => {
@@ -60,7 +71,7 @@ describe('Client', () => {
         const resetTime = new Date();
         resetTime.setHours(resetTime.getHours() + 1);
         const resetTimeInSeconds = Math.floor(resetTime.getTime() / 1000);
-        const headers: nock.ReplyHeaders = {}
+        const headers: nock.ReplyHeaders = {};
         headers[headerRateScope] = 'anonymous';
         headers[headerAPILimit] = '1000';
         headers[headerAPIRateRemaining] = '0';
@@ -72,11 +83,13 @@ describe('Client', () => {
 
         try {
             await client.datasets.list();
-            fail("request should return an error with status 429");
-        } catch(err: any) {
+            fail('request should return an error with status 429');
+        } catch (err: any) {
             expect(err).instanceOf(AxiomTooManyRequestsError);
             const untilReset = err.timeUntilReset();
-            expect(err.message).eq(`anonymous api limit exceeded, not making remote request, try again in ${untilReset.minutes}m${untilReset.seconds}s`)
+            expect(err.message).eq(
+                `anonymous api limit exceeded, not making remote request, try again in ${untilReset.minutes}m${untilReset.seconds}s`,
+            );
             expect(err.response.status).eq(429);
             expect(err.response.statusText).eq('Too Many Requests');
             expect(err.response.data).eq('');
@@ -88,7 +101,7 @@ describe('Client', () => {
         const resetTime = new Date();
         resetTime.setHours(resetTime.getHours() + 1);
         const timestampInSeconds = Math.floor(resetTime.getTime() / 1000);
-        const headers: nock.ReplyHeaders = {}
+        const headers: nock.ReplyHeaders = {};
         headers[headerIngestLimit] = '1000';
         headers[headerIngestRemaining] = '0';
         headers[headerIngestReset] = timestampInSeconds.toString();
@@ -108,13 +121,15 @@ describe('Client', () => {
                 datasets.ContentType.JSON,
                 datasets.ContentEncoding.Identity,
             );
-            fail("request should return an error with status 429");
-        } catch(err: any) {
+            fail('request should return an error with status 429');
+        } catch (err: any) {
             expect(err).instanceOf(AxiomTooManyRequestsError);
             expect(err.response.status).eq(429);
             expect(err.response.statusText).eq('Too Many Requests');
             const untilReset = err.timeUntilReset();
-            expect(err.message).eq(`ingest limit exceeded, not making remote request, try again in ${untilReset.minutes}m${untilReset.seconds}s`)
+            expect(err.message).eq(
+                `ingest limit exceeded, not making remote request, try again in ${untilReset.minutes}m${untilReset.seconds}s`,
+            );
             expect(err.response.data).eq('');
         }
     });
@@ -124,7 +139,7 @@ describe('Client', () => {
         const resetTime = new Date();
         resetTime.setHours(resetTime.getHours() + 1);
         const resetTimeInSeconds = Math.floor(resetTime.getTime() / 1000);
-        const headers: nock.ReplyHeaders = {}
+        const headers: nock.ReplyHeaders = {};
         headers[headerQueryLimit] = '1000';
         headers[headerQueryRemaining] = '0';
         headers[headerQueryReset] = resetTimeInSeconds.toString();
@@ -137,13 +152,15 @@ describe('Client', () => {
         // second request should fail without sending remote request
         try {
             await client.datasets.aplQuery("['test']");
-            fail("request should return an error with status 429");
-        } catch(err: any) {
+            fail('request should return an error with status 429');
+        } catch (err: any) {
             expect(err).instanceOf(AxiomTooManyRequestsError);
             expect(err.response.status).eq(429);
             expect(err.response.statusText).eq('Too Many Requests');
             const untilReset = err.timeUntilReset();
-            expect(err.message).eq(`query limit exceeded, not making remote request, try again in ${untilReset.minutes}m${untilReset.seconds}s`)
+            expect(err.message).eq(
+                `query limit exceeded, not making remote request, try again in ${untilReset.minutes}m${untilReset.seconds}s`,
+            );
             expect(err.response.data).eq('');
         }
     });
@@ -151,7 +168,7 @@ describe('Client', () => {
     it('No shortcircuit for ingest or query when there is api rate limit', async () => {
         const scope = nock('http://axiom-node-retries.dev.local');
         const resetTimeInSeconds = Math.floor(new Date().getTime() / 1000);
-        const headers: nock.ReplyHeaders = {}
+        const headers: nock.ReplyHeaders = {};
         headers[headerRateScope] = 'anonymous';
         headers[headerAPILimit] = '1000';
         headers[headerAPIRateRemaining] = '0';
@@ -163,8 +180,8 @@ describe('Client', () => {
         // first api call should fail
         try {
             const resp = await client.datasets.list();
-            fail("request should return an error with status 429");
-        } catch(err: any) {
+            fail('request should return an error with status 429');
+        } catch (err: any) {
             expect(err).instanceOf(AxiomTooManyRequestsError);
         }
 
@@ -176,7 +193,6 @@ describe('Client', () => {
             datasets.ContentEncoding.Identity,
         );
 
-
         await client.datasets.aplQuery("['test']");
-    })
+    });
 });

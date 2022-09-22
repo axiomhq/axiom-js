@@ -109,13 +109,13 @@ baz`,
             const status = await client.ingestEvents(datasetName, { foo: 'bar' });
             expect(status.ingested).to.equal(1);
             expect(status.failures?.length).to.equal(0);
-        })
+        });
 
         it('works with two events', async () => {
             const status = await client.ingestEvents(datasetName, [{ foo: 'bar' }, { bar: 'baz' }]);
             expect(status.ingested).to.equal(2);
             expect(status.failures?.length).to.equal(0);
-        })
+        });
     });
 
     describe('query', () => {

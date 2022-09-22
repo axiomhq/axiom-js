@@ -4,7 +4,7 @@ import nock from 'nock';
 import { datasets } from '../../lib/datasets';
 
 describe('DatasetsService', () => {
-    const client = new datasets.Service('http://axiom-node.dev.local');
+    const client = new datasets.Service({ url: 'http://axiom-node.dev.local' });
 
     beforeEach(() => {
         const datasets = [
@@ -87,10 +87,10 @@ describe('DatasetsService', () => {
             request: {
                 startTime: '2020-11-19T11:06:31.569475746Z',
                 endTime: '2020-11-27T12:06:38.966791794Z',
-                resolution: "auto"
+                resolution: 'auto',
             },
             ...queryResult,
-        }
+        };
 
         const scope = nock('http://axiom-node.dev.local');
 
@@ -99,8 +99,7 @@ describe('DatasetsService', () => {
         scope.post('/api/v1/datasets').reply(200, datasets[1]);
         scope.put('/api/v1/datasets/test1').reply(200, datasets[1]);
         scope.delete('/api/v1/datasets/test1').reply(204);
-        scope.post('/api/v1/datasets/test1/trim').reply(200, {
-        });
+        scope.post('/api/v1/datasets/test1/trim').reply(200, {});
         scope.post('/api/v1/datasets/test/ingest').reply(function (_, body, cb) {
             expect(this.req.headers).to.have.property('content-type');
             expect(body).to.deep.equal([{ foo: 'bar' }, { foo: 'baz' }]);

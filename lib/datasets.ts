@@ -35,8 +35,7 @@ export namespace datasets {
         hidden: boolean;
     }
 
-    export interface TrimResult {
-    }
+    export interface TrimResult {}
 
     export interface CreateRequest {
         name: string;
