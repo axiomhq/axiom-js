@@ -13,11 +13,7 @@ describe('WinstonTransport', () => {
         level: 'info',
         format: winston.format.json(),
         defaultMeta: { service: 'user-service' },
-        transports: [
-            // You can pass an option here, if you don't the transport is configured
-            // using environment variables like `AXIOM_DATASET` and `AXIOM_TOKEN`
-            new AxiomTransport(),
-        ],
+        transports: [new AxiomTransport({ dataset: datasetName })],
     });
 
     before(async () => {
@@ -38,9 +34,20 @@ describe('WinstonTransport', () => {
         });
 
         // Wait for the log to be sent
-        await new Promise((resolve) => setTimeout(resolve, 2000));
+        await new Promise((resolve) => setTimeout(resolve, 1500));
 
-        const res = await client.datasets.aplQuery(`['${datasetName}']`);
+        const startTime = new Date(new Date().getTime() - 1000 * 60 * 60 * 24).toISOString();
+        const endTime = new Date(new Date().getTime() + 1000 * 60 * 60 * 24).toISOString();
+
+        // const res = await client.datasets.aplQuery(`['${datasetName}']`, {
+        //     startTime, endTime, streamingDuration: 'auto', noCache: false,
+        // });
+
+        const res = await client.datasets.query(datasetName, {
+            resolution: 'auto',
+            startTime,
+            endTime,
+        });
         expect(res.matches).to.have.a.lengthOf(1);
     });
 });
