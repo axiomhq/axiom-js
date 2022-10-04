@@ -1,99 +1,59 @@
-# axiom-node [![Workflow][workflow_badge]][workflow] [![Latest Release][release_badge]][release] [![License][license_badge]][license]
+![axiom-node: The official NodeJS bindings for the Axiom API](.github/images/banner-dark.svg#gh-dark-mode-only)
+![axiom-node: The official NodeJS bindings for the Axiom API](.github/images/banner-light.svg#gh-light-mode-only)
 
-![Alt](https://repobeats.axiom.co/api/embed/40b1a942132e3f515d5374bde5e47fb0750eb411.svg "Repobeats analytics image")
+<div align="center">
 
-The Node SDK for [Axiom](https://www.axiom.co/).
+[![Workflow][workflow_badge]][workflow]
+[![Latest Release][release_badge]][release]
+[![License][license_badge]][license]
 
-## Quickstart
+</div>
 
-Install the package:
+[Axiom](https://axiom.co) unlocks observability at any scale.
+
+- **Ingest with ease, store without limits:** Axiom’s next-generation datastore enables ingesting petabytes of data with ultimate efficiency. Ship logs from Kubernetes, AWS, Azure, Google Cloud, DigitalOcean, Nomad, and others.
+- **Query everything, all the time:** Whether DevOps, SecOps, or EverythingOps, query all your data no matter its age. No provisioning, no moving data from cold/archive to “hot”, and no worrying about slow queries. All your data, all. the. time.
+- **Powerful dashboards, for continuous observability:** Build dashboards to collect related queries and present information that’s quick and easy to digest for you and your team. Dashboards can be kept private or shared with others, and are the perfect way to bring together data from different sources
+
+For more information check out the [official documentation](https://axiom.co/docs).
+
+## Usage
+
+Install using `npm install`:
 
 ```shell
 npm install @axiomhq/axiom-node
 ```
 
-Then use it like this:
+If you use the [Axiom CLI](https://github.com/axiomhq/cli), run `eval $(axiom config export -f)` to configure your environment variables.
+
+Otherwise create a personal token in [the Axiom settings](https://cloud.axiom.co/settings/profile) and export it as `AXIOM_TOKEN`. Set `AXIOM_ORG_ID` to the organization ID from the settings page of the organization you want to access.
+
+Create and use a client like this:
 
 ```ts
 import Client from '@axiomhq/axiom-node';
 
-// Construct a client from environment variables
-// Export an API token in `AXIOM_TOKEN` for this to work
 const client = new Client();
 
-// Ingest two events
-await client.datasets.ingestEvents('my-application', [
-  { 'method': 'GET', path: '/' },
-  { 'method': 'POST', path: '/login' }
+await client.datasets.ingestEvents('my-dataset', [
+  { 'foo': 'bar'},
 ]);
 
-// Query the dataset
-const res = await client.datasets.aplQuery(`['my-application'] | summarize count() by bin_auto(_time)`);
-const count = res.buckets.totals![0].aggregations![0].value;
-console.log(`We have a count of ${count}`);
+const res = await client.datasets.aplQuery(`['my-dataset'] | where foo == 'bar' | limit 100`);
 ```
 
-For more sample code snippets, head over to the [examples](examples) directory.
-
-## Advanced configuration
-
-The quickstart example above creates a client by environment variables, here's 
-all that are supported.
-
-| Environment variable | Description                                                                              |
-|----------------------|------------------------------------------------------------------------------------------|
-| `AXIOM_TOKEN`        | An Axiom API or personal token. If it's a personal token you'll also need `AXIOM_ORG_ID` |
-| `AXIOM_ORG_ID`       | Your Axiom org id, necessary for personal tokens                                         |
-| `AXIOM_URL`          | If you self-host Axiom, set this to your deployment url                                  |
-
-You can programmatically override these by passing an options object to the 
-`Client` constructor, here's an example with all values set:
-
-```ts
-const client = new Client({
-  token: "xaat-xxxx",
-  orgId: "my-org",
-  url: "http://my-axiom.example.org"
-});
-```
-
-## Logger support
-
-This library exports a transport for [winston](https://github.com/winstonjs/winston),
-which you can use like this:
-
-```ts
-import { WinstonTransport as AxiomTransport } from '@axiomhq/axiom-node';
-
-const logger = winston.createLogger({
-  // ...
-  transports: [
-    new AxiomTransport(),
-  ],
-});
-```
-
-## Contributing
-
-The main aim of this repository is to continue developing and advancing
-axiom-node, making it faster and simpler to use. Kindly check our
-[contributing guide](https://github.com/axiomhq/axiom-node/blob/main/Contributing.md)
-on how to propose bugfixes and improvements, and submitting pull requests to the
-project
+For further examples, head over to the [examples](examples) directory.
 
 ## License
 
-&copy; Axiom, Inc., 2021
-
-Distributed under MIT License (`The MIT License`).
-
-See [LICENSE](LICENSE) for more information.
+Distributed under the [MIT License](LICENSE).
 
 <!-- Badges -->
 
 [workflow]: https://github.com/axiomhq/axiom-node/actions/workflows/push.yml
-[workflow_badge]: https://img.shields.io/github/workflow/status/axiomhq/axiom-node/CI?style=flat-square&ghcache=unused
+[workflow_badge]: https://img.shields.io/github/workflow/status/axiomhq/axiom-node/CI?ghcache=unused
 [release]: https://github.com/axiomhq/axiom-node/releases/latest
-[release_badge]: https://img.shields.io/github/release/axiomhq/axiom-node.svg?style=flat-square&ghcache=unused
+[release_badge]: https://img.shields.io/github/release/axiomhq/axiom-node.svg?ghcache=unused
 [license]: https://opensource.org/licenses/MIT
-[license_badge]: https://img.shields.io/github/license/axiomhq/axiom-node.svg?color=blue&style=flat-square&ghcache=unused
+[license_badge]: https://img.shields.io/github/license/axiomhq/axiom-node.svg?color=blue&ghcache=unused
