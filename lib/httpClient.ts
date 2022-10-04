@@ -2,7 +2,8 @@ import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 import axiosRetry, { isNetworkError, isRetryableError } from 'axios-retry';
 import { Limit, LimitType, LimitScope, parseLimitFromResponse, limitKey } from './limit';
 
-export const CloudURL = 'https://cloud.axiom.co';
+const Version = require('../package.json').version;
+const AxiomURL = 'https://cloud.axiom.co';
 
 export interface ClientOptions {
     token?: string;
@@ -16,7 +17,7 @@ export default abstract class HTTPClient {
 
     constructor(options: ClientOptions = {}) {
         const token = options.token || process.env.AXIOM_TOKEN || '';
-        const url = options.url || process.env.AXIOM_URL || CloudURL;
+        const url = options.url || process.env.AXIOM_URL || AxiomURL;
         const orgId = options.orgId || process.env.AXIOM_ORG_ID || '';
 
         this.client = axios.create({
@@ -25,6 +26,7 @@ export default abstract class HTTPClient {
         });
 
         this.client.defaults.headers.common['Accept'] = 'application/json';
+        this.client.defaults.headers.common['User-Agent'] = 'axiom-node/' + Version;
         this.client.defaults.headers.common['Authorization'] = 'Bearer ' + token;
         if (orgId) {
             this.client.defaults.headers.common['X-Axiom-Org-Id'] = orgId;
