@@ -75,19 +75,19 @@ function parseLimitFromHeaders(
     const scope: string = response.headers[headerScope.toLowerCase()] || LimitScope.unknown;
     limit.scope = LimitScope[scope as keyof typeof LimitScope];
 
-    const limitValue = response.headers[headerLimit.toLowerCase()];
+    const limitValue = response.headers[headerLimit.toLowerCase()] || '';
     const limitValueNumber = parseInt(limitValue, 10);
     if (!isNaN(limitValueNumber)) {
         limit.value = limitValueNumber;
     }
 
-    const remainingValue = response.headers[headerRemaining.toLowerCase()];
+    const remainingValue = response.headers[headerRemaining.toLowerCase()] || '';
     const remainingValueNumber = parseInt(remainingValue, 10);
     if (!isNaN(remainingValueNumber)) {
         limit.remaining = remainingValueNumber;
     }
 
-    const resetValue = response.headers[headerReset.toLowerCase()];
+    const resetValue = response.headers[headerReset.toLowerCase()] || '';
     const resetValueInt = parseInt(resetValue, 10);
     if (!isNaN(resetValueInt)) {
         limit.reset = new Date(resetValueInt * 1000);
