@@ -2,8 +2,6 @@ import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 import axiosRetry, { isNetworkError, isRetryableError } from 'axios-retry';
 import { Limit, LimitType, LimitScope, parseLimitFromResponse, limitKey } from './limit';
 
-const Version = require('../package.json').version;
-
 export const CloudURL = 'https://cloud.axiom.co';
 
 export interface ClientOptions {
@@ -27,7 +25,6 @@ export default abstract class HTTPClient {
         });
 
         this.client.defaults.headers.common['Accept'] = 'application/json';
-        this.client.defaults.headers.common['User-Agent'] = 'axiom-node/' + Version;
         this.client.defaults.headers.common['Authorization'] = 'Bearer ' + token;
         if (orgId) {
             this.client.defaults.headers.common['X-Axiom-Org-Id'] = orgId;
