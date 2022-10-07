@@ -23,10 +23,9 @@ describe('WinstonTransport', () => {
         });
     });
 
-    after(async (done) => {
+    after(async () => {
         const resp = await client.datasets.delete(datasetName);
         expect(resp.status).to.equal(204);
-        done()
         
     });
 

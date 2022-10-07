@@ -16,10 +16,9 @@ describe('DatasetsService', () => {
         });
     });
 
-    after(async (done) => {
+    after(async () => {
         const resp = await client.delete(datasetName);
         expect(resp.status).to.equal(204);
-        done();
     });
 
     describe('update', () => {
