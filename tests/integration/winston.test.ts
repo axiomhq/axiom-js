@@ -23,8 +23,11 @@ describe('WinstonTransport', () => {
         });
     });
 
-    after(async () => {
-        await client.datasets.delete(datasetName);
+    after(async (done) => {
+        const resp = await client.datasets.delete(datasetName);
+        expect(resp.status).to.equal(204);
+        done()
+        
     });
 
     it('sends logs to Axiom', async () => {
