@@ -145,12 +145,12 @@ describe('Client', () => {
         scope.post('/api/v1/datasets/_apl?format=legacy').reply(200, {}, headers);
 
         // make successful request and parse the limit headers
-        await client.datasets.aplQuery("['test']");
+        await client.datasets.query("['test']");
         expect(scope.isDone()).eq(true);
 
         // second request should fail without sending remote request
         try {
-            await client.datasets.aplQuery("['test']");
+            await client.datasets.query("['test']");
             fail('request should return an error with status 429');
         } catch (err: any) {
             expect(err).instanceOf(AxiomTooManyRequestsError);
@@ -192,6 +192,6 @@ describe('Client', () => {
             datasets.ContentEncoding.Identity,
         );
 
-        await client.datasets.aplQuery("['test']");
+        await client.datasets.query("['test']");
     });
 });

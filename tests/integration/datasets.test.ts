@@ -121,7 +121,7 @@ baz`,
 
     describe('query', () => {
         it('returns a valid response', async () => {
-            const result = await client.query(datasetName, {
+            const result = await client.queryLegacy(datasetName, {
                 startTime: '2018-01-01T00:00:00.000Z',
                 endTime: '2028-01-01T00:00:00.000Z',
                 resolution: 'auto',
@@ -136,7 +136,7 @@ baz`,
 
     describe('apl query', () => {
         it('returns a valid response', async () => {
-            const result = await client.aplQuery("['" + datasetName + "']");
+            const result = await client.query("['" + datasetName + "']");
 
             // expect(result.status.blocksExamined).to.equal(1);
             expect(result.status.rowsExamined).to.equal(11);

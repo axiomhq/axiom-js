@@ -66,17 +66,17 @@ export namespace datasets {
         error: string;
     }
 
-    export interface QueryOptions {
+    export interface QueryOptionsBase {
         streamingDuration: string;
         noCache: boolean;
     }
 
-    export interface APLQueryOptions extends QueryOptions {
+    export interface QueryOptions extends QueryOptionsBase {
         startTime?: string;
         endTime?: string;
     }
 
-    export interface Query {
+    export interface QueryLegacy {
         aggregations?: Array<Aggregation>;
         continuationToken?: string;
         cursor?: string;
@@ -167,14 +167,14 @@ export namespace datasets {
         expr: string;
     }
 
-    export interface QueryResult {
+    export interface QueryLegacyResult {
         buckets: Timeseries;
         matches?: Array<Entry>;
         status: Status;
     }
 
-    export interface AplQueryResult {
-        request: Query;
+    export interface QueryResult {
+        request: QueryLegacy;
 
         // Copied from QueryResult
         buckets: Timeseries;
@@ -235,7 +235,7 @@ export namespace datasets {
         priority: string;
     }
 
-    export interface APLQuery {
+    export interface Query {
         apl: string;
         startTime?: string;
         endTime?: string;
@@ -329,9 +329,9 @@ export namespace datasets {
             return this.ingestBuffer(id, encoded, ContentType.NDJSON, ContentEncoding.GZIP, options);
         };
 
-        query = (id: string, query: Query, options?: QueryOptions): Promise<QueryResult> =>
+        queryLegacy = (id: string, query: QueryLegacy, options?: QueryOptions): Promise<QueryLegacyResult> =>
             this.client
-                .post<QueryResult>(this.localPath + '/' + id + '/query', query, {
+                .post<QueryLegacyResult>(this.localPath + '/' + id + '/query', query, {
                     params: {
                         'streaming-duration': options?.streamingDuration,
                         nocache: options?.noCache,
@@ -341,10 +341,10 @@ export namespace datasets {
                     return response.data;
                 });
 
-        aplQuery = (apl: string, options?: APLQueryOptions): Promise<AplQueryResult> => {
-            const req: APLQuery = { apl: apl, startTime: options?.startTime, endTime: options?.endTime };
+        query = (apl: string, options?: QueryOptions): Promise<QueryResult> => {
+            const req: Query = { apl: apl, startTime: options?.startTime, endTime: options?.endTime };
             return this.client
-                .post<AplQueryResult>(this.localPath + '/_apl', req, {
+                .post<QueryResult>(this.localPath + '/_apl', req, {
                     params: {
                         'streaming-duration': options?.streamingDuration,
                         nocache: options?.noCache,

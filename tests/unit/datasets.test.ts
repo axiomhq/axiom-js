@@ -33,7 +33,7 @@ describe('DatasetsService', () => {
             walLength: 2,
         };
 
-        const queryResult = {
+        const queryLegacyResult = {
             status: {
                 elapsedTime: 542114,
                 blocksExamined: 4,
@@ -83,13 +83,13 @@ describe('DatasetsService', () => {
             },
         };
 
-        const aplQueryResult = {
+        const queryResult = {
             request: {
                 startTime: '2020-11-19T11:06:31.569475746Z',
                 endTime: '2020-11-27T12:06:38.966791794Z',
                 resolution: 'auto',
             },
-            ...queryResult,
+            ...queryLegacyResult,
         };
 
         const scope = nock('http://axiom-node.dev.local');
@@ -106,10 +106,10 @@ describe('DatasetsService', () => {
 
             cb(null, [200, ingestStatus]);
         });
-        scope.post('/api/v1/datasets/test/query').reply(200, queryResult);
-        scope.post('/api/v1/datasets/test/query?streaming-duration=1m&nocache=true').reply(200, queryResult);
-        scope.post('/api/v1/datasets/_apl?format=legacy').reply(200, aplQueryResult);
-        scope.post('/api/v1/datasets/_apl?streaming-duration=1m&nocache=true&format=legacy').reply(200, aplQueryResult);
+        scope.post('/api/v1/datasets/test/query').reply(200, queryLegacyResult);
+        scope.post('/api/v1/datasets/test/query?streaming-duration=1m&nocache=true').reply(200, queryLegacyResult);
+        scope.post('/api/v1/datasets/_apl?format=legacy').reply(200, queryResult);
+        scope.post('/api/v1/datasets/_apl?streaming-duration=1m&nocache=true&format=legacy').reply(200, queryResult);
     });
 
     it('List', async () => {
@@ -179,7 +179,7 @@ describe('DatasetsService', () => {
             endTime: '2020-11-17T11:18:00Z',
             resolution: 'auto',
         };
-        let response = await client.query('test', query);
+        let response = await client.queryLegacy('test', query);
         expect(response).not.equal('undefined');
         expect(response.matches).length(2);
 
@@ -193,14 +193,14 @@ describe('DatasetsService', () => {
             streamingDuration: '1m',
             noCache: true,
         };
-        response = await client.query('test', query, options);
+        response = await client.queryLegacy('test', query, options);
         expect(response).not.equal('undefined');
         expect(response.matches).length(2);
     });
 
     it('APL Query', async () => {
         // works without options
-        let response = await client.aplQuery("['test'] | where response == 304");
+        let response = await client.query("['test'] | where response == 304");
         expect(response).not.equal('undefined');
         expect(response.matches).length(2);
 
@@ -209,7 +209,7 @@ describe('DatasetsService', () => {
             streamingDuration: '1m',
             noCache: true,
         };
-        response = await client.aplQuery("['test'] | where response == 304", options);
+        response = await client.query("['test'] | where response == 304", options);
         expect(response).not.equal('undefined');
         expect(response.matches).length(2);
     });

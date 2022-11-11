@@ -40,7 +40,7 @@ await client.datasets.ingestEvents('my-dataset', [
   { 'foo': 'bar'},
 ]);
 
-const res = await client.datasets.aplQuery(`['my-dataset'] | where foo == 'bar' | limit 100`);
+const res = await client.datasets.query(`['my-dataset'] | where foo == 'bar' | limit 100`);
 ```
 
 For further examples, head over to the [examples](examples) directory.

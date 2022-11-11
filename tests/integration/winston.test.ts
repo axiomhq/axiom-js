@@ -41,11 +41,11 @@ describe('WinstonTransport', () => {
         const startTime = new Date(new Date().getTime() - 1000 * 60 * 60 * 24).toISOString();
         const endTime = new Date(new Date().getTime() + 1000 * 60 * 60 * 24).toISOString();
 
-        // const res = await client.datasets.aplQuery(`['${datasetName}']`, {
+        // const res = await client.datasets.query(`['${datasetName}']`, {
         //     startTime, endTime, streamingDuration: 'auto', noCache: false,
         // });
 
-        const res = await client.datasets.query(datasetName, {
+        const res = await client.datasets.queryLegacy(datasetName, {
             resolution: 'auto',
             startTime,
             endTime,
