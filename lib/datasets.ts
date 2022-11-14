@@ -355,5 +355,7 @@ export namespace datasets {
                     return response.data;
                 });
         };
+
+        aplQuery = (apl: string, options?: QueryOptions): Promise<QueryResult> => this.query(apl, options);
     }
 }
