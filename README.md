@@ -29,6 +29,15 @@ If you use the [Axiom CLI](https://github.com/axiomhq/cli), run `eval $(axiom co
 
 Otherwise create a personal token in [the Axiom settings](https://cloud.axiom.co/settings/profile) and export it as `AXIOM_TOKEN`. Set `AXIOM_ORG_ID` to the organization ID from the settings page of the organization you want to access.
 
+You can also configure the client using options passed to the constructor of the Client:
+
+```ts
+const client = new Client({
+    token: process.env.AXIOM_TOKEN,
+    orgId: process.env.AXIOM_ORG_ID,
+});
+```
+
 Create and use a client like this:
 
 ```ts
