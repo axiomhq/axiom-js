@@ -17,7 +17,7 @@
 
 For more information check out the [official documentation](https://axiom.co/docs).
 
-## Usage
+## Quickstart
 
 Install using `npm install`:
 
