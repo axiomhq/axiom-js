@@ -45,7 +45,7 @@ describe('WinstonTransport', () => {
         //     startTime, endTime, streamingDuration: 'auto', noCache: false,
         // });
 
-        const res = await client.datasets.queryLegacy(datasetName, {
+        const res = await client.queryLegacy(datasetName, {
             resolution: 'auto',
             startTime,
             endTime,

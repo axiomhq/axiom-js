@@ -2,8 +2,7 @@ import { fail } from 'assert';
 import { expect } from 'chai';
 import nock from 'nock';
 
-import Client from '../../lib/client';
-import { datasets } from '../../lib/datasets';
+import Client, { ContentType, ContentEncoding } from '../../lib/client';
 import { AxiomTooManyRequestsError } from '../../lib/httpClient';
 import {
     headerIngestLimit,
@@ -106,19 +105,19 @@ describe('Client', () => {
         headers[headerIngestReset] = timestampInSeconds.toString();
         scope.post('/api/v1/datasets/test/ingest').reply(200, {}, headers);
 
-        await client.datasets.ingestString(
+        await client.ingestString(
             'test',
             JSON.stringify([{ name: 'test' }]),
-            datasets.ContentType.JSON,
-            datasets.ContentEncoding.Identity,
+            ContentType.JSON,
+            ContentEncoding.Identity,
         );
 
         try {
-            await client.datasets.ingestString(
+            await client.ingestString(
                 'test',
                 JSON.stringify([{ name: 'test' }]),
-                datasets.ContentType.JSON,
-                datasets.ContentEncoding.Identity,
+                ContentType.JSON,
+                ContentEncoding.Identity,
             );
             fail('request should return an error with status 429');
         } catch (err: any) {
@@ -145,12 +144,12 @@ describe('Client', () => {
         scope.post('/api/v1/datasets/_apl?format=legacy').reply(200, {}, headers);
 
         // make successful request and parse the limit headers
-        await client.datasets.query("['test']");
+        await client.query("['test']");
         expect(scope.isDone()).eq(true);
 
         // second request should fail without sending remote request
         try {
-            await client.datasets.query("['test']");
+            await client.query("['test']");
             fail('request should return an error with status 429');
         } catch (err: any) {
             expect(err).instanceOf(AxiomTooManyRequestsError);
@@ -185,13 +184,68 @@ describe('Client', () => {
         }
 
         // ingest and query should succeed
-        await client.datasets.ingestString(
+        await client.ingestString(
             'test',
             JSON.stringify([{ name: 'test' }]),
-            datasets.ContentType.JSON,
-            datasets.ContentEncoding.Identity,
+            ContentType.JSON,
+            ContentEncoding.Identity,
         );
 
-        await client.datasets.query("['test']");
+        await client.query("['test']");
+    });
+
+    it('IngestString', async () => {
+        const data = `[{"foo": "bar"}, {"foo": "baz"}]`;
+        const response = await client.ingestString(
+            'test',
+            data,
+            ContentType.JSON,
+            ContentEncoding.Identity,
+        );
+        expect(response).not.equal('undefined');
+        expect(response.ingested).equal(2);
+        expect(response.failed).equal(0);
+    });
+
+    it('Query', async () => {
+        // works without options
+        let query = {
+            startTime: '2020-11-26T11:18:00Z',
+            endTime: '2020-11-17T11:18:00Z',
+            resolution: 'auto',
+        };
+        let response = await client.queryLegacy('test', query);
+        expect(response).not.equal('undefined');
+        expect(response.matches).length(2);
+
+        // works with options
+        query = {
+            startTime: '2020-11-26T11:18:00Z',
+            endTime: '2020-11-17T11:18:00Z',
+            resolution: 'auto',
+        };
+        const options = {
+            streamingDuration: '1m',
+            noCache: true,
+        };
+        response = await client.queryLegacy('test', query, options);
+        expect(response).not.equal('undefined');
+        expect(response.matches).length(2);
+    });
+
+    it('APL Query', async () => {
+        // works without options
+        let response = await client.query("['test'] | where response == 304");
+        expect(response).not.equal('undefined');
+        expect(response.matches).length(2);
+
+        // works with options
+        const options = {
+            streamingDuration: '1m',
+            noCache: true,
+        };
+        response = await client.query("['test'] | where response == 304", options);
+        expect(response).not.equal('undefined');
+        expect(response.matches).length(2);
     });
 });

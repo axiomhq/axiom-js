@@ -1,13 +1,13 @@
 import { createHmac } from 'crypto';
 import { parse as uuidParse } from 'uuid';
 
-import { datasets } from './datasets';
+import { Filter as AxiomFilter, FilterOp } from '../lib/client'
 
 export namespace sas {
     export interface Options {
         organizationId: string;
         dataset: string;
-        filter: datasets.Filter | string; // Filter or APL filter statement
+        filter: AxiomFilter | string; // Filter or APL filter statement
         minStartTime: string; // RFC3339 timestamp or APL date-time expression
         maxEndTime: string; // RFC3339 timestamp or APL date-time expression
     }
@@ -38,14 +38,14 @@ export namespace sas {
     // No need to export filter as this is just in place to produce shorter json
     // field names.
     interface Filter {
-        op: datasets.FilterOp; // op = Operation
+        op: FilterOp; // op = Operation
         fd: string; // fd = Field
         vl: any; // vl = Value
         cs: boolean; // cs = Case Sensitive
         ch?: Array<Filter>; // ch = Children
     }
 
-    function filterFromDatasetsFilter(filter: datasets.Filter): Filter {
+    function filterFromDatasetsFilter(filter: AxiomFilter): Filter {
         return {
             op: filter.op,
             fd: filter.field,
@@ -65,7 +65,7 @@ export namespace sas {
         });
     }
 
-    function isFilter(filter: datasets.Filter | string): filter is datasets.Filter {
+    function isFilter(filter: AxiomFilter | string): filter is AxiomFilter {
         return Object.prototype.hasOwnProperty.call(filter, 'op');
     }
 

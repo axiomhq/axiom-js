@@ -7,7 +7,7 @@ const client = new Client();
 async function query() {
     const aplQuery = "['my-dataset'] | where status == 500";
 
-    const res = await client.datasets.query(aplQuery);
+    const res = await client.query(aplQuery);
     if (!res.matches || res.matches.length === 0) {
         console.warn('no matches found');
         return;

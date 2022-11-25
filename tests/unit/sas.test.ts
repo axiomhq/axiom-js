@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 
-import { datasets } from '../../lib/datasets';
+import { FilterOp } from '../../lib/client'
 import { sas } from '../../lib/sas';
 
 describe('Shared Access', () => {
@@ -13,7 +13,7 @@ describe('Shared Access', () => {
             organizationId: 'axiom',
             dataset: 'logs',
             filter: {
-                op: datasets.FilterOp.Equal,
+                op: FilterOp.Equal,
                 field: 'customer',
                 value: 'vercel',
                 caseSensitive: true,

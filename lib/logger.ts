@@ -61,7 +61,7 @@ export class WinstonTransport extends Transport {
         this.batchCallback = () => {};
         this.batch = [];
 
-        this.client.datasets
+        this.client
             .ingestEvents(this.dataset, batchCopy)
             .then((_res) => callback(null))
             .catch(callback);
