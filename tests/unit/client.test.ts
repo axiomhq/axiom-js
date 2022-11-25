@@ -76,13 +76,15 @@ const queryResult = {
     ...queryLegacyResult,
 };
 
+const clientURL = 'http://axiom-node-retries.dev.local';
+
 describe('Client', () => {
-    let client = new Client({ url: 'http://axiom-node-retries.dev.local' });
+    let client = new Client({ url: clientURL });
     expect(client).not.equal('undefined');
 
     beforeEach(() => {
         // reset client to clear rate limits
-        client = new Client({ url: 'http://axiom-node-retries.dev.local' });
+        client = new Client({ url: clientURL });
     });
 
     it('Services', () => {
@@ -91,7 +93,7 @@ describe('Client', () => {
     });
 
     it('Retries failed 5xx requests', async () => {
-        const scope = nock('http://axiom-node-retries.dev.local');
+        const scope = nock(clientURL);
         scope.get('/api/v1/datasets').reply(500, 'internal server error');
         scope.get('/api/v1/datasets').reply(500, 'internal server error');
         scope.get('/api/v1/datasets').reply(200, [{ name: 'test' }]);
@@ -102,7 +104,7 @@ describe('Client', () => {
     });
 
     it('Does not retry failed requests < 500', async () => {
-        const scope = nock('http://axiom-node-retries.dev.local');
+        const scope = nock(clientURL);
         scope.get('/api/v1/datasets').reply(401, 'Forbidden');
         scope.get('/api/v1/datasets').reply(200, [{ name: 'test' }]);
 
@@ -124,7 +126,7 @@ describe('Client', () => {
     });
 
     it('shortcircuit API rate limit', async () => {
-        const scope = nock('http://axiom-node-retries.dev.local');
+        const scope = nock(clientURL);
         const resetTime = new Date();
         resetTime.setHours(resetTime.getHours() + 1);
         const resetTimeInSeconds = Math.floor(resetTime.getTime() / 1000);
@@ -154,7 +156,7 @@ describe('Client', () => {
     });
 
     it('shortcircuit ingest rate limit', async () => {
-        const scope = nock('http://axiom-node-retries.dev.local');
+        const scope = nock(clientURL);
         const resetTime = new Date();
         resetTime.setHours(resetTime.getHours() + 1);
         const timestampInSeconds = Math.floor(resetTime.getTime() / 1000);
@@ -192,7 +194,7 @@ describe('Client', () => {
     });
 
     it('shortcircuit query rate limit', async () => {
-        const scope = nock('http://axiom-node-retries.dev.local');
+        const scope = nock(clientURL);
         const resetTime = new Date();
         resetTime.setHours(resetTime.getHours() + 1);
         const resetTimeInSeconds = Math.floor(resetTime.getTime() / 1000);
@@ -223,7 +225,7 @@ describe('Client', () => {
     });
 
     it('No shortcircuit for ingest or query when there is api rate limit', async () => {
-        const scope = nock('http://axiom-node-retries.dev.local');
+        const scope = nock(clientURL);
         const resetTimeInSeconds = Math.floor(new Date().getTime() / 1000);
         const headers: nock.ReplyHeaders = {};
         headers[headerRateScope] = 'anonymous';
@@ -254,7 +256,7 @@ describe('Client', () => {
     });
 
     it('IngestString', async () => {
-        const scope = nock('http://axiom-node.dev.local');
+        const scope = nock(clientURL);
         const ingestStatus = {
             ingested: 2,
             failed: 0,
@@ -284,7 +286,7 @@ describe('Client', () => {
     });
 
     it('Query', async () => {
-        const scope = nock('http://axiom-node.dev.local');
+        const scope = nock(clientURL);
         scope.post('/api/v1/datasets/test/query').reply(200, queryLegacyResult);
         scope.post('/api/v1/datasets/test/query?streaming-duration=1m&nocache=true').reply(200, queryLegacyResult);
         // works without options
@@ -313,7 +315,7 @@ describe('Client', () => {
     });
 
     it('APL Query', async () => {
-        const scope = nock('http://axiom-node.dev.local');
+        const scope = nock(clientURL);
         scope.post('/api/v1/datasets/_apl?format=legacy').reply(200, queryResult);
         scope.post('/api/v1/datasets/_apl?streaming-duration=1m&nocache=true&format=legacy').reply(200, queryResult);
         // works without options
