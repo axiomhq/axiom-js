@@ -8,7 +8,7 @@ import { Readable, Stream } from 'stream';
 export default class Client extends HTTPClient {
     datasets: datasets.Service;
     users: users.Service;
-    localPath = '/api/v1/datasets';
+    localPath = '/api/v1';
 
     constructor(options?: ClientOptions) {
         super(options);
@@ -24,7 +24,7 @@ export default class Client extends HTTPClient {
         options?: IngestOptions,
     ): Promise<IngestStatus> =>
         this.client
-            .post<IngestStatus>(this.localPath + '/' + id + '/ingest', stream, {
+        .post<IngestStatus>(this.localPath + '/datasets/' + id + '/ingest', stream, {
                 headers: {
                     'Content-Type': contentType,
                     'Content-Encoding': contentEncoding,
@@ -68,7 +68,7 @@ export default class Client extends HTTPClient {
 
     queryLegacy = (id: string, query: QueryLegacy, options?: QueryOptions): Promise<QueryLegacyResult> =>
         this.client
-            .post<QueryLegacyResult>(this.localPath + '/' + id + '/query', query, {
+        .post<QueryLegacyResult>(this.localPath + '/datasets/' + id + '/query', query, {
                 params: {
                     'streaming-duration': options?.streamingDuration,
                     nocache: options?.noCache,
@@ -81,7 +81,7 @@ export default class Client extends HTTPClient {
     query = (apl: string, options?: QueryOptions): Promise<QueryResult> => {
         const req: Query = { apl: apl, startTime: options?.startTime, endTime: options?.endTime };
         return this.client
-            .post<QueryResult>(this.localPath + '/_apl', req, {
+        .post<QueryResult>(this.localPath + '/datasets/_apl', req, {
                 params: {
                     'streaming-duration': options?.streamingDuration,
                     nocache: options?.noCache,
