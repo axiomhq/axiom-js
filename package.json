@@ -37,8 +37,8 @@
     },
     "homepage": "https://github.com/axiomhq/axiom-node",
     "dependencies": {
-        "axios": "^0.27.2",
-        "axios-retry": "^3.2.5",
+        "axios": "^1.2.0",
+        "axios-retry": "^3.3.1",
         "to-time": "^1.0.2",
         "uuid": "^8.3.2",
         "winston-transport": "^4.5.0"
