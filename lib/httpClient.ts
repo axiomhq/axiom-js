@@ -40,34 +40,15 @@ export default abstract class HTTPClient {
             },
         });
 
-        // If we've hit the rate limit, don't make further requests before
-        // the reset time and return limit error.
-        this.client.interceptors.request.use((config) => {
-            return this.checkLimit(config);
-        });
-
         this.client.interceptors.response.use(
-            (response) => {
-                const limit = parseLimitFromResponse(response);
-                const key = limitKey(limit.type, limit.scope);
-                this.limits[key] = limit;
-
-                return response;
-            },
+            (response) => response,
             (error) => {
-                // don't parse limit headers from shortcircut responses, as they
-                // are fake responses
-                if (error.shortcircuit) {
-                    return Promise.reject(error);
-                }
-
                 // Some errors don't have a response (i.e. when unit-testing)
                 if (error.response) {
-                    const limit = parseLimitFromResponse(error.response);
-                    const key = limitKey(limit.type, limit.scope);
-                    this.limits[key] = limit;
-
                     if (error.response.status == 429) {
+                        const limit = parseLimitFromResponse(error.response);
+                        const key = limitKey(limit.type, limit.scope);
+                        this.limits[key] = limit;
                         return Promise.reject(new AxiomTooManyRequestsError(limit, error.response));
                     }
 
