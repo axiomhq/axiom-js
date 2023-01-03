@@ -62,8 +62,8 @@ Distributed under the [MIT License](LICENSE).
 
 <!-- Badges -->
 
-[workflow]: https://github.com/axiomhq/axiom-node/actions/workflows/push.yml
-[workflow_badge]: https://img.shields.io/github/workflow/status/axiomhq/axiom-node/CI?ghcache=unused
+[workflow]: https://github.com/axiomhq/axiom-node/actions/workflows/ci.yml
+[workflow_badge]: https://img.shields.io/github/actions/workflow/status/axiomhq/axiom-node/ci.yml?branch=main&ghcache=unused
 [release]: https://github.com/axiomhq/axiom-node/releases/latest
 [release_badge]: https://img.shields.io/github/release/axiomhq/axiom-node.svg?ghcache=unused
 [license]: https://opensource.org/licenses/MIT
