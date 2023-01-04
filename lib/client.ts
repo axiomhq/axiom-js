@@ -128,8 +128,8 @@ export interface IngestFailure {
 }
 
 export interface QueryOptionsBase {
-    streamingDuration: string;
-    noCache: boolean;
+    streamingDuration?: string;
+    noCache?: boolean;
 }
 
 export interface QueryOptions extends QueryOptionsBase {
