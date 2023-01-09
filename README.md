@@ -29,7 +29,7 @@ npm install @axiomhq/axiom-node
 
 If you use the [Axiom CLI](https://github.com/axiomhq/cli), run `eval $(axiom config export -f)` to configure your environment variables.
 
-Otherwise create a personal token in [the Axiom settings](https://app.axiom.co/profile) and export it as `AXIOM_TOKEN`. Set `AXIOM_ORG_ID` to the organization ID from the settings page of the organization you want to access.
+Otherwise create a personal token in [the Axiom settings](https://cloud.axiom.co/profile) and export it as `AXIOM_TOKEN`. Set `AXIOM_ORG_ID` to the organization ID from the settings page of the organization you want to access.
 
 You can also configure the client using options passed to the constructor of the Client:
 
