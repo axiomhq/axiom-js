@@ -107,7 +107,7 @@ jobs:
       - run: npm install
       - env:
           AXIOM_TOKEN: ${{ secrets.TESTING_DEV_TOKEN }}
-          AXIOM_URL: ${{ secrets.TESTING_DEV_APP_URL }}
+          AXIOM_URL: ${{ secrets.TESTING_DEV_API_URL }}
           AXIOM_ORG_ID: ${{ secrets.TESTING_DEV_ORG_ID }}
           AXIOM_DATASET_SUFFIX: ${{ github.run_id }}-${{ matrix.node }}
         run: npm run integration

@@ -8,7 +8,7 @@ import { Readable, Stream } from 'stream';
 export default class Client extends HTTPClient {
     datasets: datasets.Service;
     users: users.Service;
-    localPath = '/api/v1';
+    localPath = '/v1';
 
     constructor(options?: ClientOptions) {
         super(options);

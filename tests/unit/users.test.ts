@@ -25,8 +25,8 @@ describe('UsersService', () => {
 
         const scope = nock('http://axiom-node.dev.local');
 
-        scope.get('/api/v1/user').reply(200, currentUser);
-        scope.get('/api/v1/users/20475220-20e4-4080-b2f4-68315e21f5ec').reply(200, users[0]);
+        scope.get('/v1/user').reply(200, currentUser);
+        scope.get('/v1/users/20475220-20e4-4080-b2f4-68315e21f5ec').reply(200, users[0]);
     });
 
     it('Current', async () => {

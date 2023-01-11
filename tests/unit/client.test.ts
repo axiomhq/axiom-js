@@ -94,9 +94,9 @@ describe('Client', () => {
 
     it('Retries failed 5xx requests', async () => {
         const scope = nock(clientURL);
-        scope.get('/api/v1/datasets').reply(500, 'internal server error');
-        scope.get('/api/v1/datasets').reply(500, 'internal server error');
-        scope.get('/api/v1/datasets').reply(200, [{ name: 'test' }]);
+        scope.get('/v1/datasets').reply(500, 'internal server error');
+        scope.get('/v1/datasets').reply(500, 'internal server error');
+        scope.get('/v1/datasets').reply(200, [{ name: 'test' }]);
 
         const resp = await client.datasets.list();
         expect(scope.isDone()).eq(true);
@@ -105,8 +105,8 @@ describe('Client', () => {
 
     it('Does not retry failed requests < 500', async () => {
         const scope = nock(clientURL);
-        scope.get('/api/v1/datasets').reply(401, 'Forbidden');
-        scope.get('/api/v1/datasets').reply(200, [{ name: 'test' }]);
+        scope.get('/v1/datasets').reply(401, 'Forbidden');
+        scope.get('/v1/datasets').reply(200, [{ name: 'test' }]);
 
         try {
             const resp = await client.datasets.list();
@@ -133,9 +133,9 @@ describe('Client', () => {
         headers[headerAPILimit] = '1000';
         headers[headerAPIRateRemaining] = '0';
         headers[headerAPIRateReset] = resetTimeInSeconds.toString();
-        scope.get('/api/v1/datasets').reply(429, 'Too Many Requests', headers);
-        scope.post('/api/v1/datasets/test/ingest').reply(200, {}, headers);
-        scope.post('/api/v1/datasets/_apl?format=legacy').reply(200, {}, headers);
+        scope.get('/v1/datasets').reply(429, 'Too Many Requests', headers);
+        scope.post('/v1/datasets/test/ingest').reply(200, {}, headers);
+        scope.post('/v1/datasets/_apl?format=legacy').reply(200, {}, headers);
 
         // first api call should fail
         try {
@@ -166,7 +166,7 @@ describe('Client', () => {
             blocksCreated: 0,
             walLength: 2,
         };
-        scope.post('/api/v1/datasets/test/ingest').reply(function (_, body, cb) {
+        scope.post('/v1/datasets/test/ingest').reply(function (_, body, cb) {
             expect(this.req.headers).to.have.property('content-type');
             expect(body).to.deep.equal([{ foo: 'bar' }, { foo: 'baz' }]);
 
@@ -188,8 +188,8 @@ describe('Client', () => {
 
     it('Query', async () => {
         const scope = nock(clientURL);
-        scope.post('/api/v1/datasets/test/query').reply(200, queryLegacyResult);
-        scope.post('/api/v1/datasets/test/query?streaming-duration=1m&nocache=true').reply(200, queryLegacyResult);
+        scope.post('/v1/datasets/test/query').reply(200, queryLegacyResult);
+        scope.post('/v1/datasets/test/query?streaming-duration=1m&nocache=true').reply(200, queryLegacyResult);
         // works without options
         let query = {
             startTime: '2020-11-26T11:18:00Z',
@@ -217,8 +217,8 @@ describe('Client', () => {
 
     it('APL Query', async () => {
         const scope = nock(clientURL);
-        scope.post('/api/v1/datasets/_apl?format=legacy').reply(200, queryResult);
-        scope.post('/api/v1/datasets/_apl?streaming-duration=1m&nocache=true&format=legacy').reply(200, queryResult);
+        scope.post('/v1/datasets/_apl?format=legacy').reply(200, queryResult);
+        scope.post('/v1/datasets/_apl?streaming-duration=1m&nocache=true&format=legacy').reply(200, queryResult);
         // works without options
         let response = await client.query("['test'] | where response == 304");
         expect(response).not.equal('undefined');

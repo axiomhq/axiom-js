@@ -3,7 +3,7 @@ import axiosRetry, { isNetworkError, isRetryableError } from 'axios-retry';
 import { Limit, LimitType, LimitScope, parseLimitFromResponse, limitKey } from './limit';
 
 const Version = require('../package.json').version;
-const AxiomURL = 'https://cloud.axiom.co';
+const AxiomURL = 'https://api.axiom.co';
 
 export interface ClientOptions {
     token?: string;

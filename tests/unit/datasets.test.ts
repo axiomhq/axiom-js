@@ -26,12 +26,12 @@ describe('DatasetsService', () => {
 
         const scope = nock('http://axiom-node.dev.local');
 
-        scope.get('/api/v1/datasets').reply(200, datasets);
-        scope.get('/api/v1/datasets/test').reply(200, datasets[0]);
-        scope.post('/api/v1/datasets').reply(200, datasets[1]);
-        scope.put('/api/v1/datasets/test1').reply(200, datasets[1]);
-        scope.delete('/api/v1/datasets/test1').reply(204);
-        scope.post('/api/v1/datasets/test1/trim').reply(200, {});
+        scope.get('/v1/datasets').reply(200, datasets);
+        scope.get('/v1/datasets/test').reply(200, datasets[0]);
+        scope.post('/v1/datasets').reply(200, datasets[1]);
+        scope.put('/v1/datasets/test1').reply(200, datasets[1]);
+        scope.delete('/v1/datasets/test1').reply(204);
+        scope.post('/v1/datasets/test1/trim').reply(200, {});
     });
 
     it('List', async () => {
