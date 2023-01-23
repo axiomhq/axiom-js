@@ -45,13 +45,15 @@ Create and use a client like this:
 ```ts
 import Client from '@axiomhq/axiom-node';
 
-const client = new Client();
+async function main() {
+  const client = new Client();
 
-await client.datasets.ingestEvents('my-dataset', [
-  { 'foo': 'bar'},
-]);
+  await client.ingestEvents('my-dataset', [
+    { 'foo': 'bar'},
+  ]);
 
-const res = await client.datasets.query(`['my-dataset'] | where foo == 'bar' | limit 100`);
+  const res = await client.query(`['my-dataset'] | where foo == 'bar' | limit 100`);
+}
 ```
 
 For further examples, head over to the [examples](examples) directory.
