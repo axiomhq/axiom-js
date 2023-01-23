@@ -13,8 +13,10 @@ npx ts-node <example-file.ts>
 * [ingest-file.ts](ingest-file.ts): How to ingest the contents of a file into
   Axiom.
 
-* [list-datasets.ts](list-datasets.ts): How to retrieve a list datasets.
+* [list-datasets.ts](list-datasets.ts): How to retrieve a list dataset.
 
-* [query.ts](query.ts): How to query a dataset.
+* [query-legacy.ts](query-legacy.ts): How to query a dataset.
 
-* [apl-query.ts](apl-query.ts): how to query a dataset using the Axiom Processing Language (APL).
+* [query.ts](query.ts): How to query a dataset using the Axiom Processing Language (APL).
+
+* [winston.ts](winston.ts): How to enable a logger and configure its transports.
