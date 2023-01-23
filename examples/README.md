@@ -13,7 +13,7 @@ npx ts-node <example-file.ts>
 * [ingest-file.ts](ingest-file.ts): How to ingest the contents of a file into
   Axiom.
 
-* [list-datasets.ts](list-datasets.ts): How to retrieve a list dataset.
+* [list-datasets.ts](list-datasets.ts): How to retrieve a list of datasets.
 
 * [query-legacy.ts](query-legacy.ts): How to query a dataset.
 
