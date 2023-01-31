@@ -17,7 +17,7 @@
 
 For more information check out the [official documentation](https://axiom.co/docs)
 and our
-[community Slack](https://axiomfm.slack.com/join/shared_invite/zt-w7d1vepe-L0upiOL6n6MXfjr33sCBUQ).
+[community Discord](https://axiom.co/discord).
 
 ## Quickstart
 
