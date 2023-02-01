@@ -1,16 +1,9 @@
 import { fail } from 'assert';
-import { expect } from 'chai';
 import nock from 'nock';
 
 import Client, { ContentType, ContentEncoding } from '../../lib/client';
 import { AxiomTooManyRequestsError } from '../../lib/httpClient';
 import {
-    headerIngestLimit,
-    headerIngestRemaining,
-    headerIngestReset,
-    headerQueryLimit,
-    headerQueryRemaining,
-    headerQueryReset,
     headerAPILimit,
     headerAPIRateRemaining,
     headerAPIRateReset,
@@ -80,7 +73,7 @@ const clientURL = 'http://axiom-node-retries.dev.local';
 
 describe('Client', () => {
     let client = new Client({ url: clientURL });
-    expect(client).not.equal('undefined');
+    expect(client).toBeDefined();
 
     beforeEach(() => {
         // reset client to clear rate limits
@@ -88,8 +81,8 @@ describe('Client', () => {
     });
 
     it('Services', () => {
-        expect(client.datasets).not.empty;
-        expect(client.users).not.empty;
+        expect(client.datasets).toBeTruthy()
+        expect(client.users).toBeTruthy()
     });
 
     it('Retries failed 5xx requests', async () => {
@@ -99,8 +92,8 @@ describe('Client', () => {
         scope.get('/v1/datasets').reply(200, [{ name: 'test' }]);
 
         const resp = await client.datasets.list();
-        expect(scope.isDone()).eq(true);
-        expect(resp.length).eq(1);
+        expect(scope.isDone()).toEqual(true);
+        expect(resp.length).toEqual(1);
     });
 
     it('Does not retry failed requests < 500', async () => {
@@ -109,20 +102,20 @@ describe('Client', () => {
         scope.get('/v1/datasets').reply(200, [{ name: 'test' }]);
 
         try {
-            const resp = await client.datasets.list();
+            await client.datasets.list();
             fail('response should fail and return 401');
         } catch (err: any) {
-            expect(err.response.status).eq(401);
-            expect(err.response.data).eq('Forbidden');
+            expect(err.response.status).toEqual(401);
+            expect(err.response.data).toEqual('Forbidden');
             // Scope is not done means that not all scope mocks has been consumed
-            expect(scope.isDone()).eq(false);
+            expect(scope.isDone()).toEqual(false);
         }
 
         // create another request to ensure that
         // the nock scope was not consumed before
         const resp = await client.datasets.list();
-        expect(scope.isDone()).to.be.true;
-        expect(resp.length).eq(1);
+        expect(scope.isDone()).toEqual(true);
+        expect(resp.length).toEqual(1);
     });
 
     it('No shortcircuit for ingest or query when there is api rate limit', async () => {
@@ -139,10 +132,10 @@ describe('Client', () => {
 
         // first api call should fail
         try {
-            const resp = await client.datasets.list();
+            await client.datasets.list();
             fail('request should return an error with status 429');
         } catch (err: any) {
-            expect(err).instanceOf(AxiomTooManyRequestsError);
+            expect(err instanceof AxiomTooManyRequestsError).toEqual(true);
         }
 
         // ingest and query should succeed
@@ -167,8 +160,8 @@ describe('Client', () => {
             walLength: 2,
         };
         scope.post('/v1/datasets/test/ingest').reply(function (_, body, cb) {
-            expect(this.req.headers).to.have.property('content-type');
-            expect(body).to.deep.equal([{ foo: 'bar' }, { foo: 'baz' }]);
+            expect(this.req.headers).toHaveProperty('content-type');
+            expect(body).toMatchObject([{ foo: 'bar' }, { foo: 'baz' }]);
 
             cb(null, [200, ingestStatus]);
         });
@@ -181,9 +174,9 @@ describe('Client', () => {
             ContentType.JSON,
             ContentEncoding.Identity,
         );
-        expect(response).not.equal('undefined');
-        expect(response.ingested).equal(2);
-        expect(response.failed).equal(0);
+        expect(response).not.toEqual('undefined');
+        expect(response.ingested).toEqual(2);
+        expect(response.failed).toEqual(0);
     });
 
     it('Query', async () => {
@@ -197,8 +190,8 @@ describe('Client', () => {
             resolution: 'auto',
         };
         let response = await client.queryLegacy('test', query);
-        expect(response).not.equal('undefined');
-        expect(response.matches).length(2);
+        expect(response).not.toEqual('undefined');
+        expect(response.matches).toHaveLength(2);
 
         // works with options
         query = {
@@ -211,8 +204,8 @@ describe('Client', () => {
             noCache: true,
         };
         response = await client.queryLegacy('test', query, options);
-        expect(response).not.equal('undefined');
-        expect(response.matches).length(2);
+        expect(response).not.toEqual('undefined');
+        expect(response.matches).toHaveLength(2);
     });
 
     it('APL Query', async () => {
@@ -221,8 +214,8 @@ describe('Client', () => {
         scope.post('/v1/datasets/_apl?streaming-duration=1m&nocache=true&format=legacy').reply(200, queryResult);
         // works without options
         let response = await client.query("['test'] | where response == 304");
-        expect(response).not.equal('undefined');
-        expect(response.matches).length(2);
+        expect(response).not.toEqual('undefined');
+        expect(response.matches).toHaveLength(2);
 
         // works with options
         const options = {
@@ -230,7 +223,7 @@ describe('Client', () => {
             noCache: true,
         };
         response = await client.query("['test'] | where response == 304", options);
-        expect(response).not.equal('undefined');
-        expect(response.matches).length(2);
+        expect(response).not.toEqual('undefined');
+        expect(response.matches).toHaveLength(2);
     });
 });

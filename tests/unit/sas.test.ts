@@ -1,5 +1,3 @@
-import { expect } from 'chai';
-
 import { FilterOp } from '../../lib/client'
 import { sas } from '../../lib/sas';
 
@@ -22,8 +20,8 @@ describe('Shared Access', () => {
             maxEndTime: '2023-01-01T00:00:00Z',
         });
 
-        expect(sig).not.equal('undefined');
-        expect(sig).equal(expSig);
+        expect(sig).not.toEqual('undefined');
+        expect(sig).toEqual(expSig);
     });
 
     it('Create Signature with APL filter', async () => {
@@ -37,6 +35,6 @@ describe('Shared Access', () => {
             maxEndTime: '2023-01-01T00:00:00Z',
         });
 
-        expect(sig).not.equal('undefined');
+        expect(sig).not.toEqual('undefined');
     });
 });

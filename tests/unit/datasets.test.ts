@@ -1,4 +1,3 @@
-import { expect } from 'chai';
 import nock from 'nock';
 
 import { datasets } from '../../lib/datasets';
@@ -36,15 +35,15 @@ describe('DatasetsService', () => {
 
     it('List', async () => {
         const response = await client.list();
-        expect(response).not.equal('undefined');
-        expect(response).length(2);
+        expect(response).not.toEqual('undefined');
+        expect(response).toHaveLength(2);
     });
 
     it('Get', async () => {
         const response = await client.get('test');
-        expect(response).not.equal('undefined');
-        expect(response.id).equal('test');
-        expect(response.description).equal('Test dataset');
+        expect(response).not.toEqual('undefined');
+        expect(response.id).toEqual('test');
+        expect(response.description).toEqual('Test dataset');
     });
 
     it('Create', async () => {
@@ -54,9 +53,9 @@ describe('DatasetsService', () => {
         };
 
         const response = await client.create(request);
-        expect(response).not.equal('undefined');
-        expect(response.id).equal('test1');
-        expect(response.description).equal('This is a test description');
+        expect(response).not.toEqual('undefined');
+        expect(response.id).toEqual('test1');
+        expect(response.description).toEqual('This is a test description');
     });
 
     it('Update', async () => {
@@ -65,19 +64,19 @@ describe('DatasetsService', () => {
         };
 
         const response = await client.update('test1', req);
-        expect(response).not.equal('undefined');
-        expect(response.id).equal('test1');
-        expect(response.description).equal('This is a test description');
+        expect(response).not.toEqual('undefined');
+        expect(response.id).toEqual('test1');
+        expect(response.description).toEqual('This is a test description');
     });
 
     it('Delete', async () => {
         const response = await client.delete('test1');
-        expect(response).not.equal('undefined');
-        expect(response.status).equal(204);
+        expect(response).not.toEqual('undefined');
+        expect(response.status).toEqual(204);
     });
 
     it('Trim', async () => {
         const response = await client.trim('test1', '30m');
-        expect(response).not.equal('undefined');
+        expect(response).not.toEqual('undefined');
     });
 });

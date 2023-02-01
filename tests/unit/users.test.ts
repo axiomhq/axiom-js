@@ -1,4 +1,3 @@
-import { expect } from 'chai';
 import nock from 'nock';
 
 import { users } from '../../lib/users';
@@ -31,8 +30,8 @@ describe('UsersService', () => {
 
     it('Current', async () => {
         const response = await client.current();
-        expect(response).not.equal('undefined');
-        expect(response.name).equal('Lukas Malkmus');
-        expect(response.emails).length(1);
+        expect(response).not.toEqual('undefined');
+        expect(response.name).toEqual('Lukas Malkmus');
+        expect(response.emails).toHaveLength(1);
     });
 });

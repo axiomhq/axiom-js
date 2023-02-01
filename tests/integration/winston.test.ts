@@ -1,4 +1,3 @@
-import { expect } from 'chai';
 import winston from 'winston';
 
 import Client from '../../lib/client';
@@ -16,16 +15,16 @@ describe('WinstonTransport', () => {
         transports: [new AxiomTransport({ dataset: datasetName })],
     });
 
-    before(async () => {
+    beforeAll(async () => {
         await client.datasets.create({
             name: datasetName,
             description: 'This is a test dataset for datasets integration tests.',
         });
     });
 
-    after(async () => {
+    afterAll(async () => {
         const resp = await client.datasets.delete(datasetName);
-        expect(resp.status).to.equal(204);
+        expect(resp.status).toEqual(204);
         
     });
 
@@ -50,6 +49,6 @@ describe('WinstonTransport', () => {
             startTime,
             endTime,
         });
-        expect(res.matches).to.have.a.lengthOf(1);
+        expect(res.matches).toHaveLength(1);
     });
 });

@@ -1,5 +1,3 @@
-import { expect } from 'chai';
-
 import { datasets } from '../../lib/datasets';
 
 const datasetSuffix = process.env.AXIOM_DATASET_SUFFIX || 'local';
@@ -8,16 +6,16 @@ describe('DatasetsService', () => {
     const datasetName = `test-axiom-node-dataset-${datasetSuffix}`;
     const client = new datasets.Service();
 
-    before(async () => {
+    beforeAll(async () => {
         await client.create({
             name: datasetName,
             description: 'This is a test dataset for datasets integration tests.',
         });
     });
 
-    after(async () => {
+    afterAll(async () => {
         const resp = await client.delete(datasetName);
-        expect(resp.status).to.equal(204);
+        expect(resp.status).toEqual(204);
     });
 
     describe('update', () => {
@@ -26,7 +24,7 @@ describe('DatasetsService', () => {
                 description: 'This is a soon to be filled test dataset',
             });
 
-            expect(dataset.description).to.equal('This is a soon to be filled test dataset');
+            expect(dataset.description).toEqual('This is a soon to be filled test dataset');
         });
     });
 
@@ -34,7 +32,7 @@ describe('DatasetsService', () => {
         it('should get the dataset', async () => {
             const dataset = await client.get(datasetName);
 
-            expect(dataset.name).to.equal(datasetName);
+            expect(dataset.name).toEqual(datasetName);
         });
     });
 
@@ -42,7 +40,7 @@ describe('DatasetsService', () => {
         it('should list the datasets', async () => {
             const datasets = await client.list();
 
-            expect(datasets.length).to.be.greaterThan(0);
+            expect(datasets.length).toBeGreaterThan(0);
         });
     });
 
@@ -50,7 +48,7 @@ describe('DatasetsService', () => {
         it('returns a valid response', async () => {
             const result = await client.trim(datasetName, '1s');
 
-            expect(result).to.not.equal(null);
+            expect(result).not.toEqual(null);
         });
     });
 });

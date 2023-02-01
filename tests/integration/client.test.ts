@@ -1,4 +1,3 @@
-import { expect } from 'chai';
 import { gzip } from 'zlib';
 
 import  Client, { ContentType, ContentEncoding } from '../../lib/client';
@@ -9,16 +8,16 @@ describe('Client', () => {
     const datasetName = `test-axiom-node-dataset-${datasetSuffix}`;
     const client = new Client();
 
-    before(async () => {
+    beforeAll(async () => {
         await client.datasets.create({
             name: datasetName,
             description: 'This is a test dataset for datasets integration tests.',
         });
     });
 
-    after(async () => {
+    afterAll(async () => {
         const resp = await client.datasets.delete(datasetName);
-        expect(resp.status).to.equal(204);
+        expect(resp.status).toEqual(204);
     });
 
     describe('ingest', () => {
@@ -30,8 +29,8 @@ describe('Client', () => {
                 ContentEncoding.Identity,
             );
 
-            expect(status.ingested).to.equal(2);
-            expect(status.failures?.length).to.equal(0);
+            expect(status.ingested).toEqual(2);
+            expect(status.failures?.length).toEqual(0);
         });
 
         it('works with a NDJSON payload', async () => {
@@ -43,8 +42,8 @@ describe('Client', () => {
                 ContentEncoding.Identity,
             );
 
-            expect(status.ingested).to.equal(2);
-            expect(status.failures?.length).to.equal(0);
+            expect(status.ingested).toEqual(2);
+            expect(status.failures?.length).toEqual(0);
         });
 
         it('works with a CSV payload', async () => {
@@ -57,8 +56,8 @@ baz`,
                 ContentEncoding.Identity,
             );
 
-            expect(status.ingested).to.equal(2);
-            expect(status.failures?.length).to.equal(0);
+            expect(status.ingested).toEqual(2);
+            expect(status.failures?.length).toEqual(0);
         });
 
         it('works with gzip', async () => {
@@ -76,20 +75,20 @@ baz`,
                 ContentEncoding.GZIP,
             );
 
-            expect(status.ingested).to.equal(2);
-            expect(status.failures?.length).to.equal(0);
+            expect(status.ingested).toEqual(2);
+            expect(status.failures?.length).toEqual(0);
         });
 
         it('works with single event', async () => {
             const status = await client.ingestEvents(datasetName, { foo: 'bar' });
-            expect(status.ingested).to.equal(1);
-            expect(status.failures?.length).to.equal(0);
+            expect(status.ingested).toEqual(1);
+            expect(status.failures?.length).toEqual(0);
         });
 
         it('works with two events', async () => {
             const status = await client.ingestEvents(datasetName, [{ foo: 'bar' }, { bar: 'baz' }]);
-            expect(status.ingested).to.equal(2);
-            expect(status.failures?.length).to.equal(0);
+            expect(status.ingested).toEqual(2);
+            expect(status.failures?.length).toEqual(0);
         });
     });
 
@@ -101,10 +100,10 @@ baz`,
                 resolution: 'auto',
             });
 
-            // expect(result.status.blocksExamined).to.equal(1);
-            expect(result.status.rowsExamined).to.equal(11);
-            expect(result.status.rowsMatched).to.equal(11);
-            expect(result.matches?.length).to.equal(11);
+            // expect(result.status.blocksExamined).toEqual(1);
+            expect(result.status.rowsExamined).toEqual(11);
+            expect(result.status.rowsMatched).toEqual(11);
+            expect(result.matches?.length).toEqual(11);
         });
     });
 
@@ -112,10 +111,10 @@ baz`,
         it('returns a valid response', async () => {
             const result = await client.query("['" + datasetName + "']");
 
-            // expect(result.status.blocksExamined).to.equal(1);
-            expect(result.status.rowsExamined).to.equal(11);
-            expect(result.status.rowsMatched).to.equal(11);
-            expect(result.matches?.length).to.equal(11);
+            // expect(result.status.blocksExamined).toEqual(1);
+            expect(result.status.rowsExamined).toEqual(11);
+            expect(result.status.rowsMatched).toEqual(11);
+            expect(result.matches?.length).toEqual(11);
         });
     });
 });
