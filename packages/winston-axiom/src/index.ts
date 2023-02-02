@@ -1,6 +1,6 @@
 import Transport, { TransportStreamOptions } from 'winston-transport';
 
-import Client from './client';
+import Client from '@axiomhq/axiom-js';
 
 export interface WinstonOptions extends TransportStreamOptions {
     dataset?: string;

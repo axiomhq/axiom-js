@@ -1,7 +1,7 @@
 {
     "name": "@axiomhq/axiom-js",
     "description": "The official javascript bindings for the Axiom API",
-    "version": "0.11.0",
+    "version": "0.12.0",
     "author": "Axiom, Inc.",
     "license": "MIT",
     "contributors": [
@@ -41,7 +41,6 @@
         "axios": "^1.2.0",
         "axios-retry": "^3.3.1",
         "to-time": "^1.0.2",
-        "uuid": "^8.3.2",
-        "winston-transport": "^4.5.0"
+        "uuid": "^8.3.2"
     }
 }

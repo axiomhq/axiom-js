@@ -1,0 +1,19 @@
+{
+    "name": "@axiomhq/winston-axiom",
+    "description": "The official Axiom transport for winston logger",
+    "version": "0.12.0",
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "scripts": {
+        "build": "tsc -b",
+        "format": "eslint 'src/**/*.{js,ts}' --quiet --fix",
+        "lint": "eslint 'src/**/*.{js,ts}'",
+        "integration": "jest test/integration",
+        "preapre": "npm run build",
+        "prepublish": "npm run build"
+    },
+    "dependencies": {
+        "winston-transport": "^4.5.0",
+        "@axiomhq/axiom-js": "*"
+    }
+}
