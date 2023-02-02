@@ -3,7 +3,7 @@ import { datasets } from '../../src/datasets';
 const datasetSuffix = process.env.AXIOM_DATASET_SUFFIX || 'local';
 
 describe('DatasetsService', () => {
-    const datasetName = `test-axiom-node-dataset-${datasetSuffix}`;
+    const datasetName = `test-axiom-js-dataset-${datasetSuffix}`;
     const client = new datasets.Service();
 
     beforeAll(async () => {

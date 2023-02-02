@@ -6,7 +6,7 @@ import { WinstonTransport as AxiomTransport } from '../../src/index';
 const datasetSuffix = process.env.AXIOM_DATASET_SUFFIX || 'local';
 
 describe('WinstonTransport', () => {
-    const datasetName = `test-axiom-node-winston-${datasetSuffix}`;
+    const datasetName = `test-axiom-js-winston-${datasetSuffix}`;
     const client = new Client();
     const logger = winston.createLogger({
         level: 'info',

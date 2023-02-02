@@ -68,7 +68,7 @@ const queryResult = {
     ...queryLegacyResult,
 };
 
-const clientURL = 'http://axiom-node-retries.dev.local';
+const clientURL = 'http://axiom-js-retries.dev.local';
 
 describe('Client', () => {
     let client = new Client({ url: clientURL });

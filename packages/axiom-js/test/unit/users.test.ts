@@ -3,7 +3,7 @@ import nock from 'nock';
 import { users } from '../../src/users';
 
 describe('UsersService', () => {
-    const client = new users.Service({ url: 'http://axiom-node.dev.local' });
+    const client = new users.Service({ url: 'http://axiom-js.dev.local' });
 
     beforeEach(() => {
         const currentUser = {
@@ -22,7 +22,7 @@ describe('UsersService', () => {
             },
         ];
 
-        const scope = nock('http://axiom-node.dev.local');
+        const scope = nock('http://axiom-js.dev.local');
 
         scope.get('/v1/user').reply(200, currentUser);
         scope.get('/v1/users/20475220-20e4-4080-b2f4-68315e21f5ec').reply(200, users[0]);

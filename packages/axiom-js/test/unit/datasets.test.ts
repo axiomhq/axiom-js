@@ -3,7 +3,7 @@ import nock from 'nock';
 import { datasets } from '../../src/datasets';
 
 describe('DatasetsService', () => {
-    const client = new datasets.Service({ url: 'http://axiom-node.dev.local' });
+    const client = new datasets.Service({ url: 'http://axiom-js.dev.local' });
 
     beforeEach(() => {
         const datasets = [
@@ -23,7 +23,7 @@ describe('DatasetsService', () => {
             },
         ];
 
-        const scope = nock('http://axiom-node.dev.local');
+        const scope = nock('http://axiom-js.dev.local');
 
         scope.get('/v1/datasets').reply(200, datasets);
         scope.get('/v1/datasets/test').reply(200, datasets[0]);

@@ -28,7 +28,7 @@ export default abstract class HTTPClient {
         this.client.defaults.headers.common['Accept'] = 'application/json';
         // if not in browser, set user agent
         if (typeof window === 'undefined') {
-            this.client.defaults.headers.common['User-Agent'] = 'axiom-node/' + Version;
+            this.client.defaults.headers.common['User-Agent'] = 'axiom-js/' + Version;
         }
         this.client.defaults.headers.common['Authorization'] = 'Bearer ' + token;
         if (orgId) {
