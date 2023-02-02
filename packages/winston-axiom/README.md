@@ -38,8 +38,8 @@ logger.log({
 });
 ```
 
-For further examples, head over to the [examples](examples) directory.
+For further examples, head over to the [examples](../../examples) directory.
 
 ## License
 
-Distributed under the [MIT License](LICENSE).
+Distributed under the [MIT License](../../LICENSE).
