@@ -42,5 +42,8 @@
         "axios-retry": "^3.3.1",
         "to-time": "^1.0.2",
         "uuid": "^8.3.2"
+    },
+    "devDependencies": {
+        "xhr-mock": "^2.5.1"
     }
 }
