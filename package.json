@@ -1,6 +1,7 @@
 {
-    "name": "@axiomhq/axiom-node",
-    "description": "The official NodeJS bindings for the Axiom API",
+    "name": "axiom-js-toolkit",
+    "private": true,
+    "description": "The official JS tookit & bindings for the Axiom API",
     "version": "0.11.0",
     "author": "Axiom, Inc.",
     "license": "MIT",
@@ -16,7 +17,7 @@
     "types": "dist/index.d.ts",
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/axiomhq/axiom-node.git"
+        "url": "git+https://github.com/axiomhq/axiom-js.git"
     },
     "keywords": [
         "axiom",
@@ -25,16 +26,9 @@
         "client"
     ],
     "bugs": {
-        "url": "https://github.com/axiomhq/axiom-node/issues"
+        "url": "https://github.com/axiomhq/axiom-js/issues"
     },
-    "homepage": "https://github.com/axiomhq/axiom-node",
-    "dependencies": {
-        "axios": "^1.2.0",
-        "axios-retry": "^3.3.1",
-        "to-time": "^1.0.2",
-        "uuid": "^8.3.2",
-        "winston-transport": "^4.5.0"
-    },
+    "homepage": "https://github.com/axiomhq/axiom-js",
     "scripts": {
         "format": "lerna run format",
         "lint": "lerna run lint",
