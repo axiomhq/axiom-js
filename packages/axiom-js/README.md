@@ -1,5 +1,5 @@
-![axiom-js: The official javascript bindings for the Axiom API](.github/images/banner-dark.svg#gh-dark-mode-only)
-![axiom-js: The official javascript bindings for the Axiom API](.github/images/banner-light.svg#gh-light-mode-only)
+![axiom-js: The official javascript bindings for the Axiom API](../../.github/images/banner-dark.svg#gh-dark-mode-only)
+![axiom-js: The official javascript bindings for the Axiom API](../../.github/images/banner-light.svg#gh-light-mode-only)
 
 <div align="center">
 
