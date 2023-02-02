@@ -79,6 +79,7 @@ jobs:
           key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
           restore-keys: ${{ runner.os }}-node-
       - run: npm install
+      - run: npm run build
       - run: npm run test
 
   test-integration:
@@ -106,6 +107,7 @@ jobs:
           key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
           restore-keys: ${{ runner.os }}-node-
       - run: npm install
+      - run: npm run build
       - env:
           AXIOM_TOKEN: ${{ secrets.TESTING_DEV_TOKEN }}
           AXIOM_URL: ${{ secrets.TESTING_DEV_API_URL }}
