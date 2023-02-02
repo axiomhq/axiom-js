@@ -55,6 +55,9 @@ async function main() {
   const res = await client.query(`['my-dataset'] | where foo == 'bar' | limit 100`);
 }
 ```
+:warning: Support of Edge runtime is still experimental and unstable.
+ the Edge runtime doesn't support `Stream` module, so that client methods
+ that depend on Stream won't work on edge, like `ingestStream, ingestEvents and ingestBuffer`.
 
 For further examples, head over to the [examples](../../examples) directory.
 

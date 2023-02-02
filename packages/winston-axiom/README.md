@@ -38,6 +38,8 @@ logger.log({
 });
 ```
 
+:warning: Running on Edge runtime is not supported at the moment.
+
 For further examples, head over to the [examples](../../examples) directory.
 
 ## License

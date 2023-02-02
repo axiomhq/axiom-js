@@ -1,6 +1,10 @@
-import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
+import axios, { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse, CreateAxiosDefaults } from 'axios';
 import axiosRetry, { isNetworkError, isRetryableError } from 'axios-retry';
 import { Limit, LimitType, LimitScope, parseLimitFromResponse, limitKey } from './limit';
+
+declare global {
+    var EdgeRuntime: string;
+}
 
 const Version = require('../package.json').version;
 const AxiomURL = 'https://api.axiom.co';
@@ -20,10 +24,59 @@ export default abstract class HTTPClient {
         const url = options.url || process.env.AXIOM_URL || AxiomURL;
         const orgId = options.orgId || process.env.AXIOM_ORG_ID || '';
 
-        this.client = axios.create({
+        const axiosOptions: CreateAxiosDefaults = {
             baseURL: url,
             timeout: 30000,
-        });
+        };
+
+        // detect if runnig in edge runtime
+        // axios fails to run on edge runtime due to missing http adapter, until
+        // this bug is fixed we need to use fetch instead
+        if (
+            typeof window === 'undefined' &&
+            ((globalThis.EdgeRuntime && globalThis.EdgeRuntime !== 'undefined') || process.env.NEXT_RUNTIME === 'edge')
+        ) {
+            axiosOptions.adapter = function (config) {
+                return new Promise(async (resolve, reject) => {
+                    try {
+                        const headers: HeadersInit = [
+                            ['Content-Type', config.headers!['Content-Type'] as string],
+                            ['Authorization', config.headers!['Authorization'] as string],
+                            ['X-Axiom-Org-Id', config.headers!['X-Axiom-Org-Id'] as string],
+                            ['User-Agent', config.headers!['User-Agent'] as string],
+                            ['Accept', config.headers!['Accept'] as string],
+                        ];
+
+                        const reqOptions: RequestInit = {
+                            method: config.method,
+                            keepalive: true,
+                            headers,
+                            body: config.data,
+                            // TODO: add config params to request
+                            // params: config.params,
+                        };
+                        const resp = await fetch(config.baseURL + config.url!.toString(), reqOptions);
+                        const payload = await resp.text();
+                        const response: AxiosResponse = {
+                            data: payload,
+                            status: resp.status,
+                            statusText: resp.statusText,
+                            headers: {
+                                'content-type': resp.headers.get('content-type') || undefined,
+                            },
+                            config: config,
+                        };
+                        resolve(response);
+                    } catch (err: any) {
+                        console.log({ err });
+                        const axiosErr = new AxiosError(err.message);
+                        reject(axiosErr);
+                    }
+                });
+            };
+        }
+
+        this.client = axios.create(axiosOptions);
 
         this.client.defaults.headers.common['Accept'] = 'application/json';
         // if not in browser, set user agent

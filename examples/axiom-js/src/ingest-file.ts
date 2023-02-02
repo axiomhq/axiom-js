@@ -5,7 +5,7 @@ const client = new Client();
 
 async function ingestFile() {
     const stream = fs.createReadStream('logs.json');
-    const res = await client.ingest(
+    const res = await client.ingestStream(
         'test',
         stream,
         ContentType.JSON,

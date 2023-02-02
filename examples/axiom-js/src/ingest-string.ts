@@ -4,11 +4,10 @@ import Client, { ContentType, ContentEncoding  } from '@axiomhq/axiom-js';
 const client = new Client();
 
 async function ingestString() {
-    const str = JSON.stringify([{ foo: 'bar' }, { foo: 'bar' }, { bar: 'baz' }]);
-    const stream = Readable.from(str);
+    const data = JSON.stringify([{ foo: 'bar' }, { foo: 'bar' }, { bar: 'baz' }]);
     const res = await client.ingest(
         'test',
-        stream,
+        data,
         ContentType.JSON,
         ContentEncoding.Identity,
     );

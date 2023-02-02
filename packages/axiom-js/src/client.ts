@@ -18,6 +18,29 @@ export default class Client extends HTTPClient {
 
     ingest = (
         id: string,
+        data: string,
+        contentType: ContentType,
+        contentEncoding: ContentEncoding,
+        options?: IngestOptions,
+    ): Promise<IngestStatus> =>
+        this.client
+        .post<IngestStatus>(this.localPath + '/datasets/' + id + '/ingest', data, {
+                headers: {
+                    'Content-Type': contentType,
+                    'Content-Encoding': contentEncoding,
+                },
+                params: {
+                    'timestamp-field': options?.timestampField,
+                    'timestamp-format': options?.timestampFormat,
+                    'csv-delimiter': options?.csvDelimiter,
+                },
+            })
+            .then((response) => {
+                return response.data;
+            });
+
+    ingestStream = (
+        id: string,
         stream: Stream,
         contentType: ContentType,
         contentEncoding: ContentEncoding,
@@ -45,7 +68,7 @@ export default class Client extends HTTPClient {
         contentType: ContentType,
         contentEncoding: ContentEncoding,
         options?: IngestOptions,
-    ): Promise<IngestStatus> => this.ingest(id, Readable.from(buffer), contentType, contentEncoding, options);
+    ): Promise<IngestStatus> => this.ingestStream(id, Readable.from(buffer), contentType, contentEncoding, options);
 
     ingestString = (
         id: string,
@@ -53,7 +76,7 @@ export default class Client extends HTTPClient {
         contentType: ContentType,
         contentEncoding: ContentEncoding,
         options?: IngestOptions,
-    ): Promise<IngestStatus> => this.ingest(id, Readable.from(data), contentType, contentEncoding, options);
+    ): Promise<IngestStatus> => this.ingest(id, data, contentType, contentEncoding, options);
 
     ingestEvents = async (
         id: string,
