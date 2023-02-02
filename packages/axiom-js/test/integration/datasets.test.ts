@@ -1,4 +1,4 @@
-import { datasets } from '../../lib/datasets';
+import { datasets } from '../../src/datasets';
 
 const datasetSuffix = process.env.AXIOM_DATASET_SUFFIX || 'local';
 

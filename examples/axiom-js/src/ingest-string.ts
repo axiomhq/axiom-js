@@ -1,5 +1,5 @@
 const { Readable } = require('stream');
-import Client, { ContentType, ContentEncoding  } from '@axiomhq/axiom-node';
+import Client, { ContentType, ContentEncoding  } from '@axiomhq/axiom-js';
 
 const client = new Client();
 

@@ -1,14 +1,13 @@
-import { fail } from 'assert';
 import nock from 'nock';
 
-import Client, { ContentType, ContentEncoding } from '../../lib/client';
-import { AxiomTooManyRequestsError } from '../../lib/httpClient';
+import Client, { ContentType, ContentEncoding } from '../../src/client';
+import { AxiomTooManyRequestsError } from '../../src/httpClient';
 import {
     headerAPILimit,
     headerAPIRateRemaining,
     headerAPIRateReset,
     headerRateScope,
-} from '../../lib/limit';
+} from '../../src/limit';
 
 const queryLegacyResult = {
     status: {

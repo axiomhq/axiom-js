@@ -1,7 +1,7 @@
 import { createHmac } from 'crypto';
 import { parse as uuidParse } from 'uuid';
 
-import { Filter as AxiomFilter, FilterOp } from '../lib/client'
+import { Filter as AxiomFilter, FilterOp } from './client'
 
 export namespace sas {
     export interface Options {

@@ -1,4 +1,4 @@
-import Client from '@axiomhq/axiom-node';
+import Client from '@axiomhq/axiom-js';
 
 const client = new Client();
 

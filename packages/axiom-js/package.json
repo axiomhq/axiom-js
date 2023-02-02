@@ -1,0 +1,47 @@
+{
+    "name": "@axiomhq/axiom-js",
+    "description": "The official javascript bindings for the Axiom API",
+    "version": "0.11.0",
+    "author": "Axiom, Inc.",
+    "license": "MIT",
+    "contributors": [
+        "Lukas Malkmus <lukas@axiom.co>",
+        "Islam Schehata <islam@axiom.co>",
+        "Arne Bahlo <arne@axiom.co>"
+    ],
+    "engines": {
+        "node": ">=14"
+    },
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "scripts": {
+        "build": "tsc",
+        "format": "eslint '*/**/*.{js,ts}' --quiet --fix",
+        "lint": "eslint '*/**/*.{js,ts}'",
+        "prepublish": "npm run build",
+        "test": "jest test/unit",
+        "cover": "nyc -r text -e .ts -x 'tests/unit/**/*.test.ts' npm run test",
+        "integration": "jest test/integration --testTimeout=10000"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/axiomhq/axiom-node.git"
+    },
+    "keywords": [
+        "axiom",
+        "api",
+        "rest",
+        "client"
+    ],
+    "bugs": {
+        "url": "https://github.com/axiomhq/axiom-node/issues"
+    },
+    "homepage": "https://github.com/axiomhq/axiom-node",
+    "dependencies": {
+        "axios": "^1.2.0",
+        "axios-retry": "^3.3.1",
+        "to-time": "^1.0.2",
+        "uuid": "^8.3.2",
+        "winston-transport": "^4.5.0"
+    }
+}

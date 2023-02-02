@@ -1,6 +1,6 @@
 import nock from 'nock';
 
-import { datasets } from '../../lib/datasets';
+import { datasets } from '../../src/datasets';
 
 describe('DatasetsService', () => {
     const client = new datasets.Service({ url: 'http://axiom-node.dev.local' });

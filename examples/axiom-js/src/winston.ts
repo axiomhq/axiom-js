@@ -1,5 +1,5 @@
 import winston from 'winston';
-import { WinstonTransport as AxiomTransport } from '@axiomhq/axiom-node/logger';
+import { WinstonTransport as AxiomTransport } from '@axiomhq/axiom-js';
 
 const logger = winston.createLogger({
     level: 'info',

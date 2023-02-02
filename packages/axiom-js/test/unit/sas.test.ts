@@ -1,5 +1,5 @@
-import { FilterOp } from '../../lib/client'
-import { sas } from '../../lib/sas';
+import { FilterOp } from '../../src/client'
+import { sas } from '../../src/sas';
 
 describe('Shared Access', () => {
     it('Create Signature', async () => {

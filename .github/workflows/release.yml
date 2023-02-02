@@ -6,7 +6,7 @@ on:
       - "v*"
 
 env:
-  NODEVERSION: 17.x
+  NODEVERSION: 18.x
 
 jobs:
   publish:

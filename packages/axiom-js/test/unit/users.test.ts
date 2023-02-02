@@ -1,6 +1,6 @@
 import nock from 'nock';
 
-import { users } from '../../lib/users';
+import { users } from '../../src/users';
 
 describe('UsersService', () => {
     const client = new users.Service({ url: 'http://axiom-node.dev.local' });

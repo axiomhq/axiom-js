@@ -1,7 +1,7 @@
 import winston from 'winston';
 
-import Client from '../../lib/client';
-import { WinstonTransport as AxiomTransport } from '../../lib/logger';
+import Client from '../../src/client';
+import { WinstonTransport as AxiomTransport } from '../../src/logger';
 
 const datasetSuffix = process.env.AXIOM_DATASET_SUFFIX || 'local';
 
