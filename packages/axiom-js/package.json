@@ -15,7 +15,7 @@
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
     "scripts": {
-        "build": "tsc",
+        "build": "tsc -b",
         "format": "eslint '*/**/*.{js,ts}' --quiet --fix",
         "lint": "eslint '*/**/*.{js,ts}'",
         "prepublish": "npm run build",
@@ -40,8 +40,11 @@
     "dependencies": {
         "axios": "^1.2.0",
         "axios-retry": "^3.4.0",
+        "ky": "^0.33.2",
+        "ky-universal": "^0.11.0",
         "to-time": "^1.0.2",
-        "uuid": "^8.3.2"
+        "uuid": "^8.3.2",
+        "web-streams-polyfill": "^3.2.1"
     },
     "devDependencies": {
         "xhr-mock": "^2.5.1"

@@ -10,8 +10,8 @@
     "example": "ts-node"
   },
   "dependencies": {
-    "@axiomhq/axiom-js": "*",
-    "@axiomhq/winston-axiom": "*",
+    "@axiomhq/axiom-js": "../../packages/axiom-js",
+    "@axiomhq/winston-axiom": "../../packages/winston-axiom",
     "winston": "^3.8.2"
   }
 }

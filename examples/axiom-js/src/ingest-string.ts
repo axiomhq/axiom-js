@@ -6,7 +6,7 @@ const client = new Client();
 async function ingestString() {
     const data = JSON.stringify([{ foo: 'bar' }, { foo: 'bar' }, { bar: 'baz' }]);
     const res = await client.ingest(
-        'test',
+        'my-dataset',
         data,
         ContentType.JSON,
         ContentEncoding.Identity,

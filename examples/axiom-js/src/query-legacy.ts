@@ -12,7 +12,7 @@ async function query() {
         resolution: 'auto',
     };
 
-    const res = await client.queryLegacy('id', query);
+    const res = await client.queryLegacy('my-dataset', query);
     if (!res.matches || res.matches?.length === 0) {
         console.warn('no matches found');
         return;

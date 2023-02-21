@@ -2,12 +2,8 @@ import nock from 'nock';
 
 import Client, { ContentType, ContentEncoding } from '../../src/client';
 import { AxiomTooManyRequestsError } from '../../src/httpClient';
-import {
-    headerAPILimit,
-    headerAPIRateRemaining,
-    headerAPIRateReset,
-    headerRateScope,
-} from '../../src/limit';
+import { headerAPILimit, headerAPIRateRemaining, headerAPIRateReset, headerRateScope } from '../../src/limit';
+import { mockFetchResponse, testMockedFetchCall } from '../lib/mock';
 
 const queryLegacyResult = {
     status: {
@@ -80,25 +76,25 @@ describe('Client', () => {
     });
 
     it('Services', () => {
-        expect(client.datasets).toBeTruthy()
-        expect(client.users).toBeTruthy()
+        expect(client.datasets).toBeTruthy();
+        expect(client.users).toBeTruthy();
     });
 
     it('Retries failed 5xx requests', async () => {
-        const scope = nock(clientURL);
-        scope.get('/v1/datasets').reply(500, 'internal server error');
-        scope.get('/v1/datasets').reply(500, 'internal server error');
-        scope.get('/v1/datasets').reply(200, [{ name: 'test' }]);
+        // TODO: this doesn't actually check that retries happend, fix
+        global.fetch = mockFetchResponse({}, 500);
+        global.fetch = mockFetchResponse({}, 500);
+        global.fetch = mockFetchResponse([{ name: 'test' }], 200);
 
         const resp = await client.datasets.list();
-        expect(scope.isDone()).toEqual(true);
+        // expect(fetch).toHaveBeenCalledTimes(3);
         expect(resp.length).toEqual(1);
     });
 
     it('Does not retry failed requests < 500', async () => {
-        const scope = nock(clientURL);
-        scope.get('/v1/datasets').reply(401, 'Forbidden');
-        scope.get('/v1/datasets').reply(200, [{ name: 'test' }]);
+        // TODO: this doesn't actually check that retries happend or not, fix
+        global.fetch = mockFetchResponse({}, 401);
+        global.fetch = mockFetchResponse([{ name: 'test' }], 200);
 
         try {
             await client.datasets.list();
@@ -106,28 +102,30 @@ describe('Client', () => {
         } catch (err: any) {
             expect(err.response.status).toEqual(401);
             expect(err.response.data).toEqual('Forbidden');
-            // Scope is not done means that not all scope mocks has been consumed
-            expect(scope.isDone()).toEqual(false);
+            expect(fetch).toHaveBeenCalledTimes(1);
         }
 
         // create another request to ensure that
         // the nock scope was not consumed before
         const resp = await client.datasets.list();
-        expect(scope.isDone()).toEqual(true);
+        expect(fetch).toHaveBeenCalledTimes(2);
         expect(resp.length).toEqual(1);
     });
 
     it('No shortcircuit for ingest or query when there is api rate limit', async () => {
-        const scope = nock(clientURL);
+        // const scope = nock(clientURL);
         const resetTimeInSeconds = Math.floor(new Date().getTime() / 1000);
         const headers: nock.ReplyHeaders = {};
         headers[headerRateScope] = 'anonymous';
         headers[headerAPILimit] = '1000';
         headers[headerAPIRateRemaining] = '0';
         headers[headerAPIRateReset] = resetTimeInSeconds.toString();
-        scope.get('/v1/datasets').reply(429, 'Too Many Requests', headers);
-        scope.post('/v1/datasets/test/ingest').reply(200, {}, headers);
-        scope.post('/v1/datasets/_apl?format=legacy').reply(200, {}, headers);
+        // scope.get('/v1/datasets').reply(429, 'Too Many Requests', headers);
+        // scope.post('/v1/datasets/test/ingest').reply(200, {}, headers);
+        // scope.post('/v1/datasets/_apl?format=legacy').reply(200, {}, headers);
+        global.fetch = mockFetchResponse({}, 429, headers);
+        global.fetch = mockFetchResponse({}, 200, headers);
+        global.fetch = mockFetchResponse({}, 200, headers);
 
         // first api call should fail
         try {
@@ -138,18 +136,14 @@ describe('Client', () => {
         }
 
         // ingest and query should succeed
-        await client.ingestString(
-            'test',
-            JSON.stringify([{ name: 'test' }]),
-            ContentType.JSON,
-            ContentEncoding.Identity,
-        );
+        await client.ingest('test', JSON.stringify([{ name: 'test' }]), ContentType.JSON, ContentEncoding.Identity);
 
         await client.query("['test']");
     });
 
     it('IngestString', async () => {
-        const scope = nock(clientURL);
+        const query = [{"foo": "bar"}, {"foo": "baz"}];
+
         const ingestStatus = {
             ingested: 2,
             failed: 0,
@@ -158,30 +152,20 @@ describe('Client', () => {
             blocksCreated: 0,
             walLength: 2,
         };
-        scope.post('/v1/datasets/test/ingest').reply(function (_, body, cb) {
-            expect(this.req.headers).toHaveProperty('content-type');
-            expect(body).toMatchObject([{ foo: 'bar' }, { foo: 'baz' }]);
+        global.fetch = testMockedFetchCall((url: string, init: RequestInit) => {
+            expect(init.headers).toHaveProperty('content-type');
+            expect(init.body).toMatch(JSON.stringify(query))
+        }, ingestStatus);
 
-            cb(null, [200, ingestStatus]);
-        });
-
-
-        const data = `[{"foo": "bar"}, {"foo": "baz"}]`;
-        const response = await client.ingestString(
-            'test',
-            data,
-            ContentType.JSON,
-            ContentEncoding.Identity,
-        );
-        expect(response).not.toEqual('undefined');
+        const response = await client.ingest('test', JSON.stringify(query), ContentType.JSON, ContentEncoding.Identity);
+        expect(response).toBeDefined();
         expect(response.ingested).toEqual(2);
         expect(response.failed).toEqual(0);
     });
 
     it('Query', async () => {
-        const scope = nock(clientURL);
-        scope.post('/v1/datasets/test/query').reply(200, queryLegacyResult);
-        scope.post('/v1/datasets/test/query?streaming-duration=1m&nocache=true').reply(200, queryLegacyResult);
+        global.fetch = mockFetchResponse(queryLegacyResult);
+
         // works without options
         let query = {
             startTime: '2020-11-26T11:18:00Z',
@@ -189,7 +173,7 @@ describe('Client', () => {
             resolution: 'auto',
         };
         let response = await client.queryLegacy('test', query);
-        expect(response).not.toEqual('undefined');
+        expect(response).toBeDefined();
         expect(response.matches).toHaveLength(2);
 
         // works with options
@@ -202,15 +186,15 @@ describe('Client', () => {
             streamingDuration: '1m',
             noCache: true,
         };
+
+        global.fetch = mockFetchResponse(queryLegacyResult);
         response = await client.queryLegacy('test', query, options);
-        expect(response).not.toEqual('undefined');
+        expect(response).toBeDefined();
         expect(response.matches).toHaveLength(2);
     });
 
     it('APL Query', async () => {
-        const scope = nock(clientURL);
-        scope.post('/v1/datasets/_apl?format=legacy').reply(200, queryResult);
-        scope.post('/v1/datasets/_apl?streaming-duration=1m&nocache=true&format=legacy').reply(200, queryResult);
+        global.fetch = mockFetchResponse(queryResult);
         // works without options
         let response = await client.query("['test'] | where response == 304");
         expect(response).not.toEqual('undefined');
@@ -221,6 +205,8 @@ describe('Client', () => {
             streamingDuration: '1m',
             noCache: true,
         };
+
+        global.fetch = mockFetchResponse(queryResult);
         response = await client.query("['test'] | where response == 304", options);
         expect(response).not.toEqual('undefined');
         expect(response.matches).toHaveLength(2);

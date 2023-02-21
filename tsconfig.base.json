@@ -3,19 +3,20 @@
     "compilerOptions": {
         "incremental": true,
         "target": "ES2015",
-        "module": "CommonJS",
+        "module": "Node16",
+        "moduleResolution": "node16",
         "declaration": true,
         "declarationMap": true,
         "sourceMap": true,
         "strict": true,
-        "moduleResolution": "node",
         "esModuleInterop": true,
         "skipLibCheck": true,
         "forceConsistentCasingInFileNames": true,
         "rootDir": "./src",
         "outDir": "./dist",
         "composite": true,
-        "baseUrl": "./src"
+        "baseUrl": "./src",
+        "lib": ["DOM", "ES2015"]
     },
     "exclude": [".git", ".github", "node_modules", "dist", "test"],
     "$schema": "https://json.schemastore.org/tsconfig"

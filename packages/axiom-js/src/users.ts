@@ -10,9 +10,6 @@ export namespace users {
     export class Service extends HTTPClient {
         private readonly localPath = '/v1/users';
 
-        current = (): Promise<User> =>
-            this.client.get<User>('/v1/user').then((response) => {
-                return response.data;
-            });
+        current = (): Promise<User> => this.client.get('/v1/user');
     }
 }

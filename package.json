@@ -59,7 +59,10 @@
         "winston": "^3.8.2"
     },
     "workspaces": [
-        "packages/*",
-        "examples/*"
-    ]
+        "packages/*"
+    ],
+    "dependencies": {
+        "fetch-retry": "^5.0.3",
+        "whatwg-fetch": "^3.6.2"
+    }
 }

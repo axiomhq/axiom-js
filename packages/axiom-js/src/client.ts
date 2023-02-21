@@ -18,26 +18,26 @@ export default class Client extends HTTPClient {
 
     ingest = (
         id: string,
-        data: string,
+        data: string | Buffer,
         contentType: ContentType,
         contentEncoding: ContentEncoding,
         options?: IngestOptions,
     ): Promise<IngestStatus> =>
-        this.client
-        .post<IngestStatus>(this.localPath + '/datasets/' + id + '/ingest', data, {
+        this.client.post(
+            this.localPath + '/datasets/' + id + '/ingest',
+            {
                 headers: {
                     'Content-Type': contentType,
                     'Content-Encoding': contentEncoding,
                 },
-                params: {
-                    'timestamp-field': options?.timestampField,
-                    'timestamp-format': options?.timestampFormat,
-                    'csv-delimiter': options?.csvDelimiter,
-                },
-            })
-            .then((response) => {
-                return response.data;
-            });
+                body: data,
+            },
+            {
+                'timestamp-field': options?.timestampField as string,
+                'timestamp-format': options?.timestampFormat as string,
+                'csv-delimiter': options?.csvDelimiter as string,
+            },
+        );
 
     ingestStream = (
         id: string,
@@ -46,21 +46,21 @@ export default class Client extends HTTPClient {
         contentEncoding: ContentEncoding,
         options?: IngestOptions,
     ): Promise<IngestStatus> =>
-        this.client
-        .post<IngestStatus>(this.localPath + '/datasets/' + id + '/ingest', stream, {
+        this.client.post(
+            this.localPath + '/datasets/' + id + '/ingest',
+            {
                 headers: {
                     'Content-Type': contentType,
                     'Content-Encoding': contentEncoding,
                 },
-                params: {
-                    'timestamp-field': options?.timestampField,
-                    'timestamp-format': options?.timestampFormat,
-                    'csv-delimiter': options?.csvDelimiter,
-                },
-            })
-            .then((response) => {
-                return response.data;
-            });
+                body: "" //stream,
+            },
+            {
+                'timestamp-field': options?.timestampField as string,
+                'timestamp-format': options?.timestampFormat as string,
+                'csv-delimiter': options?.csvDelimiter as string,
+            },
+        );
 
     ingestBuffer = (
         id: string,
@@ -68,15 +68,8 @@ export default class Client extends HTTPClient {
         contentType: ContentType,
         contentEncoding: ContentEncoding,
         options?: IngestOptions,
-    ): Promise<IngestStatus> => this.ingestStream(id, Readable.from(buffer), contentType, contentEncoding, options);
-
-    ingestString = (
-        id: string,
-        data: string,
-        contentType: ContentType,
-        contentEncoding: ContentEncoding,
-        options?: IngestOptions,
-    ): Promise<IngestStatus> => this.ingest(id, data, contentType, contentEncoding, options);
+    ): Promise<IngestStatus> =>
+        this.ingestStream(id, Readable.from(buffer), contentType, contentEncoding, options);
 
     ingestEvents = async (
         id: string,
@@ -85,35 +78,36 @@ export default class Client extends HTTPClient {
     ): Promise<IngestStatus> => {
         const array = Array.isArray(events) ? events : [events];
         const json = array.map((v) => JSON.stringify(v)).join('\n');
-        const encoded = await promisify(gzip)(json);
-        return this.ingestBuffer(id, encoded, ContentType.NDJSON, ContentEncoding.GZIP, options);
+        const g = promisify(gzip);
+        const encoded = await g(json);
+        return this.ingest(id, encoded, ContentType.NDJSON, ContentEncoding.GZIP, options);
     };
 
     queryLegacy = (id: string, query: QueryLegacy, options?: QueryOptions): Promise<QueryLegacyResult> =>
-        this.client
-        .post<QueryLegacyResult>(this.localPath + '/datasets/' + id + '/query', query, {
-                params: {
-                    'streaming-duration': options?.streamingDuration,
-                    nocache: options?.noCache,
-                },
-            })
-            .then((response) => {
-                return response.data;
-            });
+        this.client.post(
+            this.localPath + '/datasets/' + id + '/query',
+            {
+                body: JSON.stringify(query),
+            },
+            {
+                'streaming-duration': options?.streamingDuration as string,
+                nocache: options?.noCache as boolean,
+            },
+        );
 
     query = (apl: string, options?: QueryOptions): Promise<QueryResult> => {
         const req: Query = { apl: apl, startTime: options?.startTime, endTime: options?.endTime };
-        return this.client
-        .post<QueryResult>(this.localPath + '/datasets/_apl', req, {
-                params: {
-                    'streaming-duration': options?.streamingDuration,
-                    nocache: options?.noCache,
-                    format: 'legacy',
-                },
-            })
-            .then((response) => {
-                return response.data;
-            });
+        return this.client.post(
+            this.localPath + '/datasets/_apl',
+            {
+                body: JSON.stringify(req),
+            },
+            {
+                'streaming-duration': options?.streamingDuration as string,
+                nocache: options?.noCache as boolean,
+                format: 'legacy',
+            },
+        );
     };
 
     aplQuery = (apl: string, options?: QueryOptions): Promise<QueryResult> => this.query(apl, options);
