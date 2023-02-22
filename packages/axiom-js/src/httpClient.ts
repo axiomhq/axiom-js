@@ -18,7 +18,7 @@ export interface ClientOptions {
 class FetchClient {
     constructor(public config: { headers: HeadersInit, baseUrl: string; timeout: number }) {}
 
-    async doReq<T>(endpoint: string, method: string, init: RequestInitWithRetry = {}, searchParams: {[key: string]: string} = {}): Promise<T> {
+    async doReq<T>(endpoint: string, method: string, init: RequestInitWithRetry = {}, searchParams: {[key: string]: string} = {}): Promise<T | Response> {
         const params = new URLSearchParams();
         // searchParams.forEach((k: string) => {
         //     if (searchParams[k]) {
@@ -43,7 +43,7 @@ class FetchClient {
         if (resp.status === 401) {
             throw new Error(`Unauthorized`);
         } else if (resp.status === 204) {
-            return {} as T;
+            return resp;
         } else if (resp.status >= 400) {
             const payload = await resp.json()
             throw new Error(`Error ${resp.status} ${resp.statusText}: ${payload.message}`);
@@ -52,19 +52,19 @@ class FetchClient {
         return await resp.json() as T
     }
 
-    post<T>(url: string, init: RequestInitWithRetry = {}, searchParams: any = {}): Promise<T> {
+    post<T>(url: string, init: RequestInitWithRetry = {}, searchParams: any = {}): Promise<T | Response> {
         return this.doReq<T>(url, 'POST', init, searchParams);
     }
 
-    get<T>(url: string, init: RequestInitWithRetry = {}, searchParams: any = {}): Promise<T> {
+    get<T>(url: string, init: RequestInitWithRetry = {}, searchParams: any = {}): Promise<T | Response> {
         return this.doReq<T>(url, 'GET', init, searchParams);
     }
 
-    put<T>(url: string, init: RequestInitWithRetry = {}, searchParams: any = {}): Promise<T> {
+    put<T>(url: string, init: RequestInitWithRetry = {}, searchParams: any = {}): Promise<T | Response> {
         return this.doReq<T>(url, 'PUT', init, searchParams);
     }
 
-    delete<T>(url: string, init: RequestInitWithRetry = {}, searchParams: any = {}): Promise<T> {
+    delete<T>(url: string, init: RequestInitWithRetry = {}, searchParams: any = {}): Promise<T | Response> {
         return this.doReq<T>(url, 'DELETE', init, searchParams);
     }
 }
