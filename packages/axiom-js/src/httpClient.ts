@@ -1,5 +1,5 @@
 import 'whatwg-fetch';
-import { Limit, LimitType } from './limit';
+import { Limit, limitKey, LimitType, parseLimitFromResponse } from './limit';
 import fetchRetry, { RequestInitWithRetry } from 'fetch-retry';
 
 declare global {
@@ -16,9 +16,14 @@ export interface ClientOptions {
 }
 
 class FetchClient {
-    constructor(public config: { headers: HeadersInit, baseUrl: string; timeout: number }) {}
+    constructor(public config: { headers: HeadersInit; baseUrl: string; timeout: number }) {}
 
-    async doReq<T>(endpoint: string, method: string, init: RequestInitWithRetry = {}, searchParams: {[key: string]: string} = {}): Promise<T | Response> {
+    async doReq<T>(
+        endpoint: string,
+        method: string,
+        init: RequestInitWithRetry = {},
+        searchParams: { [key: string]: string } = {},
+    ): Promise<T> {
         const params = new URLSearchParams();
         // searchParams.forEach((k: string) => {
         //     if (searchParams[k]) {
@@ -27,7 +32,7 @@ class FetchClient {
         // })
         const finalUrl = `${this.config.baseUrl}${endpoint}?${params.toString()}`;
 
-        const headers = { ...this.config.headers, ...init.headers}
+        const headers = { ...this.config.headers, ...init.headers };
 
         const resp = await fetchRetry(fetch)(finalUrl, {
             retries: 3,
@@ -38,33 +43,38 @@ class FetchClient {
             headers,
             method,
             body: init.body ? init.body : undefined,
-        })
+        });
 
-        if (resp.status === 401) {
-            throw new Error(`Unauthorized`);
-        } else if (resp.status === 204) {
-            return resp;
+        if (resp.status === 204) {
+            return resp as T;
+        } else if (resp.status == 429) {
+            const limit = parseLimitFromResponse(resp);
+            
+            return Promise.reject(new AxiomTooManyRequestsError(limit));
+            // throw new AxiomTooManyRequestsError(limit, resp);
+        }  else if (resp.status === 401) {
+            return Promise.reject(new Error('Forbidden'))
         } else if (resp.status >= 400) {
-            const payload = await resp.json()
-            throw new Error(`Error ${resp.status} ${resp.statusText}: ${payload.message}`);
+            const payload = await resp.json() as { message: string };
+            return Promise.reject(new Error(payload.message))
         }
 
-        return await resp.json() as T
+        return (await resp.json()) as T;
     }
 
-    post<T>(url: string, init: RequestInitWithRetry = {}, searchParams: any = {}): Promise<T | Response> {
+    post<T>(url: string, init: RequestInitWithRetry = {}, searchParams: any = {}): Promise<T> {
         return this.doReq<T>(url, 'POST', init, searchParams);
     }
 
-    get<T>(url: string, init: RequestInitWithRetry = {}, searchParams: any = {}): Promise<T | Response> {
+    get<T>(url: string, init: RequestInitWithRetry = {}, searchParams: any = {}): Promise<T> {
         return this.doReq<T>(url, 'GET', init, searchParams);
     }
 
-    put<T>(url: string, init: RequestInitWithRetry = {}, searchParams: any = {}): Promise<T | Response> {
+    put<T>(url: string, init: RequestInitWithRetry = {}, searchParams: any = {}): Promise<T> {
         return this.doReq<T>(url, 'PUT', init, searchParams);
     }
 
-    delete<T>(url: string, init: RequestInitWithRetry = {}, searchParams: any = {}): Promise<T | Response> {
+    delete<T>(url: string, init: RequestInitWithRetry = {}, searchParams: any = {}): Promise<T> {
         return this.doReq<T>(url, 'DELETE', init, searchParams);
     }
 }
@@ -84,7 +94,7 @@ export default abstract class HTTPClient {
             Authorization: 'Bearer ' + token,
         };
         if (typeof window === 'undefined') {
-            headers['User-Agent'] =  'axiom-js/' + Version;
+            headers['User-Agent'] = 'axiom-js/' + Version;
         }
         if (orgId) {
             headers['X-Axiom-Org-Id'] = orgId;
@@ -95,36 +105,13 @@ export default abstract class HTTPClient {
             baseUrl: url,
             timeout: 3000,
         });
-
-        // this.client.interceptors.response.use(
-        //     (response) => response,
-        //     (error) => {
-        //         // Some errors don't have a response (i.e. when unit-testing)
-        //         if (error.response) {
-        //             if (error.response.status == 429) {
-        //                 const limit = parseLimitFromResponse(error.response);
-        //                 const key = limitKey(limit.type, limit.scope);
-        //                 this.limits[key] = limit;
-        //                 return Promise.reject(new AxiomTooManyRequestsError(limit, error.response));
-        //             }
-
-        //             const message = error.response.data.message;
-        //             if (message) {
-        //                 return Promise.reject(new Error(message));
-        //             }
-        //         }
-
-        //         return Promise.reject(error);
-        //     },
-        // );
     }
-
 }
 
 export class AxiomTooManyRequestsError extends Error {
     public message: string = '';
 
-    constructor(public limit: Limit, public response: Response, public shortcircuit = false) {
+    constructor(public limit: Limit, public shortcircuit = false) {
         super();
         const retryIn = this.timeUntilReset();
         this.message = `${limit.type} limit exceeded, not making remote request, try again in ${retryIn.minutes}m${retryIn.seconds}s`;

@@ -97,7 +97,7 @@ export default class Client extends HTTPClient {
 
     query = (apl: string, options?: QueryOptions): Promise<QueryResult> => {
         const req: Query = { apl: apl, startTime: options?.startTime, endTime: options?.endTime };
-        return this.client.post(
+        return this.client.post<QueryResult>(
             this.localPath + '/datasets/_apl',
             {
                 body: JSON.stringify(req),

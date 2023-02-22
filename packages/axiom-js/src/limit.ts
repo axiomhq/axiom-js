@@ -1,5 +1,3 @@
-import { AxiosResponse } from 'axios';
-
 export const headerRateScope = 'X-RateLimit-Scope';
 
 export const headerAPILimit = 'X-RateLimit-Limit';
@@ -37,13 +35,13 @@ export class Limit {
 }
 
 // parse limit headers from axios response and return a limit object
-export function parseLimitFromResponse(response: AxiosResponse): Limit {
+export function parseLimitFromResponse(response: Response): Limit {
     let limit: Limit;
 
-    if (response.config.url?.endsWith('/ingest')) {
+    if (response.url?.endsWith('/ingest')) {
         limit = parseLimitFromHeaders(response, '', headerIngestLimit, headerIngestRemaining, headerIngestReset);
         limit.type = LimitType.ingest;
-    } else if (response.config.url?.endsWith('/query') || response.config.url?.endsWith('/_apl')) {
+    } else if (response.url?.endsWith('/query') || response.url?.endsWith('/_apl')) {
         limit = parseLimitFromHeaders(response, '', headerQueryLimit, headerQueryRemaining, headerQueryReset);
         limit.type = LimitType.query;
     } else {
@@ -64,7 +62,7 @@ export const limitKey = (type: LimitType, scope: LimitScope): string => `${type}
 
 // parseLimitFromHeaders parses the named headers from a `*http.Response`.
 function parseLimitFromHeaders(
-    response: AxiosResponse,
+    response: Response,
     headerScope: string,
     headerLimit: string,
     headerRemaining: string,
@@ -72,22 +70,22 @@ function parseLimitFromHeaders(
 ): Limit {
     let limit: Limit = new Limit();
 
-    const scope: string = response.headers[headerScope.toLowerCase()] || LimitScope.unknown;
+    const scope: string = response.headers.get(headerScope.toLowerCase()) || LimitScope.unknown;
     limit.scope = LimitScope[scope as keyof typeof LimitScope];
 
-    const limitValue = response.headers[headerLimit.toLowerCase()] || '';
+    const limitValue = response.headers.get(headerLimit.toLowerCase()) || '';
     const limitValueNumber = parseInt(limitValue, 10);
     if (!isNaN(limitValueNumber)) {
         limit.value = limitValueNumber;
     }
 
-    const remainingValue = response.headers[headerRemaining.toLowerCase()] || '';
+    const remainingValue = response.headers.get(headerRemaining.toLowerCase()) || '';
     const remainingValueNumber = parseInt(remainingValue, 10);
     if (!isNaN(remainingValueNumber)) {
         limit.remaining = remainingValueNumber;
     }
 
-    const resetValue = response.headers[headerReset.toLowerCase()] || '';
+    const resetValue = response.headers.get(headerReset.toLowerCase()) || '';
     const resetValueInt = parseInt(resetValue, 10);
     if (!isNaN(resetValueInt)) {
         limit.reset = new Date(resetValueInt * 1000);
