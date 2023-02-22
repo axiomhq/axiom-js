@@ -22,7 +22,7 @@ describe('Client', () => {
 
     describe('ingest', () => {
         it('works with a JSON payload', async () => {
-            const status = await client.ingestString(
+            const status = await client.ingest(
                 datasetName,
                 `[{"foo":"bar"},{"bar":"baz"}]`,
                 ContentType.JSON,
@@ -34,7 +34,7 @@ describe('Client', () => {
         });
 
         it('works with a NDJSON payload', async () => {
-            const status = await client.ingestString(
+            const status = await client.ingest(
                 datasetName,
                 `{"foo":"bar"}
 {"bar":"baz"}`,
@@ -47,7 +47,7 @@ describe('Client', () => {
         });
 
         it('works with a CSV payload', async () => {
-            const status = await client.ingestString(
+            const status = await client.ingest(
                 datasetName,
                 `foo
 bar
