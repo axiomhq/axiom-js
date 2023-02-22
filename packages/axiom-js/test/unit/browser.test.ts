@@ -1,8 +1,6 @@
 /*
  * @jest-environment jsdom
  */
-// axios uses xhr in the browser, and nock can't intercept that
-// so we need a different mocking library for browser tests.
 import Client from '../../src/client';
 
 const clientUrl = 'https://mock.local';

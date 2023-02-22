@@ -1,5 +1,3 @@
-import nock from 'nock';
-
 import Client, { ContentType, ContentEncoding } from '../../src/client';
 import { AxiomTooManyRequestsError } from '../../src/httpClient';
 import { headerAPILimit, headerAPIRateRemaining, headerAPIRateReset, headerRateScope } from '../../src/limit';
@@ -106,23 +104,19 @@ describe('Client', () => {
         }
 
         // create another request to ensure that
-        // the nock scope was not consumed before
+        // the fetch mock was not consumed before
         const resp = await client.datasets.list();
         expect(fetch).toHaveBeenCalledTimes(2);
         expect(resp.length).toEqual(1);
     });
 
     it('No shortcircuit for ingest or query when there is api rate limit', async () => {
-        // const scope = nock(clientURL);
         const resetTimeInSeconds = Math.floor(new Date().getTime() / 1000);
-        const headers: nock.ReplyHeaders = {};
+        const headers = {};
         headers[headerRateScope] = 'anonymous';
         headers[headerAPILimit] = '1000';
         headers[headerAPIRateRemaining] = '0';
         headers[headerAPIRateReset] = resetTimeInSeconds.toString();
-        // scope.get('/v1/datasets').reply(429, 'Too Many Requests', headers);
-        // scope.post('/v1/datasets/test/ingest').reply(200, {}, headers);
-        // scope.post('/v1/datasets/_apl?format=legacy').reply(200, {}, headers);
         global.fetch = mockFetchResponse({}, 429, headers);
         global.fetch = mockFetchResponse({}, 200, headers);
         global.fetch = mockFetchResponse({}, 200, headers);
