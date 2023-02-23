@@ -62,6 +62,11 @@ async function main() {
 
 For further examples, head over to the [examples](examples) directory.
 
+
+## Limitations
+
+- Stream support has been removed, because it doesn't work on edge runtime.
+
 ## License
 
 Distributed under the [MIT License](LICENSE).
