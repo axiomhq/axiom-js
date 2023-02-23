@@ -1,4 +1,4 @@
-import 'whatwg-fetch';
+import fetch from 'cross-fetch';
 import fetchRetry, { RequestInitWithRetry } from 'fetch-retry';
 import { parseLimitFromResponse, Limit, LimitType } from './limit';
 
