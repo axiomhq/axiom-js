@@ -1,7 +1,9 @@
+import { describe, expect, it, beforeEach } from '@jest/globals';
+
 import Client, { ContentType, ContentEncoding } from '../../src/client';
 import { AxiomTooManyRequestsError } from '../../src/fetchClient';
 import { headerAPILimit, headerAPIRateRemaining, headerAPIRateReset, headerRateScope } from '../../src/limit';
-import { mockFetchResponse, mockFetchResponses, testMockedFetchCall } from '../lib/mock';
+import { mockFetchResponse, testMockedFetchCall } from '../lib/mock';
 
 const queryLegacyResult = {
     status: {
@@ -80,9 +82,9 @@ describe('Client', () => {
 
     it('Retries failed 5xx requests', async () => {
         // TODO: this doesn't actually check that retries happend, fix
-        global.fetch = mockFetchResponse({}, 500);
-        global.fetch = mockFetchResponse({}, 500);
-        global.fetch = mockFetchResponse([{ name: 'test' }], 200);
+        mockFetchResponse({}, 500);
+        mockFetchResponse({}, 500);
+        mockFetchResponse([{ name: 'test' }], 200);
 
         const resp = await client.datasets.list();
         // expect(fetch).toHaveBeenCalledTimes(3);
@@ -91,7 +93,7 @@ describe('Client', () => {
 
     it('Does not retry failed requests < 500', async () => {
         // TODO: this doesn't actually check that retries happend or not, fix
-        global.fetch = mockFetchResponse({}, 401);
+        mockFetchResponse({}, 401);
         // global.fetch = mockFetchResponse([{ name: 'test' }], 200);
 
         expect(client.datasets.list).rejects.toThrow(new Error('Forbidden'));
@@ -110,22 +112,20 @@ describe('Client', () => {
         headers[headerAPILimit] = '1000';
         headers[headerAPIRateRemaining] = '0';
         headers[headerAPIRateReset] = resetTimeInSeconds.toString();
-        global.fetch = mockFetchResponses([
-            {body: {}, status: 429, headers},
-            {body: {}, status: 200, headers},
-            {body: {}, status: 200, headers},
-        ]);
 
-        expect(client.datasets.list).rejects.toThrow(AxiomTooManyRequestsError)
+        mockFetchResponse({}, 429, headers);
+        expect(client.datasets.list).rejects.toThrow(AxiomTooManyRequestsError);
 
         // ingest and query should succeed
-        await client.ingest('test', JSON.stringify([{ name: 'test' }]), ContentType.JSON, ContentEncoding.Identity);
+        mockFetchResponse({}, 200, headers);
+        await client.ingestEvents('test', [{ name: 'test' }]);
 
+        mockFetchResponse({}, 200, headers);
         await client.query("['test']");
     });
 
     it('IngestString', async () => {
-        const query = [{"foo": "bar"}, {"foo": "baz"}];
+        const query = [{ foo: 'bar' }, { foo: 'baz' }];
 
         const ingestStatus = {
             ingested: 2,
@@ -135,9 +135,9 @@ describe('Client', () => {
             blocksCreated: 0,
             walLength: 2,
         };
-        global.fetch = testMockedFetchCall((url: string, init: RequestInit) => {
+        testMockedFetchCall((_: string, init: RequestInit) => {
             expect(init.headers).toHaveProperty('Content-Type');
-            expect(init.body).toMatch(JSON.stringify(query))
+            expect(init.body).toMatch(JSON.stringify(query));
         }, ingestStatus);
 
         const response = await client.ingest('test', JSON.stringify(query), ContentType.JSON, ContentEncoding.Identity);
@@ -147,7 +147,7 @@ describe('Client', () => {
     });
 
     it('Query', async () => {
-        global.fetch = mockFetchResponse(queryLegacyResult);
+        mockFetchResponse(queryLegacyResult);
 
         // works without options
         let query = {
@@ -170,14 +170,14 @@ describe('Client', () => {
             noCache: true,
         };
 
-        global.fetch = mockFetchResponse(queryLegacyResult);
+        mockFetchResponse(queryLegacyResult);
         response = await client.queryLegacy('test', query, options);
         expect(response).toBeDefined();
         expect(response.matches).toHaveLength(2);
     });
 
     it('APL Query', async () => {
-        global.fetch = mockFetchResponse(queryResult);
+        mockFetchResponse(queryResult);
         // works without options
         let response = await client.query("['test'] | where response == 304");
         expect(response).not.toEqual('undefined');
@@ -189,7 +189,7 @@ describe('Client', () => {
             noCache: true,
         };
 
-        global.fetch = mockFetchResponse(queryResult);
+        mockFetchResponse(queryResult);
         response = await client.query("['test'] | where response == 304", options);
         expect(response).not.toEqual('undefined');
         expect(response.matches).toHaveLength(2);

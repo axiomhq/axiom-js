@@ -1,6 +1,6 @@
 import { gzip } from 'zlib';
-
-import  Client, { ContentType, ContentEncoding } from '../../src/client';
+import { describe, expect, it, beforeAll, afterAll } from '@jest/globals';
+import Client, { ContentType, ContentEncoding } from '../../src/client';
 
 const datasetSuffix = process.env.AXIOM_DATASET_SUFFIX || 'local';
 
@@ -68,12 +68,7 @@ baz`,
                 });
             });
 
-            const status = await client.ingestBuffer(
-                datasetName,
-                encoded,
-                ContentType.JSON,
-                ContentEncoding.GZIP,
-            );
+            const status = await client.ingestBuffer(datasetName, encoded, ContentType.JSON, ContentEncoding.GZIP);
 
             expect(status.ingested).toEqual(2);
             expect(status.failures?.length).toEqual(0);

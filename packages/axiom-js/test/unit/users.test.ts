@@ -1,3 +1,4 @@
+import { describe, expect, it } from '@jest/globals';
 import { users } from '../../src/users';
 import { mockFetchResponse } from '../lib/mock';
 
@@ -11,7 +12,7 @@ describe('UsersService', () => {
     const client = new users.Service({ url: 'http://axiom-js.dev.local' });
 
     it('Current', async () => {
-        global.fetch = mockFetchResponse(currentUser)
+        mockFetchResponse(currentUser);
         const response = await client.current();
         expect(response).toBeDefined();
         expect(response.id).toEqual(currentUser.id);

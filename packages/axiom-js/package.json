@@ -38,7 +38,6 @@
     },
     "homepage": "https://github.com/axiomhq/axiom-js",
     "dependencies": {
-        "uuid": "^8.3.2",
-        "web-streams-polyfill": "^3.2.1"
+        "uuid": "^8.3.2"
     }
 }

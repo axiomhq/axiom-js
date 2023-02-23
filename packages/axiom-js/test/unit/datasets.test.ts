@@ -1,3 +1,4 @@
+import { describe, expect, it } from '@jest/globals';
 import { datasets } from '../../src/datasets';
 import { mockFetchResponse, mockNoContentResponse } from '../lib/mock';
 
@@ -22,14 +23,14 @@ describe('DatasetsService', () => {
     const client = new datasets.Service({ url: 'http://axiom-js.dev.local' });
 
     it('List', async () => {
-        global.fetch = mockFetchResponse(datasetList)
+        mockFetchResponse(datasetList);
         const response = await client.list();
         expect(response).not.toEqual('undefined');
         expect(response).toHaveLength(2);
     });
 
     it('Get', async () => {
-        global.fetch = mockFetchResponse(datasetList[0])
+        mockFetchResponse(datasetList[0]);
         const response = await client.get('test');
         expect(response).toBeDefined();
         expect(response.id).toEqual('test');
@@ -42,7 +43,7 @@ describe('DatasetsService', () => {
             description: 'This is a test description',
         };
 
-        global.fetch = mockFetchResponse({ id: request.name, description: request.description });
+        mockFetchResponse({ id: request.name, description: request.description });
 
         const response = await client.create(request);
         expect(response).toBeDefined();
@@ -55,7 +56,7 @@ describe('DatasetsService', () => {
             description: 'This is a test description',
         };
 
-        global.fetch = mockFetchResponse(datasetList[1]);
+        mockFetchResponse(datasetList[1]);
 
         const response = await client.update('test1', req);
         expect(response).not.toEqual('undefined');
@@ -64,15 +65,15 @@ describe('DatasetsService', () => {
     });
 
     it('Delete', async () => {
-        global.fetch = mockNoContentResponse();
+        mockNoContentResponse();
 
         const response = await client.delete('test1');
         expect(response).toBeDefined();
-        // expect(response.status).toEqual(204);
+        expect(response.status).toEqual(204);
     });
 
     it('Trim', async () => {
-        global.fetch = mockFetchResponse({ ok: true });
+         mockFetchResponse({ ok: true });
         const response = await client.trim('test1', '30m');
         expect(response).not.toEqual('undefined');
     });
