@@ -1,5 +1,5 @@
 import Client, { ContentType, ContentEncoding } from '../../src/client';
-import { AxiomTooManyRequestsError } from '../../src/httpClient';
+import { AxiomTooManyRequestsError } from '../../src/fetchClient';
 import { headerAPILimit, headerAPIRateRemaining, headerAPIRateReset, headerRateScope } from '../../src/limit';
 import { mockFetchResponse, mockFetchResponses, testMockedFetchCall } from '../lib/mock';
 
