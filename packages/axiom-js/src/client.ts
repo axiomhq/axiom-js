@@ -19,8 +19,8 @@ export default class Client extends HTTPClient {
     ingest = (
         id: string,
         data: string | Buffer,
-        contentType: ContentType,
-        contentEncoding: ContentEncoding,
+        contentType: ContentType = ContentType.JSON,
+        contentEncoding: ContentEncoding = ContentEncoding.Identity,
         options?: IngestOptions,
     ): Promise<IngestStatus> =>
         this.client.post(
@@ -39,6 +39,7 @@ export default class Client extends HTTPClient {
             },
         );
 
+    // TODO: unable to send stream using fetch
     ingestStream = (
         id: string,
         stream: Stream,
@@ -71,6 +72,7 @@ export default class Client extends HTTPClient {
     ): Promise<IngestStatus> =>
         this.ingestStream(id, Readable.from(buffer), contentType, contentEncoding, options);
 
+    // TODO: sending gzip doesn't work on edge runtime
     ingestEvents = async (
         id: string,
         events: Array<object> | object,
@@ -96,7 +98,13 @@ export default class Client extends HTTPClient {
         );
 
     query = (apl: string, options?: QueryOptions): Promise<QueryResult> => {
-        const req: Query = { apl: apl, startTime: options?.startTime, endTime: options?.endTime };
+        const req: Query = { apl: apl };
+        if (options?.startTime) {
+            req.startTime = options?.startTime;
+        }
+        if (options?.endTime) {
+            req.endTime = options?.endTime;
+        }
         return this.client.post<QueryResult>(
             this.localPath + '/datasets/_apl',
             {

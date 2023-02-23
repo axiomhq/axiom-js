@@ -18,19 +18,31 @@ export interface ClientOptions {
 class FetchClient {
     constructor(public config: { headers: HeadersInit; baseUrl: string; timeout: number }) {}
 
+    _prepareSearchParams = (searchParams: { [key: string]: string }) => {
+        const params = new URLSearchParams();
+        let hasParams = false
+
+        Object.keys(searchParams).forEach((k: string) => {
+            if (searchParams[k]) {
+                params.append(k, searchParams[k])
+                hasParams = true
+            }
+        })
+
+        return hasParams ? params : null
+    }
+
     async doReq<T>(
         endpoint: string,
         method: string,
         init: RequestInitWithRetry = {},
         searchParams: { [key: string]: string } = {},
     ): Promise<T> {
-        const params = new URLSearchParams();
-        // searchParams.forEach((k: string) => {
-        //     if (searchParams[k]) {
-        //         params.append(k, searchParams[k])
-        //     }
-        // })
-        const finalUrl = `${this.config.baseUrl}${endpoint}?${params.toString()}`;
+        let finalUrl = `${this.config.baseUrl}${endpoint}`;
+        const params = this._prepareSearchParams(searchParams)
+        if (params) {
+            finalUrl += `?${params.toString()}`;
+        }
 
         const headers = { ...this.config.headers, ...init.headers };
 
