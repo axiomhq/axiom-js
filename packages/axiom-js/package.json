@@ -15,7 +15,7 @@
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
     "scripts": {
-        "build": "tsc -b",
+        "build": "tsc",
         "format": "eslint '*/**/*.{js,ts}' --quiet --fix",
         "lint": "eslint '*/**/*.{js,ts}'",
         "prepublish": "npm run build",
@@ -38,7 +38,6 @@
     },
     "homepage": "https://github.com/axiomhq/axiom-js",
     "dependencies": {
-        "cross-fetch": "^3.1.5",
         "uuid": "^8.3.2"
     }
 }
