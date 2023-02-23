@@ -1,9 +1,6 @@
 import { datasets } from './datasets';
 import { users } from './users';
 import HTTPClient, { ClientOptions } from './httpClient';
-import { gzip } from 'zlib';
-import { promisify } from 'util';
-import { Readable, Stream } from 'stream';
 
 export default class Client extends HTTPClient {
     datasets: datasets.Service;
@@ -39,29 +36,6 @@ export default class Client extends HTTPClient {
             },
         );
 
-    // TODO: unable to send stream using fetch
-    ingestStream = (
-        id: string,
-        stream: Stream,
-        contentType: ContentType,
-        contentEncoding: ContentEncoding,
-        options?: IngestOptions,
-    ): Promise<IngestStatus> =>
-        this.client.post(
-            this.localPath + '/datasets/' + id + '/ingest',
-            {
-                headers: {
-                    'Content-Type': contentType,
-                    'Content-Encoding': contentEncoding,
-                },
-                body: "" //stream,
-            },
-            {
-                'timestamp-field': options?.timestampField as string,
-                'timestamp-format': options?.timestampFormat as string,
-                'csv-delimiter': options?.csvDelimiter as string,
-            },
-        );
 
     ingestBuffer = (
         id: string,
@@ -70,7 +44,7 @@ export default class Client extends HTTPClient {
         contentEncoding: ContentEncoding,
         options?: IngestOptions,
     ): Promise<IngestStatus> =>
-        this.ingestStream(id, Readable.from(buffer), contentType, contentEncoding, options);
+        this.ingest(id, buffer, contentType, contentEncoding, options);
 
     // TODO: sending gzip doesn't work on edge runtime
     ingestEvents = async (
@@ -80,9 +54,7 @@ export default class Client extends HTTPClient {
     ): Promise<IngestStatus> => {
         const array = Array.isArray(events) ? events : [events];
         const json = array.map((v) => JSON.stringify(v)).join('\n');
-        const g = promisify(gzip);
-        const encoded = await g(json);
-        return this.ingest(id, encoded, ContentType.NDJSON, ContentEncoding.GZIP, options);
+        return this.ingest(id, json, ContentType.NDJSON, ContentEncoding.Identity, options);
     };
 
     queryLegacy = (id: string, query: QueryLegacy, options?: QueryOptions): Promise<QueryLegacyResult> =>

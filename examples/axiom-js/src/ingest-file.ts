@@ -4,10 +4,10 @@ import Client, { ContentType, ContentEncoding } from '@axiomhq/axiom-js';
 const client = new Client();
 
 async function ingestFile() {
-    const stream = fs.createReadStream('logs.json');
-    const res = await client.ingestStream(
+    const buff = fs.readFileSync('logs.json');
+    const res = await client.ingestBuffer(
         'test',
-        stream,
+        buff,
         ContentType.JSON,
         ContentEncoding.Identity,
     );

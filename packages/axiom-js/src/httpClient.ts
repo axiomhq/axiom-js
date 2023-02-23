@@ -1,5 +1,4 @@
 import { FetchClient } from './fetchClient';
-import { Limit, LimitType } from './limit';
 
 declare global {
     var EdgeRuntime: string;

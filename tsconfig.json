@@ -5,6 +5,6 @@
     "references": [
         { "path": "packages/axiom-js" },
         { "path": "packages/winston-axiom" },
-        // { "path": "examples/axiom-js"},
+        { "path": "examples/axiom-js"},
     ]
 }
