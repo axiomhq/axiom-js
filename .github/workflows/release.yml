@@ -21,6 +21,8 @@ jobs:
           registry-url: "https://registry.npmjs.org"
       - run: npm install
       - run: npm run build
+      # also prepare the commonjs dist
+      - run: npm run build:cjs
       - run: npm publish --access public -w packages
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTOMATION_TOKEN }}

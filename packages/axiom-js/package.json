@@ -12,11 +12,12 @@
     "engines": {
         "node": ">=14"
     },
-    "main": "dist/index.js",
-    "types": "dist/index.d.ts",
+    "main": "dist/cjs/index.js",
+    "types": "dist/types/index.d.ts",
     "type": "module",
     "scripts": {
         "build": "tsc",
+        "build:cjs": "tsc --project tsconfig.cjs.json",
         "format": "eslint '*/**/*.{js,ts}' --quiet --fix",
         "lint": "eslint '*/**/*.{js,ts}'",
         "prepublish": "npm run build",
@@ -39,6 +40,13 @@
     },
     "homepage": "https://github.com/axiomhq/axiom-js",
     "dependencies": {
-        "uuid": "^8.3.2"
+        "fetch-retry": "^5.0.3",
+        "uuid": "^8.3.2",
+        "whatwg-fetch": "^3.6.2"
+    },
+    "exports": {
+        "import": "./dist/esm/index.js",
+        "require": "./dist/cjs/index.js",
+        "default": "./dist/esm/index.js"
     }
 }

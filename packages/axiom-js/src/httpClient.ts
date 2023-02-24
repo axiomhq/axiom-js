@@ -1,9 +1,5 @@
 import { FetchClient } from './fetchClient';
 
-declare global {
-    var EdgeRuntime: string;
-}
-
 const Version = require('../package.json').version;
 const AxiomURL = 'https://api.axiom.co';
 
