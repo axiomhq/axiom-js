@@ -2,13 +2,14 @@
     "compileOnSave": false,
     "compilerOptions": {
         "incremental": true,
-        "target": "ES5",
+        "target": "ESNext",
+        "module": "ESNext",
         "moduleResolution": "node",
         "esModuleInterop": true,
         "allowSyntheticDefaultImports": true,
         "declaration": true,
         "declarationMap": true,
-        "sourceMap": true,
+        "sourceMap": false,
         "strict": true,
         "skipLibCheck": true,
         "forceConsistentCasingInFileNames": true,
@@ -20,8 +21,10 @@
         "listEmittedFiles": false /* Print names of generated files part of the compilation. */,
         "listFiles": false /* Print names of files part of the compilation. */,
         "pretty": true,
-        "lib": ["DOM", "ES2015", "ES2016"]
+        "noUnusedLocals": true,
+        "lib": ["DOM", "ESNext"]
     },
     "exclude": [".git", ".github", "node_modules", "dist", "test"],
+    "types": ["node", "jest"],
     "$schema": "https://json.schemastore.org/tsconfig"
 }
