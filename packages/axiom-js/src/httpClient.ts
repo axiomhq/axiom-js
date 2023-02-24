@@ -1,6 +1,6 @@
 import { FetchClient } from './fetchClient';
 
-const Version = require('../package.json').version;
+const Version = 'AXIOM_VERSION';
 const AxiomURL = 'https://api.axiom.co';
 
 export interface ClientOptions {

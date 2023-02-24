@@ -2,7 +2,7 @@
     "name": "axiom-js-toolkit",
     "private": true,
     "description": "The official JS tookit & bindings for the Axiom API",
-    "version": "0.11.0",
+    "version": "0.13.0",
     "author": "Axiom, Inc.",
     "license": "MIT",
     "contributors": [
@@ -34,6 +34,7 @@
         "lint": "lerna run lint",
         "build": "lerna run build",
         "build:cjs": "lerna run build:cjs",
+        "postbuild:cjs": "./scripts/resolveVersion.sh",
         "test": "lerna run test",
         "integration": "lerna run integration",
         "cover": "lerna run cover"
