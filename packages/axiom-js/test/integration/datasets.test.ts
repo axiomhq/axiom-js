@@ -4,52 +4,52 @@ import { datasets } from '../../src/datasets';
 const datasetSuffix = process.env.AXIOM_DATASET_SUFFIX || 'local';
 
 describe('DatasetsService', () => {
-    const datasetName = `test-axiom-js-dataset-${datasetSuffix}`;
-    const client = new datasets.Service();
+  const datasetName = `test-axiom-js-dataset-${datasetSuffix}`;
+  const client = new datasets.Service();
 
-    beforeAll(async () => {
-        await client.create({
-            name: datasetName,
-            description: 'This is a test dataset for datasets integration tests.',
-        });
+  beforeAll(async () => {
+    await client.create({
+      name: datasetName,
+      description: 'This is a test dataset for datasets integration tests.',
     });
+  });
 
-    afterAll(async () => {
-        const resp = await client.delete(datasetName);
-        expect(resp.status).toEqual(204);
+  afterAll(async () => {
+    const resp = await client.delete(datasetName);
+    expect(resp.status).toEqual(204);
+  });
+
+  describe('update', () => {
+    it('should update the dataset', async () => {
+      const dataset = await client.update(datasetName, {
+        description: 'This is a soon to be filled test dataset',
+      });
+
+      expect(dataset.description).toEqual('This is a soon to be filled test dataset');
     });
+  });
 
-    describe('update', () => {
-        it('should update the dataset', async () => {
-            const dataset = await client.update(datasetName, {
-                description: 'This is a soon to be filled test dataset',
-            });
+  describe('get', () => {
+    it('should get the dataset', async () => {
+      const dataset = await client.get(datasetName);
 
-            expect(dataset.description).toEqual('This is a soon to be filled test dataset');
-        });
+      expect(dataset.name).toEqual(datasetName);
     });
+  });
 
-    describe('get', () => {
-        it('should get the dataset', async () => {
-            const dataset = await client.get(datasetName);
+  describe('list', () => {
+    it('should list the datasets', async () => {
+      const datasets = await client.list();
 
-            expect(dataset.name).toEqual(datasetName);
-        });
+      expect(datasets.length).toBeGreaterThan(0);
     });
+  });
 
-    describe('list', () => {
-        it('should list the datasets', async () => {
-            const datasets = await client.list();
+  describe('trim', () => {
+    it('returns a valid response', async () => {
+      const result = await client.trim(datasetName, '1s');
 
-            expect(datasets.length).toBeGreaterThan(0);
-        });
+      expect(result).not.toEqual(null);
     });
-
-    describe('trim', () => {
-        it('returns a valid response', async () => {
-            const result = await client.trim(datasetName, '1s');
-
-            expect(result).not.toEqual(null);
-        });
-    });
+  });
 });

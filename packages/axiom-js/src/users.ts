@@ -1,13 +1,13 @@
 import HTTPClient from './httpClient';
 
 export namespace users {
-    export interface User {
-        id: string;
-        name: string;
-        emails: Array<string>;
-    }
+  export interface User {
+    id: string;
+    name: string;
+    emails: Array<string>;
+  }
 
-    export class Service extends HTTPClient {
-        current = (): Promise<User> => this.client.get('/v1/user');
-    }
+  export class Service extends HTTPClient {
+    current = (): Promise<User> => this.client.get('/v1/user');
+  }
 }

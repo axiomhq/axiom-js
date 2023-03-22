@@ -40,9 +40,9 @@
     },
     "homepage": "https://github.com/axiomhq/axiom-js",
     "dependencies": {
+        "cross-fetch": "^3.1.5",
         "fetch-retry": "^5.0.3",
-        "uuid": "^8.3.2",
-        "whatwg-fetch": "^3.6.2"
+        "uuid": "^8.3.2"
     },
     "exports": {
         "import": "./dist/esm/index.js",
