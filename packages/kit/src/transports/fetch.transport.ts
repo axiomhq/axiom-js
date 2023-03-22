@@ -39,11 +39,11 @@ export class FetchTransport implements Transport {
     const reqOptions: RequestInit = { body, method, keepalive, headers };
 
     // Do not leak network errors; does not affect the running app
-    const sendFallback = () => fetch(this.endpoint, reqOptions).catch(console.error);
+    const sendFallback = async () => await fetch(this.endpoint, reqOptions).catch(console.error);
 
     try {
       if (typeof fetch === 'undefined') {
-        fetch(this.endpoint, reqOptions).catch(console.error);
+        await fetch(this.endpoint, reqOptions).catch(console.error);
       } else if (isBrowser() && isVercel() && navigator.sendBeacon) {
         // sendBeacon fails if message size is greater than 64kb, so
         // we fall back to fetch.
@@ -58,5 +58,7 @@ export class FetchTransport implements Transport {
     }
   }
 
-  flush = () => this.sendLogs();
+  async flush() {
+    return this.sendLogs();
+  }
 }

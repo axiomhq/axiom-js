@@ -1,4 +1,4 @@
-import fetch from 'cross-fetch';
+import 'cross-fetch/polyfill';
 import fetchRetry, { RequestInitWithRetry } from 'fetch-retry';
 import { parseLimitFromResponse, Limit, LimitType } from './limit';
 
