@@ -28,9 +28,8 @@
     },
     "keywords": [
         "axiom",
-        "api",
-        "rest",
-        "client"
+        "logger",
+        "kit"
     ],
     "bugs": {
         "url": "https://github.com/axiomhq/axiom-js/issues"
