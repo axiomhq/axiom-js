@@ -20,8 +20,7 @@
         "lint": "eslint '*/**/*.{js,ts}'",
         "prepublish": "npm run build",
         "test": "jest test/unit",
-        "cover": "nyc -r text -e .ts -x 'tests/unit/**/*.test.ts' npm run test",
-        "integration": "jest test/integration --testTimeout=10000"
+        "cover": "nyc -r text -e .ts -x 'tests/unit/**/*.test.ts' npm run test"
     },
     "repository": {
         "type": "git",

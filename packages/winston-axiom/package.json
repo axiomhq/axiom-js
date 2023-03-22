@@ -11,7 +11,7 @@
         "format": "eslint 'src/**/*.{js,ts}' --quiet --fix",
         "lint": "eslint 'src/**/*.{js,ts}'",
         "integration": "jest test/integration",
-        "preapre": "npm run build",
+        "prepare": "npm run build",
         "prepublish": "npm run build"
     },
     "dependencies": {
