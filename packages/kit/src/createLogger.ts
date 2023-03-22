@@ -1,6 +1,7 @@
 import { GenericAdapter } from './adapters/generic-adapter';
 import { NetlifyAdapter } from './adapters/netlify-adapter';
 import { VercelAdapter } from './adapters/vercel-adapter';
+import { Adapter } from './logging/adapter';
 import { LoggerConfig, LoggingSource } from './logging/config';
 import { Logger } from './logging/logger';
 import { Transport } from './logging/transport';
@@ -32,6 +33,20 @@ export function createLogger(args: { [key: string]: any } = {}, isWebVitals = fa
   } else {
     adapter = new GenericAdapter(source);
   }
+  const transport = getTransport(adapter, source);
+
+  // prepare logger config and return logger instance
+  const loggerConfig: LoggerConfig = {
+    source,
+    args,
+    adapter,
+    transport,
+  };
+
+  return new Logger(loggerConfig);
+}
+
+export function getTransport(adapter: Adapter, source: LoggingSource): Transport {
   // build a transport based on the detected source
   let transport: Transport;
   // if env vars are not set, fallback to console transport
@@ -54,13 +69,6 @@ export function createLogger(args: { [key: string]: any } = {}, isWebVitals = fa
         break;
     }
   }
-  // prepare logger config and return logger instance
-  const loggerConfig: LoggerConfig = {
-    source,
-    args,
-    adapter,
-    transport,
-  };
 
-  return new Logger(loggerConfig);
+  return transport;
 }

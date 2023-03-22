@@ -7,7 +7,7 @@ import { LogEvent } from '../logging/logger';
 export interface Adapter {
   isEnvVarsSet(): boolean;
   getBrowserRewrites(): any[];
-  //   getIngestURL(): string;
+    getIngestEndpoint(): string;
   injectMeta(event: LogEvent, req: any): LogEvent;
   transformEvent(event: LogEvent): LogEvent;
   //   wrapWebVitalsObject(metrics: NextWebVitalsMetric[]): any;

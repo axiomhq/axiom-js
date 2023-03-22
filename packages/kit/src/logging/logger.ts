@@ -1,5 +1,6 @@
 import { LogLevel, DEFAULT_LOG_LEVEL, resolveLogLevelFromString } from './levels';
 import { LoggerConfig } from './config';
+import { getTransport } from '../createLogger';
 
 export interface LogEvent {
   level: string;
@@ -33,7 +34,11 @@ export class Logger {
   };
 
   with = (args: { [key: string]: any }) => {
-    const child = new Logger({ ...this.config, args: { ...this.config.args, ...args } });
+    // when creating new sub loggers, transport gets copied over which is a mistake,
+    // because transports might have a state which would be copied to children.
+    // TODO: find a better way to make a copy of transport and reset its state.
+    const transport = getTransport(this.config.adapter, this.config.source);
+    const child = new Logger({ ...this.config, transport, args: { ...this.config.args, ...args } });
     this.children.push(child);
     return child;
   };
