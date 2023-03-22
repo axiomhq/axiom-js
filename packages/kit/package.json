@@ -18,7 +18,7 @@
         "build:cjs": "tsc --project tsconfig.cjs.json",
         "format": "eslint '*/**/*.{js,ts}' --quiet --fix",
         "lint": "eslint '*/**/*.{js,ts}'",
-        "prepublish": "npm run build",
+        "prepublish": "npm run build && npm run build:cjs",
         "test": "jest test/unit",
         "cover": "nyc -r text -e .ts -x 'tests/unit/**/*.test.ts' npm run test"
     },

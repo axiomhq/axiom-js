@@ -11,8 +11,7 @@
         "format": "eslint 'src/**/*.{js,ts}' --quiet --fix",
         "lint": "eslint 'src/**/*.{js,ts}'",
         "integration": "jest test/integration",
-        "prepare": "npm run build",
-        "prepublish": "npm run build"
+        "prepublish": "npm run build && npm run build:cjs"
     },
     "dependencies": {
         "winston-transport": "^4.5.0",
