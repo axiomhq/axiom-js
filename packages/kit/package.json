@@ -15,7 +15,7 @@
     "type": "module",
     "scripts": {
         "build": "tsc -b",
-        "build:cjs": "tsc -b --project tsconfig.cjs.json",
+        "build:cjs": "tsc --project tsconfig.cjs.json",
         "format": "eslint '*/**/*.{js,ts}' --quiet --fix",
         "lint": "eslint '*/**/*.{js,ts}'",
         "prepublish": "npm run build && npm run build:cjs",
