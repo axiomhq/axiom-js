@@ -6,8 +6,8 @@
     "types": "dist/types/index.d.ts",
     "type": "module",
     "scripts": {
-        "build": "tsc",
-        "build:cjs": "tsc --project tsconfig.cjs.json",
+        "build": "tsc -b",
+        "build:cjs": "tsc -b --project tsconfig.cjs.json",
         "format": "eslint 'src/**/*.{js,ts}' --quiet --fix",
         "lint": "eslint 'src/**/*.{js,ts}'",
         "integration": "jest test/integration",
