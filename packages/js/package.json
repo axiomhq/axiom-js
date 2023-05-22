@@ -1,5 +1,5 @@
 {
-    "name": "@axiomhq/axiom-js",
+    "name": "@axiomhq/js",
     "description": "The official javascript bindings for the Axiom API",
     "version": "0.13.0",
     "author": "Axiom, Inc.",

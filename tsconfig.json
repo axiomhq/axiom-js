@@ -1,11 +1,11 @@
 {
-    "extends": "./tsconfig.base.json",
-    "exclude": [".git", ".github", "node_modules", "dist"],
-    "files": [],
-    "references": [
-        { "path": "packages/axiom-js" },
-        { "path": "packages/kit" },
-        { "path": "packages/winston-axiom" },
-        { "path": "examples/axiom-js"},
-    ]
+  "extends": "./tsconfig.base.json",
+  "exclude": [".git", ".github", "node_modules", "dist"],
+  "files": [],
+  "references": [
+    { "path": "packages/js" },
+    { "path": "packages/kit" },
+    { "path": "packages/axiom" },
+    { "path": "examples/js" }
+  ]
 }

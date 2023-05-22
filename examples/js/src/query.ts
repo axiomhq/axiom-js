@@ -1,6 +1,6 @@
 // The purpose of this example is to show how to query a dataset using the Axiom
 // Processing Language (APL).
-import Client from '@axiomhq/axiom-js';
+import Client from '@axiomhq/js';
 
 const client = new Client();
 

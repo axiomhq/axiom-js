@@ -1,5 +1,5 @@
 {
-    "name": "@axiomhq/winston-axiom",
+    "name": "@axiomhq/winston",
     "description": "The official Axiom transport for winston logger",
     "version": "0.12.0",
     "main": "dist/cjs/index.js",
@@ -15,7 +15,7 @@
     },
     "dependencies": {
         "winston-transport": "^4.5.0",
-        "@axiomhq/axiom-js": "*"
+        "@axiomhq/js": "*"
     },
     "exports": {
         "import": "./dist/esm/index.js",

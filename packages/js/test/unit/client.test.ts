@@ -81,7 +81,7 @@ describe('Client', () => {
   });
 
   it('Retries failed 5xx requests', async () => {
-    // TODO: this doesn't actually check that retries happend, fix
+    // TODO: this doesn't actually check that retries happened, fix
     mockFetchResponse({}, 500);
     mockFetchResponse({}, 500);
     mockFetchResponse([{ name: 'test' }], 200);

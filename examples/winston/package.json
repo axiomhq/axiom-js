@@ -1,0 +1,16 @@
+{
+  "name": "examples-winston",
+  "version": "1.0.0",
+  "private": true,
+  "description": "examples on using axiom with winston",
+  "scripts": {
+    "build": "tsc",
+    "format": "eslint ./src --ext .ts --quiet --fix",
+    "lint": "eslint ./src --ext .ts",
+    "example": "ts-node"
+  },
+  "dependencies": {
+    "@axiomhq/winston": "*",
+    "winston": "^3.8.2"
+  }
+}

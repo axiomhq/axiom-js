@@ -1,8 +1,8 @@
 {
-  "name": "examples",
+  "name": "examples-js",
   "version": "1.0.0",
   "private": true,
-  "description": "examples on using axiom-js",
+  "description": "examples on using axiom js sdk",
   "scripts": {
     "build": "tsc",
     "format": "eslint ./src --ext .ts --quiet --fix",
@@ -10,8 +10,7 @@
     "example": "ts-node"
   },
   "dependencies": {
-    "@axiomhq/axiom-js": "*",
-    "@axiomhq/winston-axiom": "*",
+    "@axiomhq/js": "*",
     "winston": "^3.8.2"
   }
 }
