@@ -9,6 +9,7 @@ export interface WinstonOptions extends TransportStreamOptions {
   url?: string;
 }
 
+// TODO: @arne get the error handling changes from axiom-node package
 export class WinstonTransport extends Transport {
   client: Client;
   dataset: string;

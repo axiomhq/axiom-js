@@ -109,8 +109,8 @@ jobs:
       - run: npm install
       - run: npm run build && npm run build:cjs
       - env:
-          AXIOM_TOKEN: ${{ secrets.TESTING_DEV_TOKEN }}
-          AXIOM_URL: ${{ secrets.TESTING_DEV_API_URL }}
-          AXIOM_ORG_ID: ${{ secrets.TESTING_DEV_ORG_ID }}
+          AXIOM_TOKEN: ${{ secrets.TESTING_STAGING_TOKEN }}
+          AXIOM_URL: ${{ secrets.TESTING_STAGING_API_URL }}
+          AXIOM_ORG_ID: ${{ secrets.TESTING_STAGING_ORG_ID }}
           AXIOM_DATASET_SUFFIX: ${{ github.run_id }}-${{ matrix.node }}
         run: npm run integration

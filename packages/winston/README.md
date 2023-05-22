@@ -5,13 +5,13 @@
 Install using `npm install`:
 
 ```shell
-npm install @axiomhq/winstom-axiom
+npm install @axiomhq/winstom
 ```
 
 import the axiom transport for winston:
 
 ```js
-import { WinstonTransport as AxiomTransport } from '@axiomhq/winston-axiom';
+import { WinstonTransport as AxiomTransport } from '@axiomhq/winston';
 ```
 
 create a winston logger instance with axiom transport:

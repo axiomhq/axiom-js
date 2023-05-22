@@ -5,7 +5,9 @@
   "references": [
     { "path": "packages/js" },
     { "path": "packages/kit" },
-    { "path": "packages/axiom" },
-    { "path": "examples/js" }
+    { "path": "packages/winston" },
+    { "path": "examples/js" },
+    { "path": "examples/winston" },
+    { "path": "integration" }
   ]
 }

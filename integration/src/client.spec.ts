@@ -1,11 +1,11 @@
 import { gzip } from 'zlib';
 import { describe, expect, it, beforeAll, afterAll } from '@jest/globals';
-import Client, { ContentType, ContentEncoding } from '../../src/client';
+import Client, { ContentType, ContentEncoding } from '@axiomhq/js';
 
 const datasetSuffix = process.env.AXIOM_DATASET_SUFFIX || 'local';
 
 describe('Client', () => {
-  const datasetName = `test-axiom-js-dataset-${datasetSuffix}`;
+  const datasetName = `test-axiom-js-client-${datasetSuffix}`;
   const client = new Client();
 
   beforeAll(async () => {

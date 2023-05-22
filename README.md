@@ -24,7 +24,7 @@ and our
 Install using `npm install`:
 
 ```shell
-npm install @axiomhq/axiom-js
+npm install @axiomhq/js
 ```
 
 If you use the [Axiom CLI](https://github.com/axiomhq/cli), run `eval $(axiom config export -f)` to configure your environment variables.
@@ -43,7 +43,7 @@ const client = new Client({
 Create and use a client like this:
 
 ```ts
-import Client from '@axiomhq/axiom-js';
+import Client from '@axiomhq/js';
 
 async function main() {
   const client = new Client();

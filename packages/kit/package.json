@@ -1,7 +1,7 @@
 {
     "name": "@axiomhq/kit",
     "description": "The official javascript kit for the Axiom API",
-    "version": "0.13.0",
+    "version": "0.1.0",
     "author": "Axiom, Inc.",
     "license": "MIT",
     "contributors": [

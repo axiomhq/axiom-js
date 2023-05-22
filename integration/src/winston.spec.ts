@@ -2,7 +2,7 @@ import { describe, expect, it, beforeAll, afterAll } from '@jest/globals';
 import winston from 'winston';
 
 import Client from '@axiomhq/js';
-import { WinstonTransport as AxiomTransport } from '../../src/index';
+import { WinstonTransport as AxiomTransport } from '@axiomhq/winston';
 
 const datasetSuffix = process.env.AXIOM_DATASET_SUFFIX || 'local';
 
