@@ -7,7 +7,8 @@
           "lint",
           "build",
           "test",
-          "integration"
+          "integration",
+          "e2e"
         ]
       }
     }
@@ -34,6 +35,11 @@
     "integration": {
       "dependsOn": [
         "^integration"
+      ]
+    },
+    "e2e": {
+      "dependsOn": [
+        "^e2e"
       ]
     }
   }

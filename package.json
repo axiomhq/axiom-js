@@ -37,7 +37,8 @@
         "postbuild:cjs": "./scripts/resolveVersion.sh",
         "test": "lerna run test",
         "integration": "lerna run integration",
-        "cover": "lerna run cover"
+        "cover": "lerna run cover",
+        "e2e": "lerna run e2e"
     },
     "type": "module",
     "devDependencies": {
@@ -63,6 +64,7 @@
     "workspaces": [
         "packages/*",
         "examples/*",
-        "integration"
+        "integration",
+        "e2e/*"
     ]
 }
