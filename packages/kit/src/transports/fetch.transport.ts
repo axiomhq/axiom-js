@@ -4,8 +4,6 @@ import { Transport } from '../logging/transport';
 import { isBrowser, isVercel } from '../platform';
 import throttle from '../common/throttle';
 
-const Version = '';
-
 export class FetchTransport implements Transport {
   public logEvents: LogEvent[] = [];
   throttledSendLogs = throttle(this.sendLogs, 1000);
@@ -31,7 +29,6 @@ export class FetchTransport implements Transport {
     // fire request to ingest logs
     const headers: HeadersInit = {
       'Content-Type': 'application/json',
-      'User-Agent': 'next-axiom/v' + Version,
     };
     if (this.token) {
       headers['Authorization'] = `Bearer ${this.token}`;

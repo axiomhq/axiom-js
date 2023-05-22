@@ -3,7 +3,7 @@
  */
 import { describe, expect, it } from '@jest/globals';
 
-import Client from '../../src/client';
+import { Client } from '../../src/client';
 import { mockFetchResponse } from '../lib/mock';
 
 const clientUrl = 'https://mock.local';

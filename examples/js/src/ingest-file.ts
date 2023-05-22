@@ -1,5 +1,5 @@
 import fs from 'fs';
-import Client, { ContentType, ContentEncoding } from '@axiomhq/js';
+import { Client, ContentType, ContentEncoding } from '@axiomhq/js';
 
 const client = new Client();
 

@@ -2,7 +2,7 @@ import { datasets } from './datasets';
 import { users } from './users';
 import HTTPClient, { ClientOptions } from './httpClient';
 
-export default class Client extends HTTPClient {
+export class Client extends HTTPClient {
   datasets: datasets.Service;
   users: users.Service;
   localPath = '/v1';

@@ -1,6 +1,6 @@
 import { describe, expect, it, beforeEach } from '@jest/globals';
 
-import Client, { ContentType, ContentEncoding } from '../../src/client';
+import { Client, ContentType, ContentEncoding } from '../../src/client';
 import { AxiomTooManyRequestsError } from '../../src/fetchClient';
 import { headerAPILimit, headerAPIRateRemaining, headerAPIRateReset, headerRateScope } from '../../src/limit';
 import { mockFetchResponse, testMockedFetchCall } from '../lib/mock';
