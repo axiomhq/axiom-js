@@ -2,6 +2,7 @@ import { Client, ContentEncoding, ContentType } from '@axiomhq/js';
 import { NextResponse } from 'next/server';
 
 export const runtime = 'edge';
+export const dynamic = 'force-dynamic'; // disable prerendering
 
 export async function GET() {
   const client = new Client();
