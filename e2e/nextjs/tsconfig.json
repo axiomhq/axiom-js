@@ -7,8 +7,6 @@
     "module": "esnext",
     "baseUrl": "./",
     "rootDir": ".",
-    "outDir": "dist",
-    "declarationDir": "dist/types",
     "allowJs": true,
     "noEmit": true,
     "resolveJsonModule": true,

@@ -1,0 +1,19 @@
+{
+    "version": 2,
+    "public": false,
+    "github": {
+        "enabled": false
+    },
+    "builds": [
+        {
+            "src": "e2e/nextjs/.next/index.js",
+            "use": "@vercel/node"
+        }
+    ],
+    "routes": [
+        {
+            "src": "/(.*)",
+            "dest": "e2e/nextjs/.next/index.js"
+        }
+    ]
+}
