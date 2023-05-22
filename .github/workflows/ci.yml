@@ -142,6 +142,7 @@ jobs:
 
   test-e2e:
     name: E2E TESTS
+    environment: E2EPreview
     runs-on: ubuntu-latest
     needs:
       - deploy-e2e-apps
@@ -168,6 +169,7 @@ jobs:
       - run: npm install
       - run: npm run build && npm run build:cjs
       - run: echo "vercel deploy url is ${{ needs.deploy-e2e-apps.outputs.preview-url }}"
+      - run: echo "vercel deploy url is ${{ vars.environment_url }}"
       - env:
-          TESTING_TARGET_URL: ${{ needs.deploy-e2e-apps.outputs.preview-url }}
+          TESTING_TARGET_URL: ${{ vars.environment_url }}
         run: npm run e2e
