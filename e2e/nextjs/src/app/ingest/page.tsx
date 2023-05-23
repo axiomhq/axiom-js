@@ -2,6 +2,7 @@
 import { Client, ContentEncoding, ContentType } from '@axiomhq/js';
 
 export const dynamic = 'force-dynamic';
+export const fetchCache = 'force-no-store';
 
 export default async function IngestPage() {
   try {
@@ -20,7 +21,6 @@ export default async function IngestPage() {
       </div>
     );
   } catch (err: any) {
-    console.error(err);
     return <div>failed to ingest, check console for errors</div>;
   }
 }

@@ -28,6 +28,7 @@ export class FetchClient {
       headers,
       method,
       body: init.body ? init.body : undefined,
+      cache: 'no-store'
     });
 
     if (resp.status === 204) {

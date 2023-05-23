@@ -127,7 +127,6 @@ jobs:
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID}} #Required
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID}} #Required
           scope: ${{ secrets.VERCEL_SCOPE }}
-          working-directory: ./e2e/nextjs
     outputs:
       preview-url: ${{ steps.vercel-deploy.outputs.preview-url }}
     environment:
