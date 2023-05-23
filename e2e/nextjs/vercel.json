@@ -7,7 +7,7 @@
     "framework": "nextjs",
     "builds": [
         {
-            "src": ".next/index.js",
+            "src": ".next",
             "use": "@vercel/static"
         }
     ]
