@@ -147,7 +147,6 @@ jobs:
       matrix:
         node:
           - 18.x
-          - 19.x
       max-parallel: 1
       fail-fast: true
     steps:
