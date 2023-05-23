@@ -1,13 +1,13 @@
 {
     "version": 2,
-    "public": false,
+    "public": true,
     "github": {
         "enabled": false
     },
     "builds": [
         {
             "src": ".next/index.js",
-            "use": "@vercel/node"
+            "use": "@vercel/static"
         }
     ]
 }
