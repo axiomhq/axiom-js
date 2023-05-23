@@ -133,9 +133,9 @@ jobs:
           path: ~/.npm
           key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
           restore-keys: ${{ runner.os }}-node-
-      - working-directory: ./e2e/next-js
+      - working-directory: ./e2e/nextjs
         run: npm install
       - env:
           TESTING_TARGET_URL: ${{ needs.deploy-e2e-apps.outputs.preview-url }}
-        working-directory: ./e2e/next-js
+        working-directory: ./e2e/nextjs
         run: npm run e2e
