@@ -134,7 +134,7 @@ jobs:
           key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
           restore-keys: ${{ runner.os }}-node-
       - run: npm install
-      - run: npm run build
+      - run: npm run build && npm run build:cjs # cjs build needed to run jest tests
       - env:
           TESTING_TARGET_URL: ${{ needs.deploy-e2e-apps.outputs.preview-url }}
         run: npm run e2e
