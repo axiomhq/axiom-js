@@ -129,13 +129,15 @@ jobs:
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID}} #Required
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID}} #Required
           scope: ${{ secrets.VERCEL_SCOPE }}
+      - run: echo "preview url => ${{ steps.vercel-deploy.outputs.preview-url }}"
+    outputs:
+      preview-url: ${{ steps.vercel-deploy.outputs.preview-url }}
     environment:
       name: E2EPreview
       url: ${{ steps.vercel-deploy.outputs.preview-url }}
 
   test-e2e:
     name: E2E TESTS
-    environment: E2EPreview
     runs-on: ubuntu-latest
     needs:
       - deploy-e2e-apps
