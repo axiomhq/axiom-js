@@ -120,8 +120,6 @@ jobs:
     if: github.event.pull_request.head.repo.full_name == github.repository
     steps:
       - uses: actions/checkout@v3
-      - run: npm install
-      - run: npm run build && npm run build:cjs
       - uses: amondnet/vercel-action@v20 #deploy
         id: vercel-deploy
         with:
@@ -158,8 +156,9 @@ jobs:
           path: ~/.npm
           key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
           restore-keys: ${{ runner.os }}-node-
-      - run: npm install
-      - run: npm run build && npm run build:cjs
+      - working-directory: ./e2e/next-js
+        run: npm install
       - env:
           TESTING_TARGET_URL: ${{ needs.deploy-e2e-apps.outputs.preview-url }}
+        working-directory: ./e2e/next-js
         run: npm run e2e
