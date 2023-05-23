@@ -129,7 +129,7 @@ jobs:
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID}} #Required
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID}} #Required
           scope: ${{ secrets.VERCEL_SCOPE }}
-          working-directory: e2e/nextjs
+          working-directory: ./e2e/nextjs
       - run: echo "preview url => ${{ steps.vercel-deploy.outputs.preview-url }}"
     outputs:
       preview-url: ${{ steps.vercel-deploy.outputs.preview-url }}
@@ -165,5 +165,5 @@ jobs:
       - run: echo "vercel deploy url is ${{ needs.deploy-e2e-apps.outputs.preview-url }}"
       - run: echo "vercel deploy url is ${{ vars.environment_url }}"
       - env:
-          TESTING_TARGET_URL: ${{ vars.environment_url }}
+          TESTING_TARGET_URL: ${{ needs.deploy-e2e-apps.outputs.preview-url }}
         run: npm run e2e
