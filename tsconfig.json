@@ -2,5 +2,5 @@
   "extends": "./tsconfig.base.json",
   "exclude": [".git", ".github", "node_modules", "dist"],
   "files": [],
-  "references": [{ "path": "packages/js" }, { "path": "packages/kit" }, { "path": "packages/winston" }]
+  "references": [{ "path": "packages/js" }, { "path": "packages/winston" }]
 }
