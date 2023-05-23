@@ -1,9 +1,10 @@
 {
     "version": 2,
-    "public": true,
+    "public": false,
     "github": {
         "enabled": false
     },
+    "framework": "nextjs",
     "builds": [
         {
             "src": ".next/index.js",

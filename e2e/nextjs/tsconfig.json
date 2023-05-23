@@ -11,6 +11,7 @@
     "noEmit": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
+    "declarationDir": "./.next/types",
     "jsx": "preserve",
     "plugins": [
       {
