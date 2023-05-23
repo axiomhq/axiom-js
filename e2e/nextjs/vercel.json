@@ -1,0 +1,13 @@
+{
+    "version": 2,
+    "public": false,
+    "github": {
+        "enabled": false
+    },
+    "builds": [
+        {
+            "src": ".next/index.js",
+            "use": "@vercel/node"
+        }
+    ]
+}
