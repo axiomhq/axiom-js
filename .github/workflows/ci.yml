@@ -21,8 +21,6 @@ jobs:
     strategy:
       matrix:
         node:
-          - 16.x
-          - 17.x
           - 18.x
           - 19.x
     steps:
@@ -45,8 +43,6 @@ jobs:
     strategy:
       matrix:
         node:
-          - 16.x
-          - 17.x
           - 18.x
           - 19.x
     steps:
@@ -70,8 +66,6 @@ jobs:
     strategy:
       matrix:
         node:
-          - 16.x
-          - 17.x
           - 18.x
           - 19.x
     steps:
@@ -96,8 +90,6 @@ jobs:
     strategy:
       matrix:
         node:
-          - 16.x
-          - 17.x
           - 18.x
           - 19.x
       max-parallel: 1
@@ -136,6 +128,7 @@ jobs:
           vercel-token: ${{ secrets.VERCEL_TOKEN }} # Required
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID}} #Required
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID}} #Required
+          scope: ${{ secrets.VERCEL_SCOPE }}
     environment:
       name: E2EPreview
       url: ${{ steps.vercel-deploy.outputs.preview-url }}
@@ -150,8 +143,6 @@ jobs:
     strategy:
       matrix:
         node:
-          - 16.x
-          - 17.x
           - 18.x
           - 19.x
       max-parallel: 1
