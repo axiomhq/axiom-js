@@ -15,9 +15,10 @@ describe('Client ingestion & query on different runtime', () => {
   });
 
   afterAll(async () => {
-    const resp = await axiom.datasets.delete(datasetName);
-    expect(resp.status).toEqual(204);
-    console.log(`removed testing dataset: ${datasetName}`)
+    // TODO: removed dataset for debugging, put it back
+    // const resp = await axiom.datasets.delete(datasetName);
+    // expect(resp.status).toEqual(204);
+    // console.log(`removed testing dataset: ${datasetName}`)
   });
 
   it('ingest on a lambda function should succeed', async () => {
