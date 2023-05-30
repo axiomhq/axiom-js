@@ -9,9 +9,9 @@ on:
       - main
 
 env:
-  AXIOM_TOKEN: ${{ secrets.TESTING_STAGING_TOKEN }}
+  AXIOM_TOKEN: ${{ secrets.TESTING_STAGING_E2E_TOKEN }}
   AXIOM_URL: ${{ secrets.TESTING_STAGING_API_URL }}
-  AXIOM_ORG_ID: ${{ secrets.TESTING_STAGING_ORG_ID }}
+  AXIOM_ORG_ID: ${{ secrets.TESTING_STAGING_E2E_ORG_ID }}
   AXIOM_DATASET_SUFFIX: ${{ github.run_id }}
 
 jobs:
