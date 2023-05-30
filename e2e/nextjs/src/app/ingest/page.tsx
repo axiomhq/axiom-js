@@ -6,7 +6,10 @@ export const fetchCache = 'force-no-store';
 
 export default async function IngestPage() {
   try {
-    const client = new Client();
+    const client = new Client({
+      token: process.env.NEXT_PUBLIC_AXIOM_TOKEN,
+      orgId: process.env.NEXT_PUBLIC_AXIOM_ORG_ID,
+    });
 
     const resp = await client.ingest(
       'axiom-js-e2e-test',
