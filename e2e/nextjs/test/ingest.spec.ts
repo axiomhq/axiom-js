@@ -52,19 +52,20 @@ describe('Client ingestion & query on different runtime', () => {
     expect(qResp.matches![1].data.bar).toEqual('baz');
   });
 
-  it('ingest on a browser runtime should succeed', async () => {
-    const startTime = new Date(Date.now()).toISOString();
-    // call route that ingests logs
-    const resp = await fetch(process.env.TESTING_TARGET_URL + '/ingest');
-    expect(resp.status).toEqual(200);
+  // TODO: enable this test again when env vars are available on browser runtime
+  // it('ingest on a browser runtime should succeed', async () => {
+  //   const startTime = new Date(Date.now()).toISOString();
+  //   // call route that ingests logs
+  //   const resp = await fetch(process.env.TESTING_TARGET_URL + '/ingest');
+  //   expect(resp.status).toEqual(200);
 
-    // check dataset for ingested logs
-    const qResp = await axiom.query(`['${datasetName}'] | where ['test'] == "ingest_on_browser"`, {
-      startTime,
-    });
-    expect(qResp.matches).toBeDefined();
-    expect(qResp.matches).toHaveLength(2);
-    expect(qResp.matches![0].data.foo).toEqual('bar');
-    expect(qResp.matches![1].data.bar).toEqual('baz');
-  });
+  //   // check dataset for ingested logs
+  //   const qResp = await axiom.query(`['${datasetName}'] | where ['test'] == "ingest_on_browser"`, {
+  //     startTime,
+  //   });
+  //   expect(qResp.matches).toBeDefined();
+  //   expect(qResp.matches).toHaveLength(2);
+  //   expect(qResp.matches![0].data.foo).toEqual('bar');
+  //   expect(qResp.matches![1].data.bar).toEqual('baz');
+  // });
 });
