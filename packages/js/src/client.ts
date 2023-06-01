@@ -15,7 +15,7 @@ export class Client extends HTTPClient {
 
   ingest = (
     id: string,
-    data: string | Buffer,
+    data: string | Buffer | ReadableStream,
     contentType: ContentType = ContentType.JSON,
     contentEncoding: ContentEncoding = ContentEncoding.Identity,
     options?: IngestOptions,
