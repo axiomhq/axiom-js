@@ -59,9 +59,9 @@ async function main() {
 For further examples, head over to the [examples](examples) directory.
 
 
-## Limitations
+## Winston Support
 
-- Stream support has been removed, because it doesn't work on edge runtime.
+In order to use `@axiomhq/js` as a Winston transport, checkout the [@axiomhq/winston documentation](./packages/winston/README.md).
 
 ## License
 
