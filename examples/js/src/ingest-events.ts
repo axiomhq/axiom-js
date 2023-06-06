@@ -12,7 +12,8 @@ async function ingest() {
     },
   ];
 
-  const res = await client.ingestEvents('my-dataset', events);
+  const res = client.ingest('my-dataset', events);
+  await client.flush();
   console.log('Ingested %d events with %d failures', res.ingested, res.failed);
   // Ingested 2 events with 0 failures
 }

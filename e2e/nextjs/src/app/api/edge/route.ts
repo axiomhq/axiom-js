@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic'; // disable prerendering
 export async function GET() {
   const client = new Client();
 
-  const resp = await client.ingest(
+  const resp = await client.ingestImmediate(
     'axiom-js-e2e-test',
     `[{"foo":"bar", "test": "ingest_on_edge"},{"bar":"baz", "test": "ingest_on_edge"}]`,
     ContentType.JSON,

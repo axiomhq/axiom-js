@@ -1,11 +1,13 @@
 import { datasets } from './datasets';
 import { users } from './users';
+import { Batch, createBatchKey } from './batch';
 import HTTPClient, { ClientOptions } from './httpClient';
 
 export class Client extends HTTPClient {
   datasets: datasets.Service;
   users: users.Service;
   localPath = '/v1';
+  batch: { [id: string]: Batch } = {};
 
   constructor(options?: ClientOptions) {
     super(options);
@@ -13,12 +15,28 @@ export class Client extends HTTPClient {
     this.users = new users.Service(options);
   }
 
+  ingest = (id: string, events: Array<object> | object, options?: IngestOptions) => {
+    const key = createBatchKey(id, options);
+    if (!this.batch[key]) {
+      this.batch[key] = new Batch(this.ingestImmediate, id, options);
+    }
+    return this.batch[key].ingest(events);
+  };
+
+  flush = async (): Promise<void> => {
+    let promises: Array<Promise<IngestStatus | void>> = [];
+    for (const key in this.batch) {
+      promises.push(this.batch[key].flush());
+    }
+    await Promise.all(promises);
+  }
+
   // TODO: sending gzip doesn't work on edge runtime
-  ingest = async (id: string, events: Array<object> | object, options?: IngestOptions): Promise<IngestStatus> => {
+  ingestImmediate = async (id: string, events: Array<object> | object, options?: IngestOptions): Promise<IngestStatus> => {
     const array = Array.isArray(events) ? events : [events];
     const json = array.map((v) => JSON.stringify(v)).join('\n');
     return this.ingestRaw(id, json, ContentType.NDJSON, ContentEncoding.Identity, options);
-  };
+  }
 
   ingestRaw = (
     id: string,

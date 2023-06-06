@@ -12,7 +12,7 @@ export default async function IngestPage() {
       url: process.env.AXIOM_URL,
     });
 
-    const resp = await client.ingest(
+    const resp = await client.ingestImmediate(
       'axiom-js-e2e-test',
       `[{"foo":"bar", "test": "ingest_on_browser"},{"bar":"baz", "test": "ingest_on_browser"}]`,
       ContentType.JSON,
