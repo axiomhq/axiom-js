@@ -102,7 +102,7 @@ jobs:
     if: github.event.pull_request.head.repo.full_name == github.repository
     steps:
       - uses: actions/checkout@v3
-      - uses: amondnet/vercel-action@v20 #deploy
+      - uses: amondnet/vercel-action@v25 #deploy
         id: vercel-deploy
         with:
           vercel-token: ${{ secrets.VERCEL_TOKEN }} # Required
