@@ -12,7 +12,7 @@ export default async function IngestPage() {
       url: process.env.AXIOM_URL,
     });
 
-    const resp = await client.ingest(
+    const resp = await client.ingestRaw(
       'axiom-js-e2e-test',
       `[{"foo":"bar", "test": "ingest_on_browser"},{"bar":"baz", "test": "ingest_on_browser"}]`,
       ContentType.JSON,
@@ -21,12 +21,16 @@ export default async function IngestPage() {
 
     return (
       <div>
-        <p>ingested: {resp.ingested}, failed: {resp.failed}</p>
+        <p>
+          ingested: {resp.ingested}, failed: {resp.failed}
+        </p>
       </div>
     );
   } catch (err: any) {
-    return <div>
-      <p>failed to ingest, check console for errors</p>
-    </div>;
+    return (
+      <div>
+        <p>failed to ingest, check console for errors</p>
+      </div>
+    );
   }
 }

@@ -1,12 +1,12 @@
 import { gzip } from 'zlib';
 import { describe, expect, it, beforeAll, afterAll } from '@jest/globals';
-import { Client, ContentType, ContentEncoding } from '@axiomhq/js';
+import { ClientWithoutBatching, ContentType, ContentEncoding } from '@axiomhq/js';
 
 const datasetSuffix = process.env.AXIOM_DATASET_SUFFIX || 'local';
 
 describe('Client', () => {
   const datasetName = `test-axiom-js-client-${datasetSuffix}`;
-  const client = new Client();
+  const client = new ClientWithoutBatching();
 
   beforeAll(async () => {
     await client.datasets.create({
@@ -22,7 +22,7 @@ describe('Client', () => {
 
   describe('ingest', () => {
     it('works with a JSON payload', async () => {
-      const status = await client.ingest(
+      const status = await client.ingestRaw(
         datasetName,
         `[{"foo":"bar"},{"bar":"baz"}]`,
         ContentType.JSON,
@@ -34,7 +34,7 @@ describe('Client', () => {
     });
 
     it('works with a NDJSON payload', async () => {
-      const status = await client.ingest(
+      const status = await client.ingestRaw(
         datasetName,
         `{"foo":"bar"}
 {"bar":"baz"}`,
@@ -47,7 +47,7 @@ describe('Client', () => {
     });
 
     it('works with a CSV payload', async () => {
-      const status = await client.ingest(
+      const status = await client.ingestRaw(
         datasetName,
         `foo
 bar
@@ -68,20 +68,20 @@ baz`,
         });
       });
 
-      const status = await client.ingestBuffer(datasetName, encoded, ContentType.JSON, ContentEncoding.GZIP);
+      const status = await client.ingestRaw(datasetName, encoded, ContentType.JSON, ContentEncoding.GZIP);
 
       expect(status.ingested).toEqual(2);
       expect(status.failures?.length).toEqual(0);
     });
 
     it('works with single event', async () => {
-      const status = await client.ingestEvents(datasetName, { foo: 'bar' });
+      const status = await client.ingest(datasetName, { foo: 'bar' });
       expect(status.ingested).toEqual(1);
       expect(status.failures?.length).toEqual(0);
     });
 
     it('works with two events', async () => {
-      const status = await client.ingestEvents(datasetName, [{ foo: 'bar' }, { bar: 'baz' }]);
+      const status = await client.ingest(datasetName, [{ foo: 'bar' }, { bar: 'baz' }]);
       expect(status.ingested).toEqual(2);
       expect(status.failures?.length).toEqual(0);
     });
