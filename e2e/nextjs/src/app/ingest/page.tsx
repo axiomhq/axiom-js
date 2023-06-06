@@ -1,12 +1,12 @@
 'use client';
-import { Client, ContentEncoding, ContentType } from '@axiomhq/js';
+import { ClientWithoutBatching, ContentEncoding, ContentType } from '@axiomhq/js';
 
 export const dynamic = 'force-dynamic';
 export const fetchCache = 'force-no-store';
 
 export default async function IngestPage() {
   try {
-    const client = new Client({
+    const client = new ClientWithoutBatching({
       token: process.env.AXIOM_TOKEN,
       orgId: process.env.AXIOM_ORG_ID,
       url: process.env.AXIOM_URL,
