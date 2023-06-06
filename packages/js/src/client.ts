@@ -13,7 +13,14 @@ export class Client extends HTTPClient {
     this.users = new users.Service(options);
   }
 
-  ingest = (
+  // TODO: sending gzip doesn't work on edge runtime
+  ingest = async (id: string, events: Array<object> | object, options?: IngestOptions): Promise<IngestStatus> => {
+    const array = Array.isArray(events) ? events : [events];
+    const json = array.map((v) => JSON.stringify(v)).join('\n');
+    return this.ingestRaw(id, json, ContentType.NDJSON, ContentEncoding.Identity, options);
+  };
+
+  ingestRaw = (
     id: string,
     data: string | Buffer | ReadableStream,
     contentType: ContentType = ContentType.JSON,
@@ -35,21 +42,6 @@ export class Client extends HTTPClient {
         'csv-delimiter': options?.csvDelimiter as string,
       },
     );
-
-  ingestBuffer = (
-    id: string,
-    buffer: Buffer,
-    contentType: ContentType,
-    contentEncoding: ContentEncoding,
-    options?: IngestOptions,
-  ): Promise<IngestStatus> => this.ingest(id, buffer, contentType, contentEncoding, options);
-
-  // TODO: sending gzip doesn't work on edge runtime
-  ingestEvents = async (id: string, events: Array<object> | object, options?: IngestOptions): Promise<IngestStatus> => {
-    const array = Array.isArray(events) ? events : [events];
-    const json = array.map((v) => JSON.stringify(v)).join('\n');
-    return this.ingest(id, json, ContentType.NDJSON, ContentEncoding.Identity, options);
-  };
 
   queryLegacy = (id: string, query: QueryLegacy, options?: QueryOptions): Promise<QueryLegacyResult> =>
     this.client.post(
