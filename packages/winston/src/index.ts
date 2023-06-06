@@ -1,6 +1,6 @@
 import Transport, { TransportStreamOptions } from 'winston-transport';
 
-import { Client } from '@axiomhq/js';
+import { ClientWithoutBatching } from '@axiomhq/js';
 
 export interface WinstonOptions extends TransportStreamOptions {
   dataset?: string;
@@ -11,7 +11,7 @@ export interface WinstonOptions extends TransportStreamOptions {
 
 // TODO: @arne get the error handling changes from axiom-node package
 export class WinstonTransport extends Transport {
-  client: Client;
+  client: ClientWithoutBatching;
   dataset: string;
   batch: object[] = [];
   batchCallback: (err: Error | null) => void = () => {};
@@ -19,7 +19,7 @@ export class WinstonTransport extends Transport {
 
   constructor(opts?: WinstonOptions) {
     super(opts);
-    this.client = new Client(opts);
+    this.client = new ClientWithoutBatching(opts);
     this.dataset = opts?.dataset || process.env.AXIOM_DATASET || '';
   }
 
@@ -63,7 +63,7 @@ export class WinstonTransport extends Transport {
     this.batch = [];
 
     this.client
-      .ingestEvents(this.dataset, batchCopy)
+      .ingest(this.dataset, batchCopy)
       .then((_res: any) => callback(null))
       .catch(callback);
   }

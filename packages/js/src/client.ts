@@ -3,7 +3,7 @@ import { users } from './users';
 import { Batch, createBatchKey } from './batch';
 import HTTPClient, { ClientOptions } from './httpClient';
 
-export class ClientWithoutBatching extends HTTPClient {
+class BaseClient extends HTTPClient {
   datasets: datasets.Service;
   users: users.Service;
   localPath = '/v1';
@@ -12,12 +12,6 @@ export class ClientWithoutBatching extends HTTPClient {
     super(options);
     this.datasets = new datasets.Service(options);
     this.users = new users.Service(options);
-  }
-
-  ingest(dataset: string, events: Array<object> | object, options?: IngestOptions): Promise<IngestStatus> {
-    const array = Array.isArray(events) ? events : [events];
-    const json = array.map((v) => JSON.stringify(v)).join('\n');
-    return this.ingestRaw(dataset, json, ContentType.NDJSON, ContentEncoding.Identity);
   }
 
   ingestRaw = (
@@ -79,20 +73,32 @@ export class ClientWithoutBatching extends HTTPClient {
   aplQuery = (apl: string, options?: QueryOptions): Promise<QueryResult> => this.query(apl, options);
 }
 
-export class Client extends ClientWithoutBatching {
+export class ClientWithoutBatching extends BaseClient {
+  ingest(dataset: string, events: Array<object> | object, options?: IngestOptions): Promise<IngestStatus> {
+    const array = Array.isArray(events) ? events : [events];
+    const json = array.map((v) => JSON.stringify(v)).join('\n');
+    return this.ingestRaw(dataset, json, ContentType.NDJSON, ContentEncoding.Identity);
+  }
+}
+
+export class Client extends BaseClient {
   batch: { [id: string]: Batch } = {};
 
-  ingest = (dataset: string, events: Array<object> | object, options?: IngestOptions) =>  {
+  ingest = (dataset: string, events: Array<object> | object, options?: IngestOptions) => {
     const key = createBatchKey(dataset, options);
     if (!this.batch[key]) {
-      this.batch[key] = new Batch((dataset, events, options) => {
-        const array = Array.isArray(events) ? events : [events];
-        const json = array.map((v) => JSON.stringify(v)).join('\n');
-        return this.ingestRaw(dataset, json, ContentType.NDJSON, ContentEncoding.Identity);
-      }, dataset, options);
+      this.batch[key] = new Batch(
+        (dataset, events, options) => {
+          const array = Array.isArray(events) ? events : [events];
+          const json = array.map((v) => JSON.stringify(v)).join('\n');
+          return this.ingestRaw(dataset, json, ContentType.NDJSON, ContentEncoding.Identity);
+        },
+        dataset,
+        options,
+      );
     }
     return this.batch[key].ingest(events);
-  }
+  };
 
   flush = async (): Promise<void> => {
     let promises: Array<Promise<IngestStatus | void>> = [];
@@ -100,9 +106,8 @@ export class Client extends ClientWithoutBatching {
       promises.push(this.batch[key].flush());
     }
     await Promise.all(promises);
-  }
+  };
 }
-
 
 export enum ContentType {
   JSON = 'application/json',
