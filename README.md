@@ -19,49 +19,12 @@ For more information check out the [official documentation](https://axiom.co/doc
 and our
 [community Discord](https://axiom.co/discord).
 
-## Quickstart
+## Projects
 
-Install using `npm install`:
+This is a monorepo, for specific documentation, check out the different projects:
 
-```shell
-npm install @axiomhq/js
-```
-
-If you use the [Axiom CLI](https://github.com/axiomhq/cli), run `eval $(axiom config export -f)` to configure your environment variables.
-
-Otherwise create a personal token in [the Axiom settings](https://app.axiom.co/profile) and export it as `AXIOM_TOKEN`. Set `AXIOM_ORG_ID` to the organization ID from the settings page of the organization you want to access.
-
-You can also configure the client using options passed to the constructor of the Client:
-
-```ts
-const client = new Client({
-    token: process.env.AXIOM_TOKEN,
-    orgId: process.env.AXIOM_ORG_ID,
-});
-```
-
-Create and use a client like this:
-
-```ts
-import Client from '@axiomhq/js';
-
-async function main() {
-  const client = new Client();
-
-  await client.ingestEvents('my-dataset', [
-    { 'foo': 'bar'},
-  ]);
-
-  const res = await client.query(`['my-dataset'] | where foo == 'bar' | limit 100`);
-}
-```
-
-For further examples, head over to the [examples](examples) directory.
-
-
-## Winston Support
-
-In order to use `@axiomhq/js` as a Winston transport, checkout the [@axiomhq/winston documentation](./packages/winston/README.md).
+* [`@axiomhq/js`](./packages/js): Official API bindings that let you ingest or query your data.
+* [`@axiomhq/winston`](./packages/winston): A [winston](https://github.com/winstonjs/winston) transport which sends logs to Axiom.
 
 ## License
 
