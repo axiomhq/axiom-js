@@ -1,0 +1,27 @@
+{
+    "name": "nextjs",
+    "private": true,
+    "description": "e2e tests for axiom-js",
+    "version": "0.1.0",
+    "scripts": {
+        "build": "next build",
+        "dev": "next dev",
+        "format": "eslint 'src/**/*.{js,ts}' --quiet --fix",
+        "lint": "eslint 'src/**/*.{js,ts}'",
+        "e2e": "jest test"
+    },
+    "dependencies": {
+        "@axiomhq/js": "*",
+        "@axiomhq/winston": "*",
+        "next": "^13.4.3",
+        "react": "18.2.0",
+        "react-dom": "18.2.0",
+        "winston-transport": "^4.5.0",
+        "eslint": "8.41.0",
+        "eslint-config-next": "13.4.3"
+    },
+    "devDependencies": {
+        "@types/react": "^18.0.25",
+        "eslint-config-next": "13.0.5"
+    }
+}

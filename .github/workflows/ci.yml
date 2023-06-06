@@ -8,6 +8,12 @@ on:
     branches:
       - main
 
+env:
+  AXIOM_TOKEN: ${{ secrets.TESTING_STAGING_E2E_TOKEN }}
+  AXIOM_URL: ${{ secrets.TESTING_STAGING_API_URL }}
+  AXIOM_ORG_ID: ${{ secrets.TESTING_STAGING_E2E_ORG_ID }}
+  AXIOM_DATASET_SUFFIX: ${{ github.run_id }}
+
 jobs:
   build:
     name: Build
@@ -15,45 +21,20 @@ jobs:
     strategy:
       matrix:
         node:
-          - 16.x
-          - 17.x
           - 18.x
           - 19.x
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node }}
-      - uses: actions/cache@v2
+      - uses: actions/cache@v3
         with:
           path: ~/.npm
           key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
           restore-keys: ${{ runner.os }}-node-
       - run: npm install
       - run: npm run build
-
-  lint:
-    name: Lint
-    runs-on: ubuntu-latest
-    needs: build
-    strategy:
-      matrix:
-        node:
-          - 16.x
-          - 17.x
-          - 18.x
-          - 19.x
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
-        with:
-          node-version: ${{ matrix.node }}
-      - uses: actions/cache@v2
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: ${{ runner.os }}-node-
-      - run: npm install
       - run: npm run lint
 
   test-unit:
@@ -63,21 +44,20 @@ jobs:
     strategy:
       matrix:
         node:
-          - 16.x
-          - 17.x
           - 18.x
           - 19.x
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node }}
-      - uses: actions/cache@v2
+      - uses: actions/cache@v3
         with:
           path: ~/.npm
           key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
           restore-keys: ${{ runner.os }}-node-
       - run: npm install
+      - run: npm run build && npm run build:cjs
       - run: npm run test
 
   test-integration:
@@ -88,26 +68,73 @@ jobs:
     strategy:
       matrix:
         node:
-          - 16.x
-          - 17.x
           - 18.x
           - 19.x
       max-parallel: 1
       fail-fast: false
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node }}
-      - uses: actions/cache@v2
+      - uses: actions/cache@v3
         with:
           path: ~/.npm
           key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
           restore-keys: ${{ runner.os }}-node-
       - run: npm install
+      - run: npm run build && npm run build:cjs
       - env:
-          AXIOM_TOKEN: ${{ secrets.TESTING_DEV_TOKEN }}
-          AXIOM_URL: ${{ secrets.TESTING_DEV_API_URL }}
-          AXIOM_ORG_ID: ${{ secrets.TESTING_DEV_ORG_ID }}
+          AXIOM_TOKEN: ${{ secrets.TESTING_STAGING_TOKEN }}
+          AXIOM_URL: ${{ secrets.TESTING_STAGING_API_URL }}
+          AXIOM_ORG_ID: ${{ secrets.TESTING_STAGING_ORG_ID }}
           AXIOM_DATASET_SUFFIX: ${{ github.run_id }}-${{ matrix.node }}
         run: npm run integration
+
+  deploy-e2e-apps:
+    name: deploy e2e apps
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    steps:
+      - uses: actions/checkout@v3
+      - uses: amondnet/vercel-action@v20 #deploy
+        id: vercel-deploy
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }} # Required
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID}} #Required
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID}} #Required
+          scope: ${{ secrets.VERCEL_SCOPE }}
+    outputs:
+      preview-url: ${{ steps.vercel-deploy.outputs.preview-url }}
+    environment:
+      name: E2EPreview
+      url: ${{ steps.vercel-deploy.outputs.preview-url }}
+
+  test-e2e:
+    name: E2E TESTS
+    runs-on: ubuntu-latest
+    needs:
+      - deploy-e2e-apps
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    strategy:
+      matrix:
+        node:
+          - 18.x
+      max-parallel: 1
+      fail-fast: true
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node }}
+      - uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: ${{ runner.os }}-node-
+      - run: npm install
+      - run: npm run build && npm run build:cjs # cjs build needed to run jest tests
+      - env:
+          TESTING_TARGET_URL: ${{ needs.deploy-e2e-apps.outputs.preview-url }}
+        run: npm run e2e

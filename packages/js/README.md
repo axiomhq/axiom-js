@@ -1,5 +1,5 @@
-![axiom-js: The official javascript bindings for the Axiom API](.github/images/banner-dark.svg#gh-dark-mode-only)
-![axiom-js: The official javascript bindings for the Axiom API](.github/images/banner-light.svg#gh-light-mode-only)
+![axiom-js: The official javascript bindings for the Axiom API](../../.github/images/banner-dark.svg#gh-dark-mode-only)
+![axiom-js: The official javascript bindings for the Axiom API](../../.github/images/banner-light.svg#gh-light-mode-only)
 
 <div align="center">
 
@@ -48,20 +48,20 @@ import Client from '@axiomhq/js';
 async function main() {
   const client = new Client();
 
-  await client.ingestEvents('my-dataset', [
+  client.ingest('my-dataset', [
     { 'foo': 'bar'},
   ]);
+  await client.flush();
 
   const res = await client.query(`['my-dataset'] | where foo == 'bar' | limit 100`);
 }
 ```
 
-For further examples, head over to the [examples](examples) directory.
+:warning: Support of Edge runtime is still experimental and unstable.
+ the Edge runtime doesn't support `Stream` module, so that client methods
+ that depend on Stream won't work on edge, like `ingestStream, ingestEvents and ingestBuffer`.
 
-
-## Winston Support
-
-In order to use `@axiomhq/js` as a Winston transport, checkout the [@axiomhq/winston documentation](./packages/winston/README.md).
+For further examples, head over to the [examples](../../examples) directory.
 
 ## License
 

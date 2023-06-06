@@ -1,22 +1,22 @@
 ## How to Contribute
 
-👍🎉 First of all, thank you for your interest in Axiom-node! We'd love to accept your patches and contributions! 🎉👍
+👍🎉 First of all, thank you for your interest in axiom-js! We'd love to accept your patches and contributions! 🎉👍
 
 This project accepts contributions. In order to contribute, you should pay attention to a few guidelines:
 
 ## Reporting Issues
 
-Bugs, feature requests, and development-related questions should be directed to our GitHub [issue tracker.](https://github.com/axiomhq/axiom-node/issues)
+Bugs, feature requests, and development-related questions should be directed to our GitHub [issue tracker.](https://github.com/axiomhq/axiom-js/issues)
 
 When reporting a bug, please try and provide as much context as possible such as your operating system, NodeJS version and anything else that might be relevant to the bug. For feature requests, please explain what you're trying to do and how the requested feature would help you do that.
 
 ## Setup
 
-[Fork](https://github.com/axiomhq/axiom-node), then clone this repository:
+[Fork](https://github.com/axiomhq/axiom-js), then clone this repository:
 
 ```
-git clone https://github.com/axiomhq/axiom-node
-cd axiom-node
+git clone https://github.com/axiomhq/axiom-js
+cd axiom-js
 ```
 
 ### Install development dependencies

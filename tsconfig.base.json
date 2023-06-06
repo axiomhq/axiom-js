@@ -1,0 +1,31 @@
+{
+    "compileOnSave": true,
+    "compilerOptions": {
+        "incremental": true,
+        "target": "ES2015",
+        "module": "ES2015",
+        "moduleResolution": "node",
+        "esModuleInterop": true,
+        "allowSyntheticDefaultImports": true,
+        "declaration": true,
+        "declarationMap": true,
+        "sourceMap": false,
+        "strict": true,
+        "skipLibCheck": true,
+        "forceConsistentCasingInFileNames": true,
+        "baseUrl": ".",
+        "rootDir": "./src",
+        "outDir": "dist/esm",
+        "declarationDir": "dist/types",
+        "composite": true,
+        "traceResolution": false /* Report module resolution log messages. */,
+        "listEmittedFiles": false /* Print names of generated files part of the compilation. */,
+        "listFiles": false /* Print names of files part of the compilation. */,
+        "pretty": true,
+        "noUnusedLocals": true,
+        "lib": ["ESNext", "DOM"]
+    },
+    "exclude": [".git", ".github", "node_modules", "dist", "test"],
+    "types": ["node", "jest"],
+    "$schema": "https://json.schemastore.org/tsconfig"
+}
