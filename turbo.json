@@ -10,6 +10,14 @@
                 "{projectRoot}/dist"
             ]
         },
+        "build:cjs": {
+            "dependsOn": [
+                "^build:cjs"
+            ],
+            "outputs": [
+                "{projectRoot}/dist/cjs"
+            ]
+        },
         "test": {
             "dependsOn": [
                 "build"
