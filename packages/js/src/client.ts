@@ -3,11 +3,10 @@ import { users } from './users';
 import { Batch, createBatchKey } from './batch';
 import HTTPClient, { ClientOptions } from './httpClient';
 
-export class Client extends HTTPClient {
+export class ClientWithoutBatching extends HTTPClient {
   datasets: datasets.Service;
   users: users.Service;
   localPath = '/v1';
-  batch: { [id: string]: Batch } = {};
 
   constructor(options?: ClientOptions) {
     super(options);
@@ -15,38 +14,21 @@ export class Client extends HTTPClient {
     this.users = new users.Service(options);
   }
 
-  ingest = (id: string, events: Array<object> | object, options?: IngestOptions) => {
-    const key = createBatchKey(id, options);
-    if (!this.batch[key]) {
-      this.batch[key] = new Batch(this.ingestImmediate, id, options);
-    }
-    return this.batch[key].ingest(events);
-  };
-
-  flush = async (): Promise<void> => {
-    let promises: Array<Promise<IngestStatus | void>> = [];
-    for (const key in this.batch) {
-      promises.push(this.batch[key].flush());
-    }
-    await Promise.all(promises);
-  }
-
-  // TODO: sending gzip doesn't work on edge runtime
-  ingestImmediate = async (id: string, events: Array<object> | object, options?: IngestOptions): Promise<IngestStatus> => {
+  ingest(dataset: string, events: Array<object> | object, options?: IngestOptions): Promise<IngestStatus> {
     const array = Array.isArray(events) ? events : [events];
     const json = array.map((v) => JSON.stringify(v)).join('\n');
-    return this.ingestRaw(id, json, ContentType.NDJSON, ContentEncoding.Identity, options);
+    return this.ingestRaw(dataset, json, ContentType.NDJSON, ContentEncoding.Identity);
   }
 
   ingestRaw = (
-    id: string,
+    dataset: string,
     data: string | Buffer | ReadableStream,
     contentType: ContentType = ContentType.JSON,
     contentEncoding: ContentEncoding = ContentEncoding.Identity,
     options?: IngestOptions,
   ): Promise<IngestStatus> =>
     this.client.post(
-      this.localPath + '/datasets/' + id + '/ingest',
+      this.localPath + '/datasets/' + dataset + '/ingest',
       {
         headers: {
           'Content-Type': contentType,
@@ -61,9 +43,9 @@ export class Client extends HTTPClient {
       },
     );
 
-  queryLegacy = (id: string, query: QueryLegacy, options?: QueryOptions): Promise<QueryLegacyResult> =>
+  queryLegacy = (dataset: string, query: QueryLegacy, options?: QueryOptions): Promise<QueryLegacyResult> =>
     this.client.post(
-      this.localPath + '/datasets/' + id + '/query',
+      this.localPath + '/datasets/' + dataset + '/query',
       {
         body: JSON.stringify(query),
       },
@@ -96,6 +78,31 @@ export class Client extends HTTPClient {
 
   aplQuery = (apl: string, options?: QueryOptions): Promise<QueryResult> => this.query(apl, options);
 }
+
+export class Client extends ClientWithoutBatching {
+  batch: { [id: string]: Batch } = {};
+
+  ingest = (dataset: string, events: Array<object> | object, options?: IngestOptions) =>  {
+    const key = createBatchKey(dataset, options);
+    if (!this.batch[key]) {
+      this.batch[key] = new Batch((dataset, events, options) => {
+        const array = Array.isArray(events) ? events : [events];
+        const json = array.map((v) => JSON.stringify(v)).join('\n');
+        return this.ingestRaw(dataset, json, ContentType.NDJSON, ContentEncoding.Identity);
+      }, dataset, options);
+    }
+    return this.batch[key].ingest(events);
+  }
+
+  flush = async (): Promise<void> => {
+    let promises: Array<Promise<IngestStatus | void>> = [];
+    for (const key in this.batch) {
+      promises.push(this.batch[key].flush());
+    }
+    await Promise.all(promises);
+  }
+}
+
 
 export enum ContentType {
   JSON = 'application/json',

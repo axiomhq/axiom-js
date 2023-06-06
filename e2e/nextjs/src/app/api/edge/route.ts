@@ -1,13 +1,13 @@
-import { Client, ContentEncoding, ContentType } from '@axiomhq/js';
+import { ClientWithoutBatching, ContentEncoding, ContentType } from '@axiomhq/js';
 import { NextResponse } from 'next/server';
 
 export const runtime = 'edge';
 export const dynamic = 'force-dynamic'; // disable prerendering
 
 export async function GET() {
-  const client = new Client();
+  const client = new ClientWithoutBatching();
 
-  const resp = await client.ingestImmediate(
+  const resp = await client.ingest(
     'axiom-js-e2e-test',
     `[{"foo":"bar", "test": "ingest_on_edge"},{"bar":"baz", "test": "ingest_on_edge"}]`,
     ContentType.JSON,
