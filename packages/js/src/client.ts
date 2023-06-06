@@ -77,7 +77,7 @@ export class ClientWithoutBatching extends BaseClient {
   ingest(dataset: string, events: Array<object> | object, options?: IngestOptions): Promise<IngestStatus> {
     const array = Array.isArray(events) ? events : [events];
     const json = array.map((v) => JSON.stringify(v)).join('\n');
-    return this.ingestRaw(dataset, json, ContentType.NDJSON, ContentEncoding.Identity);
+    return this.ingestRaw(dataset, json, ContentType.NDJSON, ContentEncoding.Identity, options);
   }
 }
 
@@ -91,7 +91,7 @@ export class Client extends BaseClient {
         (dataset, events, options) => {
           const array = Array.isArray(events) ? events : [events];
           const json = array.map((v) => JSON.stringify(v)).join('\n');
-          return this.ingestRaw(dataset, json, ContentType.NDJSON, ContentEncoding.Identity);
+          return this.ingestRaw(dataset, json, ContentType.NDJSON, ContentEncoding.Identity, options);
         },
         dataset,
         options,

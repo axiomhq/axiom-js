@@ -1,6 +1,6 @@
 import { describe, expect, it, beforeEach } from '@jest/globals';
 
-import { Client, ContentType, ContentEncoding } from '../../src/client';
+import { ContentType, ContentEncoding, ClientWithoutBatching } from '../../src/client';
 import { AxiomTooManyRequestsError } from '../../src/fetchClient';
 import { headerAPILimit, headerAPIRateRemaining, headerAPIRateReset, headerRateScope } from '../../src/limit';
 import { mockFetchResponse, testMockedFetchCall } from '../lib/mock';
@@ -67,12 +67,12 @@ const queryResult = {
 const clientURL = 'http://axiom-js-retries.dev.local';
 
 describe('Client', () => {
-  let client = new Client({ url: clientURL });
+  let client = new ClientWithoutBatching({ url: clientURL });
   expect(client).toBeDefined();
 
   beforeEach(() => {
     // reset client to clear rate limits
-    client = new Client({ url: clientURL });
+    client = new ClientWithoutBatching({ url: clientURL });
   });
 
   it('Services', () => {
@@ -118,7 +118,7 @@ describe('Client', () => {
 
     // ingest and query should succeed
     mockFetchResponse({}, 200, headers);
-    await client.ingestEvents('test', [{ name: 'test' }]);
+    await client.ingest('test', [{ name: 'test' }]);
 
     mockFetchResponse({}, 200, headers);
     await client.query("['test']");
@@ -140,7 +140,7 @@ describe('Client', () => {
       expect(init.body).toMatch(JSON.stringify(query));
     }, ingestStatus);
 
-    const response = await client.ingest('test', JSON.stringify(query), ContentType.JSON, ContentEncoding.Identity);
+    const response = await client.ingestRaw('test', JSON.stringify(query), ContentType.JSON, ContentEncoding.Identity);
     expect(response).toBeDefined();
     expect(response.ingested).toEqual(2);
     expect(response.failed).toEqual(0);

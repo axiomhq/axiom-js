@@ -1,6 +1,6 @@
 import { IngestOptions, IngestStatus } from './client';
 
-type IngestFunction = (id: string, events: Array<object> | object, options?: IngestOptions) => Promise<IngestStatus>;
+export type IngestFunction = (id: string, events: Array<object> | object, options?: IngestOptions) => Promise<IngestStatus>;
 
 export function createBatchKey(id: string, options?: IngestOptions): string {
   return `${id}:${options?.timestampField || '-'}:${options?.timestampFormat || '-'}:${options?.csvDelimiter || '-'}`;

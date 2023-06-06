@@ -1,5 +1,5 @@
-import { fail } from 'assert';
-import { Batch } from '../../lib/batch';
+import { describe, expect, it, jest } from '@jest/globals'
+import { Batch, IngestFunction } from '../../src/batch';
 
 async function sleep(ms: number) {
     return new Promise((resolve) => setTimeout(resolve, ms));
@@ -8,11 +8,11 @@ async function sleep(ms: number) {
 describe('Batch', () => {
     it('sends events after 1s', async () => {
         jest.useFakeTimers();
-        const sendFn = jest.fn();
+        const sendFn = jest.fn() as IngestFunction;
 
         const batch = new Batch(sendFn, 'my-dataset', { timestampField: 'foo' });
-        batch.ingestEvents({ foo: 'bar' });
-        batch.ingestEvents({ foo: 'baz' });
+        batch.ingest({ foo: 'bar' });
+        batch.ingest({ foo: 'baz' });
 
         expect(sendFn).not.toHaveBeenCalled();
         jest.runAllTimers();
@@ -23,13 +23,12 @@ describe('Batch', () => {
     });
 
     it('sends events after 1k events', async () => {
-        const sendFn = jest.fn();
+        const sendFn = jest.fn() as IngestFunction;;
 
         const batch = new Batch(sendFn, 'my-dataset', { timestampField: 'foo' });
 
-        let events = [];
         for (let i = 0; i < 1000; i++) {
-            batch.ingestEvents({ foo: 'bar' });
+            batch.ingest({ foo: 'bar' });
         }
 
         await sleep(100); // just make sure we have enough time
@@ -38,12 +37,12 @@ describe('Batch', () => {
 
     it('sends events after 1s when ingesting one event every 100ms', async () => {
         jest.useFakeTimers();
-        const sendFn = jest.fn();
+        const sendFn = jest.fn() as IngestFunction;;
 
         const batch = new Batch(sendFn, 'my-dataset', { timestampField: 'foo' });
 
         for (let i = 0; i < 10; i++) {
-            batch.ingestEvents({ foo: 'bar' });
+            batch.ingest({ foo: 'bar' });
             jest.advanceTimersByTime(120);
         }
 
@@ -53,12 +52,12 @@ describe('Batch', () => {
     });
 
     it('sends events on flush', async () => {
-        const sendFn = jest.fn();
+        const sendFn = jest.fn() as IngestFunction;;
 
         const batch = new Batch(sendFn, 'my-dataset', { timestampField: 'foo' });
 
         for (let i = 0; i < 10; i++) {
-            batch.ingestEvents({ foo: 'bar' });
+            batch.ingest({ foo: 'bar' });
         }
 
         expect(sendFn).toHaveBeenCalledTimes(0);
