@@ -7,36 +7,46 @@
                 "^build"
             ],
             "outputs": [
-                "{projectRoot}/dist"
+                "dist/esm/**",
+                "dist/types/**"
             ]
         },
         "build:cjs": {
             "dependsOn": [
-                "^build",
+                "build",
                 "^build:cjs"
             ],
             "outputs": [
-                "{projectRoot}/dist/cjs"
+                "dist/cjs/**"
             ]
         },
         "test": {
             "dependsOn": [
-                "build"
+                "build",
+                "build:cjs"
             ]
         },
         "integration": {
             "dependsOn": [
+                "build",
+                "build:cjs",
                 "test"
             ]
         },
         "e2e": {
             "dependsOn": [
-                "^build"
+                "build"
             ]
         },
         "dev": {
             "cache": false,
             "persistent": true
+        },
+        "nextjs#build": {
+            "outputs": [
+                ".next/**",
+                "!.next/cache/**"
+            ]
         }
     }
 }
