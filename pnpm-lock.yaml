@@ -66,10 +66,10 @@ importers:
   e2e/nextjs:
     dependencies:
       '@axiomhq/js':
-        specifier: '*'
+        specifier: workspace:*
         version: link:../../packages/js
       '@axiomhq/winston':
-        specifier: '*'
+        specifier: workspace:*
         version: link:../../packages/winston
       eslint:
         specifier: 8.41.0
@@ -97,7 +97,7 @@ importers:
   examples/js:
     dependencies:
       '@axiomhq/js':
-        specifier: '*'
+        specifier: workspace:*
         version: link:../../packages/js
       winston:
         specifier: ^3.8.2
@@ -106,7 +106,7 @@ importers:
   examples/winston:
     dependencies:
       '@axiomhq/winston':
-        specifier: '*'
+        specifier: workspace:*
         version: link:../../packages/winston
       winston:
         specifier: ^3.8.2
@@ -115,10 +115,10 @@ importers:
   integration:
     dependencies:
       '@axiomhq/js':
-        specifier: '*'
+        specifier: workspace:*
         version: link:../packages/js
       '@axiomhq/winston':
-        specifier: '*'
+        specifier: workspace:*
         version: link:../packages/winston
       winston-transport:
         specifier: ^4.5.0
@@ -139,7 +139,7 @@ importers:
   packages/winston:
     dependencies:
       '@axiomhq/js':
-        specifier: '*'
+        specifier: workspace:*
         version: link:../js
       winston-transport:
         specifier: ^4.5.0

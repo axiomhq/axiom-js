@@ -12,6 +12,7 @@
         },
         "build:cjs": {
             "dependsOn": [
+                "^build",
                 "^build:cjs"
             ],
             "outputs": [
@@ -30,7 +31,7 @@
         },
         "e2e": {
             "dependsOn": [
-                "build"
+                "^build"
             ]
         },
         "dev": {

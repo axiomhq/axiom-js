@@ -10,7 +10,7 @@
     "example": "ts-node"
   },
   "dependencies": {
-    "@axiomhq/winston": "*",
+    "@axiomhq/winston": "workspace:*",
     "winston": "^3.8.2"
   }
 }
