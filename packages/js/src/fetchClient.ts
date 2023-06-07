@@ -31,7 +31,7 @@ export class FetchClient {
     });
 
     if (resp.status === 204) {
-      return resp as T;
+      return resp as unknown as T;
     } else if (resp.status == 429) {
       const limit = parseLimitFromResponse(resp);
 
