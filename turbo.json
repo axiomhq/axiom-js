@@ -13,7 +13,7 @@
         },
         "build:cjs": {
             "dependsOn": [
-                "build",
+                "^build",
                 "^build:cjs"
             ],
             "outputs": [
@@ -22,20 +22,20 @@
         },
         "test": {
             "dependsOn": [
-                "build",
-                "build:cjs"
+                "^build",
+                "^build:cjs"
             ]
         },
         "integration": {
             "dependsOn": [
-                "build",
-                "build:cjs",
-                "test"
+                "^build",
+                "^build:cjs",
+                "^test"
             ]
         },
         "e2e": {
             "dependsOn": [
-                "build"
+                "^build"
             ]
         },
         "dev": {
@@ -43,6 +43,9 @@
             "persistent": true
         },
         "nextjs#build": {
+            "dependsOn": [
+                "^build"
+            ],
             "outputs": [
                 ".next/**",
                 "!.next/cache/**"
