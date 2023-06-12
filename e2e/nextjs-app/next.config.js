@@ -1,7 +1,8 @@
 /** @type {import('next').NextConfig} */
+const withAxiom = require('@axiomhq/nextjs')
 
 const nextConfig = {
   reactStrictMode: true,
 };
 
-module.exports = nextConfig;
+module.exports = withAxiom(nextConfig);

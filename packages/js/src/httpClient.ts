@@ -7,6 +7,7 @@ export interface ClientOptions {
   token?: string;
   url?: string;
   orgId?: string;
+  sdk?: string;
 }
 
 export default abstract class HTTPClient {
@@ -23,7 +24,7 @@ export default abstract class HTTPClient {
       Authorization: 'Bearer ' + token,
     };
     if (typeof window === 'undefined') {
-      headers['User-Agent'] = 'axiom-js/' + Version;
+      headers['User-Agent'] = options.sdk ? options.sdk : 'axiom-js/' + Version;
     }
     if (orgId) {
       headers['X-Axiom-Org-Id'] = orgId;

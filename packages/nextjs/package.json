@@ -1,0 +1,44 @@
+{
+  "name": "@axiomhq/nextjs",
+  "description": "Send Logs & WebVitals from your Next.js app to Axiom.",
+  "version": "0.18.0",
+  "author": "Axiom, Inc.",
+  "license": "MIT",
+  "contributors": [
+    "Arne Bahlo <arne@axiom.co>",
+    "Islam Shehata <islam@axiom.co>"
+  ],
+  "engines": {
+    "node": ">=16"
+  },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -b",
+    "format": "prettier --write src/*.ts test/*.ts",
+    "lint": "prettier -c src/*.ts test/*.ts",
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/axiomhq/next-axiom.git"
+  },
+  "keywords": [
+    "web-vitals",
+    "axiom",
+    "observability",
+    "performance",
+    "nextjs"
+  ],
+  "bugs": {
+    "url": "https://github.com/axiomhq/next-axiom/issues"
+  },
+  "homepage": "https://github.com/axiomhq/next-axiom#readme",
+  "dependencies": {
+    "@axiomhq/js": "workspace:*"
+  },
+  "peerDependencies": {
+    "next": ">=13.4",
+    "react": ">=18.0.0"
+  }
+}

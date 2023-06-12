@@ -5,6 +5,7 @@
   "references": [
     { "path": "packages/js" },
     { "path": "packages/winston" },
+    { "path": "packages/nextjs" },
     { "path": "examples/js" },
     { "path": "examples/winston" },
     { "path": "integration"},

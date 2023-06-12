@@ -43,6 +43,15 @@
         },
         "nextjs-app#build": {
             "dependsOn": [
+                "^build"
+            ],
+            "outputs": [
+                ".next/**",
+                "!.next/cache/**"
+            ]
+        },
+        "nextjs#build": {
+            "dependsOn": [
                 "^build",
                 "^build:esm"
             ],
