@@ -63,7 +63,7 @@ importers:
         specifier: ^3.8.2
         version: 3.8.2
 
-  e2e/nextjs:
+  e2e/nextjs-app:
     dependencies:
       '@axiomhq/js':
         specifier: workspace:*

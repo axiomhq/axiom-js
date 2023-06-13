@@ -1,12 +1,12 @@
 {
     "name": "@axiomhq/js",
     "description": "The official javascript bindings for the Axiom API",
-    "version": "0.13.0",
+    "version": "0.1.0",
     "author": "Axiom, Inc.",
     "license": "MIT",
     "contributors": [
         "Lukas Malkmus <lukas@axiom.co>",
-        "Islam Schehata <islam@axiom.co>",
+        "Islam Shehata <islam@axiom.co>",
         "Arne Bahlo <arne@axiom.co>"
     ],
     "engines": {
@@ -14,13 +14,13 @@
     },
     "main": "dist/cjs/index.js",
     "types": "dist/types/index.d.ts",
-    "type": "module",
+    "module": "dist/esm/index.js",
     "scripts": {
         "build": "tsc -b",
-        "build:cjs": "tsc --project tsconfig.cjs.json",
+        "build:esm": "tsc --project tsconfig.esm.json",
         "format": "eslint '*/**/*.{js,ts}' --quiet --fix",
         "lint": "eslint '*/**/*.{js,ts}'",
-        "prepublish": "npm run build && npm run build:cjs",
+        "prepublish": "npm run build && npm run build:esm",
         "test": "jest test/unit",
         "cover": "nyc -r text -e .ts -x 'tests/unit/**/*.test.ts' npm run test"
     },
@@ -32,12 +32,16 @@
         "axiom",
         "api",
         "rest",
-        "client"
+        "client",
+        "axiom-js",
+        "axiom sdk",
+        "axiom js",
+        "logging"
     ],
     "bugs": {
         "url": "https://github.com/axiomhq/axiom-js/issues"
     },
-    "homepage": "https://github.com/axiomhq/axiom-js",
+    "homepage": "https://github.com/axiomhq/axiom-js/blob/main/packages/js/README.md",
     "dependencies": {
         "cross-fetch": "^3.1.5",
         "fetch-retry": "^5.0.3",
@@ -46,6 +50,6 @@
     "exports": {
         "import": "./dist/esm/index.js",
         "require": "./dist/cjs/index.js",
-        "default": "./dist/esm/index.js"
+        "default": "./dist/cjs/index.js"
     }
 }

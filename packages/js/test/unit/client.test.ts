@@ -106,7 +106,7 @@ describe('Client', () => {
   });
 
   it('No shortcircuit for ingest or query when there is api rate limit', async () => {
-    const resetTimeInSeconds = Math.floor(new Date().getTime() / 1000);
+    const resetTimeInSeconds = Math.floor(new Date().getTime() / 1000) + 1;
     const headers: HeadersInit = {};
     headers[headerRateScope] = 'anonymous';
     headers[headerAPILimit] = '1000';
@@ -114,7 +114,7 @@ describe('Client', () => {
     headers[headerAPIRateReset] = resetTimeInSeconds.toString();
 
     mockFetchResponse({}, 429, headers);
-    expect(client.datasets.list).rejects.toThrow(AxiomTooManyRequestsError);
+    expect(client.datasets.list).rejects.toBeInstanceOf(AxiomTooManyRequestsError);
 
     // ingest and query should succeed
     mockFetchResponse({}, 200, headers);

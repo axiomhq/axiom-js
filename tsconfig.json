@@ -8,6 +8,6 @@
     { "path": "examples/js" },
     { "path": "examples/winston" },
     { "path": "integration"},
-    { "path": "e2e/nextjs" }
+    { "path": "e2e/nextjs-app" }
   ]
 }

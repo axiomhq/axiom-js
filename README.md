@@ -4,7 +4,6 @@
 <div align="center">
 
 [![Workflow][workflow_badge]][workflow]
-[![Latest Release][release_badge]][release]
 [![License][license_badge]][license]
 
 </div>
@@ -34,7 +33,5 @@ Distributed under the [MIT License](LICENSE).
 
 [workflow]: https://github.com/axiomhq/axiom-js/actions/workflows/ci.yml
 [workflow_badge]: https://img.shields.io/github/actions/workflow/status/axiomhq/axiom-js/ci.yml?branch=main&ghcache=unused
-[release]: https://github.com/axiomhq/axiom-js/releases/latest
-[release_badge]: https://img.shields.io/github/release/axiomhq/axiom-js.svg?ghcache=unused
 [license]: https://opensource.org/licenses/MIT
 [license_badge]: https://img.shields.io/github/license/axiomhq/axiom-js.svg?color=blue&ghcache=unused

@@ -1,3 +1,5 @@
+# caching pnpm deps: https://github.com/actions/setup-node/blob/main/docs/advanced-usage.md#caching-packages-data
+
 name: CI
 
 on:
@@ -13,6 +15,7 @@ env:
   AXIOM_URL: ${{ secrets.TESTING_STAGING_API_URL }}
   AXIOM_ORG_ID: ${{ secrets.TESTING_STAGING_E2E_ORG_ID }}
   AXIOM_DATASET_SUFFIX: ${{ github.run_id }}
+  PNPM_VERSION: 8.6.0
 
 jobs:
   build:
@@ -25,29 +28,15 @@ jobs:
           - 19.x
     steps:
       - uses: actions/checkout@v3
+      - uses: pnpm/action-setup@v2
+        with:
+          version: ${{ env.PNPM_VERSION }}
       - uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node }}
-      - uses: pnpm/action-setup@v2
-        name: Install pnpm
-        id: pnpm-install
-        with:
-          version: 8
-          run_install: false
-      - name: Get pnpm store directory
-        id: pnpm-cache
-        shell: bash
-        run: |
-          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
-      - uses: actions/cache@v3
-        name: Setup pnpm cache
-        with:
-          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
-      - run: pnpm install
-      - run: pnpm build && pnpm build:cjs
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build && pnpm build:esm
       - run: pnpm lint
       - run: pnpm test
 
@@ -65,29 +54,15 @@ jobs:
       fail-fast: false
     steps:
       - uses: actions/checkout@v3
+      - uses: pnpm/action-setup@v2
+        with:
+          version: ${{ env.PNPM_VERSION }}
       - uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node }}
-      - uses: pnpm/action-setup@v2
-        name: Install pnpm
-        id: pnpm-install
-        with:
-          version: 8
-          run_install: false
-      - name: Get pnpm store directory
-        id: pnpm-cache
-        shell: bash
-        run: |
-          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
-      - uses: actions/cache@v3
-        name: Setup pnpm cache
-        with:
-          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
-      - run: pnpm install
-      - run: pnpm build && pnpm build:cjs
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build && pnpm build:esm
       - env:
           AXIOM_TOKEN: ${{ secrets.TESTING_STAGING_TOKEN }}
           AXIOM_URL: ${{ secrets.TESTING_STAGING_API_URL }}
@@ -96,7 +71,7 @@ jobs:
         run: pnpm integration
 
   deploy-e2e-apps:
-    name: deploy e2e apps
+    name: Deploy E2E apps
     runs-on: ubuntu-latest
     needs: build
     if: github.event.pull_request.head.repo.full_name == github.repository
@@ -116,7 +91,7 @@ jobs:
       url: ${{ steps.vercel-deploy.outputs.preview-url }}
 
   test-e2e:
-    name: E2E TESTS
+    name: E2E tests
     runs-on: ubuntu-latest
     needs:
       - deploy-e2e-apps
@@ -129,29 +104,15 @@ jobs:
       fail-fast: true
     steps:
       - uses: actions/checkout@v3
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 6.32.9
       - uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node }}
-      - uses: pnpm/action-setup@v2
-        name: Install pnpm
-        id: pnpm-install
-        with:
-          version: 8
-          run_install: false
-      - name: Get pnpm store directory
-        id: pnpm-cache
-        shell: bash
-        run: |
-          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
-      - uses: actions/cache@v3
-        name: Setup pnpm cache
-        with:
-          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
-      - run: pnpm install
-      - run: pnpm build && pnpm build:cjs # cjs build needed to run jest tests
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build && pnpm build:esm # cjs build needed to run jest tests
       - env:
           TESTING_TARGET_URL: ${{ needs.deploy-e2e-apps.outputs.preview-url }}
         run: pnpm run e2e
