@@ -14,13 +14,13 @@
     },
     "main": "dist/cjs/index.js",
     "types": "dist/types/index.d.ts",
-    "type": "module",
+    "module": "dist/esm/index.js",
     "scripts": {
         "build": "tsc -b",
-        "build:cjs": "tsc --project tsconfig.cjs.json",
+        "build:esm": "tsc --project tsconfig.esm.json",
         "format": "eslint '*/**/*.{js,ts}' --quiet --fix",
         "lint": "eslint '*/**/*.{js,ts}'",
-        "prepublish": "npm run build && npm run build:cjs",
+        "prepublish": "npm run build && npm run build:esm",
         "test": "jest test/unit",
         "cover": "nyc -r text -e .ts -x 'tests/unit/**/*.test.ts' npm run test"
     },
@@ -50,6 +50,6 @@
     "exports": {
         "import": "./dist/esm/index.js",
         "require": "./dist/cjs/index.js",
-        "default": "./dist/esm/index.js"
+        "default": "./dist/cjs/index.js"
     }
 }

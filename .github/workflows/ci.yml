@@ -47,7 +47,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
       - run: pnpm install
-      - run: pnpm build && pnpm build:cjs
+      - run: pnpm build && pnpm build:esm
       - run: pnpm lint
       - run: pnpm test
 
@@ -87,7 +87,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
       - run: pnpm install
-      - run: pnpm build && pnpm build:cjs
+      - run: pnpm build && pnpm build:esm
       - env:
           AXIOM_TOKEN: ${{ secrets.TESTING_STAGING_TOKEN }}
           AXIOM_URL: ${{ secrets.TESTING_STAGING_API_URL }}
@@ -151,7 +151,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
       - run: pnpm install
-      - run: pnpm build && pnpm build:cjs # cjs build needed to run jest tests
+      - run: pnpm build && pnpm build:esm # cjs build needed to run jest tests
       - env:
           TESTING_TARGET_URL: ${{ needs.deploy-e2e-apps.outputs.preview-url }}
         run: pnpm run e2e

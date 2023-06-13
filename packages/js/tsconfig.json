@@ -1,9 +1,12 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "rootDir": "./src",
-    "outDir": "dist/esm",
-    "declarationDir": "dist/types"
+      "target": "ES5",
+      "module": "Commonjs",
+      "baseUrl": ".",
+      "rootDir": "./src",
+      "outDir": "dist/cjs",
+      "declarationDir": "dist/types",
   },
   "include": ["src/**/*"]
 }

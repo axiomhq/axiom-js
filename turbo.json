@@ -7,29 +7,29 @@
                 "^build"
             ],
             "outputs": [
-                "dist/esm/**",
+                "dist/cjs/**",
                 "dist/types/**"
             ]
         },
-        "build:cjs": {
+        "build:esm": {
             "dependsOn": [
                 "^build",
-                "^build:cjs"
+                "^build:esm"
             ],
             "outputs": [
-                "dist/cjs/**"
+                "dist/esm/**"
             ]
         },
         "test": {
             "dependsOn": [
                 "^build",
-                "^build:cjs"
+                "^build:esm"
             ]
         },
         "integration": {
             "dependsOn": [
                 "^build",
-                "^build:cjs",
+                "^build:esm",
                 "^test"
             ]
         },
