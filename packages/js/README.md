@@ -38,4 +38,4 @@ async function main() {
 }
 ```
 
-For further examples, head over to the [examples](../../examples) directory.
+For further examples, head over to the [examples](../../examples/js) directory.
