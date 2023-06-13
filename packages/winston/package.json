@@ -5,6 +5,9 @@
     "main": "dist/cjs/index.js",
     "types": "dist/types/index.d.ts",
     "type": "module",
+    "author": "Axiom, Inc.",
+    "license": "MIT",
+    "homepage": "https://github.com/axiomhq/axiom-js/blob/main/packages/winston/README.md",
     "scripts": {
         "build": "tsc -b",
         "build:cjs": "tsc --project tsconfig.cjs.json",
@@ -17,6 +20,22 @@
     "dependencies": {
         "winston-transport": "^4.5.0",
         "@axiomhq/js": "workspace:*"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/axiomhq/axiom-js.git"
+    },
+    "engines": {
+        "node": ">=16"
+    },
+    "keywords": [
+        "axiom",
+        "winston",
+        "axiom-js",
+        "axiom-winston"
+    ],
+    "bugs": {
+        "url": "https://github.com/axiomhq/axiom-js/issues"
     },
     "exports": {
         "import": "./dist/esm/index.js",
