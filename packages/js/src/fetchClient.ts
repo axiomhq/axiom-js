@@ -82,8 +82,9 @@ export class AxiomTooManyRequestsError extends Error {
 
   constructor(public limit: Limit, public shortcircuit = false) {
     super();
+    Object.setPrototypeOf(this, AxiomTooManyRequestsError.prototype); // https://github.com/Microsoft/TypeScript/wiki/Breaking-Changes#extending-built-ins-like-error-array-and-map-may-no-longer-work
     const retryIn = AxiomTooManyRequestsError.timeUntilReset(limit);
-    this.message = `${limit.type} limit exceeded, not making remote request, try again in ${retryIn.minutes}m${retryIn.seconds}s`;
+    this.message = `${limit.type} limit exceeded, try again in ${retryIn.minutes}m${retryIn.seconds}s`;
     if (limit.type == LimitType.api) {
       this.message = `${limit.scope} ` + this.message;
     }
