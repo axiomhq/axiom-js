@@ -82,15 +82,15 @@ export class AxiomTooManyRequestsError extends Error {
 
   constructor(public limit: Limit, public shortcircuit = false) {
     super();
-    const retryIn = this.timeUntilReset();
+    const retryIn = AxiomTooManyRequestsError.timeUntilReset(limit);
     this.message = `${limit.type} limit exceeded, not making remote request, try again in ${retryIn.minutes}m${retryIn.seconds}s`;
     if (limit.type == LimitType.api) {
       this.message = `${limit.scope} ` + this.message;
     }
   }
 
-  timeUntilReset() {
-    const total = this.limit.reset.getTime() - new Date().getTime();
+  static timeUntilReset(limit: Limit) {
+    const total = limit.reset.getTime() - new Date().getTime();
     const seconds = Math.floor((total / 1000) % 60);
     const minutes = Math.floor((total / 1000 / 60) % 60);
 
