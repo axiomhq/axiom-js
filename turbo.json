@@ -13,7 +13,6 @@
         },
         "build:esm": {
             "dependsOn": [
-                "^build",
                 "^build:esm"
             ],
             "outputs": [
@@ -44,7 +43,8 @@
         },
         "nextjs-app#build": {
             "dependsOn": [
-                "^build"
+                "^build",
+                "^build:esm"
             ],
             "outputs": [
                 ".next/**",
