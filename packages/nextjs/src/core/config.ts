@@ -15,13 +15,4 @@ if (isVercel) {
   config = new NetlifyConfig();
 }
 
-console.log('debug config', {
-  config,
-  token: config.token,
-  dataset: config.dataset,
-  ingestEndpoint: config.axiomUrl,
-  isVercel,
-  isNetlify,
-});
-
 export { config };

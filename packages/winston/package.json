@@ -3,6 +3,7 @@
     "description": "The official Axiom transport for winston logger",
     "version": "0.1.0",
     "main": "dist/cjs/index.js",
+    "module": "dis/esm/index.js",
     "types": "dist/types/index.d.ts",
     "module": "dist/esm/index.js",
     "author": "Axiom, Inc.",
