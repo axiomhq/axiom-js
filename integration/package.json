@@ -15,10 +15,5 @@
         "winston-transport": "^4.5.0",
         "@axiomhq/winston": "workspace:*",
         "@axiomhq/js": "workspace:*"
-    },
-    "exports": {
-        "import": "./dist/esm/index.js",
-        "require": "./dist/cjs/index.js",
-        "default": "./dist/esm/index.js"
     }
 }
