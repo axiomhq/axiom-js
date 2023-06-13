@@ -42,7 +42,7 @@
             "cache": false,
             "persistent": true
         },
-        "nextjs#build": {
+        "nextjs-app#build": {
             "dependsOn": [
                 "^build"
             ],

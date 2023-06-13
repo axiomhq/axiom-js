@@ -1,5 +1,5 @@
 {
-    "name": "nextjs",
+    "name": "nextjs-app",
     "private": true,
     "description": "e2e tests for axiom-js",
     "version": "0.1.0",
