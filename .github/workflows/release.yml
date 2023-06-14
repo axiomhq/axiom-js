@@ -23,6 +23,6 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm build && pnpm build:esm
       - run: ./scripts/resolveVersion.sh # replace the constant VERSION with correct value
-      - run: pnpm publish --access public --filter={@axiomhq/js,@axiomhq/winston}
+      - run: pnpm publish --access public --filter "./packages/**"
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTOMATION_TOKEN }}
