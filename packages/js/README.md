@@ -15,27 +15,30 @@ Otherwise create a personal token in [the Axiom settings](https://app.axiom.co/p
 You can also configure the client using options passed to the constructor of the Client:
 
 ```ts
+import { Client } from '@axiomhq/js';
+
 const client = new Client({
     token: process.env.AXIOM_TOKEN,
     orgId: process.env.AXIOM_ORG_ID,
 });
 ```
 
-Create and use a client like this:
+You can then ingest data like this:
 
 ```ts
-import Client from '@axiomhq/js';
+client.ingest('my-dataset', [
+  { 'foo': 'bar'},
+]);
+await client.flush()
+```
 
-async function main() {
-  const client = new Client();
+> **Note** that the client is automatically batching events in the background, in most cases you'll only want to call `flush()` before your application exits.
 
-  client.ingest('my-dataset', [
-    { 'foo': 'bar'},
-  ]);
-  await client.flush();
+And query data like this:
 
-  const res = await client.query(`['my-dataset'] | where foo == 'bar' | limit 100`);
-}
+```ts
+const res = await client.query(`['my-dataset'] | where foo == 'bar' | limit 100`);
+console.log(res)
 ```
 
 For further examples, head over to the [examples](../../examples/js) directory.
