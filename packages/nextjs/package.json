@@ -21,19 +21,21 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/axiomhq/next-axiom.git"
+    "url": "git+https://github.com/axiomhq/axiom-js.git"
   },
   "keywords": [
     "web-vitals",
     "axiom",
     "observability",
     "performance",
-    "nextjs"
+    "nextjs",
+    "axiom-js",
+    "logs"
   ],
   "bugs": {
     "url": "https://github.com/axiomhq/next-axiom/issues"
   },
-  "homepage": "https://github.com/axiomhq/next-axiom#readme",
+  "homepage": "https://github.com/axiomhq/axiom-js/blob/main/packages/nextjs/README.md",
   "dependencies": {
     "@axiomhq/js": "workspace:*"
   },

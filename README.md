@@ -24,6 +24,7 @@ This is a monorepo, for specific documentation, check out the different projects
 
 * [`@axiomhq/js`](./packages/js): Official API bindings that let you ingest or query your data.
 * [`@axiomhq/winston`](./packages/winston): A [winston](https://github.com/winstonjs/winston) transport which sends logs to Axiom.
+* [`@axiomhq/nextjs`](./packages/nextjs): A [Next.js](https://github.com/vercel/next.js) library which sends logs & web-vitals to Axiom.
 
 ## License
 
