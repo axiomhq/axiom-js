@@ -9,7 +9,7 @@ describe('Client ingestion & query on different runtime', () => {
   beforeAll(async () => {
     const ds = await axiom.datasets.create({
       name: datasetName,
-      description: 'This is a test dataset for datasets integration tests.',
+      description: 'This is a test dataset for ingestion tests.',
     });
     console.log(`creating datasets for testing: ${ds.name} (${ds.id})`)
   });
