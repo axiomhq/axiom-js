@@ -86,17 +86,16 @@ exceptions:
 ```ts
 import { withAxiom, AxiomRequest } from '@axiomhq/nextjs';
 
-async function handler(req: AxiomRequest) {
+export const GET = withAxiom((req: AxiomRequest) => {
   req.log.info('Login function called');
 
   // You can create intermediate loggers
   const log = req.log.with({ scope: 'user' });
   log.info('User logged in', { userId: 42 });
 
-  res.status(200).text('hi');
-}
+  return NextResponse.json({ hello: 'world' });
+})
 
-export default withAxiom(handler);
 ```
 
 Import and use `useLogger` in the components like this:
