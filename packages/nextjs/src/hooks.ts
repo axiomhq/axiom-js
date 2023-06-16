@@ -12,9 +12,12 @@ export function useReportWebVitals() {
 export function useLogger(config: LoggerConfig = {}): Logger {
   const path = usePathname();
   useEffect(() => {
-    return () => { logger.flush() };
+    return () => {
+      if (logger) {
+        logger.flush();
+      }
+    };
   }, [path]);
-
 
   const logger = new Logger(config);
   return logger; // FIXME: Provide request data and source
