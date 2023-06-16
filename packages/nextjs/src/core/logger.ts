@@ -57,7 +57,7 @@ export class Logger {
   public logLevel: string;
   public config: LoggerConfig = {
     // default config
-    source: 'browser',
+    source: 'frontend',
     logLevel: LogLevel.debug,
   };
 
@@ -65,7 +65,10 @@ export class Logger {
     this.config = { ...this.config, ...initConfig };
     this.logLevel = this.config.logLevel ? this.config.logLevel.toString() : LOG_LEVEL || 'debug';
     if (!clientOpts) {
-      clientOpts = {};
+      clientOpts = {
+        token: configurator.token,
+        url: configurator.axiomUrl,
+      };
     }
     clientOpts.sdk = 'next-axiom/v' + Version;
     this.client = new Client(clientOpts);
@@ -85,7 +88,7 @@ export class Logger {
   };
 
   with = (config: LoggerConfig) => {
-    const newConfig = { ...this.config, ...config };
+    const newConfig = {...this.config, ...config };
     const child = new Logger(newConfig, this.clientOpts);
     this.children.push(child);
     return child;
@@ -159,6 +162,7 @@ export class Logger {
     try {
       return this.client.ingest(configurator.dataset || 'vercel', ev);
     } catch (err: any) {
+      // swallow errors
       console.warn(err);
     }
   }
@@ -168,12 +172,11 @@ export class Logger {
       return await this.client.flush();
     } catch (err: any) {
       console.warn(err);
-      return Promise.reject(err)
+      // swallow errors
+      return Promise.resolve();
     }
   };
 }
-
-// export const log = new Logger({}, this.clientOpts);
 
 const levelColors: { [key: string]: any } = {
   info: {

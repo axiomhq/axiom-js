@@ -1,25 +1,21 @@
 import { useReportWebVitals as useNextReportWebVitals } from 'next/web-vitals';
 import { usePathname } from 'next/navigation';
-import { Logger, LoggerConfig, config } from './core';
+import { Logger, LoggerConfig } from './core';
 import { reportWebVitals } from './webVitals';
+import { useEffect } from 'react';
 
 export function useReportWebVitals() {
   const path = usePathname();
   useNextReportWebVitals((metric) => reportWebVitals(metric, path));
 }
 
-export const parentLogger: Logger = new Logger(
-  {},
-  {
-    token: config.token,
-    url: config.axiomUrl,
-  }
-);
-
 export function useLogger(config: LoggerConfig = {}): Logger {
-  const isServerSide = typeof window === 'undefined';
+  const path = usePathname();
+  useEffect(() => {
+    return () => { logger.flush() };
+  }, [path]);
 
-  config.source = config.source || isServerSide ? 'RSC' : 'frontend';
 
-  return parentLogger.with(config); // FIXME: Provide request data and source
+  const logger = new Logger(config);
+  return logger; // FIXME: Provide request data and source
 }

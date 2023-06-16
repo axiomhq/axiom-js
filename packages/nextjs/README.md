@@ -98,9 +98,10 @@ export const GET = withAxiom((req: AxiomRequest) => {
 
 ```
 
-Import and use `useLogger` in the components like this:
+Import and use `useLogger` hook in **client components** like this:
 
 ```js
+'use client';
 import { useLogger } from `@axiomhq/nextjs`;
 
 // pages/index.js
@@ -111,11 +112,20 @@ function home() {
 }
 ```
 
-For server side components you will have to make sure to flush the logs before component returns
+For **server side components** you will have to create an instance  make sure to flush the logs before component returns
 
 ```js
-await log.flush();
-return (...)
+import { Logger } from `@axiomhq/nextjs`;
+
+function RSC() {
+  const log = new Logger();
+  log.info('...')
+
+  ...
+
+  await log.flush();
+  return (...)
+}
 ```
 
 ### Log Levels

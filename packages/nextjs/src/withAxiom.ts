@@ -65,7 +65,9 @@ export function withAxiomRouteHandler(handler: NextHandler) {
       ip: req.headers.get('x-forwarded-for'),
       region: '', // FIXME: get region information
     };
-    const logger = new Logger({ req: report, source: globalThis.EdgeRuntime ? 'edge' : 'lambda' });
+    const isEdgeRuntime = globalThis.EdgeRuntime ? true : false;
+
+    const logger = new Logger({ req: report, source: isEdgeRuntime ? 'edge' : 'lambda' });
     const axiomContext = req as AxiomRequest;
     axiomContext.log = logger;
 

@@ -1,9 +1,9 @@
 
-import { useLogger } from '@axiomhq/nextjs'
+import { Logger } from '@axiomhq/nextjs'
 import Link from 'next/link'
 
 export default async function Home() {
-  const log = useLogger()
+  const log = new Logger();
   log.info('AXIOM/NEXT::SERVER_COMPONENT_LOG')
 
   await log.flush()

@@ -1,6 +1,5 @@
 import { NextWebVitalsMetric } from 'next/app';
-import { config } from './core';
-import { useLogger } from './hooks';
+import { config, Logger } from './core';
 
 export declare type WebVitalsMetric = NextWebVitalsMetric & { route: string };
 
@@ -12,7 +11,7 @@ export async function reportWebVitals(metric: NextWebVitalsMetric, path: string)
     return;
   }
 
-  const logger = useLogger();
+  const logger = new Logger();
   // FIXME: find a better way to ingest web-vitals
   logger.client.ingest(config.dataset!, config.wrapWebVitalsObject([{ ...metric, route }]));
   return await logger.flush();
