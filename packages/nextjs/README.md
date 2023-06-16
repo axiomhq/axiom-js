@@ -36,7 +36,7 @@ module.exports = withAxiom({
 
 ### Using Any Other Platform
 
-Create an API token in [Axiom settings](https://cloud.axiom.co/settings/profile) and export it as `AXIOM_TOKEN`, as well as the Axiom dataset name as `AXIOM_DATASET`. Once it is done, perform the steps below:
+Create an API token in [Axiom settings](https://cloud.axiom.co/settings/profile) and export it as `NEXT_PUBLIC_AXIOM_TOKEN`, as well as the Axiom dataset name as `NEXT_PUBLIC_AXIOM_DATASET`. Once it is done, perform the steps below:
 
 - In your Next.js project, run install `@axiomhq/nextjs` as follows:
 
@@ -110,6 +110,13 @@ function home() {
     log.debug('User logged in', { userId: 42 })
     ...
 }
+```
+
+For server side components you will have to make sure to flush the logs before component returns
+
+```js
+await log.flush();
+return (...)
 ```
 
 ### Log Levels
