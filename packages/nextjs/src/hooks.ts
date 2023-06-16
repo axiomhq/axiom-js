@@ -8,11 +8,13 @@ export function useReportWebVitals() {
   useNextReportWebVitals((metric) => reportWebVitals(metric, path));
 }
 
-export const parentLogger: Logger = new Logger({}, {
-  token: config.token,
-  url: config.axiomUrl,
-});
-
+export const parentLogger: Logger = new Logger(
+  {},
+  {
+    token: config.token,
+    url: config.axiomUrl,
+  }
+);
 
 export function useLogger(config: LoggerConfig = {}): Logger {
   const isServerSide = typeof window === 'undefined';

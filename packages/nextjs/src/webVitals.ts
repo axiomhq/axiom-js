@@ -4,7 +4,6 @@ import { useLogger } from './hooks';
 
 export declare type WebVitalsMetric = NextWebVitalsMetric & { route: string };
 
-
 export async function reportWebVitals(metric: NextWebVitalsMetric, path: string) {
   const route = path || window.__NEXT_DATA__?.page;
   // if Axiom env vars are not set, do nothing,
@@ -15,6 +14,6 @@ export async function reportWebVitals(metric: NextWebVitalsMetric, path: string)
 
   const logger = useLogger();
   // FIXME: find a better way to ingest web-vitals
-  logger.client.ingest(config.dataset!, config.wrapWebVitalsObject([{ ...metric, route }]))
+  logger.client.ingest(config.dataset!, config.wrapWebVitalsObject([{ ...metric, route }]));
   return await logger.flush();
 }
