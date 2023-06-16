@@ -41,16 +41,17 @@
             "cache": false,
             "persistent": true
         },
-        "nextjs-app#build": {
+        "nextjs#build": {
             "dependsOn": [
-                "^build"
+                "^build",
+                "^build:esm"
             ],
             "outputs": [
                 ".next/**",
                 "!.next/cache/**"
             ]
         },
-        "nextjs#build": {
+        "nextjs-app#build": {
             "dependsOn": [
                 "^build",
                 "^build:esm"
