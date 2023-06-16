@@ -1,4 +1,3 @@
-import 'whatwg-fetch';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { NextFetchEvent, NextRequest, NextResponse } from 'next/server';
 import { withAxiom, Logger } from '../src/index';
