@@ -8,14 +8,14 @@ export default class GenericConfig implements Provider {
   proxyPath = '/_axiom';
   isBrowser = typeof window !== 'undefined';
   shouldSendEdgeReport = false;
-  token = process.env.AXIOM_TOKEN;
-  dataset = process.env.AXIOM_DATASET;
+  token = process.env.NEXT_PUBLIC_AXIOM_TOKEN;
+  dataset = process.env.NEXT_PUBLIC_AXIOM_DATASET;
   environment: string = process.env.NODE_ENV || '';
-  axiomUrl = process.env.AXIOM_URL || 'https://cloud.axiom.co';
+  axiomUrl = process.env.NEXT_PUBLIC_AXIOM_URL || 'https://cloud.axiom.co';
   region = process.env.REGION || undefined;
 
   isEnvVarsSet(): boolean {
-    return !!(this.axiomUrl && process.env.AXIOM_DATASET && process.env.AXIOM_TOKEN);
+    return !!(this.axiomUrl && process.env.NEXT_PUBLIC_AXIOM_DATASET && process.env.NEXT_PUBLIC_AXIOM_TOKEN);
   }
 
   getIngestURL(_: EndpointType): string {
@@ -33,6 +33,7 @@ export default class GenericConfig implements Provider {
   wrapWebVitalsObject(metrics: any[]): any {
     return metrics.map(m => ({
         webVital: m,
+        label: 'web-vital',
         _time: new Date().getTime(),
         platform: {
           environment: this.environment,

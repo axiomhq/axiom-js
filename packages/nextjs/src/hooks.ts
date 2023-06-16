@@ -1,6 +1,6 @@
 import { useReportWebVitals as useNextReportWebVitals } from 'next/web-vitals';
 import { usePathname } from 'next/navigation';
-import { Logger, LoggerConfig } from './core';
+import { Logger, LoggerConfig, config } from './core';
 import { reportWebVitals } from './webVitals';
 
 export function useReportWebVitals() {
@@ -8,11 +8,16 @@ export function useReportWebVitals() {
   useNextReportWebVitals((metric) => reportWebVitals(metric, path));
 }
 
-let logger: Logger;
+export const parentLogger: Logger = new Logger({}, {
+  token: config.token,
+  url: config.axiomUrl,
+});
+
 
 export function useLogger(config: LoggerConfig = {}): Logger {
-  if (!logger) {
-    logger = new Logger(config, {}); // FIXME: Provide request data and source
-  }
-  return logger;
+  const isServerSide = typeof window === 'undefined';
+
+  config.source = config.source || isServerSide ? 'RSC' : 'frontend';
+
+  return parentLogger.with(config); // FIXME: Provide request data and source
 }

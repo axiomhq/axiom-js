@@ -7,7 +7,7 @@ import { describe, it } from '@jest/globals'
 describe('Lambda e2e tests', () => {
     const axiom = new Client();
 
-    const dataset = 'axiom-nextjs-lambda-e2e-test';
+    const dataset = 'axiom-js-e2e-test';
 
     beforeAll(async () => {
         const ds = await axiom.datasets.create({

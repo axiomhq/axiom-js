@@ -1,6 +1,6 @@
 'use client';
 import { usePathname } from 'next/navigation';
-import { useLogger, useReportWebVitals } from './hooks';
+import { parentLogger, useReportWebVitals } from './hooks';
 import { useEffect } from 'react';
 
 export function AxiomWebVitals() {
@@ -8,10 +8,9 @@ export function AxiomWebVitals() {
 
   // TODO: this could be used to flush logger whenever route changes
   const pathname = usePathname();
-  const logger = useLogger();
   useEffect(() => {
     return () => {
-      logger.flush();
+      parentLogger.flush();
     };
   }, [pathname]);
   return null;

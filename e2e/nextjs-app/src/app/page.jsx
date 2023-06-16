@@ -1,12 +1,16 @@
 
 import { useLogger } from '@axiomhq/nextjs'
+import Link from 'next/link'
 
 export default async function Home() {
   const log = useLogger()
-  log.debug('AXIOM/NEXT::FRONTEND_LOG')
+  log.info('AXIOM/NEXT::SERVER_COMPONENT_LOG')
 
   await log.flush()
   return (
-    <div>Test</div>
+    <div>
+      <h4>RSC Page</h4>
+      <Link href="/log_client">Client Component</Link>
+    </div>
   )
 }

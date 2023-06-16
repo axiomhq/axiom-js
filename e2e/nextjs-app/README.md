@@ -2,7 +2,9 @@
 
 ## Quickstart
 
-Run the tests using `npm run integration`
+Start the dev app with `pnpm dev`
+
+Run the tests using `pnpm e2e`
 
 - configuration:
 

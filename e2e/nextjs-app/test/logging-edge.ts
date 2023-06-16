@@ -7,20 +7,20 @@ import { describe, it } from '@jest/globals'
 describe('Edge e2e tests', () => {
     const axiom = new Client();
 
-    const dataset = 'axiom-nextjs-edge-e2e-test';
+    const dataset = 'axiom-js-e2e-test';
 
     beforeAll(async () => {
         const ds = await axiom.datasets.create({
-          name: dataset,
-          description: 'This is a test dataset for edge logging tests.',
+            name: dataset,
+            description: 'This is a test dataset for edge logging tests.',
         });
         console.log(`creating datasets for testing: ${ds.name} (${ds.id})`)
-      });
-    
+    });
+
     afterAll(async () => {
-    const resp = await axiom.datasets.delete(dataset);
-    expect(resp.status).toEqual(204);
-    console.log(`removed testing dataset: ${dataset}`)
+        const resp = await axiom.datasets.delete(dataset);
+        expect(resp.status).toEqual(204);
+        console.log(`removed testing dataset: ${dataset}`);
     });
 
     it('Send logs from edge functions', async () => {

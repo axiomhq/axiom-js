@@ -2,7 +2,7 @@
 
 ## Quickstart
 
-Run the tests using `npm run integration`
+Run the tests using `pnpm integration`
 
 - configuration:
 

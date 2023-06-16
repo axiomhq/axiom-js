@@ -56,6 +56,7 @@ export class Logger {
 
   public logLevel: string;
   public config: LoggerConfig = {
+    // default config
     source: 'browser',
     logLevel: LogLevel.debug,
   };
@@ -83,7 +84,14 @@ export class Logger {
     this._log('error', message, args);
   };
 
-  with = (args: { [key: string]: any }) => {
+  with = (config: LoggerConfig) => {
+    const newConfig = { ...this.config, ...config };
+    const child = new Logger(newConfig, this.clientOpts);
+    this.children.push(child);
+    return child;
+  };
+
+  withArgs = (args: { [key: string]: any }) => {
     const config = { ...this.config, args: { ...this.config.args, ...args } };
     const child = new Logger(config, this.clientOpts);
     this.children.push(child);
