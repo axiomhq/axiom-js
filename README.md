@@ -24,7 +24,7 @@ This is a monorepo, for specific documentation, check out the different projects
 
 * [`@axiomhq/js`](./packages/js): Official API bindings that let you ingest or query your data.
 * [`@axiomhq/winston`](./packages/winston): A [winston](https://github.com/winstonjs/winston) transport which sends logs to Axiom.
-* [`@axiomhq/js`](./packages/pino): A [pino](https://github.com/pinojs/pino) transport which sends logs to Axiom.
+* [`@axiomhq/pino`](./packages/pino): A [pino](https://github.com/pinojs/pino) transport which sends logs to Axiom.
 
 ## License
 
