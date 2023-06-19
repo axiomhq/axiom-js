@@ -1,8 +1,8 @@
-import { Client } from '@axiomhq/js';
+import { Axiom } from '@axiomhq/js';
 import { describe, it, expect, beforeAll, afterAll } from '@jest/globals';
 
-describe('Client ingestion & query on different runtime', () => {
-  const axiom = new Client();
+describe('Ingestion & query on different runtime', () => {
+  const axiom = new Axiom();
 
   const datasetName = 'axiom-js-e2e-test';
 
@@ -11,13 +11,13 @@ describe('Client ingestion & query on different runtime', () => {
       name: datasetName,
       description: 'This is a test dataset for datasets integration tests.',
     });
-    console.log(`creating datasets for testing: ${ds.name} (${ds.id})`)
+    console.log(`creating datasets for testing: ${ds.name} (${ds.id})`);
   });
 
   afterAll(async () => {
     const resp = await axiom.datasets.delete(datasetName);
     expect(resp.status).toEqual(204);
-    console.log(`removed testing dataset: ${datasetName}`)
+    console.log(`removed testing dataset: ${datasetName}`);
   });
 
   it('ingest on a lambda function should succeed', async () => {

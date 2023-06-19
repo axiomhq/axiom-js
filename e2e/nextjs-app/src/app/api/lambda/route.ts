@@ -1,12 +1,12 @@
-import { ClientWithoutBatching, ContentEncoding, ContentType } from '@axiomhq/js';
+import { AxiomWithoutBatching, ContentEncoding, ContentType } from '@axiomhq/js';
 import { NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic'; // disable prerendering
 
 export async function GET() {
-  const client = new ClientWithoutBatching();
+  const axiom = new AxiomWithoutBatching();
 
-  const resp = await client.ingestRaw(
+  const resp = await axiom.ingestRaw(
     'axiom-js-e2e-test',
     `[{"foo":"bar", "test": "ingest_on_lambda"},{"bar":"baz", "test": "ingest_on_lambda"}]`,
     ContentType.JSON,

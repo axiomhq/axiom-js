@@ -1,6 +1,6 @@
-import { ClientWithoutBatching } from '@axiomhq/js';
+import { AxiomWithoutBatching } from '@axiomhq/js';
 
-const client = new ClientWithoutBatching();
+const axiom = new AxiomWithoutBatching();
 
 async function ingest() {
   const events = [
@@ -12,7 +12,7 @@ async function ingest() {
     },
   ];
 
-  const res = await client.ingest('my-dataset', events);
+  const res = await axiom.ingest('my-dataset', events);
   console.log('Ingested %d events with %d failures', res.ingested, res.failed);
   // Ingested 2 events with 0 failures
 }
