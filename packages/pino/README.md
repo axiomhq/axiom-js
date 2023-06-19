@@ -10,15 +10,11 @@ Install using `npm install`:
 npm install @axiomhq/pino
 ```
 
-import the axiom transport for winston:
-
-```ts
-import pino from 'pino';
-```
-
 create a pino logger with Axiom configured:
 
 ```ts
+import pino from 'pino';
+
 const logger = pino(
   { level: 'info' },
   pino.transport({
