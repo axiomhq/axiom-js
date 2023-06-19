@@ -11,4 +11,6 @@ const logger = pino(
   }),
 );
 
-logger.info("Hello from pino!");
+logger.info('Hello from pino!');
+
+logger.flush();
