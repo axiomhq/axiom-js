@@ -15,7 +15,7 @@ export interface Options extends ClientOptions {
   dataset?: string;
 }
 
-export async function axiomTransport(options?: Options) {
+export default async function axiomTransport(options?: Options) {
   const axiom = new Axiom(options);
   const dataset = options?.dataset || process.env.AXIOM_DATASET;
 
