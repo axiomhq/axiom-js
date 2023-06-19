@@ -1,6 +1,6 @@
 import { describe, expect, it, beforeEach } from '@jest/globals';
 
-import { ContentType, ContentEncoding, ClientWithoutBatching } from '../../src/client';
+import { ContentType, ContentEncoding, AxiomWithoutBatching } from '../../src/client';
 import { AxiomTooManyRequestsError } from '../../src/fetchClient';
 import { headerAPILimit, headerAPIRateRemaining, headerAPIRateReset, headerRateScope } from '../../src/limit';
 import { mockFetchResponse, testMockedFetchCall } from '../lib/mock';
@@ -66,18 +66,18 @@ const queryResult = {
 
 const clientURL = 'http://axiom-js-retries.dev.local';
 
-describe('Client', () => {
-  let client = new ClientWithoutBatching({ url: clientURL });
-  expect(client).toBeDefined();
+describe('Axiom', () => {
+  let axiom = new AxiomWithoutBatching({ url: clientURL });
+  expect(axiom).toBeDefined();
 
   beforeEach(() => {
     // reset client to clear rate limits
-    client = new ClientWithoutBatching({ url: clientURL });
+    axiom = new AxiomWithoutBatching({ url: clientURL });
   });
 
   it('Services', () => {
-    expect(client.datasets).toBeTruthy();
-    expect(client.users).toBeTruthy();
+    expect(axiom.datasets).toBeTruthy();
+    expect(axiom.users).toBeTruthy();
   });
 
   it('Retries failed 5xx requests', async () => {
@@ -86,7 +86,7 @@ describe('Client', () => {
     mockFetchResponse({}, 500);
     mockFetchResponse([{ name: 'test' }], 200);
 
-    const resp = await client.datasets.list();
+    const resp = await axiom.datasets.list();
     // expect(fetch).toHaveBeenCalledTimes(3);
     expect(resp.length).toEqual(1);
   });
@@ -96,11 +96,11 @@ describe('Client', () => {
     mockFetchResponse({}, 401);
     // global.fetch = mockFetchResponse([{ name: 'test' }], 200);
 
-    expect(client.datasets.list).rejects.toThrow(new Error('Forbidden'));
+    expect(axiom.datasets.list).rejects.toThrow(new Error('Forbidden'));
 
     // create another request to ensure that
     // the fetch mock was not consumed before
-    // const resp = await client.datasets.list();
+    // const resp = await axiom.datasets.list();
     // expect(fetch).toHaveBeenCalledTimes(2);
     // expect(resp.length).toEqual(1);
   });
@@ -114,14 +114,14 @@ describe('Client', () => {
     headers[headerAPIRateReset] = resetTimeInSeconds.toString();
 
     mockFetchResponse({}, 429, headers);
-    expect(client.datasets.list).rejects.toBeInstanceOf(AxiomTooManyRequestsError);
+    expect(axiom.datasets.list).rejects.toBeInstanceOf(AxiomTooManyRequestsError);
 
     // ingest and query should succeed
     mockFetchResponse({}, 200, headers);
-    await client.ingest('test', [{ name: 'test' }]);
+    await axiom.ingest('test', [{ name: 'test' }]);
 
     mockFetchResponse({}, 200, headers);
-    await client.query("['test']");
+    await axiom.query("['test']");
   });
 
   it('IngestString', async () => {
@@ -140,7 +140,7 @@ describe('Client', () => {
       expect(init.body).toMatch(JSON.stringify(query));
     }, ingestStatus);
 
-    const response = await client.ingestRaw('test', JSON.stringify(query), ContentType.JSON, ContentEncoding.Identity);
+    const response = await axiom.ingestRaw('test', JSON.stringify(query), ContentType.JSON, ContentEncoding.Identity);
     expect(response).toBeDefined();
     expect(response.ingested).toEqual(2);
     expect(response.failed).toEqual(0);
@@ -155,7 +155,7 @@ describe('Client', () => {
       endTime: '2020-11-17T11:18:00Z',
       resolution: 'auto',
     };
-    let response = await client.queryLegacy('test', query);
+    let response = await axiom.queryLegacy('test', query);
     expect(response).toBeDefined();
     expect(response.matches).toHaveLength(2);
 
@@ -171,7 +171,7 @@ describe('Client', () => {
     };
 
     mockFetchResponse(queryLegacyResult);
-    response = await client.queryLegacy('test', query, options);
+    response = await axiom.queryLegacy('test', query, options);
     expect(response).toBeDefined();
     expect(response.matches).toHaveLength(2);
   });
@@ -179,7 +179,7 @@ describe('Client', () => {
   it('APL Query', async () => {
     mockFetchResponse(queryResult);
     // works without options
-    let response = await client.query("['test'] | where response == 304");
+    let response = await axiom.query("['test'] | where response == 304");
     expect(response).not.toEqual('undefined');
     expect(response.matches).toHaveLength(2);
 
@@ -190,7 +190,7 @@ describe('Client', () => {
     };
 
     mockFetchResponse(queryResult);
-    response = await client.query("['test'] | where response == 304", options);
+    response = await axiom.query("['test'] | where response == 304", options);
     expect(response).not.toEqual('undefined');
     expect(response.matches).toHaveLength(2);
   });

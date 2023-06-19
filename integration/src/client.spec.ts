@@ -1,28 +1,28 @@
 import { gzip } from 'zlib';
 import { describe, expect, it, beforeAll, afterAll } from '@jest/globals';
-import { ClientWithoutBatching, ContentType, ContentEncoding } from '@axiomhq/js';
+import { AxiomWithoutBatching, ContentType, ContentEncoding } from '@axiomhq/js';
 
 const datasetSuffix = process.env.AXIOM_DATASET_SUFFIX || 'local';
 
-describe('Client', () => {
+describe('Axiom', () => {
   const datasetName = `test-axiom-js-client-${datasetSuffix}`;
-  const client = new ClientWithoutBatching();
+  const axiom = new AxiomWithoutBatching();
 
   beforeAll(async () => {
-    await client.datasets.create({
+    await axiom.datasets.create({
       name: datasetName,
       description: 'This is a test dataset for datasets integration tests.',
     });
   });
 
   afterAll(async () => {
-    const resp = await client.datasets.delete(datasetName);
+    const resp = await axiom.datasets.delete(datasetName);
     expect(resp.status).toEqual(204);
   });
 
   describe('ingest', () => {
     it('works with a JSON payload', async () => {
-      const status = await client.ingestRaw(
+      const status = await axiom.ingestRaw(
         datasetName,
         `[{"foo":"bar"},{"bar":"baz"}]`,
         ContentType.JSON,
@@ -34,7 +34,7 @@ describe('Client', () => {
     });
 
     it('works with a NDJSON payload', async () => {
-      const status = await client.ingestRaw(
+      const status = await axiom.ingestRaw(
         datasetName,
         `{"foo":"bar"}
 {"bar":"baz"}`,
@@ -47,7 +47,7 @@ describe('Client', () => {
     });
 
     it('works with a CSV payload', async () => {
-      const status = await client.ingestRaw(
+      const status = await axiom.ingestRaw(
         datasetName,
         `foo
 bar
@@ -68,20 +68,20 @@ baz`,
         });
       });
 
-      const status = await client.ingestRaw(datasetName, encoded, ContentType.JSON, ContentEncoding.GZIP);
+      const status = await axiom.ingestRaw(datasetName, encoded, ContentType.JSON, ContentEncoding.GZIP);
 
       expect(status.ingested).toEqual(2);
       expect(status.failures?.length).toEqual(0);
     });
 
     it('works with single event', async () => {
-      const status = await client.ingest(datasetName, { foo: 'bar' });
+      const status = await axiom.ingest(datasetName, { foo: 'bar' });
       expect(status.ingested).toEqual(1);
       expect(status.failures?.length).toEqual(0);
     });
 
     it('works with two events', async () => {
-      const status = await client.ingest(datasetName, [{ foo: 'bar' }, { bar: 'baz' }]);
+      const status = await axiom.ingest(datasetName, [{ foo: 'bar' }, { bar: 'baz' }]);
       expect(status.ingested).toEqual(2);
       expect(status.failures?.length).toEqual(0);
     });
@@ -89,7 +89,7 @@ baz`,
 
   describe('query', () => {
     it('returns a valid response', async () => {
-      const result = await client.queryLegacy(datasetName, {
+      const result = await axiom.queryLegacy(datasetName, {
         startTime: '2018-01-01T00:00:00.000Z',
         endTime: '2028-01-01T00:00:00.000Z',
         resolution: 'auto',
@@ -104,7 +104,7 @@ baz`,
 
   describe('apl query', () => {
     it('returns a valid response', async () => {
-      const result = await client.query("['" + datasetName + "']");
+      const result = await axiom.query("['" + datasetName + "']");
 
       // expect(result.status.blocksExamined).toEqual(1);
       expect(result.status.rowsExamined).toEqual(11);

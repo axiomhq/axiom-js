@@ -1,14 +1,14 @@
 import { describe, expect, it, beforeAll, afterAll } from '@jest/globals';
 import winston from 'winston';
 
-import { Client } from '@axiomhq/js';
+import { Axiom } from '@axiomhq/js';
 import { WinstonTransport as AxiomTransport } from '@axiomhq/winston';
 
 const datasetSuffix = process.env.AXIOM_DATASET_SUFFIX || 'local';
 
 describe('WinstonTransport', () => {
   const datasetName = `test-axiom-js-winston-${datasetSuffix}`;
-  const client = new Client();
+  const axiom = new Axiom();
   const logger = winston.createLogger({
     level: 'info',
     format: winston.format.json(),
@@ -17,14 +17,14 @@ describe('WinstonTransport', () => {
   });
 
   beforeAll(async () => {
-    await client.datasets.create({
+    await axiom.datasets.create({
       name: datasetName,
       description: 'This is a test dataset for datasets integration tests.',
     });
   });
 
   afterAll(async () => {
-    const resp = await client.datasets.delete(datasetName);
+    const resp = await axiom.datasets.delete(datasetName);
     expect(resp.status).toEqual(204);
   });
 
@@ -40,11 +40,11 @@ describe('WinstonTransport', () => {
     const startTime = new Date(new Date().getTime() - 1000 * 60 * 60 * 24).toISOString();
     const endTime = new Date(new Date().getTime() + 1000 * 60 * 60 * 24).toISOString();
 
-    // const res = await client.datasets.query(`['${datasetName}']`, {
+    // const res = await axiom.datasets.query(`['${datasetName}']`, {
     //     startTime, endTime, streamingDuration: 'auto', noCache: false,
     // });
 
-    const res = await client.queryLegacy(datasetName, {
+    const res = await axiom.queryLegacy(datasetName, {
       resolution: 'auto',
       startTime,
       endTime,

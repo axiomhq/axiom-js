@@ -73,7 +73,7 @@ class BaseClient extends HTTPClient {
   aplQuery = (apl: string, options?: QueryOptions): Promise<QueryResult> => this.query(apl, options);
 }
 
-export class ClientWithoutBatching extends BaseClient {
+export class AxiomWithoutBatching extends BaseClient {
   ingest(dataset: string, events: Array<object> | object, options?: IngestOptions): Promise<IngestStatus> {
     const array = Array.isArray(events) ? events : [events];
     const json = array.map((v) => JSON.stringify(v)).join('\n');
@@ -81,7 +81,7 @@ export class ClientWithoutBatching extends BaseClient {
   }
 }
 
-export class Client extends BaseClient {
+export class Axiom extends BaseClient {
   batch: { [id: string]: Batch } = {};
 
   ingest = (dataset: string, events: Array<object> | object, options?: IngestOptions) => {
