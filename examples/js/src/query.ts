@@ -1,13 +1,13 @@
 // The purpose of this example is to show how to query a dataset using the Axiom
 // Processing Language (APL).
-import { Client } from '@axiomhq/js';
+import { Axiom } from '@axiomhq/js';
 
-const client = new Client();
+const axiom = new Axiom();
 
 async function query() {
   const aplQuery = "['my-dataset']";
 
-  const res = await client.query(aplQuery);
+  const res = await axiom.query(aplQuery);
   if (!res.matches || res.matches.length === 0) {
     console.warn('no matches found');
     return;

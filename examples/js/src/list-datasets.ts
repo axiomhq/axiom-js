@@ -1,9 +1,9 @@
-import { Client } from '@axiomhq/js';
+import { Axiom } from '@axiomhq/js';
 
-const client = new Client();
+const axiom = new Axiom();
 
 async function listDatasets() {
-  const res = await client.datasets.list();
+  const res = await axiom.datasets.list();
   for (let ds of res) {
     console.log(`found dataset: ${ds.name}`);
   }
