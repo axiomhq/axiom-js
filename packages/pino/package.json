@@ -1,7 +1,7 @@
 {
   "name": "@axiomhq/pino",
   "version": "0.1.0",
-  "description": "THe offiical Axiom transport for Pino",
+  "description": "The official Axiom transport for Pino",
   "main": "dist/cjs/index.ts",
   "types": "dist/types/index.d.ts",
   "module": "dist/esm/index.js",
