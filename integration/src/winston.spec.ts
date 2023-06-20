@@ -1,4 +1,4 @@
-import { describe, expect, it, beforeAll, afterAll } from '@jest/globals';
+import { describe, expect, it, beforeAll, afterAll } from 'vitest';
 import winston from 'winston';
 
 import { Axiom } from '@axiomhq/js';

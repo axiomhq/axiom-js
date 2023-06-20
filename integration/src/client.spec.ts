@@ -1,5 +1,5 @@
 import { gzip } from 'zlib';
-import { describe, expect, it, beforeAll, afterAll } from '@jest/globals';
+import { describe, expect, it, beforeAll, afterAll } from 'vitest';
 import { AxiomWithoutBatching, ContentType, ContentEncoding } from '@axiomhq/js';
 
 const datasetSuffix = process.env.AXIOM_DATASET_SUFFIX || 'local';

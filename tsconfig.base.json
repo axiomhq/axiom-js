@@ -25,6 +25,6 @@
         "lib": ["ESNext", "DOM"]
     },
     "exclude": [".git", ".github", "node_modules", "dist", "test"],
-    "types": ["node", "jest"],
+    "types": ["node"],
     "$schema": "https://json.schemastore.org/tsconfig"
 }

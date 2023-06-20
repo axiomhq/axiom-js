@@ -8,7 +8,7 @@
         "dev": "next dev",
         "format": "eslint 'src/**/*.{js,ts}' --quiet --fix",
         "lint": "eslint 'src/**/*.{js,ts}'",
-        "e2e": "jest test"
+        "e2e": "vitest run test/*"
     },
     "dependencies": {
         "@axiomhq/js": "workspace:*",

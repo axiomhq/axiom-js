@@ -1,7 +1,7 @@
 /*
  * @jest-environment jsdom
  */
-import { describe, expect, it } from '@jest/globals';
+import { describe, expect, it } from 'vitest';
 
 import { Axiom } from '../../src/client';
 import { mockFetchResponse } from '../lib/mock';

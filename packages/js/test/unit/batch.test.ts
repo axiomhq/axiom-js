@@ -1,4 +1,4 @@
-import { describe, expect, it, jest } from '@jest/globals'
+import { describe, expect, it, vi } from 'vitest'
 import { Batch, IngestFunction } from '../../src/batch';
 
 async function sleep(ms: number) {
@@ -7,23 +7,23 @@ async function sleep(ms: number) {
 
 describe('Batch', () => {
     it('sends events after 1s', async () => {
-        jest.useFakeTimers();
-        const sendFn = jest.fn() as IngestFunction;
+        vi.useFakeTimers();
+        const sendFn = vi.fn() as IngestFunction;
 
         const batch = new Batch(sendFn, 'my-dataset', { timestampField: 'foo' });
         batch.ingest({ foo: 'bar' });
         batch.ingest({ foo: 'baz' });
 
         expect(sendFn).not.toHaveBeenCalled();
-        jest.runAllTimers();
-        jest.useRealTimers();
+        vi.runAllTimers();
+        vi.useRealTimers();
         await sleep(100); // async code yay
 
         expect(sendFn).toHaveBeenCalledTimes(1);
     });
 
     it('sends events after 1k events', async () => {
-        const sendFn = jest.fn() as IngestFunction;;
+        const sendFn = vi.fn() as IngestFunction;;
 
         const batch = new Batch(sendFn, 'my-dataset', { timestampField: 'foo' });
 
@@ -36,23 +36,23 @@ describe('Batch', () => {
     });
 
     it('sends events after 1s when ingesting one event every 100ms', async () => {
-        jest.useFakeTimers();
-        const sendFn = jest.fn() as IngestFunction;;
+        vi.useFakeTimers();
+        const sendFn = vi.fn() as IngestFunction;;
 
         const batch = new Batch(sendFn, 'my-dataset', { timestampField: 'foo' });
 
         for (let i = 0; i < 10; i++) {
             batch.ingest({ foo: 'bar' });
-            jest.advanceTimersByTime(120);
+            vi.advanceTimersByTime(120);
         }
 
-        jest.useRealTimers();
+        vi.useRealTimers();
         await sleep(100); // just make sure we have enough time
         expect(sendFn).toHaveBeenCalledTimes(1);
     });
 
     it('sends events on flush', async () => {
-        const sendFn = jest.fn() as IngestFunction;;
+        const sendFn = vi.fn() as IngestFunction;;
 
         const batch = new Batch(sendFn, 'my-dataset', { timestampField: 'foo' });
 

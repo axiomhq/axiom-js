@@ -13,7 +13,7 @@
     "build:esm": "tsc --project tsconfig.esm.json",
     "format": "eslint 'src/**/*.{js,ts}' --quiet --fix",
     "lint": "eslint 'src/**/*.{js,ts}'",
-    "test": "jest test/unit",
+    "test": "vitest run test/unit/*",
     "prepublish": "npm run build && npm run build:esm",
     "cover": "nyc -r text -e .ts -x 'tests/unit/**/*.spec.ts' npm run test"
   },

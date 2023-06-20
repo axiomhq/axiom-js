@@ -1,4 +1,4 @@
-import { jest } from '@jest/globals';
+import { vi } from 'vitest';
 
 export const mockFetchResponse = (body: any, statusCode: number = 200, headers = {}) => {
   const resp = new Response(JSON.stringify(body), { status: statusCode, headers });
@@ -6,7 +6,7 @@ export const mockFetchResponse = (body: any, statusCode: number = 200, headers =
     return Promise.resolve(resp);
   };
 
-  jest.spyOn(global, 'fetch').mockImplementationOnce(func);
+  vi.spyOn(global, 'fetch').mockImplementationOnce(func);
 };
 
 export const testMockedFetchCall = (test: any, body: any, statusCode: number = 200, headers = {}) => {
@@ -15,11 +15,11 @@ export const testMockedFetchCall = (test: any, body: any, statusCode: number = 2
     return Promise.resolve(new Response(JSON.stringify(body), { status: statusCode, headers }));
   };
 
-  jest.spyOn(global, 'fetch').mockImplementationOnce(func);
+  vi.spyOn(global, 'fetch').mockImplementationOnce(func);
 };
 
 export const mockNoContentResponse = () => {
-  jest.spyOn(global, 'fetch').mockImplementationOnce(() => {
+  vi.spyOn(global, 'fetch').mockImplementationOnce(() => {
     return Promise.resolve(new Response(null, { status: 204, statusText: 'No Content' }));
   });
 };

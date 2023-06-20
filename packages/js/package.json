@@ -21,7 +21,7 @@
         "format": "eslint '*/**/*.{js,ts}' --quiet --fix",
         "lint": "eslint '*/**/*.{js,ts}'",
         "prepublish": "npm run build && npm run build:esm",
-        "test": "jest test/unit",
+        "test": "vitest run test/unit/*",
         "cover": "nyc -r text -e .ts -x 'tests/unit/**/*.test.ts' npm run test"
     },
     "repository": {

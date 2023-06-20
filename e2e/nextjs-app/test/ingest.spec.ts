@@ -1,5 +1,5 @@
 import { Axiom } from '@axiomhq/js';
-import { describe, it, expect, beforeAll, afterAll } from '@jest/globals';
+import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 
 describe('Ingestion & query on different runtime', () => {
   const axiom = new Axiom();

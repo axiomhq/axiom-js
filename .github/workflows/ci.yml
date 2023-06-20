@@ -112,7 +112,7 @@ jobs:
           node-version: ${{ matrix.node }}
           cache: 'pnpm'
       - run: pnpm install --frozen-lockfile
-      - run: pnpm build && pnpm build:esm # cjs build needed to run jest tests
+      - run: pnpm build && pnpm build:esm # cjs build needed to run tests
       - env:
           TESTING_TARGET_URL: ${{ needs.deploy-e2e-apps.outputs.preview-url }}
         run: pnpm run e2e
