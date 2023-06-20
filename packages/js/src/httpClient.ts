@@ -3,9 +3,44 @@ import { FetchClient } from './fetchClient';
 const Version = 'AXIOM_VERSION';
 const AxiomURL = 'https://api.axiom.co';
 
+/**
+ * ClientOptions is used to configure the HTTPClient and provide the necessary
+ * authentication information.
+ * 
+ * @remarks
+ *
+ * If no options are passed to the client, The options will fallback into read its values from environment variables: 
+ * AXIOM_TOKEN and AXIOM_ORG_ID for token and orgId respectively.
+ * 
+ * @example
+ * ```
+ * const axiom = new Axiom({
+ *     token: "my-token",
+ *     orgId: "my-org-id",
+ * })
+ * ```
+ */
 export interface ClientOptions {
+  /**
+   * an API or personal token to use for authentication, you can get one
+   * from @{link: Axiom settings | https://app.axiom.co/profile}.
+   * 
+   * @defaultValue reads from the AXIOM_TOKEN environment variable
+   */
   token?: string;
+  /**
+   * the URL of the Axiom API, defaults to https://api.axiom.co. You should not
+   * need to change this unless you are using a self-hosted version of Axiom.
+   * 
+   * @defaultValue reads from the AXIOM_URL environment variable
+   */
   url?: string;
+  /**
+   * the ID of the organization to use, you can get this from Axiom settings page of your
+   * organization. This is only needed if you are using a personal token.
+   * 
+   * @defaultValue reads from the AXIOM_ORG_ID environment variable
+   */
   orgId?: string;
 }
 
