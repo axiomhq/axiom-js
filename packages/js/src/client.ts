@@ -124,16 +124,15 @@ class BaseClient extends HTTPClient {
 }
 
 /**
- * Axiom's client that works without batching events,
- * sends them immediately to the server.
+ * Axiom's client without batching events in the background.
  * 
- * @param options - The options passed to the client
+ * 
+ * @param options - The {@link ClientOptions} to configure authentication
  * 
  */
 export class AxiomWithoutBatching extends BaseClient {
   /**
-   * Ingest events
-   * sends them immediately to the server.
+   * Ingest event(s) asynchronously
    * 
    * @param dataset - name of the dataset to ingest events into
    * @param events - list of events to be ingested, could be a single object as well
@@ -145,6 +144,7 @@ export class AxiomWithoutBatching extends BaseClient {
    * import { AxiomWithoutBatching } from '@axiomhq/js';
    * 
    * const axiom = new AxiomWithoutBatching();
+   * await axiom.ingest('dataset-name', [{ foo: 'bar' }])
    * ```
    * 
    */
