@@ -1,6 +1,10 @@
 import build from 'pino-abstract-transport';
 import { Axiom, ClientOptions } from '@axiomhq/js';
 
+// The browsers don't have process.env, fake it
+const process: { env: Record<string, string | undefined> } =
+  typeof window === 'undefined' ? global.process : { env: {} };
+
 export enum AxiomEventLevel {
   Trace = 'trace',
   Debug = 'debug',
