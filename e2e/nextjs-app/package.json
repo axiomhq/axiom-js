@@ -18,10 +18,10 @@
         "react-dom": "18.2.0",
         "winston-transport": "^4.5.0",
         "eslint": "8.41.0",
-        "eslint-config-next": "13.4.3"
+        "eslint-config-next": "13.4.7"
     },
     "devDependencies": {
         "@types/react": "^18.0.25",
-        "eslint-config-next": "13.0.5"
+        "eslint-config-next": "13.4.7"
     }
 }
