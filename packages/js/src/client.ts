@@ -14,6 +14,24 @@ class BaseClient extends HTTPClient {
     this.users = new users.Service(options);
   }
 
+  /**
+   * Ingest events into the provided dataset using raw data types, e.g: string, buffer or a stream.
+   * 
+   * @param dataset - name of the dataset to ingest events into
+   * @param data - data to be ingested
+   * @param contentType - optional content type, defaults to JSON
+   * @param contentEncoding - optional content encoding, defaults to Identity
+   * @param options - optional ingest options
+   * @returns result a promise of ingest and its status, check: {@link IngestStatus}
+   * 
+   * @example
+   * ```
+   * import { AxiomWithoutBatching } from '@axiomhq/js';
+   * 
+   * const axiom = new AxiomWithoutBatching();
+   * ```
+   * 
+   */
   ingestRaw = (
     dataset: string,
     data: string | Buffer | ReadableStream,
@@ -49,6 +67,19 @@ class BaseClient extends HTTPClient {
       },
     );
 
+  /**
+   * Executes APL query using the provided APL and returns the result
+   * 
+   * @param apl - the apl query
+   * @param options - optional query options
+   * @returns result of the query, check: {@link QueryResult}
+   * 
+   * @example
+   * ```
+   * await axiom.query("['dataset'] | count");
+   * ```
+   * 
+   */
   query = (apl: string, options?: QueryOptions): Promise<QueryResult> => {
     const req: Query = { apl: apl };
     if (options?.startTime) {
@@ -70,10 +101,48 @@ class BaseClient extends HTTPClient {
     );
   };
 
+  /**
+   * Executes APL query using the provided APL and returns the result.
+   * This is just an alias for the `query()` method, please use that instead.
+   * 
+   * @param apl - the apl query
+   * @param options - optional query options
+   * @returns Promise<QueryResult>
+   * 
+   * @example
+   * ```
+   * await axiom.aplQuery("['dataset'] | count");
+   * ```
+   */
   aplQuery = (apl: string, options?: QueryOptions): Promise<QueryResult> => this.query(apl, options);
 }
 
+/**
+ * Axiom's client without batching events in the background.
+ * In most cases you'll want to use the {@link Axiom} client instead.
+ * 
+ * 
+ * @param options - The {@link ClientOptions} to configure authentication
+ * 
+ */
 export class AxiomWithoutBatching extends BaseClient {
+  /**
+   * Ingest event(s) asynchronously
+   * 
+   * @param dataset - name of the dataset to ingest events into
+   * @param events - list of events to be ingested, could be a single object as well
+   * @param options - optional ingest options
+   * @returns the result of the ingest, check: {@link IngestStatus}
+   * 
+   * @example
+   * ```
+   * import { AxiomWithoutBatching } from '@axiomhq/js';
+   * 
+   * const axiom = new AxiomWithoutBatching();
+   * await axiom.ingest('dataset-name', [{ foo: 'bar' }])
+   * ```
+   * 
+   */
   ingest(dataset: string, events: Array<object> | object, options?: IngestOptions): Promise<IngestStatus> {
     const array = Array.isArray(events) ? events : [events];
     const json = array.map((v) => JSON.stringify(v)).join('\n');
@@ -81,9 +150,29 @@ export class AxiomWithoutBatching extends BaseClient {
   }
 }
 
+/**
+ * Axiom's default client that queues events in the background,
+ * sends them asynchronously to the server every 1s or every 1000 events.
+ * 
+ * @param options - The options passed to the client
+ * 
+ */
 export class Axiom extends BaseClient {
   batch: { [id: string]: Batch } = {};
 
+  /**
+   * Ingest events asynchronously
+   * 
+   * @remarks
+   * Events passed to ingest method will be queued in a batch and sent
+   * in the background every second or every 1000 events. 
+   * 
+   * @param dataset - name of the dataset to ingest events into
+   * @param events - list of events to be ingested, could be a single object as well
+   * @param options - optional ingest options
+   * @returns void, as the events are sent in the background
+   * 
+   */
   ingest = (dataset: string, events: Array<object> | object, options?: IngestOptions) => {
     const key = createBatchKey(dataset, options);
     if (!this.batch[key]) {
@@ -100,6 +189,13 @@ export class Axiom extends BaseClient {
     return this.batch[key].ingest(events);
   };
 
+  /**
+   * Flushes all the events that have been queued in the background
+   * 
+   * @remarks
+   * calling `await flush()` will wait for all the events to be sent to the server
+   * and is necessary to ensure data delivery.
+   */
   flush = async (): Promise<void> => {
     let promises: Array<Promise<IngestStatus | void>> = [];
     for (const key in this.batch) {
@@ -120,18 +216,53 @@ export enum ContentEncoding {
   GZIP = 'gzip',
 }
 
+/**
+ * Ingest options
+ * 
+ */
 export interface IngestOptions {
+  /**
+   * name of the field that contains the timestamp
+   */
   timestampField?: string;
+  /**
+   * format of the timestamp
+   */
   timestampFormat?: string;
+  /**
+   * delimiter used in the csv file
+   */
   csvDelimiter?: string;
 }
 
+/**
+ * Query result
+ * 
+ */
 export interface IngestStatus {
+  /**
+   * number of ingested events
+   */
   ingested: number;
+  /**
+   * number of failed events
+   */
   failed: number;
+  /**
+   * list of failed events
+   */
   failures?: Array<IngestFailure>;
+  /**
+   * number of processed bytes
+   */
   processedBytes: number;
+  /**
+   * number of blocks created
+   */
   blocksCreated: number;
+  /**
+   * length of the write ahead log
+   */
   walLength: number;
 }
 
