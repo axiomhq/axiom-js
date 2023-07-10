@@ -1,7 +1,7 @@
 {
     "name": "@axiomhq/js",
     "description": "The official javascript bindings for the Axiom API",
-    "version": "0.1.1",
+    "version": "0.1.2",
     "author": "Axiom, Inc.",
     "license": "MIT",
     "contributors": [
@@ -50,6 +50,7 @@
     "exports": {
         "import": "./dist/esm/index.js",
         "require": "./dist/cjs/index.js",
-        "default": "./dist/cjs/index.js"
+        "default": "./dist/cjs/index.js",
+        "types": "./dist/types/index.d.ts"
     }
 }

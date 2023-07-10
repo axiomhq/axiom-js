@@ -1,7 +1,7 @@
 {
     "name": "@axiomhq/winston",
     "description": "The official Axiom transport for winston logger",
-    "version": "0.1.1",
+    "version": "0.1.2",
     "main": "dist/cjs/index.js",
     "types": "dist/types/index.d.ts",
     "module": "dist/esm/index.js",
@@ -40,6 +40,7 @@
     "exports": {
         "import": "./dist/esm/index.js",
         "require": "./dist/cjs/index.js",
-        "default": "./dist/cjs/index.js"
+        "default": "./dist/cjs/index.js",
+        "types": "./dist/types/index.d.ts"
     }
 }
