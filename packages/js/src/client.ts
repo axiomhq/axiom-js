@@ -125,6 +125,7 @@ class BaseClient extends HTTPClient {
 
 /**
  * Axiom's client without batching events in the background.
+ * In most cases you'll want to use the {@link Axiom} client instead.
  * 
  * 
  * @param options - The {@link ClientOptions} to configure authentication
