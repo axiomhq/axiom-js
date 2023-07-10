@@ -171,7 +171,7 @@ export class Axiom extends BaseClient {
    * 
    * @remarks
    * Events passed to ingest method will be queued in a batch and sent
-   * in the background. 
+   * in the background every second or every 1000 events. 
    * 
    * @param dataset - name of the dataset to ingest events into
    * @param events - list of events to be ingested, could be a single object as well
