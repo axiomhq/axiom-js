@@ -3,12 +3,6 @@ import { users } from './users';
 import { Batch, createBatchKey } from './batch';
 import HTTPClient, { ClientOptions } from './httpClient';
 
-/**
- * Axiom's BaseClient that works as a wrapper around the HTTPClient
- * 
- * @param options - The options passed to the client, check: {@link ClientOptions}
- * 
- */
 class BaseClient extends HTTPClient {
   datasets: datasets.Service;
   users: users.Service;
