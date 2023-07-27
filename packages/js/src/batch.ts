@@ -1,6 +1,10 @@
 import { IngestOptions, IngestStatus } from './client';
 
-export type IngestFunction = (id: string, events: Array<object> | object, options?: IngestOptions) => Promise<IngestStatus>;
+export type IngestFunction = (
+  id: string,
+  events: Array<object> | object,
+  options?: IngestOptions,
+) => Promise<IngestStatus>;
 
 export function createBatchKey(id: string, options?: IngestOptions): string {
   return `${id}:${options?.timestampField || '-'}:${options?.timestampFormat || '-'}:${options?.csvDelimiter || '-'}`;
@@ -52,7 +56,7 @@ export class Batch {
       return;
     }
 
-    const res = await this.ingestFn(this.id, this.events, this.options);
+    const res = await this.ingestFn(this.id, [...this.events], this.options);
     this.events = [];
     this.lastFlush = new Date();
     return res;
