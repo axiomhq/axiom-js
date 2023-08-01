@@ -4,7 +4,6 @@
     "version": "0.1.2",
     "main": "dist/cjs/index.js",
     "types": "dist/types/index.d.ts",
-    "module": "dist/esm/index.js",
     "author": "Axiom, Inc.",
     "license": "MIT",
     "homepage": "https://github.com/axiomhq/axiom-js/blob/main/packages/winston/README.md",
@@ -38,9 +37,9 @@
         "url": "https://github.com/axiomhq/axiom-js/issues"
     },
     "exports": {
-        "import": "./dist/esm/index.js",
-        "require": "./dist/cjs/index.js",
+        "types": "./dist/types/index.d.ts",
         "default": "./dist/cjs/index.js",
-        "types": "./dist/types/index.d.ts"
+        "import": "./dist/esm/index.js",
+        "require": "./dist/cjs/index.js"
     }
 }
