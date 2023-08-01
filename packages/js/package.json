@@ -48,9 +48,9 @@
         "uuid": "^8.3.2"
     },
     "exports": {
+        "types": "./dist/types/index.d.ts",
         "import": "./dist/esm/index.js",
         "require": "./dist/cjs/index.js",
-        "default": "./dist/cjs/index.js",
-        "types": "./dist/types/index.d.ts"
+        "default": "./dist/cjs/index.js"
     }
 }

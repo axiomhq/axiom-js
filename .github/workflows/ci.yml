@@ -39,6 +39,27 @@ jobs:
       - run: pnpm build && pnpm build:esm
       - run: pnpm lint
       - run: pnpm test
+  
+  check-winston-example:
+    name: Check Winston example
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node:
+          - 18.x
+          - 19.x
+    steps:
+      - uses: actions/checkout@v3
+      - uses: pnpm/action-setup@v2
+        with:
+          version: ${{ env.PNPM_VERSION }}
+      - uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node }}
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build && pnpm build:esm
+      - run: cd examples/winston && pnpm example
 
   test-integration:
     name: Test (Integration)
