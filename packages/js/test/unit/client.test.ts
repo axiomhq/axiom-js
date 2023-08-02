@@ -1,6 +1,6 @@
 import { describe, expect, it, beforeEach } from '@jest/globals';
 
-import { ContentType, ContentEncoding, AxiomWithoutBatching } from '../../src/client';
+import { ContentType, ContentEncoding, AxiomWithoutBatching, IngestOptions } from '../../src/client';
 import { AxiomTooManyRequestsError } from '../../src/fetchClient';
 import { headerAPILimit, headerAPIRateRemaining, headerAPIRateReset, headerRateScope } from '../../src/limit';
 import { mockFetchResponse, testMockedFetchCall } from '../lib/mock';
@@ -193,5 +193,18 @@ describe('Axiom', () => {
     response = await axiom.query("['test'] | where response == 304", options);
     expect(response).not.toEqual('undefined');
     expect(response.matches).toHaveLength(2);
+  });
+  it('should successfully handle circular JSON during ingestion with correct option', async () => {
+    const obj: any = { prop1: 'Test', prop2: null };
+    obj.prop2 = obj;
+
+    expect(() => {
+      axiom.ingest('test', [obj]);
+    }).toThrow(TypeError);
+
+    const options: IngestOptions = { flattenData: true };
+    expect(() => {
+      axiom.ingest('test', [obj], options);
+    }).not.toThrow(TypeError);
   });
 });
