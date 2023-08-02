@@ -194,17 +194,17 @@ describe('Axiom', () => {
     expect(response).not.toEqual('undefined');
     expect(response.matches).toHaveLength(2);
   });
-  it('should successfully handle circular JSON during ingestion with correct option', async () => {
-    const obj: any = { prop1: 'Test', prop2: null };
-    obj.prop2 = obj;
+  it('should successfully handle circular JSON during ingestion with correct options', async () => {
+    const circularReferenceObject: any = { foo: 'bar', circularAttribute: null };
+    circularReferenceObject.circularAttribute = circularReferenceObject;
 
     expect(() => {
-      axiom.ingest('test', [obj]);
+      axiom.ingest('test', [circularReferenceObject]);
     }).toThrow(TypeError);
 
     const options: IngestOptions = { flattenData: true };
     expect(() => {
-      axiom.ingest('test', [obj], options);
+      axiom.ingest('test', [circularReferenceObject], options);
     }).not.toThrow(TypeError);
   });
 });
