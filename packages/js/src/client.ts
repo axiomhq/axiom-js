@@ -233,6 +233,10 @@ export interface IngestOptions {
    * delimiter used in the csv file
    */
   csvDelimiter?: string;
+  /**
+   * flatten json, preventing circular dependencies
+   */
+  flattenData?: boolean;
 }
 
 /**
