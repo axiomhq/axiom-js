@@ -1,4 +1,4 @@
-lockfileVersion: '6.1'
+lockfileVersion: '6.0'
 
 settings:
   autoInstallPeers: true
@@ -144,6 +144,9 @@ importers:
       fetch-retry:
         specifier: ^5.0.3
         version: 5.0.6
+      flatted:
+        specifier: ^3.2.7
+        version: 3.2.7
       uuid:
         specifier: ^8.3.2
         version: 8.3.2
