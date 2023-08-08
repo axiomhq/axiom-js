@@ -38,8 +38,8 @@
     },
     "exports": {
         "types": "./dist/types/index.d.ts",
-        "default": "./dist/cjs/index.js",
         "import": "./dist/esm/index.js",
-        "require": "./dist/cjs/index.js"
+        "require": "./dist/cjs/index.js",
+        "default": "./dist/cjs/index.js"
     }
 }
