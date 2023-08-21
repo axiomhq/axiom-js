@@ -1,6 +1,8 @@
 import { Axiom } from '@axiomhq/js';
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 
+jest.useRealTimers()
+
 describe('Ingestion & query on different runtime', () => {
   const axiom = new Axiom();
 
@@ -25,6 +27,8 @@ describe('Ingestion & query on different runtime', () => {
     // call route that ingests logs
     const resp = await fetch(process.env.TESTING_TARGET_URL + '/api/lambda');
     expect(resp.status).toEqual(200);
+    const payload = await resp.json();
+    expect(payload.ingested).toEqual(2);
 
     // check dataset for ingested logs
     const qResp = await axiom.query(`['${datasetName}'] | where ['test'] == "ingest_on_lambda"`, {
@@ -41,6 +45,10 @@ describe('Ingestion & query on different runtime', () => {
     // call route that ingests logs
     const resp = await fetch(process.env.TESTING_TARGET_URL + '/api/edge');
     expect(resp.status).toEqual(200);
+    const payload = await resp.json();
+    expect(payload.ingested).toEqual(2);
+
+    await new Promise(resolve => setTimeout(resolve, 1000)); // wait 1 sec
 
     // check dataset for ingested logs
     const qResp = await axiom.query(`['${datasetName}'] | where ['test'] == "ingest_on_edge"`, {

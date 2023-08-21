@@ -13,15 +13,15 @@
     "dependencies": {
         "@axiomhq/js": "workspace:*",
         "@axiomhq/winston": "workspace:*",
-        "next": "^13.4.3",
+        "next": "^13.4.9",
         "react": "18.2.0",
         "react-dom": "18.2.0",
         "winston-transport": "^4.5.0",
-        "eslint": "8.41.0",
-        "eslint-config-next": "13.4.3"
+        "eslint": "8.46.0",
+        "eslint-config-next": "13.4.12"
     },
     "devDependencies": {
-        "@types/react": "^18.0.25",
-        "eslint-config-next": "13.0.5"
+        "@types/react": "^18.2.17",
+        "eslint-config-next": "13.4.12"
     }
 }

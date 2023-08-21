@@ -27,7 +27,7 @@ You can then ingest data like this:
 
 ```ts
 axiom.ingest('my-dataset', [{ foo: 'bar' }]);
-await client.flush();
+await axiom.flush();
 ```
 
 > **Note** that the client is automatically batching events in the background, in most cases you'll only want to call `flush()` before your application exits.
