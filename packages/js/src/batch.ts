@@ -1,4 +1,4 @@
-import { IngestOptions, IngestStatus } from './client';
+import { IngestOptions, IngestStatus } from './client.js';
 
 export type IngestFunction = (
   id: string,

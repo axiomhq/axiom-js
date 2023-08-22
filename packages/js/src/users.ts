@@ -1,4 +1,4 @@
-import HTTPClient from './httpClient';
+import HTTPClient from './httpClient.js';
 
 export namespace users {
   export interface User {

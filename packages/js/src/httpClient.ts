@@ -1,4 +1,4 @@
-import { FetchClient } from './fetchClient';
+import { FetchClient } from './fetchClient.js';
 
 const Version = 'AXIOM_VERSION';
 const AxiomURL = 'https://api.axiom.co';
