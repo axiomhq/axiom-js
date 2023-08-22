@@ -4,12 +4,13 @@ export default [
   {
     input: 'src/index.ts',
     output: {
-      dir: 'dist/esm',
-      format: 'esm',
+      dir: 'dist/cjs',
+      format: 'cjs',
       exports: 'named',
       sourcemap: true,
       preserveModules: true,
+      entryFileNames: '[name].cjs',
     },
-    plugins: [typescript({ outDir: 'dist/esm', declarationDir: 'dist/esm/types' })],
+    plugins: [typescript({ outDir: 'dist/cjs', declarationDir: 'dist/cjs/types' })],
   },
 ];

@@ -1,14 +1,16 @@
 {
-  "extends": "../../tsconfig.base.json",
-  "compilerOptions": {
-    "target": "ESNext",
-    "module": "ES6",
-    "moduleResolution": "node",
-    "baseUrl": ".",
-    "rootDir": "./src",
-    "outDir": "dist",
-    "declarationDir": "dist/types",
-    "emitDeclarationOnly": true
-  },
-  "include": ["src/**/*"]
-}
+    "extends": "../../tsconfig.base.json",
+    "compilerOptions": {
+      "target": "ESNext",
+      "module": "ESNext",
+      "moduleResolution": "node",
+      "baseUrl": ".",
+      "rootDir": "./src",
+      "outDir": "dist/esm",
+      "declarationDir": "dist/esm/types",
+      "declarationMap": true,
+      "emitDeclarationOnly": true
+    },
+    "include": ["src/**/*"]
+  }
+  
