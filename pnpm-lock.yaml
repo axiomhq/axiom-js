@@ -154,9 +154,6 @@ importers:
 
   packages/js:
     dependencies:
-      cross-fetch:
-        specifier: ^3.1.5
-        version: 3.1.6
       fetch-retry:
         specifier: ^5.0.3
         version: 5.0.6
@@ -1420,14 +1417,6 @@ packages:
   /create-require@1.1.1:
     resolution: {integrity: sha512-dcKFX3jn0MpIaXjisoRvexIJVEKzaq7z2rZKxf+MSr9TkdmHmsU4m2lcLojrj/FHl8mk5VxMmYA+ftRkP/3oKQ==}
     dev: true
-
-  /cross-fetch@3.1.6:
-    resolution: {integrity: sha512-riRvo06crlE8HiqOwIpQhxwdOk4fOeR7FVM/wXoxchFEqMNUjvbs3bfo4OTgMEMHzppd4DxFBDbyySj8Cv781g==}
-    dependencies:
-      node-fetch: 2.6.11
-    transitivePeerDependencies:
-      - encoding
-    dev: false
 
   /cross-spawn@7.0.3:
     resolution: {integrity: sha512-iRDPJKUPVEND7dHPO8rkbOnPpyDygcDFtWjpeWNCgy8WP2rXcxXL8TskReQl6OrB2G7+UJrags1q15Fudc7G6w==}
@@ -2890,18 +2879,6 @@ packages:
       - babel-plugin-macros
     dev: false
 
-  /node-fetch@2.6.11:
-    resolution: {integrity: sha512-4I6pdBY1EthSqDmJkiNk3JIT8cswwR9nfeW/cPdUagJYEQG7R95WRH74wpz7ma8Gh/9dI9FP+OU+0E4FvtA55w==}
-    engines: {node: 4.x || >=6.0.0}
-    peerDependencies:
-      encoding: ^0.1.0
-    peerDependenciesMeta:
-      encoding:
-        optional: true
-    dependencies:
-      whatwg-url: 5.0.0
-    dev: false
-
   /npm-run-path@4.0.1:
     resolution: {integrity: sha512-S48WzZW777zhNIrn7gxOlISNAqi9ZC/uQFnRdbeIHhZhCA6UqpkOT8T1G7BvfdgP4Er8gF4sUbaS0i7QvIfCWw==}
     engines: {node: '>=8'}
@@ -3634,10 +3611,6 @@ packages:
       url-parse: 1.5.10
     dev: true
 
-  /tr46@0.0.3:
-    resolution: {integrity: sha512-N3WMsuqV66lT30CrXNbEjx4GEwlow3v6rr4mCcv6prnfwhS01rkgyFdjPNBYd9br7LpXV1+Emh01fHnq2Gdgrw==}
-    dev: false
-
   /tr46@4.1.1:
     resolution: {integrity: sha512-2lv/66T7e5yNyhAAC4NaKe5nVavzuGJQVVtRYLyQ2OI8tsJ61PMLlelehb0wi2Hx6+hT/OJUWZcw8MjlSRnxvw==}
     engines: {node: '>=14'}
@@ -3994,10 +3967,6 @@ packages:
       graceful-fs: 4.2.11
     dev: false
 
-  /webidl-conversions@3.0.1:
-    resolution: {integrity: sha512-2JAn3z8AR6rjK8Sm8orRC0h/bcl/DqL7tRPdGZ4I1CjdF+EaMLmYxBHyXuKL849eucPFhvBoxMsflfOb8kxaeQ==}
-    dev: false
-
   /webidl-conversions@7.0.0:
     resolution: {integrity: sha512-VwddBukDzu71offAQR975unBIGqfKZpM+8ZX6ySk8nYhVoo5CYaZyzt3YBvYtRtO+aoGlqxPg/B87NGVZ/fu6g==}
     engines: {node: '>=12'}
@@ -4027,13 +3996,6 @@ packages:
       tr46: 4.1.1
       webidl-conversions: 7.0.0
     dev: true
-
-  /whatwg-url@5.0.0:
-    resolution: {integrity: sha512-saE57nupxk6v3HY35+jzBwYa0rKSy0XR8JSxZPwgLr7ys0IBzhGviA1/TUGJLmSVqs8pb9AnvICXEuOHLprYTw==}
-    dependencies:
-      tr46: 0.0.3
-      webidl-conversions: 3.0.1
-    dev: false
 
   /which-boxed-primitive@1.0.2:
     resolution: {integrity: sha512-bwZdv0AKLpplFY2KZRX6TvyuN7ojjr7lwkg6ml0roIy9YeuSr7JS372qlNW18UQYzgYK9ziGcerWqZOmEn9VNg==}
