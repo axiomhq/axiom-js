@@ -2,18 +2,18 @@
     "name": "@axiomhq/winston",
     "description": "The official Axiom transport for winston logger",
     "version": "0.1.3",
-    "main": "dist/cjs/index.js",
+    "type": "module",
     "types": "dist/types/index.d.ts",
+    "module": "dist/index.js",
     "author": "Axiom, Inc.",
     "license": "MIT",
     "homepage": "https://github.com/axiomhq/axiom-js/blob/main/packages/winston/README.md",
     "scripts": {
-        "build": "tsc -b",
-        "build:esm": "tsc --project tsconfig.esm.json",
+        "build": "rollup -c rollup.config.js",
         "format": "eslint 'src/**/*.{js,ts}' --quiet --fix",
         "lint": "eslint 'src/**/*.{js,ts}'",
         "test": "jest test/unit",
-        "prepublish": "npm run build && npm run build:esm",
+        "prepublish": "npm run build",
         "cover": "nyc -r text -e .ts -x 'tests/unit/**/*.spec.ts' npm run test"
     },
     "dependencies": {
@@ -38,8 +38,7 @@
     },
     "exports": {
         "types": "./dist/types/index.d.ts",
-        "default": "./dist/cjs/index.js",
-        "import": "./dist/esm/index.js",
-        "require": "./dist/cjs/index.js"
+        "import": "./dist/index.js",
+        "default": "./dist/index.js"
     }
 }

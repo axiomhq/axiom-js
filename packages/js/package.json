@@ -12,15 +12,14 @@
     "engines": {
         "node": ">=16"
     },
-    "main": "dist/cjs/index.js",
+    "type": "module",
     "types": "dist/types/index.d.ts",
-    "module": "dist/esm/index.js",
+    "module": "dist/index.js",
     "scripts": {
-        "build": "tsc -b",
-        "build:esm": "tsc --project tsconfig.esm.json",
+        "build": "rollup -c rollup.config.js",
         "format": "eslint '*/**/*.{js,ts}' --quiet --fix",
         "lint": "eslint '*/**/*.{js,ts}'",
-        "prepublish": "npm run build && npm run build:esm",
+        "prepublish": "npm run build",
         "test": "jest test/unit",
         "cover": "nyc -r text -e .ts -x 'tests/unit/**/*.test.ts' npm run test"
     },
@@ -49,8 +48,7 @@
     },
     "exports": {
         "types": "./dist/types/index.d.ts",
-        "import": "./dist/esm/index.js",
-        "require": "./dist/cjs/index.js",
-        "default": "./dist/cjs/index.js"
+        "import": "./dist/index.js",
+        "default": "./dist/index.js"
     }
 }

@@ -44,9 +44,10 @@ export interface ClientOptions {
   orgId?: string;
 }
 
+// FIXME: this breaks on edge functions
 // The browsers don't have process.env, fake it
-const process: { env: Record<string, string | undefined> } =
-  typeof window === 'undefined' ? global.process : { env: {} };
+// const process: { env: Record<string, string | undefined> } =
+//   typeof window === 'undefined' ? global?.process : { env: {} };
 
 export default abstract class HTTPClient {
   protected readonly client: FetchClient;
