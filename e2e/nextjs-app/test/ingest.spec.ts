@@ -1,5 +1,5 @@
 import { Axiom } from '@axiomhq/js';
-import { describe, it, expect, beforeAll, afterAll, jest } from '@jest/globals';
+import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 
 jest.useRealTimers()
 

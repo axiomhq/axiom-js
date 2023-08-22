@@ -1,4 +1,4 @@
-import { describe, expect, it } from '@jest/globals';
+import { describe, expect, it } from 'vitest';
 import { datasets } from '../../src/datasets';
 import { mockFetchResponse, mockNoContentResponse } from '../lib/mock';
 

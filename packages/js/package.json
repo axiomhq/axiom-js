@@ -21,9 +21,8 @@
         "build:cjs": "rollup -c rollup.config.cjs.js",
         "format": "eslint '*/**/*.{js,ts}' --quiet --fix",
         "lint": "eslint '*/**/*.{js,ts}'",
-        "prepublish": "npm run build",
-        "test": "jest test/unit",
-        "cover": "nyc -r text -e .ts -x 'tests/unit/**/*.test.ts' npm run test"
+        "prepublish": "pnpm run build && pnpm run build:esm",
+        "test": "vitest run test/unit/* --coverage"
     },
     "repository": {
         "type": "git",

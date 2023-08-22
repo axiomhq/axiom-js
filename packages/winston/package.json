@@ -14,13 +14,15 @@
         "build:cjs": "rollup -c rollup.config.cjs.js",
         "format": "eslint 'src/**/*.{js,ts}' --quiet --fix",
         "lint": "eslint 'src/**/*.{js,ts}'",
-        "test": "jest test/unit",
-        "prepublish": "npm run build",
-        "cover": "nyc -r text -e .ts -x 'tests/unit/**/*.spec.ts' npm run test"
+        "test": "vitest run test/unit/*  --coverage",
+        "prepublish": "npm run build && npm run build:esm"
     },
     "dependencies": {
         "winston-transport": "^4.5.0",
         "@axiomhq/js": "workspace:*"
+    },
+    "devDependencies": {
+        "winston": "^3.8.2"
     },
     "repository": {
         "type": "git",
