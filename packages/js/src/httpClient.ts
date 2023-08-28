@@ -2,7 +2,7 @@ import { FetchClient } from './fetchClient.js';
 
 const Version = 'AXIOM_VERSION';
 const AxiomURL = 'https://api.axiom.co';
-
+const isBrowser = typeof window !== 'undefined';
 /**
  * ClientOptions is used to configure the HTTPClient and provide the necessary
  * authentication information.
@@ -44,18 +44,27 @@ export interface ClientOptions {
   orgId?: string;
 }
 
-// FIXME: this breaks on edge functions
-// The browsers don't have process.env, fake it
-// const process: { env: Record<string, string | undefined> } =
-//   typeof window === 'undefined' ? global?.process : { env: {} };
-
 export default abstract class HTTPClient {
   protected readonly client: FetchClient;
 
   constructor(options: ClientOptions = {}) {
-    const token = options.token || process.env.AXIOM_TOKEN || '';
-    const url = options.url || process.env.AXIOM_URL || AxiomURL;
-    const orgId = options.orgId || process.env.AXIOM_ORG_ID || '';
+    let token = options.token;
+    if (!token && !isBrowser) {
+      token = process.env.AXIOM_TOKEN || '';
+    } else if (!token && isBrowser) {
+      console.warn('must provide Axiom token')
+    }
+    let url = options.url;
+    if (!url && !isBrowser) {
+      url = process.env.AXIOM_URL || AxiomURL;
+    } else if (!url && isBrowser) {
+      url = AxiomURL;
+    }
+
+    let orgId = options.orgId;
+    if (!orgId && !isBrowser) {
+      orgId = process.env.AXIOM_ORG_ID || ''
+    }
 
     const headers: HeadersInit = {
       Accept: 'application/json',
