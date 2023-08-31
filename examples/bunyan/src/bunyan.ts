@@ -1,7 +1,6 @@
 import bunyan from "bunyan"
 import { AxiomStream } from '@axiomhq/bunyan'
 
-
 const stream = new AxiomStream({
     dataset: process.env.AXIOM_DATASET as string,
     orgId: process.env.AXIOM_ORG_ID as string,
@@ -18,12 +17,13 @@ const logger = bunyan.createLogger({
             type: 'raw',
             stream: stream,
             level: 'info'
-        }
+        },
+     
     ]
 
 })
 
 logger.info("Hello world!!")
 
-
-
+// flush axiom event batch 
+stream.close()
