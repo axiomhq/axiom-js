@@ -1,0 +1,19 @@
+{
+  "name": "examples-bunyan",
+  "version": "1.0.0",
+  "private": true,
+  "description": "examples on using axiom with bunyan",
+  "scripts": {
+    "build": "tsc",
+    "format": "eslint ./src --ext .ts --quiet --fix",
+    "lint": "eslint ./src --ext .ts",
+    "example": "ts-node"
+  },
+  "dependencies": {
+    "@axiomhq/bunyan": "workspace:*",
+    "bunyan": "^1.8.15"
+  },
+  "devDependencies": {
+    "@types/bunyan": "^1.8.8"
+  }
+}

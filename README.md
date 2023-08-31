@@ -26,6 +26,8 @@ This is a monorepo, for specific documentation, check out the different projects
 * [`@axiomhq/winston`](./packages/winston): A [winston](https://github.com/winstonjs/winston) transport which sends logs to Axiom.
 * [`@axiomhq/pino`](./packages/pino): A [pino](https://github.com/pinojs/pino) transport which sends logs to Axiom.
 
+* [`@axiomhq/bunyan`](./packages/bunyan): A [Bunyan](https://github.com/trentm/node-bunyan) transport which sends logs to Axiom.
+
 ## License
 
 Distributed under the [MIT License](LICENSE).
