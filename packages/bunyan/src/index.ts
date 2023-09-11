@@ -23,9 +23,9 @@ const noop = () => {};
 
 export class AxiomStream<T extends { msg: string; level: RecordLevel; time: Date }> {
   private axiom: Axiom;
-  dataset: string;
-  token: string;
-  orgId?: string;
+  dataset: any;
+  token: any;
+  orgId?: any;
   onError: (err: unknown) => void;
 
   constructor(
