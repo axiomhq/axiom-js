@@ -52,7 +52,7 @@ export default abstract class HTTPClient {
     if (!token && !isBrowser) {
       token = process.env.AXIOM_TOKEN || '';
     } else if (!token && isBrowser) {
-      console.warn('must provide Axiom token')
+      console.warn('Missing Axiom token')
     }
     let url = options.url;
     if (!url && !isBrowser) {
