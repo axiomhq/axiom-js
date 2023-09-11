@@ -63,7 +63,7 @@ export class AxiomStream<T extends { msg: string; level: RecordLevel; time: Date
         ...rest,
       };
 
-      await this.axiom.ingest(this.dataset!, event);
+      this.axiom.ingest(this.dataset, event);
     } catch (err) {
       this.onError(err);
     }
