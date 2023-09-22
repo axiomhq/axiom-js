@@ -1,9 +1,8 @@
-import 'cross-fetch/polyfill';
 import fetchRetry, { RequestInitWithRetry } from 'fetch-retry';
 import { parseLimitFromResponse, Limit, LimitType } from './limit';
 
 export class FetchClient {
-  constructor(public config: { headers: HeadersInit; baseUrl: string; timeout: number }) {}
+  constructor(public config: { headers: HeadersInit; baseUrl: string; timeout: number }) { }
 
   async doReq<T>(
     endpoint: string,
