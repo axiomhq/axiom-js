@@ -51,5 +51,8 @@
         "import": "./dist/esm/index.js",
         "require": "./dist/cjs/index.js",
         "default": "./dist/cjs/index.js"
+    },
+    "devDependencies": {
+        "cross-fetch": "^4.0.0"
     }
 }

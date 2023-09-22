@@ -1,6 +1,7 @@
 /*
  * @jest-environment jsdom
  */
+import 'cross-fetch/polyfill';
 import { describe, expect, it } from '@jest/globals';
 
 import { Axiom } from '../../src/client';
