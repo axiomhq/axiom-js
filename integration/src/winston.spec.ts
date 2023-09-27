@@ -13,7 +13,7 @@ describe('WinstonTransport', () => {
     level: 'info',
     format: winston.format.json(),
     defaultMeta: { service: 'user-service' },
-    transports: [new AxiomTransport({ token: process.env.AXIOM_TOKEN || '', dataset: datasetName })],
+    transports: [new AxiomTransport({ token: process.env.AXIOM_TOKEN || '', url: process.env.AXIOM_URL, orgId: process.env.AXIOM_ORG_ID, dataset: datasetName })],
   });
 
   beforeAll(async () => {
