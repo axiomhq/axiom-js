@@ -5,7 +5,11 @@ export const runtime = 'edge';
 export const dynamic = 'force-dynamic'; // disable prerendering
 
 export async function GET() {
-  const axiom = new AxiomWithoutBatching();
+  const axiom = new AxiomWithoutBatching({
+    token: process.env.AXIOM_TOKEN || '',
+    orgId: process.env.AXIOM_ORG_ID,
+    url: process.env.AXIOM_URL,
+  });
 
   try {
     const resp = await axiom.ingestRaw(

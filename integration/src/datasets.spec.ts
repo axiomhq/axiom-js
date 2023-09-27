@@ -5,7 +5,7 @@ const datasetSuffix = process.env.AXIOM_DATASET_SUFFIX || 'local';
 
 describe('DatasetsService', () => {
   const datasetName = `test-axiom-js-datasets-${datasetSuffix}`;
-  const client = new datasets.Service();
+  const client = new datasets.Service({ token: process.env.AXIOM_TOKEN || ''});
 
   beforeAll(async () => {
     await client.create({

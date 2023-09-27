@@ -10,7 +10,7 @@ describe('browser tests', () => {
   mockFetchResponse({ created: true });
   it('should run in the browser', async () => {
     expect(typeof window).toBe('object');
-    const axiom = new Axiom({ url: clientUrl });
+    const axiom = new Axiom({ url: clientUrl, token: 'test' });
     expect(axiom).toBeDefined();
 
     const resp = await axiom.datasets.create({ name: 'test' });

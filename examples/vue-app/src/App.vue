@@ -2,7 +2,7 @@
 import { Axiom } from '@axiomhq/js'
 import HelloWorld from './components/HelloWorld.vue'
 
-const axiom = new Axiom()
+const axiom = new Axiom({ token: import.meta.env.VITE_AXIOM_TOKEN})
 
 axiom.ingest('dataset', {
   message: 'Hello from Vite + Vue!',

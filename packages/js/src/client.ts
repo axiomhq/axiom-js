@@ -8,7 +8,7 @@ class BaseClient extends HTTPClient {
   users: users.Service;
   localPath = '/v1';
 
-  constructor(options?: ClientOptions) {
+  constructor(options: ClientOptions) {
     super(options);
     this.datasets = new datasets.Service(options);
     this.users = new users.Service(options);

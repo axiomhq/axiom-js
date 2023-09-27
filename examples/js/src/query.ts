@@ -2,7 +2,7 @@
 // Processing Language (APL).
 import { Axiom } from '@axiomhq/js';
 
-const axiom = new Axiom();
+const axiom = new Axiom({ token: process.env.AXIOM_TOKEN || ''});
 
 async function query() {
   const aplQuery = "['my-dataset']";

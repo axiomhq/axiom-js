@@ -1,7 +1,7 @@
 // The purpose of this example is to show how to query a dataset.
 import { Axiom } from '@axiomhq/js';
 
-const axiom = new Axiom();
+const axiom = new Axiom({ token: process.env.AXIOM_TOKEN || ''});
 
 async function query() {
   const endTime = new Date(Date.now()).toISOString();

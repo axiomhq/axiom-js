@@ -4,7 +4,7 @@ import { AxiomWithoutBatching } from '@axiomhq/js';
 
 export interface WinstonOptions extends TransportStreamOptions {
   dataset?: string;
-  token?: string;
+  token: string;
   orgId?: string;
   url?: string;
 }
@@ -17,9 +17,13 @@ export class WinstonTransport extends Transport {
   batchCallback: (err: Error | null) => void = () => {};
   batchTimeoutId?: NodeJS.Timeout;
 
-  constructor(opts?: WinstonOptions) {
+  constructor(opts: WinstonOptions) {
     super(opts);
-    this.client = new AxiomWithoutBatching(opts);
+    this.client = new AxiomWithoutBatching({
+      token: opts.token,
+      orgId: opts.orgId,
+      url: opts.url,
+    });
     this.dataset = opts?.dataset || process.env.AXIOM_DATASET || '';
   }
 

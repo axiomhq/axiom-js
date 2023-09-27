@@ -27,9 +27,9 @@ const logger = winston.createLogger({
         // You can pass an option here, if you don't the transport is configured automatically
         // using environment variables like `AXIOM_DATASET` and `AXIOM_TOKEN`
         new AxiomTransport({
-            dataset: 'my-dataset', // defaults to process.env.AXIOM_DATASET
-            token: 'my-token', // defaults to process.env.AXIOM_TOKEN
-            orgId: 'my-org-id', // defaults to process.env.AXIOM_ORG_ID
+            dataset: 'my-dataset',
+            token: 'my-token',
+            orgId: 'my-org-id',
         }),
     ],
 });
@@ -40,7 +40,7 @@ then you can use the logger as usual:
 ```js
 logger.log({
     level: 'info',
-    message: 'Logger successfuly setup',
+    message: 'Logger successfully setup',
 });
 ```
 

@@ -3,7 +3,7 @@ import { Axiom } from '@axiomhq/js'
 import { useEffect } from 'react';
 
 export default function Home() {
-  const axiom = new Axiom()
+  const axiom = new Axiom({ token: '' })
 
   axiom.ingest({
     name: 'test',
