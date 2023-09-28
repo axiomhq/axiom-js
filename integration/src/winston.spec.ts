@@ -8,7 +8,7 @@ const datasetSuffix = process.env.AXIOM_DATASET_SUFFIX || 'local';
 
 describe('WinstonTransport', () => {
   const datasetName = `test-axiom-js-winston-${datasetSuffix}`;
-  const axiom = new Axiom({ token: process.env.AXIOM_TOKEN || '' });
+  const axiom = new Axiom({ token: process.env.AXIOM_TOKEN || '', url: process.env.AXIOM_URL, orgId: process.env.AXIOM_ORG_ID });
   const logger = winston.createLogger({
     level: 'info',
     format: winston.format.json(),
