@@ -5,7 +5,7 @@ import { describe, it, expect, beforeAll, afterAll, vi } from 'vitest';
 describe('Ingestion & query on different runtime', () => {
   vi.useRealTimers()
 
-  const axiom = new Axiom();
+  const axiom = new Axiom({ token: process.env.AXIOM_TOKEN || '', url: process.env.AXIOM_URL, orgId: process.env.AXIOM_ORG_ID });
   const datasetName = 'axiom-js-e2e-test';
 
   beforeAll(async () => {
