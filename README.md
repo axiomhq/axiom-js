@@ -39,8 +39,7 @@ This is a monorepo, for specific documentation, check out the different projects
   instead of:
   ```ts
   const axiom = new Axiom();
- ```
-
+  ```
 
 ## License
 
