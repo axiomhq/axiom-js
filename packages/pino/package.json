@@ -15,7 +15,7 @@
     "format": "eslint 'src/**/*.{js,ts}' --quiet --fix",
     "lint": "eslint 'src/**/*.{js,ts}'",
     "test": "vitest run test/unit/*  --coverage",
-    "prepublish": "npm run build && npm run build:esm"
+    "prepublish": "npm run build && npm run build:cjs"
   },
   "repository": {
     "type": "git",
