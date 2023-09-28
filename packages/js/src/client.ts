@@ -1,14 +1,14 @@
-import { datasets } from './datasets';
-import { users } from './users';
-import { Batch, createBatchKey } from './batch';
-import HTTPClient, { ClientOptions } from './httpClient';
+import { datasets } from './datasets.js';
+import { users } from './users.js';
+import { Batch, createBatchKey } from './batch.js';
+import HTTPClient, { ClientOptions } from './httpClient.js';
 
 class BaseClient extends HTTPClient {
   datasets: datasets.Service;
   users: users.Service;
   localPath = '/v1';
 
-  constructor(options?: ClientOptions) {
+  constructor(options: ClientOptions) {
     super(options);
     this.datasets = new datasets.Service(options);
     this.users = new users.Service(options);

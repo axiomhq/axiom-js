@@ -1,4 +1,4 @@
-import { describe, expect, it, beforeAll, afterAll } from '@jest/globals';
+import { describe, expect, it, beforeAll, afterAll } from 'vitest';
 import winston from 'winston';
 
 import { Axiom } from '@axiomhq/js';
@@ -8,12 +8,12 @@ const datasetSuffix = process.env.AXIOM_DATASET_SUFFIX || 'local';
 
 describe('WinstonTransport', () => {
   const datasetName = `test-axiom-js-winston-${datasetSuffix}`;
-  const axiom = new Axiom();
+  const axiom = new Axiom({ token: process.env.AXIOM_TOKEN || '' });
   const logger = winston.createLogger({
     level: 'info',
     format: winston.format.json(),
     defaultMeta: { service: 'user-service' },
-    transports: [new AxiomTransport({ dataset: datasetName })],
+    transports: [new AxiomTransport({ token: process.env.AXIOM_TOKEN || '', url: process.env.AXIOM_URL, orgId: process.env.AXIOM_ORG_ID, dataset: datasetName })],
   });
 
   beforeAll(async () => {

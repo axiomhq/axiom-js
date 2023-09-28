@@ -36,7 +36,7 @@ jobs:
           node-version: ${{ matrix.node }}
           cache: 'pnpm'
       - run: pnpm install --frozen-lockfile
-      - run: pnpm build && pnpm build:esm
+      - run: pnpm build && pnpm build:cjs
       - run: pnpm lint
       - run: pnpm test
   
@@ -58,7 +58,7 @@ jobs:
           node-version: ${{ matrix.node }}
           cache: 'pnpm'
       - run: pnpm install --frozen-lockfile
-      - run: pnpm build && pnpm build:esm
+      - run: pnpm build && pnpm build:cjs
       - run: cd examples/winston && pnpm example
 
   test-integration:
@@ -83,7 +83,7 @@ jobs:
           node-version: ${{ matrix.node }}
           cache: 'pnpm'
       - run: pnpm install --frozen-lockfile
-      - run: pnpm build && pnpm build:esm
+      - run: pnpm build && pnpm build:cjs
       - env:
           AXIOM_TOKEN: ${{ secrets.TESTING_STAGING_TOKEN }}
           AXIOM_URL: ${{ secrets.TESTING_STAGING_API_URL }}
@@ -133,7 +133,7 @@ jobs:
           node-version: ${{ matrix.node }}
           cache: 'pnpm'
       - run: pnpm install --frozen-lockfile
-      - run: pnpm build && pnpm build:esm # cjs build needed to run jest tests
+      - run: pnpm build && pnpm build:cjs # cjs build needed to run tests
       - env:
           TESTING_TARGET_URL: ${{ needs.deploy-e2e-apps.outputs.preview-url }}
         run: pnpm run e2e

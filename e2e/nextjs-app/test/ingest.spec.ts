@@ -1,11 +1,11 @@
 import { Axiom } from '@axiomhq/js';
-import { describe, it, expect, beforeAll, afterAll, jest } from '@jest/globals';
+import { describe, it, expect, beforeAll, afterAll, vi } from 'vitest';
 
-jest.useRealTimers()
 
 describe('Ingestion & query on different runtime', () => {
-  const axiom = new Axiom();
+  vi.useRealTimers()
 
+  const axiom = new Axiom();
   const datasetName = 'axiom-js-e2e-test';
 
   beforeAll(async () => {

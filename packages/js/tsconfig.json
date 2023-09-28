@@ -1,12 +1,16 @@
 {
-  "extends": "../../tsconfig.base.json",
-  "compilerOptions": {
-      "target": "ES5",
-      "module": "Commonjs",
+    "extends": "../../tsconfig.base.json",
+    "compilerOptions": {
+      "target": "ESNext",
+      "module": "ESNext",
+      "moduleResolution": "node",
       "baseUrl": ".",
       "rootDir": "./src",
-      "outDir": "dist/cjs",
-      "declarationDir": "dist/types",
-  },
-  "include": ["src/**/*"]
-}
+      "outDir": "dist/esm",
+      "declarationDir": "dist/esm/types",
+      "declarationMap": true,
+      "emitDeclarationOnly": true
+    },
+    "include": ["src/**/*"]
+  }
+  

@@ -1,7 +1,5 @@
-/*
- * @jest-environment jsdom
- */
-import { describe, expect, it } from '@jest/globals';
+// @vitest-environment jsdom
+import { describe, expect, it } from 'vitest';
 
 import { Axiom } from '../../src/client';
 import { mockFetchResponse } from '../lib/mock';
@@ -12,7 +10,7 @@ describe('browser tests', () => {
   mockFetchResponse({ created: true });
   it('should run in the browser', async () => {
     expect(typeof window).toBe('object');
-    const axiom = new Axiom({ url: clientUrl });
+    const axiom = new Axiom({ url: clientUrl, token: 'test' });
     expect(axiom).toBeDefined();
 
     const resp = await axiom.datasets.create({ name: 'test' });

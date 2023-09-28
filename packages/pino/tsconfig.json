@@ -1,10 +1,12 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "target": "ES5",
-    "module": "Commonjs",
+    "baseUrl": ".",
+    "target": "ESNext",
+    "module": "ES6",
+    "moduleResolution": "node",
     "rootDir": "./src",
-    "outDir": "dist/cjs",
+    "outDir": "dist",
     "declarationDir": "dist/types"
   },
   "include": ["src/**/*"]
