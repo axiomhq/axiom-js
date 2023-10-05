@@ -29,7 +29,7 @@ export class AxiomStream<T extends { msg: string; level: RecordLevel; time: Date
   onError: (err: unknown) => void;
 
   constructor(
-    opt: Omit<AxiomStream<T>, 'write' | 'onError' | 'close'> & {
+    opt: Omit<AxiomStream<T>, 'write' | 'onError' | 'flush'> & {
       onError?: AxiomStream<T>['onError'];
     },
   ) {
@@ -92,7 +92,7 @@ export class AxiomStream<T extends { msg: string; level: RecordLevel; time: Date
     return AxiomEventLevel.Silent;
   }
 
-  async close() {
+  async flush() {
     await this.axiom.flush();
   }
 }

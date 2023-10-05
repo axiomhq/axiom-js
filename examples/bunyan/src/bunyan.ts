@@ -24,4 +24,4 @@ const logger = bunyan.createLogger({
 logger.info('Hello world!!');
 
 // flush axiom event batch
-stream.close();
+stream.flush();
