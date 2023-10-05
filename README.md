@@ -27,6 +27,21 @@ This is a monorepo, for specific documentation, check out the different projects
 * [`@axiomhq/pino`](./packages/pino): A [pino](https://github.com/pinojs/pino) transport which sends logs to Axiom.
 * [`@axiomhq/bunyan`](./packages/bunyan): A [Bunyan](https://github.com/trentm/node-bunyan) transport which sends logs to Axiom.
 
+
+## Migrate to v1.x
+
+- Pass the credentials as an object to Axiom client, this package no longer reads them from the environment variables.
+  do:
+  ```ts
+    const axiom = new Axiom({
+      token: process.env.AXIOM_TOKEN,
+    });
+  ```
+  instead of:
+  ```ts
+  const axiom = new Axiom();
+  ```
+
 ## License
 
 Distributed under the [MIT License](LICENSE).

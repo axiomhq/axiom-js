@@ -1,11 +1,11 @@
-import { describe, expect, it, beforeAll, afterAll } from '@jest/globals';
+import { describe, expect, it, beforeAll, afterAll } from 'vitest';
 import { datasets } from '@axiomhq/js';
 
 const datasetSuffix = process.env.AXIOM_DATASET_SUFFIX || 'local';
 
 describe('DatasetsService', () => {
   const datasetName = `test-axiom-js-datasets-${datasetSuffix}`;
-  const client = new datasets.Service();
+  const client = new datasets.Service({ token: process.env.AXIOM_TOKEN || '', url: process.env.AXIOM_URL, orgId: process.env.AXIOM_ORG_ID });
 
   beforeAll(async () => {
     await client.create({

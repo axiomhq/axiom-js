@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.0-rc.1] - 2023-09-27
+
+### Breaking Change
+
+- Axiom token is now required as a parameter of the constructor, automatic detection of environment variables is now removed.
+
+## Fixed
+
+- switched the build process to use rollup in order to solves the module resolution issue.
+- reorder the export object of winston package.json
+
 ## [0.1.2] - 2023-06-26
 
 ### Fixed

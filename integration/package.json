@@ -9,7 +9,7 @@
         "build": "tsc -b",
         "format": "eslint 'src/**/*.{js,ts}' --quiet --fix",
         "lint": "eslint 'src/**/*.{js,ts}'",
-        "integration": "jest src"
+        "integration": "vitest run src/*"
     },
     "dependencies": {
         "winston-transport": "^4.5.0",

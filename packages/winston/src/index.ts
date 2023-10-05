@@ -2,13 +2,9 @@ import Transport, { TransportStreamOptions } from 'winston-transport';
 
 import { AxiomWithoutBatching } from '@axiomhq/js';
 
-// The browsers don't have process.env, fake it
-const process: { env: Record<string, string | undefined> } =
-  typeof window === 'undefined' ? global.process : { env: {} };
-
 export interface WinstonOptions extends TransportStreamOptions {
   dataset?: string;
-  token?: string;
+  token: string;
   orgId?: string;
   url?: string;
 }
@@ -21,9 +17,13 @@ export class WinstonTransport extends Transport {
   batchCallback: (err: Error | null) => void = () => {};
   batchTimeoutId?: NodeJS.Timeout;
 
-  constructor(opts?: WinstonOptions) {
+  constructor(opts: WinstonOptions) {
     super(opts);
-    this.client = new AxiomWithoutBatching(opts);
+    this.client = new AxiomWithoutBatching({
+      token: opts.token,
+      orgId: opts.orgId,
+      url: opts.url,
+    });
     this.dataset = opts?.dataset || process.env.AXIOM_DATASET || '';
   }
 

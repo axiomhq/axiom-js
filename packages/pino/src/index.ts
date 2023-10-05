@@ -1,10 +1,6 @@
 import build from 'pino-abstract-transport';
 import { Axiom, ClientOptions } from '@axiomhq/js';
 
-// The browsers don't have process.env, fake it
-const process: { env: Record<string, string | undefined> } =
-  typeof window === 'undefined' ? global.process : { env: {} };
-
 export enum AxiomEventLevel {
   Trace = 'trace',
   Debug = 'debug',
@@ -16,12 +12,13 @@ export enum AxiomEventLevel {
 }
 
 export interface Options extends ClientOptions {
-  dataset?: string;
+  dataset: string;
 }
 
-export default async function axiomTransport(options?: Options) {
+export default async function axiomTransport(options: Options) {
   const axiom = new Axiom(options);
-  const dataset = options?.dataset || process.env.AXIOM_DATASET;
+
+  const dataset = options.dataset;
 
   return build(
     async function (source: any) {
@@ -34,7 +31,7 @@ export default async function axiomTransport(options?: Options) {
           ...rest,
         };
 
-        axiom.ingest(dataset!, event);
+        axiom.ingest(dataset, event);
       }
     },
     { close: async () => await axiom.flush() },

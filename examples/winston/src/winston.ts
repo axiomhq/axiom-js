@@ -6,9 +6,7 @@ const logger = winston.createLogger({
   format: winston.format.json(),
   defaultMeta: { service: 'user-service' },
   transports: [
-    // You can pass an option here, if you don't the transport is configured
-    // using environment variables like `AXIOM_DATASET` and `AXIOM_TOKEN`
-    new AxiomTransport(),
+    new AxiomTransport({ token: process.env.AXIOM_TOKEN || '', dataset: process.env.AXIOM_DATASET }),
   ],
 });
 
@@ -23,5 +21,5 @@ if (process.env.NODE_ENV != 'production') {
 
 logger.log({
   level: 'info',
-  message: 'Logger successfuly setup',
+  message: 'Logger successfully setup',
 });
