@@ -148,7 +148,7 @@ export class AxiomWithoutBatching extends BaseClient {
     const array = Array.isArray(events) ? events : [events];
     const json = array
       .map((v) => {
-        options?.flattenData ? flattedStringify(v) : JSON.stringify(v);
+        return options?.flattenData ? flattedStringify(v) : JSON.stringify(v);
       })
       .join('\n');
     return this.ingestRaw(dataset, json, ContentType.NDJSON, ContentEncoding.Identity, options);
