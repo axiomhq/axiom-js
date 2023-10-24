@@ -2,20 +2,20 @@
   "name": "@axiomhq/bunyan",
   "version": "0.1.0",
   "description": "The official Axiom transport for bunyan",
-  "main": "dist/cjs/index.ts",
-  "types": "dist/types/index.d.ts",
+  "type": "module",
+  "types": "dist/esm/types/index.d.ts",
   "module": "dist/esm/index.js",
+  "main": "dist/cjs/index.cjs",
   "author": "Axiom, Inc.",
   "license": "MIT",
   "homepage": "https://github.com/axiomhq/axiom-js/tree/main/packages/bunyan#readme",
   "scripts": {
-    "build": "tsc -b",
-    "build:esm": "tsc --project tsconfig.esm.json",
+    "build": "rollup -c rollup.config.js",
+    "build:cjs": "rollup -c rollup.config.cjs.js",
     "format": "eslint 'src/**/*.{js,ts}' --quiet --fix",
     "lint": "eslint 'src/**/*.{js,ts}'",
-    "test": "jest test/unit",
-    "prepublish": "npm run build && npm run build:esm",
-    "cover": "nyc -r text -e .ts -x 'tests/unit/**/*.spec.ts' npm run test"
+    "test": "vitest run test/unit/*  --coverage",
+    "prepublish": "npm run build && npm run build:cjs"
   },
   "repository": {
     "type": "git",
