@@ -103,6 +103,12 @@ importers:
         specifier: ^18.2.17
         version: 18.2.17
 
+  examples/axiomLogger:
+    dependencies:
+      '@axiomhq/axiomLogger':
+        specifier: workspace:*
+        version: link:../../packages/axiomLogger
+
   examples/js:
     dependencies:
       '@axiomhq/js':
@@ -176,6 +182,12 @@ importers:
       winston-transport:
         specifier: ^4.5.0
         version: 4.5.0
+
+  packages/axiomLogger:
+    dependencies:
+      '@axiomhq/js':
+        specifier: workspace:*
+        version: link:../js
 
   packages/js:
     dependencies:
