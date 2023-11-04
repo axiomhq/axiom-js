@@ -37,7 +37,7 @@ export namespace datasets {
   export class Service extends HTTPClient {
     private readonly localPath = '/v1/datasets';
 
-    list = (): Promise<[Dataset]> => this.client.get(this.localPath);
+    list = (): Promise<Dataset[]> => this.client.get(this.localPath);
 
     get = (id: string): Promise<Dataset> => this.client.get(this.localPath + '/' + id);
 
