@@ -1,14 +1,7 @@
+import { Axiom } from '@axiomhq/js';
 import { LogEvent, LogLevel, LoggerConfig } from './interface';
 import { throttle } from './throttle';
 
-// sync package version
-const Version = "1.0.0-rc.1";
-
-function buildLogsEndpoint() {
-  const axiomUrl = 'https://api.axiom.co';
-  const dataset = process.env.AXIOM_DATASET;
-  return `${axiomUrl}/api/v1/datasets/${dataset}/ingest`;
-}
 
 function injectPlatformMetadata(logEvent: LogEvent, source: string) {
   logEvent.platform = {
@@ -22,13 +15,8 @@ const AXIOM_URL = 'https://api.axiom.co';
 const LOG_LEVEL = process.env.AXIOM_LOG_LEVEL || 'debug';
 
 const isBrowser = typeof window !== 'undefined';
-const isVercel = process.env.NEXT_PUBLIC_AXIOM_INGEST_ENDPOINT || process.env.AXIOM_INGEST_ENDPOINT;
 const isNoPrettyPrint = process.env.AXIOM_NO_PRETTY_PRINT == 'true' ? true : false;
-
-function isEnvVarsSet(token: string | undefined, dataset: string | undefined): boolean {
-    console.log({ dataset, token })
-      return !!(AXIOM_URL && dataset && token);
-}    
+   
 
 export class AxiomLogger {
   public logEvents: LogEvent[] = [];
@@ -36,8 +24,7 @@ export class AxiomLogger {
   children: AxiomLogger[] = [];
   public logLevel: LogLevel = LogLevel.debug;
   public config: LoggerConfig;
-
-  private url = buildLogsEndpoint()
+  private client: Axiom
 
   constructor(public initConfig: LoggerConfig) {
     if (this.initConfig.logLevel != undefined && this.initConfig.logLevel >= 0) {
@@ -45,7 +32,19 @@ export class AxiomLogger {
     } else if (LOG_LEVEL) {
       this.logLevel = LogLevel[LOG_LEVEL as keyof typeof LogLevel];
     }
+    
     this.config = { ...initConfig };
+
+    const token = this.config.token;
+    if (!token ) {
+       throw new Error('Axiom Token required')
+    }
+
+    this.client = new Axiom({
+      token,
+      url: AXIOM_URL
+    })
+  
   }
 
   debug = (message: string, args: { [key: string]: any } = {}) => {
@@ -97,7 +96,10 @@ export class AxiomLogger {
     this.logEvents.push(logEvent);
     if (this.config.autoFlush) {
       this.throttledSendLogs();
+    }else {
+      this.sendLogs()
     }
+  
   };
 
   attachResponseStatus = (statusCode: number) => {
@@ -114,9 +116,9 @@ export class AxiomLogger {
       return;
     }
 
-    const isAxiomEnvVarsSet = isEnvVarsSet(this.config.token, this.config.dataset)
-   console.log({  isAxiomEnvVarsSet })
-    if (!isAxiomEnvVarsSet) {
+    const datasets = this.config.dataset;
+    
+    if (!datasets) {
       // if AXIOM ingesting url is not set, fallback to printing to console
       // to avoid network errors in development environments
       this.logEvents.forEach((ev) => prettyPrint(ev));
@@ -124,47 +126,18 @@ export class AxiomLogger {
       return;
     }
 
-    const method = 'POST';
-    const keepalive = true;
-    const body = JSON.stringify(this.logEvents);
-    // clear pending logs
-    this.logEvents = [];
-    const headers: HeadersInit = {
-      'Content-Type': 'application/json',
-      'User-Agent': 'next-axiom/v' + Version,
-    };
-    if (this.config.token) {
-      headers['Authorization'] = `Bearer ${this.config.token}`;
-    }
-    const reqOptions: RequestInit = { body, method, keepalive, headers };
-    function sendFallback() {
-      // Do not leak network errors; does not affect the running app
-       const url = buildLogsEndpoint()
-      return fetch(url, reqOptions).catch(console.error);
-    }
+  
 
     try {
-      if (typeof fetch === 'undefined') {
-        const fetch = await require('whatwg-fetch');
-        return fetch(this.url, reqOptions).catch(console.error);
-      } else if (isBrowser && isVercel && navigator.sendBeacon) {
-        // sendBeacon fails if message size is greater than 64kb, so
-        // we fall back to fetch.
-        if (!navigator.sendBeacon(this.url, body)) {
-          return sendFallback();
-        }
-      } else {
-        return sendFallback();
-      }
-    } catch (e) {
+      this.client.ingest(datasets, this.logEvents)
+    }catch(e){
       console.warn(`Failed to send logs to Axiom: ${e}`);
-      // put the log events back in the queue
-      this.logEvents = [...this.logEvents, JSON.parse(body)];
+      this.logEvents = [...this.logEvents];
     }
   }
 
   flush: any = async () => {
-    return Promise.all([this.sendLogs(), ...this.children.map((c) => c.flush())]);
+    return this.client.flush();
   };
  }
 
@@ -190,6 +163,7 @@ const levelColors: { [key: string]: any } = {
 
 
 function prettyPrint(ev: LogEvent) {
+    console.log({ ev })
     const hasFields = Object.keys(ev.fields).length > 0;
     // check whether pretty print is disabled
     if (isNoPrettyPrint) {
