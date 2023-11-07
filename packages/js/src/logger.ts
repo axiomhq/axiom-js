@@ -81,7 +81,7 @@ export class Logger {
 
 
 
-  constructor(public initConfig: LoggerConfig) {
+  constructor(public initConfig: LoggerConfig ) {
     if (this.initConfig.logLevel != undefined && this.initConfig.logLevel >= 0) {
       this.logLevel = this.initConfig.logLevel;
     } else if (LOG_LEVEL) {

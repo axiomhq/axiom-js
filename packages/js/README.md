@@ -39,4 +39,20 @@ const res = await axiom.query(`['my-dataset'] | where foo == 'bar' | limit 100`)
 console.log(res);
 ```
 
+
+If you want to use Axiom logger to ingest logs into Axiom
+
+```ts
+import { Logger } from '@axiomhq/js'
+
+const logger = new Logger({
+    source: 'web',
+    autoFlush: true,
+    token: process.env.AXIOM_TOKEN || '',
+    dataset: process.env.AXIOM_dataset || ''
+})
+
+logger.info("Hello Axiom");
+logger.flush()
+```
 For further examples, head over to the [examples](../../examples/js) directory.
