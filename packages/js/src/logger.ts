@@ -1,3 +1,10 @@
+import { Batch } from "./batch";
+import { Axiom, ContentEncoding, ContentType, IngestOptions, QueryLegacy, QueryLegacyResult, QueryOptions, QueryResult } from "./client";
+import { datasets } from "./datasets";
+import { FetchClient } from "./fetchClient";
+import { ClientOptions } from "./httpClient";
+import { users } from "./users";
+
 interface NetlifyInfo extends PlatformInfo {
   buildId?: string;
   context?: string;
@@ -43,7 +50,7 @@ interface PlatformInfo {
   source?: string;
 }
 
-type LoggerConfig = {
+export type LoggerConfig = {
   args?: { [key: string]: any };
   logLevel?: LogLevel;
   autoFlush?: boolean;
@@ -81,7 +88,7 @@ export class Logger {
 
 
 
-  constructor(public initConfig: LoggerConfig ) {
+  constructor(public initConfig: LoggerConfig  & ClientOptions) {
     if (this.initConfig.logLevel != undefined && this.initConfig.logLevel >= 0) {
       this.logLevel = this.initConfig.logLevel;
     } else if (LOG_LEVEL) {
@@ -205,10 +212,15 @@ export class Logger {
     }
   }
 
-  flush: any = async () => {
-    return Promise.all([this.sendLogs(), ...this.children.map((c) => c.flush())]);
+  flushLogger: any = async () => {
+    return Promise.all([this.sendLogs(), ...this.children.map((c) => c.flushLogger())]);
   };
 }
+
+
+
+
+
 
 function jsonFriendlyErrorReplacer(key: string, value: any) {
   if (value instanceof Error) {
