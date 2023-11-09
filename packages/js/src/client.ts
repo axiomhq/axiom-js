@@ -2,8 +2,6 @@ import { datasets } from './datasets.js';
 import { users } from './users.js';
 import { Batch, createBatchKey } from './batch.js';
 import HTTPClient, { ClientOptions } from './httpClient.js';
-import { Logger } from './logger.js';
-import { FetchClient } from './fetchClient.js';
 
 class BaseClient extends HTTPClient {
   datasets: datasets.Service;
