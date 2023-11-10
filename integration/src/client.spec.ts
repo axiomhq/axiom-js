@@ -109,7 +109,8 @@ baz`,
       // expect(result.status.blocksExamined).toEqual(1);
       expect(result.status.rowsExamined).toEqual(11);
       expect(result.status.rowsMatched).toEqual(11);
-      expect(result.matches?.length).toEqual(11);
+      expect(result.tables?.length).toEqual(2);
+      expect(result.tables[0].columns).toEqual(11);
     });
   });
 });
