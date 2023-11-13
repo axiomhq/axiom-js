@@ -2,49 +2,19 @@ import { Axiom } from "./client";
 import { ClientOptions } from "./httpClient";
 
 
-interface NetlifyInfo extends PlatformInfo {
-  buildId?: string;
-  context?: string;
-  deploymentUrl?: string;
-  deploymentId?: string;
-  siteId?: string;
-}
-
 interface LogEvent {
   level: string;
   message: string;
   fields: any;
-  _time: string;
-  request?: RequestReport;
-  platform?: PlatformInfo;
-  vercel?: PlatformInfo;
-  netlify?: NetlifyInfo;
+  _time: string; 
 }
+
 enum LogLevel {
   debug = 0,
   info = 1,
   warn = 2,
   error = 3,
   off = 100,
-}
-
-interface RequestReport {
-  startTime: number;
-  statusCode?: number;
-  ip?: string | null;
-  region?: string | null;
-  path: string;
-  host?: string | null;
-  method: string;
-  scheme: string;
-  userAgent?: string | null;
-}
-
-interface PlatformInfo {
-  environment?: string;
-  region?: string;
-  route?: string;
-  source?: string;
 }
 
 export type LoggerConfig = {
@@ -58,7 +28,7 @@ export type LoggerConfig = {
 };
 
 
-const Version = '1.0.0-rc.1'
+const Version = 'AXIOM_VERSION';
 const LOG_LEVEL = process.env.AXIOM_LOG_LEVEL || 'debug';
 
 const isBrowser = typeof window !== 'undefined';
@@ -124,25 +94,11 @@ export class AxiomClient extends Axiom  {
       logEvent.fields = { ...logEvent.fields, args: args };
     }
 
-
-    if (this.config.req != null) {
-      logEvent.request = this.config.req;
-    }
-
     this.logEvents.push(logEvent);
     if (this.config.autoFlush) {
       this.throttledSendLogs();
     }
 
-  };
-
-  attachResponseStatus = (statusCode: number) => {
-    this.logEvents = this.logEvents.map((log) => {
-      if (log.request) {
-        log.request.statusCode = statusCode;
-      }
-      return log;
-    });
   };
 
   async sendLogs() {
@@ -298,11 +254,6 @@ const levelColors: { [key: string]: any } = {
     if (hasFields) {
       msgString += ' %o';
       args.push(ev.fields);
-    }
-
-    if (ev.request) {
-      msgString += ' %o';
-      args.push(ev.request);
     }
 
     console.log.apply(console, [msgString, ...args]);

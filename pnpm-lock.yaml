@@ -103,12 +103,6 @@ importers:
         specifier: ^18.2.17
         version: 18.2.17
 
-  examples/axiomLogger:
-    dependencies:
-      '@axiomhq/axiomLogger':
-        specifier: workspace:*
-        version: link:../../packages/axiomLogger
-
   examples/js:
     dependencies:
       '@axiomhq/js':
@@ -183,12 +177,6 @@ importers:
         specifier: ^4.5.0
         version: 4.5.0
 
-  packages/axiomLogger:
-    dependencies:
-      '@axiomhq/js':
-        specifier: workspace:*
-        version: link:../js
-
   packages/js:
     dependencies:
       fetch-retry:
@@ -197,6 +185,10 @@ importers:
       uuid:
         specifier: ^8.3.2
         version: 8.3.2
+    devDependencies:
+      '@rollup/plugin-json':
+        specifier: ^6.0.1
+        version: 6.0.1(rollup@3.29.4)
 
   packages/pino:
     dependencies:
@@ -727,6 +719,19 @@ packages:
 
   /@polka/url@1.0.0-next.21:
     resolution: {integrity: sha512-a5Sab1C4/icpTZVzZc5Ghpz88yQtGOyNqYXcZgOssB2uuAr+wF/MvN6bgtW32q7HHrvBki+BsZ0OuNv6EV3K9g==}
+    dev: true
+
+  /@rollup/plugin-json@6.0.1(rollup@3.29.4):
+    resolution: {integrity: sha512-RgVfl5hWMkxN1h/uZj8FVESvPuBJ/uf6ly6GTj0GONnkfoBN5KC0MSz+PN2OLDgYXMhtG0mWpTrkiOjoxAIevw==}
+    engines: {node: '>=14.0.0'}
+    peerDependencies:
+      rollup: ^1.20.0||^2.0.0||^3.0.0||^4.0.0
+    peerDependenciesMeta:
+      rollup:
+        optional: true
+    dependencies:
+      '@rollup/pluginutils': 5.0.3(rollup@3.29.4)
+      rollup: 3.29.4
     dev: true
 
   /@rollup/plugin-replace@5.0.2(rollup@3.29.4):

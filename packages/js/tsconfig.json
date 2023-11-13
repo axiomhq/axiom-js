@@ -4,6 +4,7 @@
       "target": "ESNext",
       "module": "ESNext",
       "moduleResolution": "node",
+      "resolveJsonModule": true,
       "baseUrl": ".",
       "rootDir": "./src",
       "outDir": "dist/esm",
