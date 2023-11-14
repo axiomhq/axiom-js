@@ -2,6 +2,12 @@ import { datasets } from './datasets.js';
 import { users } from './users.js';
 import { Batch, createBatchKey } from './batch.js';
 import HTTPClient, { ClientOptions } from './httpClient.js';
+import { LogEvent, LogLevel, LoggerConfig } from './type.js';
+import { jsonFriendlyErrorReplacer, prettyPrint, throttle } from './utils.js';
+
+
+
+
 
 class BaseClient extends HTTPClient {
   datasets: datasets.Service;
@@ -149,6 +155,9 @@ export class AxiomWithoutBatching extends BaseClient {
   }
 }
 
+const Version = 'AXIOM_VERSION';
+
+
 /**
  * Axiom's default client that queues events in the background,
  * sends them asynchronously to the server every 1s or every 1000 events.
@@ -158,6 +167,28 @@ export class AxiomWithoutBatching extends BaseClient {
  */
 export class Axiom extends BaseClient {
   batch: { [id: string]: Batch } = {};
+  public logEvents: LogEvent[] = [];
+  children: Axiom[] = [];
+  public logLevel: LogLevel = LogLevel.debug;
+  public loggerConfig: LoggerConfig
+  private LOG_LEVEL = process.env.AXIOM_LOG_LEVEL || 'debug';
+  throttledSendLogs = throttle(this.sendLogs, 1000);
+
+  constructor(public options: ClientOptions){
+    super(options);
+    if (this.options.logLevel != undefined && this.options.logLevel >= 0) {
+      this.logLevel = this.options.logLevel;
+    } else if (this.LOG_LEVEL) {
+      this.logLevel = LogLevel[this.LOG_LEVEL as keyof typeof LogLevel];
+    }
+
+    this.loggerConfig = {
+      dataset: options.dataset || '',
+      ...(options )
+    }
+
+  }
+
 
   /**
    * Ingest events asynchronously
@@ -202,7 +233,77 @@ export class Axiom extends BaseClient {
     }
     await Promise.all(promises);
   };
+
+
+  debug = (message: string, args: { [key: string]: any } = {}) => {
+    this._log(LogLevel.debug, message, args);
+  };
+  info = (message: string, args: { [key: string]: any } = {}) => {
+    this._log(LogLevel.info, message, args);
+  };
+  warn = (message: string, args: { [key: string]: any } = {}) => {
+    this._log(LogLevel.warn, message, args);
+  };
+  error = (message: string, args: { [key: string]: any } = {}) => {
+    this._log(LogLevel.error, message, args);
+  };
+
+  _log = (level: LogLevel, message: string, args: { [key: string]: any } = {}) => {
+    if (level < this.logLevel) {
+      return;
+    }
+    const logEvent: LogEvent = {
+      level: LogLevel[level].toString(),
+      message,
+      _time: new Date(Date.now()).toISOString(),
+      fields: this.loggerConfig.args || {},
+    };
+
+    // check if passed args is an object, if its not an object, add it to fields.args
+    if (args instanceof Error) {
+      logEvent.fields = { ...logEvent.fields, message: args.message, stack: args.stack, name: args.name };
+    } else if (typeof args === 'object' && args !== null && Object.keys(args).length > 0) {
+      const parsedArgs = JSON.parse(JSON.stringify(args, jsonFriendlyErrorReplacer));
+      logEvent.fields = { ...logEvent.fields, ...parsedArgs };
+    } else if (args && args.length) {
+      logEvent.fields = { ...logEvent.fields, args: args };
+    }
+
+    this.logEvents.push(logEvent);
+    if (this.options.autoFlush) {
+      this.throttledSendLogs();
+    }
+  
+  };
+
+  sendLogs (){
+    if (!this.logEvents.length) {
+      return;
+    }
+    const dataset = this.options.dataset;
+
+    if(!dataset || !this.options.token){
+         // if AXIOM ingesting url is not set, fallback to printing to console
+      // to avoid network errors in development environments
+      this.logEvents.forEach((ev) => prettyPrint(ev));
+      this.logEvents = [];
+      return;
+    }
+
+    const currentLogs = this.logEvents;
+    // clear pending Logs
+    this.logEvents = [];
+    this.ingest(dataset, currentLogs); 
+      // always log to the console 
+    currentLogs.map((log) => prettyPrint(log));
+  }          
+
+  flushLogger: any = async () => {
+    return Promise.all([this.sendLogs(), ...this.children.map((c) => c.flushLogger())]);
+  }; 
 }
+
+
 
 export enum ContentType {
   JSON = 'application/json',
