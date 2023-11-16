@@ -36,10 +36,12 @@ describe('Ingestion & query on different runtime', () => {
     const qResp = await axiom.query(`['${datasetName}'] | where ['test'] == "ingest_on_lambda"`, {
       startTime,
     });
-    expect(qResp.matches).toBeDefined();
-    expect(qResp.matches).toHaveLength(2);
-    expect(qResp.matches![0].data.foo).toEqual('bar');
-    expect(qResp.matches![1].data.bar).toEqual('baz');
+    expect(qResp.status).toBeDefined();
+    expect(qResp.tables).toBeDefined();
+    expect(qResp.tables).toHaveLength(2);
+    expect(qResp.tables[0].columns).toHaveLength(2);
+    expect(qResp.tables[0].columns[0].data.foo).toEqual('bar');
+    expect(qResp.tables[0].columns[1].data.bar).toEqual('baz');
   });
 
   it('ingest on a edge function should succeed', async () => {
@@ -57,9 +59,11 @@ describe('Ingestion & query on different runtime', () => {
     const qResp = await axiom.query(`['${datasetName}'] | where ['test'] == "ingest_on_edge"`, {
       startTime,
     });
-    expect(qResp.matches).toBeDefined();
-    expect(qResp.matches).toHaveLength(2);
-    expect(qResp.matches![0].data.foo).toEqual('bar');
-    expect(qResp.matches![1].data.bar).toEqual('baz');
+    expect(qResp.status).toBeDefined();
+    expect(qResp.tables).toBeDefined();
+    expect(qResp.tables).toHaveLength(2);
+    expect(qResp.tables[0].columns).toHaveLength(2);
+    expect(qResp.tables[0].columns[0].data.foo).toEqual('bar');
+    expect(qResp.tables[0].columns[1].data.bar).toEqual('baz');
   });
 });

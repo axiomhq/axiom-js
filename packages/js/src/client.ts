@@ -417,20 +417,25 @@ export interface LegacyQueryResult {
 export interface QueryResult {
   status: Status;
   tables: Array<APLResultTable>;
+  request: Query;
 }
 
 export interface APLResultTable {
   name: string;
   sources: Array<{name: string}>;
   fields: Array<{name: string, type: string, agg?: Aggregation}>
-  order: Array<string>;
+  order: Array<{
+    name: string,
+    desc: boolean,
+  }>;
   groups: Array<{name: string}>;
-  range: {
+  range?: {
     field: string,
     start: string,
     end: string,
   },
-  columns: Array<Array<string>>
+  buckets?: {field: string, size: any},
+  columns: Array<any>
 }
 
 export interface Timeseries {
