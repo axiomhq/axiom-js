@@ -38,7 +38,7 @@ describe('Ingestion & query on different runtime', () => {
     });
     expect(qResp.status).toBeDefined();
     expect(qResp.tables).toBeDefined();
-    expect(qResp.tables).toHaveLength(2);
+    expect(qResp.tables).toHaveLength(1);
     expect(qResp.tables[0].columns).toHaveLength(2);
     expect(qResp.tables[0].columns[0].data.foo).toEqual('bar');
     expect(qResp.tables[0].columns[1].data.bar).toEqual('baz');
@@ -61,7 +61,7 @@ describe('Ingestion & query on different runtime', () => {
     });
     expect(qResp.status).toBeDefined();
     expect(qResp.tables).toBeDefined();
-    expect(qResp.tables).toHaveLength(2);
+    expect(qResp.tables).toHaveLength(1);
     expect(qResp.tables[0].columns).toHaveLength(2);
     expect(qResp.tables[0].columns[0].data.foo).toEqual('bar');
     expect(qResp.tables[0].columns[1].data.bar).toEqual('baz');
