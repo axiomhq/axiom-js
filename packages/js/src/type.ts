@@ -1,3 +1,15 @@
+import { Axiom } from "./client";
+
+
+
+export interface LoggerConfig {
+  dataset: string;
+  client: Axiom;
+  args?: { [key: string]: any };
+  logLevel?: LogLevel;
+  autoFlush?: boolean;
+}
+
 
 export interface LogEvent {
     level: string;
@@ -13,11 +25,3 @@ export enum LogLevel {
     error = 3,
     off = 100,
 }
-
-export type LoggerConfig = {
-    args?: { [key: string]: any };
-    logLevel?: LogLevel;
-    autoFlush?: boolean;
-    token: string 
-    dataset: string | undefined;
-  };

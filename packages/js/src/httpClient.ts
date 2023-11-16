@@ -1,6 +1,4 @@
 import { FetchClient } from './fetchClient.js';
-import { LogLevel } from './type.js';
-
 const Version = 'AXIOM_VERSION';
 const AxiomURL = 'https://api.axiom.co';
 
@@ -32,10 +30,6 @@ export interface ClientOptions {
    * need to change this unless you are using a self-hosted version of Axiom.
    */
   url?: string;
-  logLevel?: LogLevel;
-  autoFlush?: boolean;
-  dataset?: string;
-  
 }
 
 export default abstract class HTTPClient {

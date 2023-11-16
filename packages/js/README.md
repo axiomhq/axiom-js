@@ -43,13 +43,12 @@ console.log(res);
 If you want to use Axiom logger to ingest logs into Axiom
 
 ```ts
-import { Axiom } from '@axiomhq/js'
+import { Axiom, Logger } from '@axiomhq/js'
 
-const logger = new Axiom({
-    autoFlush: true,
+const client = new Axiom({
     token: process.env.AXIOM_TOKEN || '',
-    dataset: process.env.AXIOM_DATASET || ''
 })
+const logger = new Logger({ dataset:  process.env.AXIOM_DATASET || '', client, autoFLush: true  })
 
 logger.info("Hello Axiom");
 ```

@@ -2,3 +2,4 @@ export { AxiomWithoutBatching, Axiom, ContentType, ContentEncoding, IngestOption
 export { ClientOptions } from './httpClient.js';
 export { datasets } from './datasets.js';
 export { users } from './users.js';
+export {Logger}  from './logger';
