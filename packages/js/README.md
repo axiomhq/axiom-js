@@ -48,7 +48,7 @@ import { Axiom, Logger } from '@axiomhq/js'
 const client = new Axiom({
     token: process.env.AXIOM_TOKEN || '',
 })
-const logger = new Logger({ dataset:  process.env.AXIOM_DATASET || '', client, autoFLush: true  })
+const logger = new Logger(client, { dataset:  process.env.AXIOM_DATASET || '', autoFLush: true  })
 
 logger.info("Hello Axiom");
 ```

@@ -1,20 +1,18 @@
 import { Axiom } from "./client";
-import { LogEvent, LogLevel, LoggerConfig } from "./type";
+import { LogEvent, LogLevel, LoggerOptions } from "./type";
 import { jsonFriendlyErrorReplacer, prettyPrint, throttle } from "./utils";
 
 class Logger {
     public dataset: string;
-    public client: Axiom;
     private logLevel: LogLevel;
     private LOG_LEVEL = process.env.AXIOM_LOG_LEVEL || 'debug';
     public logEvents: LogEvent[] = [];
     children: Axiom[] = [];
     throttledSendLogs = throttle(this.sendLogs.bind(this), 1000);
 
-    constructor(public config: LoggerConfig) {
-        this.client = config.client;
-        this.dataset = config.dataset;
-        this.logLevel = this.calculateLogLevel(config.logLevel);
+    constructor(public client: Axiom, public options: LoggerOptions) {
+        this.dataset = options.dataset;
+        this.logLevel = this.calculateLogLevel(options.logLevel);
     }
 
     debug = (message: string, args: { [key: string]: any } = {}) => {
@@ -41,7 +39,7 @@ class Logger {
             level: LogLevel[level].toString(),
             message,
             _time: new Date(Date.now()).toISOString(),
-            fields: this.config.args || {},
+            fields: this.options.args || {},
         };
         if (args instanceof Error) {
             logEvent.fields = { ...logEvent.fields, message: args.message, stack: args.stack, name: args.name };
@@ -52,7 +50,7 @@ class Logger {
             logEvent.fields = { ...logEvent.fields, args: args };
         }
         this.logEvents.push(logEvent);
-        if (this.config.autoFlush) {
+        if (this.options.autoFlush) {
             this.throttledSendLogs();
         }
     };
@@ -62,7 +60,7 @@ class Logger {
         if (!this.logEvents.length) {
             return;
         }
-        const dataset = this.config.dataset;
+        const dataset = this.options.dataset;
 
         if (!dataset) {
             this.logEvents.forEach((ev) => prettyPrint(ev));

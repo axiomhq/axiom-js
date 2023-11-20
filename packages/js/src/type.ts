@@ -1,10 +1,5 @@
-import { Axiom } from "./client";
-
-
-
-export interface LoggerConfig {
+export interface LoggerOptions {
   dataset: string;
-  client: Axiom;
   args?: { [key: string]: any };
   logLevel?: LogLevel;
   autoFlush?: boolean;

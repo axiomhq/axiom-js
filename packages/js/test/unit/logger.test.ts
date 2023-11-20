@@ -7,7 +7,7 @@ describe('Axiom', () => {
     expect(client).toBeDefined()
 
     it('Should create an instance of logger', () => {
-        const logger = new Logger({ autoFlush: true, dataset: '', client })
+        const logger = new Logger(client, { autoFlush: true, dataset: '' })
         expect(logger).toBeDefined()
     })
 })
