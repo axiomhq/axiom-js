@@ -1,4 +1,4 @@
-import { LogEvent } from "./type";
+import { LogEvent } from "./types";
 
 const levelColors: { [key: string]: any } = {
     info: {

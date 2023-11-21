@@ -1,5 +1,5 @@
 import { Axiom } from "./client";
-import { LogEvent, LogLevel, LoggerOptions } from "./type";
+import { LogEvent, LogLevel, LoggerOptions } from "./types";
 import { jsonFriendlyErrorReplacer, prettyPrint, throttle } from "./utils";
 
 class Logger {
@@ -56,13 +56,12 @@ class Logger {
     };
 
     private sendLogs() {
-        console.log("sending logs")
         if (!this.logEvents.length) {
             return;
         }
         const dataset = this.options.dataset;
 
-        if (!dataset) {
+        if (!dataset || process.env.AXIOM_NO_PRETTY_PRINT === 'true') {
             this.logEvents.forEach((ev) => prettyPrint(ev));
             this.logEvents = [];
             return;
