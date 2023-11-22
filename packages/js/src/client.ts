@@ -7,7 +7,6 @@ class BaseClient extends HTTPClient {
   datasets: datasets.Service;
   users: users.Service;
   localPath = '/v1';
-
   constructor(options: ClientOptions) {
     super(options);
     this.datasets = new datasets.Service(options);
@@ -159,7 +158,6 @@ export class AxiomWithoutBatching extends BaseClient {
  */
 export class Axiom extends BaseClient {
   batch: { [id: string]: Batch } = {};
-
   /**
    * Ingest events asynchronously
    * 

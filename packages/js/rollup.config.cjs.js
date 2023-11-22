@@ -1,4 +1,5 @@
 import typescript from '@rollup/plugin-typescript';
+import json from "@rollup/plugin-json";
 
 export default [
   {
@@ -11,6 +12,9 @@ export default [
       preserveModules: true,
       entryFileNames: '[name].cjs',
     },
-    plugins: [typescript({ outDir: 'dist/cjs', declarationDir: 'dist/cjs/types' })],
+    plugins: [
+      typescript({ outDir: 'dist/cjs', declarationDir: 'dist/cjs/types' }),
+      json()
+    ],
   },
 ];

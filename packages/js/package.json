@@ -51,5 +51,8 @@
         "import": "./dist/esm/index.js",
         "require": "./dist/cjs/index.cjs",
         "default": "./dist/esm/index.js"
+    },
+    "devDependencies": {
+        "@rollup/plugin-json": "^6.0.1"
     }
 }
