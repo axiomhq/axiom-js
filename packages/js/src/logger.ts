@@ -74,7 +74,6 @@ class Logger {
         } catch (error) {
             console.error("Error while ingesting logs:", error);
         }
-        currentLogs.forEach((log) => prettyPrint(log));
     }
 
     async flush() {
