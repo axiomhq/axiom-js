@@ -104,13 +104,18 @@ baz`,
 
   describe('apl query', () => {
     it('returns a valid response', async () => {
-      const result = await axiom.query("['" + datasetName + "']");
+      const status = await axiom.ingest(datasetName, { test: 'apl' });
+      expect(status.ingested).toEqual(1);
+      // wait 1 sec for ingestion to finish
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      const result = await axiom.query("['" + datasetName + "'] | where ['test'] == 'apl' | project _time, ['test']");
 
-      // expect(result.status.blocksExamined).toEqual(1);
-      expect(result.status.rowsExamined).toEqual(11);
-      expect(result.status.rowsMatched).toEqual(11);
+      expect(result.status.rowsMatched).toEqual(1);
       expect(result.tables?.length).toEqual(1);
-      expect(result.tables[0].columns.length).toEqual(11);
+      expect(result.tables[0].columns.length).toEqual(2); // _time and test
+      expect(result.tables[0].columns[0]).toBeDefined();
+      expect(result.tables[0].columns[1]).toBeDefined();
+      expect(result.tables[0].columns[1].length).toEqual(1); // only one row
     });
   });
 });
