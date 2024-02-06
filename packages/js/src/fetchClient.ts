@@ -20,7 +20,7 @@ export class FetchClient {
 
     const resp = await fetchRetry(fetch)(finalUrl, {
       retries: 3,
-      retryDelay: (attempt, error, response) => Math.pow(2, attempt) * 1000,
+      retryDelay: (attempt, error, response) => Math.pow(2, attempt) * 1000, // 1000, 2000, 4000
       retryOn: [503, 502, 504, 500],
       headers,
       method,
@@ -54,16 +54,20 @@ export class FetchClient {
   };
 }
 
+// Custom error class for handling  requests errors.
+
 export class AxiomTooManyRequestsError extends Error {
   constructor(public limit: Limit, public shortcircuit = false) {
     super();
-    Object.setPrototypeOf(this, AxiomTooManyRequestsError.prototype);
+    Object.setPrototypeOf(this, AxiomTooManyRequestsError.prototype); // https://github.com/Microsoft/TypeScript/wiki/Breaking-Changes#extending-built-ins-like-error-array-and-map-may-no-longer-work
     const retryIn = AxiomTooManyRequestsError.timeUntilReset(limit);
     this.message = `${limit.type} limit exceeded, try again in ${retryIn.minutes}m${retryIn.seconds}s`;
     if (limit.type === LimitType.api) {
       this.message = `${limit.scope} ` + this.message;
     }
   }
+
+    // Calculates the time until the rate limit resets.
 
   static timeUntilReset(limit: Limit) {
     const total = limit.reset.getTime() - new Date().getTime();
