@@ -17,21 +17,25 @@ export interface Options extends ClientOptions {
 
 export default async function axiomTransport(options: Options) {
   const axiom = new Axiom(options);
-
   const dataset = options.dataset;
 
   return build(
     async function (source: any) {
       for await (const obj of source) {
         const { time, level, ...rest } = obj;
-
         const event = {
           _time: time,
           level: mapLogLevel(level),
           ...rest,
         };
 
-        axiom.ingest(dataset, event);
+        try {
+          await axiom.ingest(dataset, event);
+        } catch (error) {
+          // Errors during log ingestion are caught and not rethrown,
+          // making this process fail silently.
+          console.error("Failed to ingest log to Axiom:", error);
+        }
       }
     },
     { close: async () => await axiom.flush() },
