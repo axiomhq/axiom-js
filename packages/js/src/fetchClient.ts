@@ -2,7 +2,9 @@ import fetchRetry, { RequestInitWithRetry } from 'fetch-retry';
 import { parseLimitFromResponse, Limit, LimitType } from './limit.js';
 
 export class FetchClient {
-  constructor(public config: { headers: HeadersInit; baseUrl: string; timeout: number }) {}
+  constructor(public config: { headers: HeadersInit; baseUrl: string; timeout: number }) {
+    process.on('unhandledRejection', (error) => console.error('Unhandled Rejection:', error));
+  }
 
   async doReq<T>(
     endpoint: string,
