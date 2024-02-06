@@ -21,6 +21,7 @@ export default async function axiomTransport(options: Options) {
 
   return build(
     async function (source: any) {
+      const ingestPromises: Promise<void>[] = [];
       for await (const obj of source) {
         const { time, level, ...rest } = obj;
         const event = {
@@ -29,20 +30,27 @@ export default async function axiomTransport(options: Options) {
           ...rest,
         };
 
-        try {
-          await axiom.ingest(dataset, event);
-        } catch (error) {
-          // Errors during log ingestion are caught and not rethrown,
-          // making this process fail silently.
+        // Wrap the ingest call in a Promise for proper async handling
+        const ingestPromise = new Promise<void>((resolve, reject) => {
+          axiom.ingest(dataset, event);
+          resolve(); // Resolve the promise once ingest is called
+        }).catch((error: Error) => {
           console.error("Failed to ingest log to Axiom:", error);
-        }
+        });
+
+        ingestPromises.push(ingestPromise);
       }
+
+      // Wait for all ingestion to complete
+      await Promise.all(ingestPromises);
     },
     { close: async () => await axiom.flush() },
   );
 }
 
 // See https://github.com/pinojs/pino/blob/master/docs/api.md#loggerlevel-string-gettersetter
+
+
 export const mapLogLevel = (level: string | number) => {
   if (typeof level === 'string') {
     return level;
