@@ -9,7 +9,7 @@ export class FetchClient {
     method: string,
     init: RequestInitWithRetry = {},
     searchParams: { [key: string]: string } = {}
-  ): Promise<T> {
+  ): Promise<T | null> {
     let finalUrl = `${this.config.baseUrl}${endpoint}`;
     const params = this.prepareSearchParams(searchParams);
     if (params) {
@@ -31,17 +31,25 @@ export class FetchClient {
     return this._handleResponse<T>(resp);
   }
 
-  private async _handleResponse<T>(resp: Response): Promise<T> {
+  private async _handleResponse<T>(resp: Response): Promise<T | null> {
     if (resp.ok) {
-      return (await resp.json()) as T;
-    } else if (resp.status === 204) {
-      return resp as unknown as T; // Handle no-content responses
-    } else if (resp.status === 429) {
-      const limit = parseLimitFromResponse(resp);
-      throw new AxiomTooManyRequestsError(limit);
+      if (resp.status === 204 || resp.headers.get('Content-Length') === '0') {
+        return null; 
+      }
+      return await resp.json() as T; 
     } else {
-      const errorMessage = await resp.text();
-      throw new Error(`Error ${resp.status}: ${errorMessage}`);
+      if (resp.status === 429) {
+        const limit = parseLimitFromResponse(resp); 
+        throw new AxiomTooManyRequestsError(limit); 
+      } else {
+        if (resp.headers.get('Content-Length') !== '0') {
+          const errorBody = await resp.json();
+          const errorMessage = errorBody.message || resp.statusText;
+          throw new Error(`Error ${resp.status}: ${errorMessage}`);
+        } else {
+          throw new Error(`Error ${resp.status}: ${resp.statusText}`);
+        }
+      }
     }
   }
 
@@ -56,24 +64,24 @@ export class FetchClient {
     return params.toString();
   }
 
-  post<T>(url: string, init: RequestInitWithRetry = {}, searchParams: any = {}): Promise<T> {
+  post<T>(url: string, init: RequestInitWithRetry = {}, searchParams: any = {}): Promise<T | null> {
     return this.doReq<T>(url, 'POST', init, searchParams);
   }
 
-  get<T>(url: string, init: RequestInitWithRetry = {}, searchParams: any = {}): Promise<T> {
+  get<T>(url: string, init: RequestInitWithRetry = {}, searchParams: any = {}): Promise<T | null> {
     return this.doReq<T>(url, 'GET', init, searchParams);
   }
 
-  put<T>(url: string, init: RequestInitWithRetry = {}, searchParams: any = {}): Promise<T> {
+  put<T>(url: string, init: RequestInitWithRetry = {}, searchParams: any = {}): Promise<T | null> {
     return this.doReq<T>(url, 'PUT', init, searchParams);
   }
 
-  delete<T>(url: string, init: RequestInitWithRetry = {}, searchParams: any = {}): Promise<T> {
+  delete<T>(url: string, init: RequestInitWithRetry = {}, searchParams: any = {}): Promise<T | null> {
     return this.doReq<T>(url, 'DELETE', init, searchParams);
   }
 }
 
-// Custom error class for handling requests (429) error.
+// Custom error class for handling 429 Too Many Requests error.
 export class AxiomTooManyRequestsError extends Error {
   constructor(public limit: Limit, public shortcircuit = false) {
     super();
