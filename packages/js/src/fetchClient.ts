@@ -11,7 +11,7 @@ export class FetchClient {
     searchParams: { [key: string]: string } = {}
   ): Promise<T> {
     let finalUrl = `${this.config.baseUrl}${endpoint}`;
-    const params = this._prepareSearchParams(searchParams);
+    const params = this.prepareSearchParams(searchParams);
     if (params) {
       finalUrl += `?${params}`;
     }
@@ -45,13 +45,16 @@ export class FetchClient {
     }
   }
 
-  _prepareSearchParams = (searchParams: { [key: string]: string }) => {
-    const params = new URLSearchParams();
-    Object.entries(searchParams).forEach(([key, value]) => {
-      if (value) params.append(key, value);
-    });
+  private prepareSearchParams(searchParams: { [key: string]: string }): string {
+    for (const key in searchParams) {
+      if (!searchParams[key]) {
+        delete searchParams[key];
+      }
+    }
+
+    const params = new URLSearchParams(searchParams);
     return params.toString();
-  };
+  }
 
   post<T>(url: string, init: RequestInitWithRetry = {}, searchParams: any = {}): Promise<T> {
     return this.doReq<T>(url, 'POST', init, searchParams);
