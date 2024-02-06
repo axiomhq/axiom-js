@@ -96,7 +96,7 @@ describe('Axiom', () => {
     mockFetchResponse({}, 401);
     // global.fetch = mockFetchResponse([{ name: 'test' }], 200);
 
-    expect(axiom.datasets.list).rejects.toThrow(new Error('Forbidden'));
+    expect(axiom.datasets.list).rejects.toThrow(new Error('Error 401: Unauthorized access. Please check your credentials.'));
 
     // create another request to ensure that
     // the fetch mock was not consumed before
