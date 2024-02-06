@@ -24,7 +24,7 @@ export class FetchClient {
             retryOn: [503, 502, 504, 500],
             headers,
             method,
-            body: init.body ? JSON.stringify(init.body) : undefined,
+            body: init.body ? init.body : undefined,
             ...init,
         });
 
