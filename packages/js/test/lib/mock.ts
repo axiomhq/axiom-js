@@ -9,6 +9,15 @@ export const mockFetchResponse = (body: any, statusCode: number = 200, headers =
   vi.spyOn(global, 'fetch').mockImplementationOnce(func);
 };
 
+export const mockFetchResponseErr = (headers = {}) => {
+  const resp = new Response(null, { status: 500, headers });
+  const func: () => Promise<Response> = () => {
+    return Promise.reject(resp);
+  };
+
+  vi.spyOn(global, 'fetch').mockImplementationOnce(func);
+};
+
 export const testMockedFetchCall = (test: any, body: any, statusCode: number = 200, headers = {}) => {
   const func: typeof fetch = (url: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
     test(url, init);

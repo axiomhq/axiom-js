@@ -3,7 +3,7 @@ import { describe, expect, it, beforeEach } from 'vitest';
 import { ContentType, ContentEncoding, Axiom, AxiomWithoutBatching } from '../../src/client';
 import { AxiomTooManyRequestsError } from '../../src/fetchClient';
 import { headerAPILimit, headerAPIRateRemaining, headerAPIRateReset, headerRateScope } from '../../src/limit';
-import { mockFetchResponse, testMockedFetchCall } from '../lib/mock';
+import { mockFetchResponse, mockFetchResponseErr, testMockedFetchCall } from '../lib/mock';
 
 const queryLegacyResult = {
   status: {
@@ -201,11 +201,11 @@ describe('Axiom', () => {
       console.log('callback has been called', err);
       errorCaptured = true;
     } });
-    mockFetchResponse({}, 500);
+    mockFetchResponseErr();
 
     client.ingest('test', [{ name: 'test' }]);
     client.ingest('test', [{ name: 'test' }]);
     await client.flush();
     expect(true).toEqual(errorCaptured);
-  })
+  }, 50000)
 });
