@@ -1,6 +1,6 @@
 import { describe, expect, it, beforeEach } from 'vitest';
 
-import { ContentType, ContentEncoding, AxiomWithoutBatching } from '../../src/client';
+import { ContentType, ContentEncoding, Axiom, AxiomWithoutBatching } from '../../src/client';
 import { AxiomTooManyRequestsError } from '../../src/fetchClient';
 import { headerAPILimit, headerAPIRateRemaining, headerAPIRateReset, headerRateScope } from '../../src/limit';
 import { mockFetchResponse, testMockedFetchCall } from '../lib/mock';
@@ -67,12 +67,12 @@ const queryResult = {
 const clientURL = 'http://axiom-js-retries.dev.local';
 
 describe('Axiom', () => {
-  let axiom = new AxiomWithoutBatching({ url: clientURL });
+  let axiom = new AxiomWithoutBatching({ url: clientURL, token: '' });
   expect(axiom).toBeDefined();
 
   beforeEach(() => {
     // reset client to clear rate limits
-    axiom = new AxiomWithoutBatching({ url: clientURL });
+    axiom = new AxiomWithoutBatching({ url: clientURL, token: '' });
   });
 
   it('Services', () => {
@@ -194,4 +194,18 @@ describe('Axiom', () => {
     expect(response).not.toEqual('undefined');
     expect(response.matches).toHaveLength(2);
   });
+
+  it('catch fetch errors correctly', async () => {
+    let errorCaptured = false;
+    let client = new Axiom({ url: clientURL, token: 'test', onError: (err) => {
+      console.log('callback has been called', err);
+      errorCaptured = true;
+    } });
+    mockFetchResponse({}, 500);
+
+    client.ingest('test', [{ name: 'test' }]);
+    client.ingest('test', [{ name: 'test' }]);
+    await client.flush();
+    expect(true).toEqual(errorCaptured);
+  })
 });

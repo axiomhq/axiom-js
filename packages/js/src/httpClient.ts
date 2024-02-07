@@ -31,6 +31,7 @@ export interface ClientOptions {
    * need to change this unless you are using a self-hosted version of Axiom.
    */
   url?: string;
+  onError?: (error: Error) => void;
 }
 
 export default abstract class HTTPClient {

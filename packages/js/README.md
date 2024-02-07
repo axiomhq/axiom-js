@@ -40,3 +40,18 @@ console.log(res);
 ```
 
 For further examples, head over to the [examples](../../examples/js) directory.
+
+
+## Capture Errors
+
+To capture errors, you can pass a method `onError` to the client:
+
+```ts
+let client = new Axiom({
+  token: '',
+  ...,
+  onError: (err) => {
+    console.log('ERROR:', err);
+  }
+});
+```

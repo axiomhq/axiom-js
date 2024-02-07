@@ -7,11 +7,15 @@ class BaseClient extends HTTPClient {
   datasets: datasets.Service;
   users: users.Service;
   localPath = '/v1';
+  onError = (err: Error) => console.error(err);
 
   constructor(options: ClientOptions) {
     super(options);
     this.datasets = new datasets.Service(options);
     this.users = new users.Service(options);
+    if (options.onError) {
+      this.onError = options.onError;
+    }
   }
 
   /**
@@ -199,9 +203,9 @@ export class Axiom extends BaseClient {
   flush = async (): Promise<void> => {
     let promises: Array<Promise<IngestStatus | void>> = [];
     for (const key in this.batch) {
-      promises.push(this.batch[key].flush());
+      promises.push(this.batch[key].flush().catch(this.onError));
     }
-    await Promise.all(promises);
+    await Promise.all(promises).catch(this.onError);
   };
 }
 
