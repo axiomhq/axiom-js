@@ -51,7 +51,8 @@ let client = new Axiom({
   token: '',
   ...,
   onError: (err) => {
-    console.log('ERROR:', err);
+    console.error('ERROR:', err);
   }
 });
 ```
+by default `onError` is set to `console.error`.

@@ -7,7 +7,7 @@ class BaseClient extends HTTPClient {
   datasets: datasets.Service;
   users: users.Service;
   localPath = '/v1';
-  onError = (err: Error) => console.error(err);
+  onError = console.error;
 
   constructor(options: ClientOptions) {
     super(options);
@@ -42,22 +42,33 @@ class BaseClient extends HTTPClient {
     contentType: ContentType = ContentType.JSON,
     contentEncoding: ContentEncoding = ContentEncoding.Identity,
     options?: IngestOptions,
-  ): Promise<IngestStatus> =>
-    this.client.post(
-      this.localPath + '/datasets/' + dataset + '/ingest',
-      {
-        headers: {
-          'Content-Type': contentType,
-          'Content-Encoding': contentEncoding,
+  ): Promise<IngestStatus> => {
+    try {
+      return this.client.post(
+        this.localPath + '/datasets/' + dataset + '/ingest',
+        {
+          headers: {
+            'Content-Type': contentType,
+            'Content-Encoding': contentEncoding,
+          },
+          body: data,
         },
-        body: data,
-      },
-      {
-        'timestamp-field': options?.timestampField as string,
-        'timestamp-format': options?.timestampFormat as string,
-        'csv-delimiter': options?.csvDelimiter as string,
-      },
-    );
+        {
+          'timestamp-field': options?.timestampField as string,
+          'timestamp-format': options?.timestampFormat as string,
+          'csv-delimiter': options?.csvDelimiter as string,
+        },
+      );
+    } catch (err: any) {
+      this.onError(err);
+      return Promise.resolve({
+        ingested: 0,
+        failed: 0,
+        processedBytes: 0,
+        blocksCreated: 0,
+        walLength: 0,
+      });
+    }}
 
   queryLegacy = (dataset: string, query: QueryLegacy, options?: QueryOptions): Promise<QueryLegacyResult> =>
     this.client.post(
@@ -147,9 +158,10 @@ export class AxiomWithoutBatching extends BaseClient {
    * ```
    * 
    */
-  ingest(dataset: string, events: Array<object> | object, options?: IngestOptions): Promise<IngestStatus> {
+  async ingest(dataset: string, events: Array<object> | object, options?: IngestOptions): Promise<IngestStatus> {
     const array = Array.isArray(events) ? events : [events];
     const json = array.map((v) => JSON.stringify(v)).join('\n');
+
     return this.ingestRaw(dataset, json, ContentType.NDJSON, ContentEncoding.Identity, options);
   }
 }
