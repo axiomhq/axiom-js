@@ -43,8 +43,7 @@ class BaseClient extends HTTPClient {
     contentEncoding: ContentEncoding = ContentEncoding.Identity,
     options?: IngestOptions,
   ): Promise<IngestStatus> => {
-    try {
-      return this.client.post(
+      return this.client.post<IngestStatus>(
         this.localPath + '/datasets/' + dataset + '/ingest',
         {
           headers: {
@@ -58,17 +57,17 @@ class BaseClient extends HTTPClient {
           'timestamp-format': options?.timestampFormat as string,
           'csv-delimiter': options?.csvDelimiter as string,
         },
-      );
-    } catch (err: any) {
-      this.onError(err);
-      return Promise.resolve({
-        ingested: 0,
-        failed: 0,
-        processedBytes: 0,
-        blocksCreated: 0,
-        walLength: 0,
+      ).catch((err) => {
+        this.onError(err);
+        return Promise.resolve({
+          ingested: 0,
+          failed: 0,
+          processedBytes: 0,
+          blocksCreated: 0,
+          walLength: 0,
+        });
       });
-    }}
+    }
 
   queryLegacy = (dataset: string, query: QueryLegacy, options?: QueryOptions): Promise<QueryLegacyResult> =>
     this.client.post(
