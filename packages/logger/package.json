@@ -1,0 +1,58 @@
+{
+    "name": "@axiomhq/logger",
+    "description": "The official Axiom javascript logger",
+    "version": "1.0.0",
+    "author": "Axiom, Inc.",
+    "license": "MIT",
+    "contributors": [
+        "Islam Shehata <islam@axiom.co>",
+        "Arne Bahlo <arne@axiom.co>"
+    ],
+    "engines": {
+        "node": ">=18"
+    },
+    "type": "module",
+    "types": "dist/esm/types/index.d.ts",
+    "module": "dist/esm/index.js",
+    "main": "dist/cjs/index.cjs",
+    "scripts": {
+        "build": "rollup -c rollup.config.js",
+        "build:cjs": "rollup -c rollup.config.cjs.js",
+        "format": "eslint '*/**/*.{js,ts}' --quiet --fix",
+        "lint": "eslint '*/**/*.{js,ts}'",
+        "prepublish": "pnpm run build && pnpm run build:cjs",
+        "test": "vitest run test/unit/* --coverage"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/axiomhq/axiom-js.git"
+    },
+    "keywords": [
+        "axiom",
+        "api",
+        "rest",
+        "client",
+        "axiom-js",
+        "axiom sdk",
+        "axiom js",
+        "logging",
+        "logger",
+        "axiom logger"
+    ],
+    "bugs": {
+        "url": "https://github.com/axiomhq/axiom-js/issues"
+    },
+    "homepage": "https://github.com/axiomhq/axiom-js/blob/main/packages/logger/README.md",
+    "dependencies": {
+        "@axiomhq/runtime": "*"
+    },
+    "peerDependencies": {
+        "@axiomhq/js": "*"
+    },
+    "exports": {
+        "types": "./dist/esm/types/index.d.ts",
+        "import": "./dist/esm/index.js",
+        "require": "./dist/cjs/index.cjs",
+        "default": "./dist/esm/index.js"
+    }
+}
