@@ -189,8 +189,11 @@ importers:
   packages/logger:
     dependencies:
       '@axiomhq/js':
-        specifier: ^1.0.0-rc.2
-        version: 1.0.0-rc.2
+        specifier: workspace:*
+        version: link:../js
+      '@axiomhq/runtime':
+        specifier: workspace:*
+        version: link:../runtime
 
   packages/pino:
     dependencies:
@@ -236,14 +239,6 @@ packages:
       '@jridgewell/gen-mapping': 0.3.3
       '@jridgewell/trace-mapping': 0.3.18
     dev: true
-
-  /@axiomhq/js@1.0.0-rc.2:
-    resolution: {integrity: sha512-BQJQNkumdKZgbLGhf3DZb6A8w/31jtX3hWtdv0mMiSE3O5PioeIZNxRTMoWRChxt8TylZrJoVezqrw/ooWPoyQ==}
-    engines: {node: '>=16'}
-    dependencies:
-      fetch-retry: 5.0.6
-      uuid: 8.3.2
-    dev: false
 
   /@babel/helper-string-parser@7.22.5:
     resolution: {integrity: sha512-mM4COjgZox8U+JcXQwPijIZLElkgEpO5rsERVDJTc2qfCDfERyob6k5WegS14SX18IIjv+XD+GrqNumY5JRCDw==}

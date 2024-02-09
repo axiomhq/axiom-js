@@ -12,9 +12,7 @@ export type LoggerConfig = {
 };
 
 export class Logger {
-  public logEvents: LogEvent[] = [];
   children: Logger[] = [];
-
 
   constructor(public config: LoggerConfig) {
     if (this.config.logLevel == undefined || this.config.logLevel < 0) {
@@ -71,7 +69,7 @@ export class Logger {
       logEvent = t.transform(logEvent);
     }
 
-    this.logEvents.push(logEvent);
+    this.config.transport.log(logEvent);
     if (this.config.autoFlush) {
       this.flush();
     }

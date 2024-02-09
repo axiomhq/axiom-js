@@ -44,10 +44,10 @@
     },
     "homepage": "https://github.com/axiomhq/axiom-js/blob/main/packages/logger/README.md",
     "dependencies": {
-        "@axiomhq/runtime": "*"
+        "@axiomhq/runtime": "workspace:*"
     },
     "peerDependencies": {
-        "@axiomhq/js": "*"
+        "@axiomhq/js": "workspace:*"
     },
     "exports": {
         "types": "./dist/esm/types/index.d.ts",
