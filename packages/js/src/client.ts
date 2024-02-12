@@ -69,8 +69,8 @@ class BaseClient extends HTTPClient {
       });
     }
 
-  queryLegacy = (dataset: string, query: QueryLegacy, options?: QueryOptions): Promise<QueryLegacyResult> =>
-    this.client.post(
+  queryLegacy = (dataset: string, query: LegacyQuery, options?: QueryOptions): Promise<LegacyQueryResult> =>
+    this.client.post<LegacyQueryResult>(
       this.localPath + '/datasets/' + dataset + '/query',
       {
         body: JSON.stringify(query),
@@ -78,6 +78,7 @@ class BaseClient extends HTTPClient {
       {
         'streaming-duration': options?.streamingDuration as string,
         nocache: options?.noCache as boolean,
+        format: 'legacy',
       },
     );
 
@@ -102,6 +103,7 @@ class BaseClient extends HTTPClient {
     if (options?.endTime) {
       req.endTime = options?.endTime;
     }
+
     return this.client.post<QueryResult>(
       this.localPath + '/datasets/_apl',
       {
@@ -110,7 +112,7 @@ class BaseClient extends HTTPClient {
       {
         'streaming-duration': options?.streamingDuration as string,
         nocache: options?.noCache as boolean,
-        format: 'legacy',
+        format: 'tabular',
       },
     );
   };
@@ -296,7 +298,7 @@ export interface QueryOptions extends QueryOptionsBase {
   endTime?: string;
 }
 
-export interface QueryLegacy {
+export interface LegacyQuery {
   aggregations?: Array<Aggregation>;
   continuationToken?: string;
   cursor?: string;
@@ -387,20 +389,34 @@ export interface VirtualColumn {
   expr: string;
 }
 
-export interface QueryLegacyResult {
+export interface LegacyQueryResult {
   buckets: Timeseries;
   matches?: Array<Entry>;
   status: Status;
 }
 
 export interface QueryResult {
-  request: QueryLegacy;
-
-  // Copied from QueryResult
-  buckets: Timeseries;
-  datasetNames: string[];
-  matches?: Array<Entry>;
   status: Status;
+  tables: Array<APLResultTable>;
+  request: Query;
+}
+
+export interface APLResultTable {
+  name: string;
+  sources: Array<{name: string}>;
+  fields: Array<{name: string, type: string, agg?: Aggregation}>
+  order: Array<{
+    name: string,
+    desc: boolean,
+  }>;
+  groups: Array<{name: string}>;
+  range?: {
+    field: string,
+    start: string,
+    end: string,
+  },
+  buckets?: {field: string, size: any},
+  columns: Array<any>
 }
 
 export interface Timeseries {
