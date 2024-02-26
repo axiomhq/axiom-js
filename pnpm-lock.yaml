@@ -8,6 +8,9 @@ importers:
 
   .:
     devDependencies:
+      '@edge-runtime/vm':
+        specifier: ^3.2.0
+        version: 3.2.0
       '@rollup/plugin-replace':
         specifier: ^5.0.2
         version: 5.0.2(rollup@3.29.4)
@@ -53,6 +56,9 @@ importers:
       rollup:
         specifier: ^3.29.4
         version: 3.29.4
+      runtime:
+        specifier: ^0.14.1
+        version: 0.14.1
       ts-node:
         specifier: ^10.8.1
         version: 10.9.1(@types/node@20.4.1)(typescript@5.2.2)
@@ -67,7 +73,7 @@ importers:
         version: 5.2.2
       vitest:
         specifier: ^0.34.6
-        version: 0.34.6(@vitest/ui@0.32.2)(jsdom@22.1.0)
+        version: 0.34.6(@edge-runtime/vm@3.2.0)(@vitest/ui@0.32.2)(jsdom@22.1.0)
       winston:
         specifier: ^3.8.2
         version: 3.9.0
@@ -291,6 +297,18 @@ packages:
       colorspace: 1.1.4
       enabled: 2.0.0
       kuler: 2.0.0
+
+  /@edge-runtime/primitives@4.1.0:
+    resolution: {integrity: sha512-Vw0lbJ2lvRUqc7/soqygUX216Xb8T3WBZ987oywz6aJqRxcwSVWwr9e+Nqo2m9bxobA9mdbWNNoRY6S9eko1EQ==}
+    engines: {node: '>=16'}
+    dev: true
+
+  /@edge-runtime/vm@3.2.0:
+    resolution: {integrity: sha512-0dEVyRLM/lG4gp1R/Ik5bfPl/1wX00xFwd5KcNH602tzBa09oF7pbTKETEhR1GjZ75K6OJnYFu8II2dyMhONMw==}
+    engines: {node: '>=16'}
+    dependencies:
+      '@edge-runtime/primitives': 4.1.0
+    dev: true
 
   /@esbuild/android-arm64@0.18.20:
     resolution: {integrity: sha512-Nz4rJcchGDtENV0eMKUNa6L12zz2zBDXuhj/Vjh18zGqB44Bi7MBMSXjgunJgjRhCmKOjnPuZp4Mb6OKqtMHLQ==}
@@ -1089,7 +1107,7 @@ packages:
       std-env: 3.4.2
       test-exclude: 6.0.0
       v8-to-istanbul: 9.1.0
-      vitest: 0.34.6(@vitest/ui@0.32.2)(jsdom@22.1.0)
+      vitest: 0.34.6(@edge-runtime/vm@3.2.0)(@vitest/ui@0.32.2)(jsdom@22.1.0)
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -1136,7 +1154,7 @@ packages:
       pathe: 1.1.1
       picocolors: 1.0.0
       sirv: 2.0.3
-      vitest: 0.34.6(@vitest/ui@0.32.2)(jsdom@22.1.0)
+      vitest: 0.34.6(@edge-runtime/vm@3.2.0)(@vitest/ui@0.32.2)(jsdom@22.1.0)
     dev: true
 
   /@vitest/utils@0.32.2:
@@ -1409,6 +1427,16 @@ packages:
     resolution: {integrity: sha512-eBvWn1lvIApYMhzQMsu9ciLfkBY499mFZlNqG+/9WR7PVlroQw0vG30cOQQbaKz3sCEc44TAOu2ykzqXSNnwag==}
     dev: false
 
+  /async-done@1.3.2:
+    resolution: {integrity: sha512-uYkTP8dw2og1tu1nmza1n1CMW0qb8gWWlwqMmLb7MhBVs4BXrFziT6HXUd+/RlRA/i4H9AkofYloUbs1fwMqlw==}
+    engines: {node: '>= 0.10'}
+    dependencies:
+      end-of-stream: 1.4.4
+      once: 1.4.0
+      process-nextick-args: 2.0.1
+      stream-exhaust: 1.0.2
+    dev: true
+
   /async@3.2.4:
     resolution: {integrity: sha512-iAB+JbDEGXhyIUavoDl9WP/Jj106Kz9DEn1DPgYw5ruDn0e3Wgi3sKFm55sASdGBNOQB8F59d9qQ7deqrHA8wQ==}
 
@@ -1597,6 +1625,12 @@ packages:
     resolution: {integrity: sha512-dcKFX3jn0MpIaXjisoRvexIJVEKzaq7z2rZKxf+MSr9TkdmHmsU4m2lcLojrj/FHl8mk5VxMmYA+ftRkP/3oKQ==}
     dev: true
 
+  /createClass@1.0.7:
+    resolution: {integrity: sha512-unCMvR78WxGWg464+UDn31JA4+Q1hdwf50Z7ooyut2xCLLNIcMSsayytG6gscvgFHCpUw14EGszmks7aGhZXKA==}
+    dependencies:
+      inherits: 2.0.4
+    dev: true
+
   /cross-spawn@7.0.3:
     resolution: {integrity: sha512-iRDPJKUPVEND7dHPO8rkbOnPpyDygcDFtWjpeWNCgy8WP2rXcxXL8TskReQl6OrB2G7+UJrags1q15Fudc7G6w==}
     engines: {node: '>= 8'}
@@ -1745,6 +1779,12 @@ packages:
 
   /enabled@2.0.0:
     resolution: {integrity: sha512-AKrN98kuwOzMIdAizXGI86UFBoo26CL21UM763y1h/GMSJ4/OHU9k2YlsmBpyScFo/wbLzWQJBMCW4+IO3/+OQ==}
+
+  /end-of-stream@1.4.4:
+    resolution: {integrity: sha512-+uw1inIHVPQoaVuHzRyXd21icM+cnt4CzD5rW+NC1wjOUSTOs+Te7FOv7AhN7vS9x/oIyhLP5PR1H+phQAHu5Q==}
+    dependencies:
+      once: 1.4.0
+    dev: true
 
   /enhanced-resolve@5.14.1:
     resolution: {integrity: sha512-Vklwq2vDKtl0y/vtwjSesgJ5MYS7Etuk5txS8VdKL4AOS1aUlD96zqIfsOSLQsdv3xgMRbtkWM8eG9XDfKUPow==}
@@ -2828,8 +2868,132 @@ packages:
     dependencies:
       p-locate: 5.0.0
 
+  /lodash._arraycopy@3.0.0:
+    resolution: {integrity: sha512-RHShTDnPKP7aWxlvXKiDT6IX2jCs6YZLCtNhOru/OX2Q/tzX295vVBK5oX1ECtN+2r86S0Ogy8ykP1sgCZAN0A==}
+    dev: true
+
+  /lodash._arrayeach@3.0.0:
+    resolution: {integrity: sha512-Mn7HidOVcl3mkQtbPsuKR0Fj0N6Q6DQB77CtYncZcJc0bx5qv2q4Gl6a0LC1AN+GSxpnBDNnK3CKEm9XNA4zqQ==}
+    dev: true
+
+  /lodash._baseassign@3.2.0:
+    resolution: {integrity: sha512-t3N26QR2IdSN+gqSy9Ds9pBu/J1EAFEshKlUHpJG3rvyJOYgcELIxcIeKKfZk7sjOz11cFfzJRsyFry/JyabJQ==}
+    dependencies:
+      lodash._basecopy: 3.0.1
+      lodash.keys: 3.1.2
+    dev: true
+
+  /lodash._baseclone@3.3.0:
+    resolution: {integrity: sha512-1K0dntf2dFQ5my0WoGKkduewR6+pTNaqX03kvs45y7G5bzl4B3kTR4hDfJIc2aCQDeLyQHhS280tc814m1QC1Q==}
+    dependencies:
+      lodash._arraycopy: 3.0.0
+      lodash._arrayeach: 3.0.0
+      lodash._baseassign: 3.2.0
+      lodash._basefor: 3.0.3
+      lodash.isarray: 3.0.4
+      lodash.keys: 3.1.2
+    dev: true
+
+  /lodash._basecopy@3.0.1:
+    resolution: {integrity: sha512-rFR6Vpm4HeCK1WPGvjZSJ+7yik8d8PVUdCJx5rT2pogG4Ve/2ZS7kfmO5l5T2o5V2mqlNIfSF5MZlr1+xOoYQQ==}
+    dev: true
+
+  /lodash._basefor@3.0.3:
+    resolution: {integrity: sha512-6bc3b8grkpMgDcVJv9JYZAk/mHgcqMljzm7OsbmcE2FGUMmmLQTPHlh/dFqR8LA0GQ7z4K67JSotVKu5058v1A==}
+    dev: true
+
+  /lodash._bindcallback@3.0.1:
+    resolution: {integrity: sha512-2wlI0JRAGX8WEf4Gm1p/mv/SZ+jLijpj0jyaE/AXeuQphzCgD8ZQW4oSpoN8JAopujOFGU3KMuq7qfHBWlGpjQ==}
+    dev: true
+
+  /lodash._createassigner@3.1.1:
+    resolution: {integrity: sha512-LziVL7IDnJjQeeV95Wvhw6G28Z8Q6da87LWKOPWmzBLv4u6FAT/x5v00pyGW0u38UoogNF2JnD3bGgZZDaNEBw==}
+    dependencies:
+      lodash._bindcallback: 3.0.1
+      lodash._isiterateecall: 3.0.9
+      lodash.restparam: 3.6.1
+    dev: true
+
+  /lodash._getnative@3.9.1:
+    resolution: {integrity: sha512-RrL9VxMEPyDMHOd9uFbvMe8X55X16/cGM5IgOKgRElQZutpX89iS6vwl64duTV1/16w5JY7tuFNXqoekmh1EmA==}
+    dev: true
+
+  /lodash._isiterateecall@3.0.9:
+    resolution: {integrity: sha512-De+ZbrMu6eThFti/CSzhRvTKMgQToLxbij58LMfM8JnYDNSOjkjTCIaa8ixglOeGh2nyPlakbt5bJWJ7gvpYlQ==}
+    dev: true
+
+  /lodash.clone@3.0.3:
+    resolution: {integrity: sha512-yVYPpFTdZDCLG2p07gVRTvcwN5X04oj2hu4gG6r0fer58JA08wAVxXzWM+CmmxO2bzOH8u8BkZTZqgX6juVF7A==}
+    dependencies:
+      lodash._baseclone: 3.3.0
+      lodash._bindcallback: 3.0.1
+      lodash._isiterateecall: 3.0.9
+    dev: true
+
+  /lodash.isarguments@3.1.0:
+    resolution: {integrity: sha512-chi4NHZlZqZD18a0imDHnZPrDeBbTtVN7GXMwuGdRH9qotxAjYs3aVLKc7zNOG9eddR5Ksd8rvFEBc9SsggPpg==}
+    dev: true
+
+  /lodash.isarray@3.0.4:
+    resolution: {integrity: sha512-JwObCrNJuT0Nnbuecmqr5DgtuBppuCvGD9lxjFpAzwnVtdGoDQ1zig+5W8k5/6Gcn0gZ3936HDAlGd28i7sOGQ==}
+    dev: true
+
+  /lodash.isplainobject@3.2.0:
+    resolution: {integrity: sha512-P4wZnho5curNqeEq/x292Pb57e1v+woR7DJ84DURelKB46lby8aDEGVobSaYtzHdQBWQrJSdxcCwjlGOvvdIyg==}
+    dependencies:
+      lodash._basefor: 3.0.3
+      lodash.isarguments: 3.1.0
+      lodash.keysin: 3.0.8
+    dev: true
+
+  /lodash.istypedarray@3.0.6:
+    resolution: {integrity: sha512-lGWJ6N8AA3KSv+ZZxlTdn4f6A7kMfpJboeyvbFdE7IU9YAgweODqmOgdUHOA+c6lVWeVLysdaxciFXi+foVsWw==}
+    dev: true
+
+  /lodash.keys@3.1.2:
+    resolution: {integrity: sha512-CuBsapFjcubOGMn3VD+24HOAPxM79tH+V6ivJL3CHYjtrawauDJHUk//Yew9Hvc6e9rbCrURGk8z6PC+8WJBfQ==}
+    dependencies:
+      lodash._getnative: 3.9.1
+      lodash.isarguments: 3.1.0
+      lodash.isarray: 3.0.4
+    dev: true
+
+  /lodash.keysin@3.0.8:
+    resolution: {integrity: sha512-YDB/5xkL3fBKFMDaC+cfGV00pbiJ6XoJIfRmBhv7aR6wWtbCW6IzkiWnTfkiHTF6ALD7ff83dAtB3OEaSoyQPg==}
+    dependencies:
+      lodash.isarguments: 3.1.0
+      lodash.isarray: 3.0.4
+    dev: true
+
+  /lodash.merge@3.3.2:
+    resolution: {integrity: sha512-ZgGZpRhWLjivGUbjtApZR4HyLv/UAyoYqESVYkK4aLBJVHRrbFpG+GNnE9JPijliME4LkKM0SFI/WyOiBiv1+w==}
+    dependencies:
+      lodash._arraycopy: 3.0.0
+      lodash._arrayeach: 3.0.0
+      lodash._createassigner: 3.1.1
+      lodash._getnative: 3.9.1
+      lodash.isarguments: 3.1.0
+      lodash.isarray: 3.0.4
+      lodash.isplainobject: 3.2.0
+      lodash.istypedarray: 3.0.6
+      lodash.keys: 3.1.2
+      lodash.keysin: 3.0.8
+      lodash.toplainobject: 3.0.0
+    dev: true
+
   /lodash.merge@4.6.2:
     resolution: {integrity: sha512-0KpjqXRVvrYyCsX1swR/XTK0va6VQkQM6MNo7PqW77ByjAhoARA8EfrP1N4+KlKj8YS0ZUCtRT/YUuhyYDujIQ==}
+
+  /lodash.restparam@3.6.1:
+    resolution: {integrity: sha512-L4/arjjuq4noiUJpt3yS6KIKDtJwNe2fIYgMqyYYKoeIfV1iEqvPwhCx23o+R9dzouGihDAPN1dTIRWa7zk8tw==}
+    dev: true
+
+  /lodash.toplainobject@3.0.0:
+    resolution: {integrity: sha512-wMI0Ju1bvSmnBS3EcRRH/3zDnZOPpDtMtNDzbbNMKuTrEpALsf+sPyMeogmv63Y11qZQO7H1xFzohIEGRMjPYA==}
+    dependencies:
+      lodash._basecopy: 3.0.1
+      lodash.keysin: 3.0.8
+    dev: true
 
   /logform@2.5.1:
     resolution: {integrity: sha512-9FyqAm9o9NKKfiAKfZoYo9bGXXuwMkxQiQttkT4YjjVtQVIQtK6LmVtlxmCaFswo6N4AfEkHqZTV0taDtPotNg==}
@@ -3280,6 +3444,10 @@ packages:
       react-is: 18.2.0
     dev: true
 
+  /process-nextick-args@2.0.1:
+    resolution: {integrity: sha512-3ouUOpQhtgrbOa17J7+uxOTpITYWaGP7/AhoR3+A+/1e9skrzelGi/dXzEYyvbxubEF6Wn2ypscTKiKJFFn1ag==}
+    dev: true
+
   /process-warning@2.2.0:
     resolution: {integrity: sha512-/1WZ8+VQjR6avWOgHeEPd7SDQmFQ1B5mC1eRXsCm5TarlNmx/wCsa5GEaxGm05BORRtyG/Ex/3xq3TuRvq57qg==}
     dev: false
@@ -3456,6 +3624,16 @@ packages:
     dependencies:
       queue-microtask: 1.2.3
 
+  /runtime@0.14.1:
+    resolution: {integrity: sha512-okusjXO4tfjIK+YHvghl9mP23zxoBvIcamV24CIzk2XXYFx+qWVd1SyNFqIa8htV8eX2aMW3QtM2YFj2QQTQlg==}
+    dependencies:
+      async-done: 1.3.2
+      createClass: 1.0.7
+      lodash.clone: 3.0.3
+      lodash.merge: 3.3.2
+      once: 1.4.0
+    dev: true
+
   /safe-buffer@5.2.1:
     resolution: {integrity: sha512-rp3So07KcdmmKbGvgaNxQSJr7bGVSVk5S9Eq1F+ppbRo70+YeaDxkw5Dd8NPN+GD6bjnYm2VuPuCXmpuYvmCXQ==}
 
@@ -3578,6 +3756,10 @@ packages:
 
   /std-env@3.4.2:
     resolution: {integrity: sha512-Cw6eJDX9AxEEL0g5pYj8Zx9KXtDf60rxwS2ze0HBanS0aKhj1sBlzcsmg+R0qYy8byFa854/yR2X5ZmBSClVmg==}
+    dev: true
+
+  /stream-exhaust@1.0.2:
+    resolution: {integrity: sha512-b/qaq/GlBK5xaq1yrK9/zFcyRSTNxmcZwFLGSTG0mXgZl/4Z6GgiyYOXOvY7N3eEvFRAG1bkDRz5EPGSvPYQlw==}
     dev: true
 
   /streamsearch@1.1.0:
@@ -4036,7 +4218,7 @@ packages:
       fsevents: 2.3.2
     dev: true
 
-  /vitest@0.34.6(@vitest/ui@0.32.2)(jsdom@22.1.0):
+  /vitest@0.34.6(@edge-runtime/vm@3.2.0)(@vitest/ui@0.32.2)(jsdom@22.1.0):
     resolution: {integrity: sha512-+5CALsOvbNKnS+ZHMXtuUC7nL8/7F1F2DnHGjSsszX8zCjWSSviphCb/NuS9Nzf4Q03KyyDRBAXhF/8lffME4Q==}
     engines: {node: '>=v14.18.0'}
     hasBin: true
@@ -4067,6 +4249,7 @@ packages:
       webdriverio:
         optional: true
     dependencies:
+      '@edge-runtime/vm': 3.2.0
       '@types/chai': 4.3.5
       '@types/chai-subset': 1.3.3
       '@types/node': 20.4.1
