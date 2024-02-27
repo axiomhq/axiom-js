@@ -1,4 +1,4 @@
-export const LOG_LEVEL = process.env.NEXT_PUBLIC_AXIOM_LOG_LEVEL || process.env.AXIOM_LOG_LEVEL || 'debug';
+export const LOG_LEVEL = process.env.AXIOM_LOG_LEVEL || 'debug';
 
 export enum LogLevel {
   debug = 0,

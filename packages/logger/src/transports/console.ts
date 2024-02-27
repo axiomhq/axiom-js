@@ -5,8 +5,7 @@ import { isBrowser } from "@axiomhq/runtime";
 export const isNoPrettyPrint = process.env.AXIOM_NO_PRETTY_PRINT == 'true' ? true : false;
 
 export class ConsoleTransport implements Transport {
-    constructor(public isNoPrettyPrint: boolean = false) {
-    }
+    constructor(public isNoPrettyPrint: boolean = false) {}
 
     log(ev: LogEvent) {
         const hasFields = Object.keys(ev.fields).length > 0;
