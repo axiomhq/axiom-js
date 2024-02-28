@@ -1,7 +1,7 @@
 {
     "name": "@axiomhq/winston",
     "description": "The official Axiom transport for winston logger",
-    "version": "1.0.0-rc.2",
+    "version": "1.0.0-rc.3",
     "type": "module",
     "types": "dist/esm/types/index.d.ts",
     "module": "dist/esm/index.js",
