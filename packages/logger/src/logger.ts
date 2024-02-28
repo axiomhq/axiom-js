@@ -43,7 +43,7 @@ export class Logger {
     return child;
   };
 
-  _log = (level: LogLevel, message: string, args: { [key: string]: any } = {}) => {
+  private _log = (level: LogLevel, message: string, args: { [key: string]: any } = {}) => {
     if (level < this.config.logLevel) {
       return;
     }
@@ -90,6 +90,7 @@ function jsonFriendlyErrorReplacer(key: string, value: any) {
       name: value.name,
       message: value.message,
       stack: value.stack,
+      cause: value.cause,
     };
   }
 
