@@ -19,7 +19,7 @@ export class FetchClient {
     const headers = { ...this.config.headers, ...init.headers };
 
     const resp = await fetchRetry(fetch)(finalUrl, {
-      retries: 3,
+      retries: 1,
       retryDelay: function (attempt, error, response) {
         return Math.pow(2, attempt) * 1000; // 1000, 2000, 4000
       },

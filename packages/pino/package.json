@@ -1,6 +1,6 @@
 {
   "name": "@axiomhq/pino",
-  "version": "1.0.0-rc.2",
+  "version": "1.0.0-rc.3",
   "description": "The official Axiom transport for Pino",
   "type": "module",
   "types": "dist/esm/types/index.d.ts",
