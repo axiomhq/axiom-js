@@ -17,28 +17,40 @@ export interface Options extends ClientOptions {
 
 export default async function axiomTransport(options: Options) {
   const axiom = new Axiom(options);
-
   const dataset = options.dataset;
 
   return build(
     async function (source: any) {
+      const ingestPromises: Promise<void>[] = [];
       for await (const obj of source) {
         const { time, level, ...rest } = obj;
-
         const event = {
           _time: time,
           level: mapLogLevel(level),
           ...rest,
         };
 
-        axiom.ingest(dataset, event);
+        // Wrap the ingest call in a Promise for proper async handling
+        const ingestPromise = new Promise<void>((resolve, reject) => {
+          axiom.ingest(dataset, event);
+          resolve(); // Resolve the promise once ingest is called
+        }).catch((error: Error) => {
+          console.error("Failed to ingest log to Axiom:", error);
+        });
+
+        ingestPromises.push(ingestPromise);
       }
+
+      // Wait for all ingestion to complete
+      await Promise.all(ingestPromises);
     },
     { close: async () => await axiom.flush() },
   );
 }
 
 // See https://github.com/pinojs/pino/blob/master/docs/api.md#loggerlevel-string-gettersetter
+
+
 export const mapLogLevel = (level: string | number) => {
   if (typeof level === 'string') {
     return level;
