@@ -15,7 +15,8 @@ env:
   AXIOM_URL: ${{ secrets.TESTING_STAGING_API_URL }}
   AXIOM_ORG_ID: ${{ secrets.TESTING_STAGING_E2E_ORG_ID }}
   AXIOM_DATASET_SUFFIX: ${{ github.run_id }}
-  PNPM_VERSION: 8.9.0
+  NODEVERSION: 18.x
+  PNPM_VERSION: 8.15.5
 
 jobs:
   build:
