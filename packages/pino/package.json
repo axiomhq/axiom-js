@@ -41,6 +41,6 @@
   },
   "dependencies": {
     "@axiomhq/js": "workspace:*",
-    "pino-abstract-transport": "^1.0.0"
+    "pino-abstract-transport": "^1.1.0"
   }
 }
