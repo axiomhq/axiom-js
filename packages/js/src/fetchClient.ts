@@ -7,7 +7,7 @@ export class FetchClient {
   async doReq<T>(
     endpoint: string,
     method: string,
-    init: RequestInitWithRetry = {},
+    init: RequestInit = {},
     searchParams: { [key: string]: string } = {},
   ): Promise<T> {
     let finalUrl = `${this.config.baseUrl}${endpoint}`;
@@ -45,19 +45,19 @@ export class FetchClient {
     return (await resp.json()) as T;
   }
 
-  post<T>(url: string, init: RequestInitWithRetry = {}, searchParams: any = {}): Promise<T> {
+  post<T>(url: string, init: RequestInit = {}, searchParams: any = {}): Promise<T> {
     return this.doReq<T>(url, 'POST', init, searchParams);
   }
 
-  get<T>(url: string, init: RequestInitWithRetry = {}, searchParams: any = {}): Promise<T> {
+  get<T>(url: string, init: RequestInit = {}, searchParams: any = {}): Promise<T> {
     return this.doReq<T>(url, 'GET', init, searchParams);
   }
 
-  put<T>(url: string, init: RequestInitWithRetry = {}, searchParams: any = {}): Promise<T> {
+  put<T>(url: string, init: RequestInit = {}, searchParams: any = {}): Promise<T> {
     return this.doReq<T>(url, 'PUT', init, searchParams);
   }
 
-  delete<T>(url: string, init: RequestInitWithRetry = {}, searchParams: any = {}): Promise<T> {
+  delete<T>(url: string, init: RequestInit = {}, searchParams: any = {}): Promise<T> {
     return this.doReq<T>(url, 'DELETE', init, searchParams);
   }
 
