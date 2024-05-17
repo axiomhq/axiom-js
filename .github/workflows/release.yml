@@ -4,7 +4,7 @@ on: workflow_dispatch
 
 env:
   NODEVERSION: 18.x
-  PNPM_VERSION: 8.15.5
+  PNPM_VERSION: 9.1.1
 
 jobs:
   publish:
