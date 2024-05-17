@@ -19,8 +19,6 @@ export namespace datasets {
     hidden: boolean;
   }
 
-  export interface TrimResult {}
-
   export interface CreateRequest {
     name: string;
     description?: string;
@@ -48,7 +46,7 @@ export namespace datasets {
 
     delete = (id: string): Promise<Response> => this.client.delete(this.localPath + '/' + id);
 
-    trim = (id: string, maxDurationStr: string): Promise<TrimResult> => {
+    trim = (id: string, maxDurationStr: string): Promise<void> => {
       // Go's 'time.Duration' uses nanoseconds as its base unit. So parse the
       // duration string and convert to nanoseconds. 1ms = 1000000ns.
       const req: TrimRequest = { maxDuration: maxDurationStr };

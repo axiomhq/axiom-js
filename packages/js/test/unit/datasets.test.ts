@@ -74,7 +74,6 @@ describe('DatasetsService', () => {
 
   it('Trim', async () => {
     mockFetchResponse({ ok: true });
-    const response = await client.trim('test1', '30m');
-    expect(response).not.toEqual('undefined');
+    await client.trim('test1', '30m');
   });
 });
