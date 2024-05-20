@@ -1,7 +1,6 @@
 import { Axiom } from '@axiomhq/js';
 import { describe, it, expect, beforeAll, afterAll, vi } from 'vitest';
 
-
 describe('Ingestion & query on different runtime', () => {
   vi.useRealTimers()
 
@@ -19,7 +18,7 @@ describe('Ingestion & query on different runtime', () => {
   afterAll(async () => {
     const resp = await axiom.datasets.delete(datasetName);
     expect(resp.status).toEqual(204);
-    console.log(`removed testing dataset: ${datasetName}`);
+    console.log(`deleted testing dataset: ${datasetName}`);
   });
 
   it('ingest on a lambda function should succeed', async () => {
@@ -29,6 +28,9 @@ describe('Ingestion & query on different runtime', () => {
     expect(resp.status).toEqual(200);
     const payload = await resp.json();
     expect(payload.ingested).toEqual(2);
+
+    // sleep 1 sec
+    await new Promise(r => setTimeout(r, 1000));
 
     // check dataset for ingested logs
     const qResp = await axiom.query(`['${datasetName}'] | where ['test'] == "ingest_on_lambda"`, {
@@ -48,7 +50,8 @@ describe('Ingestion & query on different runtime', () => {
     const payload = await resp.json();
     expect(payload.ingested).toEqual(2);
 
-    await new Promise(resolve => setTimeout(resolve, 1000)); // wait 1 sec
+    // sleep 1 sec
+    await new Promise(resolve => setTimeout(resolve, 1000));
 
     // check dataset for ingested logs
     const qResp = await axiom.query(`['${datasetName}'] | where ['test'] == "ingest_on_edge"`, {

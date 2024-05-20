@@ -1,36 +1,44 @@
 'use client';
-import { AxiomWithoutBatching, ContentEncoding, ContentType } from '@axiomhq/js';
+import { AxiomWithoutBatching } from '@axiomhq/js';
 
 export const dynamic = 'force-dynamic';
 export const fetchCache = 'force-no-store';
 
-export default async function IngestPage() {
-  try {
-    const axiom = new AxiomWithoutBatching({
-      token: process.env.AXIOM_TOKEN,
-      orgId: process.env.AXIOM_ORG_ID,
-      url: process.env.AXIOM_URL,
+export default function IngestPage() {
+  const axiom = new AxiomWithoutBatching({
+    token: process.env.NEXT_PUBLIC_AXIOM_TOKEN,
+    orgId: process.env.NEXT_PUBLIC_AXIOM_ORG_ID,
+    url: process.env.NEXT_PUBLIC_AXIOM_URL,
+  });
+
+  axiom
+    .ingest('axiom-js-e2e-test', [
+      {
+        foo: 'bar',
+        test: 'ingest_on_browser',
+        request: {
+          path: '/ingest',
+        },
+      },
+      {
+        bar: 'baz',
+        test: 'ingest_on_browser',
+        request: {
+          path: '/ingest',
+        },
+      },
+    ])
+    .then((r) => {
+      console.log({ response: r });
+    })
+    .catch((err) => {
+      console.error(err);
     });
 
-    const resp = await axiom.ingestRaw(
-      'axiom-js-e2e-test',
-      `[{"foo":"bar", "test": "ingest_on_browser"},{"bar":"baz", "test": "ingest_on_browser"}]`,
-      ContentType.JSON,
-      ContentEncoding.Identity,
-    );
-
-    return (
-      <div>
-        <p>
-          ingested: {resp.ingested}, failed: {resp.failed}
-        </p>
-      </div>
-    );
-  } catch (err: any) {
-    return (
-      <div>
-        <p>failed to ingest, check console for errors</p>
-      </div>
-    );
-  }
+  return (
+    <div>
+      <h1>Client component ingests to Axiom</h1>
+      <p>check network tab for ingest status</p>
+    </div>
+  );
 }

@@ -20,7 +20,7 @@ const datasetList = [
 ];
 
 describe('DatasetsService', () => {
-  const client = new datasets.Service({ url: 'http://axiom-js.dev.local' });
+  const client = new datasets.Service({ url: 'http://axiom-js.dev.local', token: '' });
 
   it('List', async () => {
     mockFetchResponse(datasetList);

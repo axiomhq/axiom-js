@@ -1,4 +1,4 @@
-import { AxiomWithoutBatching, ContentEncoding, ContentType } from '@axiomhq/js';
+import { AxiomWithoutBatching } from '@axiomhq/js';
 import { NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic'; // disable prerendering
@@ -11,12 +11,14 @@ export async function GET() {
   });
 
   try {
-    const resp = await axiom.ingestRaw(
+    const resp = await axiom.ingest(
       'axiom-js-e2e-test',
-      `[{"foo":"bar", "test": "ingest_on_lambda"},{"bar":"baz", "test": "ingest_on_lambda"}]`,
-      ContentType.JSON,
-      ContentEncoding.Identity,
+      [
+        { foo: "bar", test: "ingest_on_lambda", request: { path: '/api/lambda' } },
+        { bar: "baz", test: "ingest_on_lambda", request: { path: '/api/lambda' } }
+      ],
     );
+
     if (resp.ingested !== 2) {
       return NextResponse.json({ test: 'ingest_on_lambda', error: 'ingest failed' }, { status: 500 });
     }
