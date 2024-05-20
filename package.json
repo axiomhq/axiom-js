@@ -54,7 +54,7 @@
         "eslint-plugin-tsdoc": "^0.2.17",
         "jsdom": "^24.0.0",
         "prettier": "^2.8.8",
-        "rollup": "^3.29.4",
+        "rollup": "^4.17.2",
         "ts-node": "^10.9.2",
         "tslib": "^2.6.2",
         "turbo": "^1.12.5",
