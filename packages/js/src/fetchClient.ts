@@ -1,4 +1,4 @@
-import fetchRetry, { RequestInitWithRetry } from 'fetch-retry';
+import fetchRetry from 'fetch-retry';
 import { parseLimitFromResponse, Limit, LimitType } from './limit.js';
 
 export class FetchClient {
@@ -27,6 +27,7 @@ export class FetchClient {
       headers,
       method,
       body: init.body ? init.body : undefined,
+      cache: 'no-cache',
     });
 
     if (resp.status === 204) {
