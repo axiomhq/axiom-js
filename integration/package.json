@@ -12,7 +12,7 @@
         "integration": "vitest run src/*"
     },
     "dependencies": {
-        "winston-transport": "^4.5.0",
+        "winston-transport": "^4.7.0",
         "@axiomhq/winston": "workspace:*",
         "@axiomhq/js": "workspace:*"
     }
