@@ -1,0 +1,9 @@
+node_modules/
+/tsconfig.tsbuildinfo
+/src/*.d.ts
+/src/*.js
+/src/*.js.map
+dist/
+.vscode/
+coverage/
+.envrc

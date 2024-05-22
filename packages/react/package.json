@@ -1,0 +1,59 @@
+{
+  "name": "@axiomhq/react",
+  "description": "Send logs & WebVitals from your React app to Axiom.",
+  "version": "1.0.0-rc.3",
+  "author": "Axiom, Inc.",
+  "license": "MIT",
+  "contributors": [
+    "Islam Shehata <islam@axiom.co>"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "type": "module",
+  "types": "dist/esm/types/index.d.ts",
+  "module": "dist/esm/index.js",
+  "main": "dist/cjs/index.cjs",
+  "homepage": "https://github.com/axiomhq/axiom-js/blob/main/packages/winston/README.md",
+  "scripts": {
+    "build": "tsc",
+    "prepare": "npm run build",
+    "format": "prettier --write src/*.ts tests/*.ts",
+    "check-format": "prettier -c src/*.ts tests/*.ts",
+    "test": "vitest run tests --coverage"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/axiomhq/next-axiom.git"
+  },
+  "keywords": [
+    "web-vitals",
+    "axiom",
+    "observability",
+    "performance",
+    "react",
+    "axiom-react",
+    "next",
+    "next-axiom",
+    "logs"
+  ],
+  "bugs": {
+    "url": "https://github.com/axiomhq/next-axiom/issues"
+  },
+  "peerDependencies": {
+    "react": ">=18.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.15"
+  },
+  "dependencies": {
+    "remeda": "^1.29.0",
+    "web-vitals": "^4.0.1"
+  },
+  "exports": {
+    "types": "./dist/esm/types/index.d.ts",
+    "import": "./dist/esm/index.js",
+    "require": "./dist/cjs/index.cjs",
+    "default": "./dist/esm/index.js"
+  }
+}
