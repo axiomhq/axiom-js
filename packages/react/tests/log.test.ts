@@ -1,10 +1,6 @@
 import { log } from '../src/logger';
 import { test, expect, vi, vitest } from 'vitest';
 
-vi.hoisted(() => {
-  // set axiom env vars before importing logger
-  vi.stubEnv('NEXT_PUBLIC_AXIOM_INGEST_ENDPOINT', 'https://example.co/api/test');
-});
 
 vi.useFakeTimers();
 
