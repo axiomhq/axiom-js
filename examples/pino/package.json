@@ -11,6 +11,6 @@
   },
   "dependencies": {
     "@axiomhq/pino": "workspace:*",
-    "pino": "^8.14.1"
+    "pino": "^9.1.0"
   }
 }
