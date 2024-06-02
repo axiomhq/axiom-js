@@ -221,6 +221,16 @@ export class Axiom extends BaseClient {
   };
 }
 
+declare global {
+  interface BigInt {
+    toJSON: () => string;
+  }
+}
+
+BigInt.prototype.toJSON = function () {
+  return this.toString();
+};
+
 export enum ContentType {
   JSON = 'application/json',
   NDJSON = 'application/x-ndjson',
