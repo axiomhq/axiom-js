@@ -3,7 +3,7 @@ import HTTPClient from './httpClient.js';
 export namespace annotations {
 
     export interface Annotation {
-        id: number;
+        id: string;
         type: string;
         datasets: string[];
         title?: string;
