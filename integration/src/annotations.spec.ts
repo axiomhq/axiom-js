@@ -12,7 +12,7 @@ describe('AnnotationsService', () => {
   beforeAll(async () => {
     await datasetsClient.create({
       name: datasetName,
-      description: 'This is a test dataset for datasets integration tests.',
+      description: 'This is a test dataset to be used for annotations testing',
     });
   });
 
