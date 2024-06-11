@@ -29,7 +29,6 @@ const logger = winston.createLogger({
         new AxiomTransport({
             dataset: 'my-dataset',
             token: 'my-token',
-            orgId: 'my-org-id',
         }),
     ],
 });

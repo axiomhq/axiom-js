@@ -10,7 +10,7 @@ npm install @axiomhq/js
 
 If you use the [Axiom CLI](https://github.com/axiomhq/cli), run `eval $(axiom config export -f)` to configure your environment variables.
 
-Otherwise create a personal token in [the Axiom settings](https://app.axiom.co/profile) and export it as `AXIOM_TOKEN`. Set `AXIOM_ORG_ID` to the organization ID from the settings page of the organization you want to access.
+Otherwise create a new token in [the Axiom settings](https://app.axiom.co/api-tokens) and export it as `AXIOM_TOKEN`.
 
 You can also configure the client using options passed to the constructor of the Client:
 
@@ -19,7 +19,6 @@ import { Axiom } from '@axiomhq/js';
 
 const axiom = new Axiom({
   token: process.env.AXIOM_TOKEN,
-  orgId: process.env.AXIOM_ORG_ID,
 });
 ```
 
