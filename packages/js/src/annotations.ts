@@ -42,12 +42,6 @@ export namespace annotations {
     export class Service extends HTTPClient {
         private readonly localPath = '/v2/annotations';
 
-        constructor(options: {
-            token: string,
-        }) {
-            super(options);
-        }
-
         list = (req?: ListingQueryParams): Promise<Annotation[]> => this.client.get(this.localPath, {}, req);
 
         get = (id: string): Promise<Annotation> => this.client.get(this.localPath + '/' + id);
