@@ -42,6 +42,10 @@ describe('AnnotationsService', () => {
   describe('update', () => {
     it('should update the annotation', async () => {
       const dataset = await client.update(id, {
+        type: 'test-deployment',
+        datasets: [datasetName],
+        title: 'test1',
+        url: 'some-url',
         description: 'This is a soon to be filled test dataset',
       });
 

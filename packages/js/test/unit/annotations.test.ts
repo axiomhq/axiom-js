@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { annotations } from '../../src/annotations';
 import { mockFetchResponse, mockNoContentResponse } from '../lib/mock';
 
-const annotationsList = [
+const annotationsList: annotations.Annotation[] = [
   {
     id: 'test',
     type: 'production-deployment',
@@ -70,12 +70,13 @@ describe('AnnotationsService', () => {
 
   it('Update', async () => {
     const req: annotations.UpdateRequest = {
+      ...annotationsList[1],
       description: 'This is a test description',
     };
 
     mockFetchResponse(annotationsList[1]);
 
-    const response = await client.update('test1', req);
+    const response = await client.update(annotationsList[1].id, req);
     expect(response).not.toEqual('undefined');
     expect(response.id).toEqual('test1');
     expect(response.description).toEqual('This is a test description');
