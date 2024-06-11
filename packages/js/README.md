@@ -56,3 +56,26 @@ let client = new Axiom({
 });
 ```
 by default `onError` is set to `console.error`.
+
+
+## Annotations
+
+Starting from `v1.0.0` the SDK supports the [Annotations API](https://axiom.co/docs/restapi/endpoints/createAnnotation). You can create annotations like this:
+
+```ts
+// import the annotations module
+import { annotations } from '@axiomhq/js';
+// create a client
+const client = new annotations.Service({ token: process.env.AXIOM_TOKEN });
+```
+
+Then create an annotation like this:
+
+```ts
+await annotations.create({
+  type: 'deployment',
+  datasets: ['dataset_name'],
+  title: 'New deployment',
+  description: 'Deployed version 1.0.0 with fixes for ...',
+})
+```
