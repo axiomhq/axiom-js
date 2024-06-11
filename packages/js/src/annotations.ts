@@ -30,7 +30,13 @@ export namespace annotations {
     }
 
     export interface UpdateRequest {
-        description: string;
+        type: string;
+        datasets: string[];
+        title?: string;
+        description?: string;
+        url?: string;
+        time?: string;
+        endTime?: string;
     }
 
     export class Service extends HTTPClient {
