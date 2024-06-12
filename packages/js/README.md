@@ -10,7 +10,7 @@ npm install @axiomhq/js
 
 If you use the [Axiom CLI](https://github.com/axiomhq/cli), run `eval $(axiom config export -f)` to configure your environment variables.
 
-Otherwise create a personal token in [the Axiom settings](https://app.axiom.co/profile) and export it as `AXIOM_TOKEN`. Set `AXIOM_ORG_ID` to the organization ID from the settings page of the organization you want to access.
+Otherwise create a new token in [the Axiom settings](https://app.axiom.co/api-tokens) and export it as `AXIOM_TOKEN`.
 
 You can also configure the client using options passed to the constructor of the Client:
 
@@ -19,7 +19,6 @@ import { Axiom } from '@axiomhq/js';
 
 const axiom = new Axiom({
   token: process.env.AXIOM_TOKEN,
-  orgId: process.env.AXIOM_ORG_ID,
 });
 ```
 
@@ -56,3 +55,26 @@ let client = new Axiom({
 });
 ```
 by default `onError` is set to `console.error`.
+
+
+## Annotations
+
+Starting from `v1.0.0` the SDK supports the [Annotations API](https://axiom.co/docs/restapi/endpoints/createAnnotation). You can create annotations like this:
+
+```ts
+// import the annotations module
+import { annotations } from '@axiomhq/js';
+// create a client
+const client = new annotations.Service({ token: process.env.AXIOM_TOKEN });
+```
+
+Then create an annotation like this:
+
+```ts
+await annotations.create({
+  type: 'deployment',
+  datasets: ['dataset_name'],
+  title: 'New deployment',
+  description: 'Deployed version 1.0.0 with fixes for ...',
+})
+```
