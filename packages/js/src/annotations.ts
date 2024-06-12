@@ -9,7 +9,7 @@ export namespace annotations {
         title?: string;
         description?: string;
         url?: string;
-        time?: string;
+        time: string;
         endTime?: string;
     }
 
@@ -30,8 +30,8 @@ export namespace annotations {
     }
 
     export interface UpdateRequest {
-        type: string;
-        datasets: string[];
+        type?: string;
+        datasets?: string[];
         title?: string;
         description?: string;
         url?: string;
