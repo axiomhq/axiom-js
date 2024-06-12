@@ -1,3 +1,4 @@
+// This example shows querying a dataset with summarized results.
 import { Axiom } from '@axiomhq/js';
 
 const axiom = new Axiom({ token: process.env.AXIOM_TOKEN || '', orgId: process.env.AXIOM_ORG_ID || '' });
