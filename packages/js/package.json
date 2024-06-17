@@ -44,7 +44,7 @@
     "homepage": "https://github.com/axiomhq/axiom-js/blob/main/packages/js/README.md",
     "dependencies": {
         "fetch-retry": "^6.0.0",
-        "uuid": "^8.3.2"
+        "uuid": "^10.0.0"
     },
     "exports": {
         "types": "./dist/esm/types/index.d.ts",
