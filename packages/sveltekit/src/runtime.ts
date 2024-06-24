@@ -13,7 +13,7 @@ export const isEdgeRuntime = globalThis.EdgeRuntime ? true : false;
 
 export function resolveRuntime() {
     if (isWebWorker) {
-        return 'webworker';
+        return 'worker';
     } else if (isEdgeRuntime) {
         return 'edge';
     } else if (typeof window !== 'undefined') {

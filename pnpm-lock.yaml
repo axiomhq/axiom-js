@@ -139,9 +139,9 @@ importers:
       '@axiomhq/js':
         specifier: 1.0.0-rc.3
         version: 1.0.0-rc.3
-      '@axiomhq/svelte':
+      '@axiomhq/sveltekit':
         specifier: workspace:*
-        version: link:../../packages/svelte
+        version: link:../../packages/sveltekit
     devDependencies:
       '@fontsource/fira-mono':
         specifier: ^4.5.10
@@ -259,7 +259,7 @@ importers:
         specifier: ^1.2.0
         version: 1.2.0
 
-  packages/svelte:
+  packages/sveltekit:
     dependencies:
       '@axiomhq/js':
         specifier: workspace:*
