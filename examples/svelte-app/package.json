@@ -32,7 +32,7 @@
 	},
 	"dependencies": {
 		"@axiomhq/js": "1.0.0-rc.3",
-		"@axiomhq/svelte": "workspace:*"
+		"@axiomhq/sveltekit": "workspace:*"
 	},
 	"type": "module"
 }

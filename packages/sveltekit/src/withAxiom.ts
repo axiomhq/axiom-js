@@ -20,7 +20,7 @@ export function withAxiom(logger: Logger, handler: Handle): Handle {
                 status: response.status,
                 durationMs: durationMs,
             },
-            source: 'hooks'
+            source: 'hooks-server'
         });
 
         await logger.flush();
