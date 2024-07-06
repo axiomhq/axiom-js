@@ -20,7 +20,7 @@ export const handleError: HandleClientError = async ({ error, event, status, mes
 			path: url.pathname,
 			status: status
 		},
-		source: 'hooks-client',
+		source: 'hooks',
 	});
 
 	await logger.flush()

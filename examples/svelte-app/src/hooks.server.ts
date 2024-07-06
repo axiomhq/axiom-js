@@ -30,7 +30,7 @@ export const handleError: HandleServerError = async  ({ error, event, status, me
 			method: event.request.method,
 			status: status
 		},
-		source: 'hooks-server',
+		source: 'hooks',
 	});
 
 	await logger.flush()
