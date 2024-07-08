@@ -18,7 +18,7 @@ const AxiomURL = 'https://api.axiom.co';
 export interface ClientOptions {
   /**
    * an API or personal token to use for authentication, you can get one
-   * from @{link: Axiom settings | https://app.axiom.co/profile}.
+   * from @{link: Axiom settings | https://app.axiom.co/api-tokens}.
    */
   token: string;
   /**

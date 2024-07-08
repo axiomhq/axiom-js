@@ -7,6 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+
+
+## [1.0.0] - 2024-06-12
+
+## Added
+
+- Added support for Annotations API
+
+## [1.0.0-rc.4] - 2024-06-10
+
+### Fixed
+
+- fix: add BigInt support to JSON.stringify [#189] from lucassmuller/fix/json-stringify 
+
+## [1.0.0-rc.3] - 2024-03-20
+
+### Fixed
+
+- Fix fetch request init with retry 
+
+## [1.0.0-rc.2] - 2024-02-09
+
 ## [1.0.0-rc.1] - 2023-09-27
 
 ### Breaking Change
