@@ -137,8 +137,8 @@ importers:
   examples/svelte-app:
     dependencies:
       '@axiomhq/js':
-        specifier: 1.0.0-rc.3
-        version: 1.0.0-rc.3
+        specifier: workspace:*
+        version: link:../../packages/js
       '@axiomhq/sveltekit':
         specifier: workspace:*
         version: link:../../packages/sveltekit
@@ -302,10 +302,6 @@ packages:
   '@ampproject/remapping@2.3.0':
     resolution: {integrity: sha512-30iZtAPgz+LTIYoeivqYo853f02jBYSd5uGnGpkFV0M3xOt9aN73erkgYAmZU43x4VfqcnLxW9Kpg3R5LC4YYw==}
     engines: {node: '>=6.0.0'}
-
-  '@axiomhq/js@1.0.0-rc.3':
-    resolution: {integrity: sha512-Zm10TczcMLounWqC42nMkXQ7XKLqjzLrd5ia022oBKDUZqAFVg2y9d1quQVNV4FlXyg9MKDdfMjpKQRmzEGaog==}
-    engines: {node: '>=16'}
 
   '@babel/code-frame@7.24.6':
     resolution: {integrity: sha512-ZJhac6FkEd1yhG2AHOmfcXG4ceoLltoCVJjN5XsWN9BifBQr+cHJbWi0h68HZuSORq+3WtJ2z0hwF2NG1b5kcA==}
@@ -3362,11 +3358,6 @@ snapshots:
     dependencies:
       '@jridgewell/gen-mapping': 0.3.5
       '@jridgewell/trace-mapping': 0.3.25
-
-  '@axiomhq/js@1.0.0-rc.3':
-    dependencies:
-      fetch-retry: 6.0.0
-      uuid: 8.3.2
 
   '@babel/code-frame@7.24.6':
     dependencies:

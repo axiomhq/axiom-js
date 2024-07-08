@@ -13,7 +13,7 @@ const logger = new Logger({
 export const handleError: HandleClientError = async ({ error, event, status, message }) => {
 	
 	const url = new URL(event.url);
-	console.log({ url })
+
 	logger.error(`${message}`, {
 		exception: error, request: {
 			host: url.hostname,

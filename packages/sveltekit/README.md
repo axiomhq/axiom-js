@@ -7,80 +7,125 @@ You can use Winston logger to send logs to Axiom. First, install the winston and
 Install using `npm install`:
 
 ```shell
-npm install @axiomhq/winston
+npm install @axiomhq/sveltekit
 ```
 
-import the axiom transport for winston:
 
-```js
-import { WinstonTransport as AxiomTransport } from '@axiomhq/winston';
+Create a new API token and add it to your `.env` file, along with the dataset name, e.g:
+
+```shell
+AXIOM_TOKEN=your-api-token
+AXIOM_DATASET=your-dataset-name
 ```
 
-create a winston logger instance with axiom transport:
-
-```js
-const logger = winston.createLogger({
-    level: 'info',
-    format: winston.format.json(),
-    defaultMeta: { service: 'user-service' },
-    transports: [
-        // You can pass an option here, if you don't the transport is configured automatically
-        // using environment variables like `AXIOM_DATASET` and `AXIOM_TOKEN`
-        new AxiomTransport({
-            dataset: 'my-dataset',
-            token: 'my-token',
-            orgId: 'my-org-id',
-        }),
-    ],
-});
-```
-
-then you can use the logger as usual:
-
-```js
-logger.log({
-    level: 'info',
-    message: 'Logger successfully setup',
-});
-```
-
-### Error, exception and rejection handling
-
-If you want to log `Error`s, we recommend using the
-[`winston.format.errors`](https://github.com/winstonjs/logform#errors)
-formatter, for example like this:
+Create a new API endpoint in your SvelteKit project, under `/api/axiom/server.js`:
 
 ```ts
-import winston from 'winston';
-import { WinstonTransport as AxiomTransport } from '@axiomhq/winston';
-const { combine, errors, stack } = winston.format;
-const axiomTransport = new AxiomTransport({ ... });
-const logger = winston.createLogger({
-  // 8<----snip----
-  format: combine(errors({ stack: true }), json()),
-  // 8<----snip----
-});
+import type { RequestHandler } from '@sveltejs/kit';
+
+import { AxiomWithoutBatching } from '@axiomhq/js'
+
+import { AXIOM_TOKEN, AXIOM_DATASET } from '$env/static/private';
+
+const axiom = new AxiomWithoutBatching({ token: AXIOM_TOKEN });
+
+export const POST: RequestHandler = async ({ request }) => {
+    
+    const events = await request.json()
+    axiom.ingest(AXIOM_DATASET, events)
+
+    return new Response("OK");
+}
 ```
 
-To automatically log exceptions and rejections, add the Axiom transport to the
-[`exceptionHandlers`](https://github.com/winstonjs/winston#exceptions) and
-[`rejectionHandlers`](https://github.com/winstonjs/winston#rejections) like
-this:
+## Server Hook
+
+Create a `server.hooks.ts` file in your SvelteKit project if you don't have one already, and wrap your handler function inside `withAxiom()`, e.g:
 
 ```ts
-import winston from 'winston';
-import { WinstonTransport as AxiomTransport } from '@axiomhq/winston';
-const axiomTransport = new AxiomTransport({ ... });
-const logger = winston.createLogger({
-  // 8<----snip----
-  transports: [axiomTransport],
-  exceptionHandlers: [axiomTransport],
-  rejectionHandlers: [axiomTransport],
-  // 8<----snip----
+import type { Handle } from '@sveltejs/kit';
+
+import { resolveRuntime, withAxiom, Logger } from '@axiomhq/sveltekit';
+
+import { AXIOM_TOKEN, AXIOM_DATASET, AXIOM_URL } from '$env/static/private';
+import { dev, browser, version } from '$app/environment'
+
+
+const logger = new Logger({
+	dataset: AXIOM_DATASET,
+	token: AXIOM_TOKEN,
+	url: AXIOM_URL,
+	runtime: resolveRuntime(),
+	args: { dev, browser, version }
 });
+
+
+export const handle: Handle = withAxiom(logger, async ({ event, resolve }) => {
+	return resolve(event);
+})
 ```
 
-:warning: Running on Edge runtime is not supported at the moment.
+### Handling server errors
+
+The server hook could be extended to capture errors and send them using the same logger. export `handleError` function from the `hooks.server.ts` by appending the following towards the end of the file:
+
+```ts
+export const handleError: HandleServerError = async  ({ error, event, status, message }) => {
+	
+	const url = new URL(event.request.url);
+	logger.error(`${message}`, {
+		exception: error, request: {
+			host: url.hostname,
+			path: url.pathname,
+			method: event.request.method,
+			status: status
+		},
+		source: 'hooks',
+	});
+
+	await logger.flush()
+
+	return { message }
+}
+```
+
+
+## Client Hook
+
+
+This follows the same concepts as the server hook, but for the client side. Create a `hooks.client.ts` file in your SvelteKit project, and wrap your handler function inside `withAxiom()`, e.g:
+
+```ts
+import type { HandleClientError } from '@sveltejs/kit';
+
+import { Logger }  from '@axiomhq/sveltekit';
+
+import { dev, browser, version } from '$app/environment'
+
+
+const logger = new Logger({
+	args: { dev, browser, version }
+});
+
+
+export const handleError: HandleClientError = async ({ error, event, status, message }) => {
+	
+	const url = new URL(event.url);
+	
+	logger.error(`${message}`, {
+		exception: error, request: {
+			host: url.hostname,
+			path: url.pathname,
+			status: status
+		},
+		source: 'hooks',
+	});
+
+	await logger.flush()
+
+	return { message }
+}
+```
 
 For further examples, head over to the [examples](../../examples/winston/) directory.
 

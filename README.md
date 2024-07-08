@@ -25,6 +25,7 @@ This is a monorepo, for specific documentation, check out the different projects
 * [`@axiomhq/js`](./packages/js): Official API bindings that let you ingest or query your data.
 * [`@axiomhq/winston`](./packages/winston): A [winston](https://github.com/winstonjs/winston) transport which sends logs to Axiom.
 * [`@axiomhq/pino`](./packages/pino): A [pino](https://github.com/pinojs/pino) transport which sends logs to Axiom.
+* [`@axiomhq/sveltekit`](./packages/sveltekit): A [sveltekit](https://github.com/sveltejs/kit) library which sends logs to Axiom.
 
 
 ## Migrate to v1.x

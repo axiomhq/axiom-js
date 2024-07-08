@@ -1,7 +1,7 @@
 {
   "name": "@axiomhq/sveltekit",
   "description": "The official Axiom library for sveltekit",
-  "version": "1.0.0-rc.3",
+  "version": "1.0.0",
   "type": "module",
   "author": "Axiom, Inc.",
   "license": "MIT",
