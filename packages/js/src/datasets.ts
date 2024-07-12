@@ -26,6 +26,10 @@ export namespace datasets {
     description?: string;
   }
 
+  export interface CreateOptions {
+    referrer?: string;
+  }
+
   export interface UpdateRequest {
     description: string;
   }
@@ -41,7 +45,12 @@ export namespace datasets {
 
     get = (id: string): Promise<Dataset> => this.client.get(this.localPath + '/' + id);
 
-    create = (req: CreateRequest): Promise<Dataset> => this.client.post(this.localPath, { body: JSON.stringify(req) });
+    create = (req: CreateRequest, opts?: CreateOptions): Promise<Dataset> => {
+      const params = new URLSearchParams();
+      params.set('referrer', opts?.referrer ?? '');
+      let path = `/v2/datasets?${params.toString()}`;
+      return this.client.post(path, { body: JSON.stringify(req) });
+    };
 
     update = (id: string, req: UpdateRequest): Promise<Dataset> =>
       this.client.put(this.localPath + '/' + id, { body: JSON.stringify(req) });
