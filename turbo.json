@@ -28,8 +28,7 @@
         "integration": {
             "dependsOn": [
                 "^build",
-                "^build:cjs",
-                "^test"
+                "^build:cjs"
             ]
         },
         "e2e": {
