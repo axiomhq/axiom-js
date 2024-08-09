@@ -58,7 +58,7 @@ export class WinstonTransport extends Transport {
     }
   }
 
-  private flush(callback: (err: Error | null) => void = () => {}) {
+  flush(callback: (err: Error | null) => void = () => {}) {
     const batchCopy = this.batch.slice();
 
     clearTimeout(this.batchTimeoutId);
