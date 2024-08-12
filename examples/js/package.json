@@ -11,6 +11,6 @@
   },
   "dependencies": {
     "@axiomhq/js": "workspace:*",
-    "winston": "^3.8.2"
+    "winston": "^3.14.1"
   }
 }

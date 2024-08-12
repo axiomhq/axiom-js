@@ -22,7 +22,7 @@
         "@axiomhq/js": "workspace:*"
     },
     "devDependencies": {
-        "winston": "^3.8.2"
+        "winston": "^3.14.1"
     },
     "repository": {
         "type": "git",
