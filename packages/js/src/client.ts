@@ -11,7 +11,7 @@ class BaseClient extends HTTPClient {
   onError = console.error;
 
   constructor(options: ClientOptions) {
-    if (isAxiomPersonalToken(options.token)) {
+    if (options.token && isAxiomPersonalToken(options.token)) {
       console.warn(
         'Using a personal token (`xapt-...`) is deprecated for security reasons. Please use an API token (`xaat-...`) instead. Support for personal tokens will be removed in a future release.',
       );
