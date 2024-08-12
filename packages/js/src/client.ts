@@ -2,6 +2,7 @@ import { datasets } from './datasets.js';
 import { users } from './users.js';
 import { Batch, createBatchKey } from './batch.js';
 import HTTPClient, { ClientOptions } from './httpClient.js';
+import { isAxiomPersonalToken } from './token.js';
 
 class BaseClient extends HTTPClient {
   datasets: datasets.Service;
@@ -10,6 +11,12 @@ class BaseClient extends HTTPClient {
   onError = console.error;
 
   constructor(options: ClientOptions) {
+    if (isAxiomPersonalToken(options.token)) {
+      console.warn(
+        'Using a personal token (`xapt-...`) is deprecated for security reasons. Please use an API token (`xaat-...`) instead. Support for personal tokens will be removed in a future release.',
+      );
+    }
+
     super(options);
     this.datasets = new datasets.Service(options);
     this.users = new users.Service(options);
@@ -20,21 +27,21 @@ class BaseClient extends HTTPClient {
 
   /**
    * Ingest events into the provided dataset using raw data types, e.g: string, buffer or a stream.
-   * 
+   *
    * @param dataset - name of the dataset to ingest events into
    * @param data - data to be ingested
    * @param contentType - optional content type, defaults to JSON
    * @param contentEncoding - optional content encoding, defaults to Identity
    * @param options - optional ingest options
    * @returns result a promise of ingest and its status, check: {@link IngestStatus}
-   * 
+   *
    * @example
    * ```
    * import { AxiomWithoutBatching } from '@axiomhq/js';
-   * 
+   *
    * const axiom = new AxiomWithoutBatching();
    * ```
-   * 
+   *
    */
   ingestRaw = async (
     dataset: string,
@@ -43,7 +50,7 @@ class BaseClient extends HTTPClient {
     contentEncoding: ContentEncoding = ContentEncoding.Identity,
     options?: IngestOptions,
   ): Promise<IngestStatus> => {
-      try {
+    try {
       return await this.client.post<IngestStatus>(
         this.localPath + '/datasets/' + dataset + '/ingest',
         {
@@ -57,7 +64,8 @@ class BaseClient extends HTTPClient {
           'timestamp-field': options?.timestampField as string,
           'timestamp-format': options?.timestampFormat as string,
           'csv-delimiter': options?.csvDelimiter as string,
-        });
+        },
+      );
     } catch (err) {
       this.onError(err);
       return await Promise.resolve({
@@ -68,7 +76,7 @@ class BaseClient extends HTTPClient {
         walLength: 0,
       });
     }
-    }
+  };
 
   queryLegacy = (dataset: string, query: QueryLegacy, options?: QueryOptions): Promise<QueryLegacyResult> =>
     this.client.post(
@@ -84,16 +92,16 @@ class BaseClient extends HTTPClient {
 
   /**
    * Executes APL query using the provided APL and returns the result
-   * 
+   *
    * @param apl - the apl query
    * @param options - optional query options
    * @returns result of the query, check: {@link QueryResult}
-   * 
+   *
    * @example
    * ```
    * await axiom.query("['dataset'] | count");
    * ```
-   * 
+   *
    */
   query = (apl: string, options?: QueryOptions): Promise<QueryResult> => {
     const req: Query = { apl: apl };
@@ -119,11 +127,11 @@ class BaseClient extends HTTPClient {
   /**
    * Executes APL query using the provided APL and returns the result.
    * This is just an alias for the `query()` method, please use that instead.
-   * 
+   *
    * @param apl - the apl query
    * @param options - optional query options
    * @returns Promise<QueryResult>
-   * 
+   *
    * @example
    * ```
    * await axiom.aplQuery("['dataset'] | count");
@@ -135,28 +143,28 @@ class BaseClient extends HTTPClient {
 /**
  * Axiom's client without batching events in the background.
  * In most cases you'll want to use the {@link Axiom} client instead.
- * 
- * 
+ *
+ *
  * @param options - The {@link ClientOptions} to configure authentication
- * 
+ *
  */
 export class AxiomWithoutBatching extends BaseClient {
   /**
    * Ingest event(s) asynchronously
-   * 
+   *
    * @param dataset - name of the dataset to ingest events into
    * @param events - list of events to be ingested, could be a single object as well
    * @param options - optional ingest options
    * @returns the result of the ingest, check: {@link IngestStatus}
-   * 
+   *
    * @example
    * ```
    * import { AxiomWithoutBatching } from '@axiomhq/js';
-   * 
+   *
    * const axiom = new AxiomWithoutBatching();
    * await axiom.ingest('dataset-name', [{ foo: 'bar' }])
    * ```
-   * 
+   *
    */
   async ingest(dataset: string, events: Array<object> | object, options?: IngestOptions): Promise<IngestStatus> {
     const array = Array.isArray(events) ? events : [events];
@@ -169,25 +177,25 @@ export class AxiomWithoutBatching extends BaseClient {
 /**
  * Axiom's default client that queues events in the background,
  * sends them asynchronously to the server every 1s or every 1000 events.
- * 
+ *
  * @param options - The options passed to the client
- * 
+ *
  */
 export class Axiom extends BaseClient {
   batch: { [id: string]: Batch } = {};
 
   /**
    * Ingest events asynchronously
-   * 
+   *
    * @remarks
    * Events passed to ingest method will be queued in a batch and sent
-   * in the background every second or every 1000 events. 
-   * 
+   * in the background every second or every 1000 events.
+   *
    * @param dataset - name of the dataset to ingest events into
    * @param events - list of events to be ingested, could be a single object as well
    * @param options - optional ingest options
    * @returns void, as the events are sent in the background
-   * 
+   *
    */
   ingest = (dataset: string, events: Array<object> | object, options?: IngestOptions) => {
     const key = createBatchKey(dataset, options);
@@ -207,7 +215,7 @@ export class Axiom extends BaseClient {
 
   /**
    * Flushes all the events that have been queued in the background
-   * 
+   *
    * @remarks
    * calling `await flush()` will wait for all the events to be sent to the server
    * and is necessary to ensure data delivery.
@@ -244,7 +252,7 @@ export enum ContentEncoding {
 
 /**
  * Ingest options
- * 
+ *
  */
 export interface IngestOptions {
   /**
@@ -263,7 +271,7 @@ export interface IngestOptions {
 
 /**
  * Query result
- * 
+ *
  */
 export interface IngestStatus {
   /**
