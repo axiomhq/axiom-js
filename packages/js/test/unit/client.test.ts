@@ -1,4 +1,4 @@
-import { describe, expect, it, beforeEach, vitest } from 'vitest';
+import { describe, expect, it, beforeEach, vi } from 'vitest';
 
 import { ContentType, ContentEncoding, Axiom, AxiomWithoutBatching } from '../../src/client';
 import { AxiomTooManyRequestsError } from '../../src/fetchClient';
@@ -92,7 +92,6 @@ describe('Axiom', () => {
   });
 
   describe('Ingesting', () => {
-
     it('Does not retry failed requests < 500', async () => {
       // TODO: this doesn't actually check that retries happend or not, fix
       mockFetchResponse({}, 401);
@@ -171,53 +170,55 @@ describe('Axiom', () => {
     });
 
     it('does not throw exception on ingest (50x failure)', async () => {
-      let client = new AxiomWithoutBatching({ url: clientURL, token: 'test' })
+      let client = new AxiomWithoutBatching({ url: clientURL, token: 'test' });
       mockFetchResponseErr();
 
       await expect(client.ingest('test', [{ name: 'test' }])).resolves.toBeTruthy();
-    }, 50000)
+    }, 50000);
 
     it('does not throw exception on ingest (40x failure)', async () => {
-      let client = new AxiomWithoutBatching({ url: clientURL, token: 'test' })
+      let client = new AxiomWithoutBatching({ url: clientURL, token: 'test' });
       mockFetchResponseErr(401);
 
       await expect(client.ingest('test', [{ name: 'test' }])).resolves.toBeTruthy();
-    }, 50000)
+    }, 50000);
 
     it('catch ingest errors', async () => {
       let errorCaptured = false;
       let client = new Axiom({
-        url: clientURL, token: 'test', onError: (err) => {
+        url: clientURL,
+        token: 'test',
+        onError: (err) => {
           console.error('error callback has been called', err);
           errorCaptured = true;
-        }
+        },
       });
       mockFetchResponseErr();
 
       client.ingest('test', [{ name: 'test' }]);
       await client.flush();
       expect(errorCaptured).toEqual(true);
-    }, 50000)
+    }, 50000);
 
     it('catch ingest errors on WithoutBatching client', async () => {
       let errorCaptured = false;
       let client = new AxiomWithoutBatching({
-        url: clientURL, token: 'test', onError: (err) => {
+        url: clientURL,
+        token: 'test',
+        onError: (err) => {
           console.error('error callback has been called', err);
           errorCaptured = true;
-        }
+        },
       });
       mockFetchResponseErr();
 
       await expect(client.ingest('test', [{ name: 'test' }])).resolves.toBeTruthy();
 
       expect(true).toEqual(errorCaptured);
-    }, 50000)
-
-  })
+    }, 50000);
+  });
 
   describe('Querying', async () => {
-
     it('Legacy Query', async () => {
       mockFetchResponse(queryLegacyResult);
 
@@ -265,6 +266,26 @@ describe('Axiom', () => {
       response = await axiom.query("['test'] | where response == 304", options);
       expect(response).not.toEqual('undefined');
       expect(response.matches).toHaveLength(2);
+    });
+  });
+
+  describe('Tokens', () => {
+    it('Should warn when creating Axiom with a personal token', async () => {
+      const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      const _client = new Axiom({ token: 'xapt-test' });
+
+      expect(consoleWarnSpy).toHaveBeenCalledWith(
+        'Using a personal token (`xapt-...`) is deprecated for security reasons. Please use an API token (`xaat-...`) instead. Support for personal tokens will be removed in a future release.',
+      );
+    });
+
+    it('Should not warn when creating AxiomWithoutBatching with a personal token', async () => {
+      const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      const _client = new AxiomWithoutBatching({ token: 'xapt-test' });
+
+      expect(consoleWarnSpy).toHaveBeenCalledWith(
+        'Using a personal token (`xapt-...`) is deprecated for security reasons. Please use an API token (`xaat-...`) instead. Support for personal tokens will be removed in a future release.',
+      );
     });
   });
 });
