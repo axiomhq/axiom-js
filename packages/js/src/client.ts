@@ -79,7 +79,7 @@ class BaseClient extends HTTPClient {
   };
 
   queryLegacy = (dataset: string, query: LegacyQuery, options?: QueryOptions): Promise<LegacyQueryResult> =>
-    this.client.post<LegacyQueryResult>(
+    this.client.post(
       this.localPath + '/datasets/' + dataset + '/query',
       {
         body: JSON.stringify(query),
@@ -87,7 +87,6 @@ class BaseClient extends HTTPClient {
       {
         'streaming-duration': options?.streamingDuration as string,
         nocache: options?.noCache as boolean,
-        format: 'legacy',
       },
     );
 
@@ -104,7 +103,13 @@ class BaseClient extends HTTPClient {
    * ```
    *
    */
-  query = (apl: string, options?: QueryOptions): Promise<QueryResult> => {
+  query = <
+    TOptions extends QueryOptions,
+    TResult = TOptions['format'] extends 'tabular' ? Promise<QueryResult> : Promise<LegacyQueryResult>,
+  >(
+    apl: string,
+    options?: TOptions,
+  ): Promise<TResult> => {
     const req: Query = { apl: apl };
     if (options?.startTime) {
       req.startTime = options?.startTime;
@@ -113,7 +118,7 @@ class BaseClient extends HTTPClient {
       req.endTime = options?.endTime;
     }
 
-    return this.client.post<QueryResult>(
+    return this.client.post<TResult>(
       this.localPath + '/datasets/_apl',
       {
         body: JSON.stringify(req),
@@ -121,7 +126,7 @@ class BaseClient extends HTTPClient {
       {
         'streaming-duration': options?.streamingDuration as string,
         nocache: options?.noCache as boolean,
-        format: 'tabular',
+        format: options?.format ?? 'legacy',
       },
     );
   };
@@ -139,7 +144,13 @@ class BaseClient extends HTTPClient {
    * await axiom.aplQuery("['dataset'] | count");
    * ```
    */
-  aplQuery = (apl: string, options?: QueryOptions): Promise<QueryResult> => this.query(apl, options);
+  aplQuery = <
+    TOptions extends QueryOptions,
+    TResult = TOptions['format'] extends 'tabular' ? Promise<QueryResult> : Promise<LegacyQueryResult>,
+  >(
+    apl: string,
+    options?: TOptions,
+  ): Promise<TResult> => this.query(apl, options);
 }
 
 /**
@@ -315,6 +326,7 @@ export interface QueryOptionsBase {
 export interface QueryOptions extends QueryOptionsBase {
   startTime?: string;
   endTime?: string;
+  format?: 'legacy' | 'tabular';
 }
 
 export interface LegacyQuery {
@@ -422,20 +434,20 @@ export interface QueryResult {
 
 export interface APLResultTable {
   name: string;
-  sources: Array<{name: string}>;
-  fields: Array<{name: string, type: string, agg?: Aggregation}>
+  sources: Array<{ name: string }>;
+  fields: Array<{ name: string; type: string; agg?: Aggregation }>;
   order: Array<{
-    name: string,
-    desc: boolean,
+    name: string;
+    desc: boolean;
   }>;
-  groups: Array<{name: string}>;
+  groups: Array<{ name: string }>;
   range?: {
-    field: string,
-    start: string,
-    end: string,
-  },
-  buckets?: {field: string, size: any},
-  columns: Array<any>
+    field: string;
+    start: string;
+    end: string;
+  };
+  buckets?: { field: string; size: any };
+  columns: Array<any>;
 }
 
 export interface Timeseries {

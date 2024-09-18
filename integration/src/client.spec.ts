@@ -6,7 +6,11 @@ const datasetSuffix = process.env.AXIOM_DATASET_SUFFIX || 'local';
 
 describe('Axiom', () => {
   const datasetName = `test-axiom-js-client-${datasetSuffix}`;
-  const axiom = new AxiomWithoutBatching({ token: process.env.AXIOM_TOKEN || '', url: process.env.AXIOM_URL, orgId: process.env.AXIOM_ORG_ID });
+  const axiom = new AxiomWithoutBatching({
+    token: process.env.AXIOM_TOKEN || '',
+    url: process.env.AXIOM_URL,
+    orgId: process.env.AXIOM_ORG_ID,
+  });
 
   beforeAll(async () => {
     await axiom.datasets.create({
@@ -104,11 +108,24 @@ baz`,
 
   describe('apl query', () => {
     it('returns a valid response', async () => {
+      const result = await axiom.query("['" + datasetName + "']");
+
+      // expect(result.status.blocksExamined).toEqual(1);
+      expect(result.status.rowsExamined).toEqual(11);
+      expect(result.status.rowsMatched).toEqual(11);
+      expect(result.matches?.length).toEqual(11);
+    });
+  });
+
+  describe('apl tabular query', () => {
+    it('returns a valid response', async () => {
       const status = await axiom.ingest(datasetName, { test: 'apl' });
       expect(status.ingested).toEqual(1);
       // wait 1 sec for ingestion to finish
       await new Promise((resolve) => setTimeout(resolve, 1000));
-      const result = await axiom.query("['" + datasetName + "'] | where ['test'] == 'apl' | project _time, ['test']");
+      const result = await axiom.query("['" + datasetName + "'] | where ['test'] == 'apl' | project _time, ['test']", {
+        format: 'tabular',
+      });
 
       expect(result.status.rowsMatched).toEqual(1);
       expect(result.tables?.length).toEqual(1);
