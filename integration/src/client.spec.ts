@@ -1,5 +1,5 @@
 import { gzip } from 'zlib';
-import { describe, expect, it, beforeAll, afterAll } from 'vitest';
+import { describe, expect, it, beforeAll, afterAll, vi } from 'vitest';
 import { AxiomWithoutBatching, ContentType, ContentEncoding } from '@axiomhq/js';
 
 const datasetSuffix = process.env.AXIOM_DATASET_SUFFIX || 'local';
@@ -119,8 +119,14 @@ baz`,
 
   describe('apl tabular query', () => {
     it('returns a valid response', async () => {
+      vi.useFakeTimers();
       const status = await axiom.ingest(datasetName, { test: 'apl' });
       expect(status.ingested).toEqual(1);
+
+      // wait 1 sec for ingestion to finish
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      vi.runAllTimers();
 
       const result = await axiom.query("['" + datasetName + "'] | where ['test'] == 'apl' | project _time, ['test']", {
         format: 'tabular',
