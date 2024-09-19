@@ -468,7 +468,7 @@ export interface APLResultTable {
     end: string;
   };
   buckets?: { field: string; size: any };
-  columns: Array<any>;
+  columns?: Array<any>;
 }
 
 export interface Timeseries {
