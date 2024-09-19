@@ -118,17 +118,52 @@ class BaseClient extends HTTPClient {
       req.endTime = options?.endTime;
     }
 
-    return this.client.post<TResult>(
-      this.localPath + '/datasets/_apl',
-      {
-        body: JSON.stringify(req),
-      },
-      {
-        'streaming-duration': options?.streamingDuration as string,
-        nocache: options?.noCache as boolean,
-        format: options?.format ?? 'legacy',
-      },
-    );
+    return this.client
+      .post<TOptions['format'] extends 'tabular' ? RawTabularQueryResult : QueryResult>(
+        this.localPath + '/datasets/_apl',
+        {
+          body: JSON.stringify(req),
+        },
+        {
+          'streaming-duration': options?.streamingDuration as string,
+          nocache: options?.noCache as boolean,
+          format: options?.format ?? 'legacy',
+        },
+      )
+      .then((res) => {
+        if (options?.format !== 'tabular') {
+          return res;
+        }
+
+        const result = res as RawTabularQueryResult;
+        return {
+          ...res,
+          tables: result.tables.map((t) => {
+            return {
+              ...t,
+              events: function* () {
+                let iteration = 0;
+                if (!this.columns) {
+                  return;
+                }
+
+                while (iteration <= this.columns[0].length) {
+                  const value = Object.fromEntries(
+                    this.fields.map((field, fieldIdx) => [field.name, this.columns![fieldIdx][iteration]]),
+                  );
+
+                  if (iteration >= this.columns[0].length) {
+                    return value;
+                  }
+
+                  yield value;
+                  iteration++;
+                }
+              },
+            };
+          }),
+        };
+      }) as Promise<TResult>;
   };
 
   /**
@@ -442,7 +477,7 @@ export interface QueryResult {
   status: Status;
 }
 
-export interface TabularQueryResult {
+export interface RawTabularQueryResult {
   datasetNames: string[];
   fieldsMetaMap: Record<
     string,
@@ -450,10 +485,14 @@ export interface TabularQueryResult {
   >;
   format: string;
   status: Status;
+  tables: Array<RawAPLResultTable>;
+}
+
+export interface TabularQueryResult extends RawTabularQueryResult {
   tables: Array<APLResultTable>;
 }
 
-export interface APLResultTable {
+export interface RawAPLResultTable {
   name: string;
   sources: Array<{ name: string }>;
   fields: Array<{ name: string; type: string; agg?: TabularAggregation }>;
@@ -468,7 +507,17 @@ export interface APLResultTable {
     end: string;
   };
   buckets?: { field: string; size: any };
-  columns?: Array<any>;
+  columns?: Array<Array<any>>;
+}
+
+export interface APLResultTable extends RawAPLResultTable {
+  /**
+   * Returns an iterable that yields each row of the table as a record,
+   * where the keys are the field names and the values are the values in the columns.
+   *
+   * @returns {Generator<Record<string, any>, undefined, unknown>}
+   */
+  events: () => Generator<Record<string, any>, undefined, unknown>;
 }
 
 export interface Timeseries {

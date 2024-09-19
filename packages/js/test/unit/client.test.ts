@@ -153,6 +153,21 @@ const tabularQueryResult = {
   },
 };
 
+const tabularEvents = [
+  {
+    status_int: 301,
+    _time: '2024-08-14T22:26:25Z',
+    _sysTime: '2024-08-14T22:26:26.691450448Z',
+    simplified_agent: 'Mozilla/5.0',
+  },
+  {
+    status_int: 500,
+    _time: '2024-08-14T22:26:25Z',
+    _sysTime: '2024-08-14T22:26:27.691450448Z',
+    simplified_agent: 'Mozilla/4.0',
+  },
+];
+
 const clientURL = 'http://axiom-js-retries.dev.local';
 
 describe('Axiom', () => {
@@ -363,6 +378,7 @@ describe('Axiom', () => {
       let response = await axiom.query("['sample-http-logs'] | where status_int != 200", { format: 'tabular' });
       expect(response).not.toEqual('undefined');
       expect(response.tables).toHaveLength(1);
+      expect(Array.from(response.tables[0].events())).toEqual(tabularEvents);
 
       // works with options
       const options = {

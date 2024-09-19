@@ -128,13 +128,17 @@ baz`,
       const result = await axiom.query("['" + datasetName + "'] | where ['test'] == 'apl' | project _time, ['test']", {
         format: 'tabular',
       });
-
       expect(result.status.rowsMatched).toEqual(1);
       expect(result.tables?.length).toEqual(1);
       expect(result.tables[0].columns?.length).toEqual(2); // _time and test
       expect(result.tables[0].columns?.[0]).toBeDefined();
       expect(result.tables[0].columns?.[1]).toBeDefined();
       expect(result.tables[0].columns?.[1].length).toEqual(1); // only one row
+      expect(Array.from(result.tables[0].events()).length).toEqual(result.tables[0].columns?.[0].length);
+      expect(Object.keys(Array.from(result.tables[0].events())[0])).toEqual(result.tables[0].fields.map((f) => f.name));
+      expect(Object.values(Array.from(result.tables[0].events())[0][result.tables[0].fields[0].name])).toEqual(
+        result.tables[0].columns?.[0][0],
+      );
     });
   });
 });
