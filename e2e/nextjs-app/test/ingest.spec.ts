@@ -33,9 +33,13 @@ describe('Ingestion & query on different runtime', () => {
     await new Promise(r => setTimeout(r, 1000));
 
     // check dataset for ingested logs
-    const qResp = await axiom.query(`['${datasetName}'] | where ['test'] == "ingest_on_lambda" | project _time, test, foo, bar`, {
-      startTime,
-    });
+    const qResp = await axiom.query(
+      `['${datasetName}'] | where ['test'] == "ingest_on_lambda" | project _time, test, foo, bar`,
+      {
+        startTime,
+        format: 'tabular',
+      },
+    );
     expect(qResp.status).toBeDefined();
     expect(qResp.tables).toBeDefined();
     expect(qResp.tables).toHaveLength(1);
@@ -57,9 +61,13 @@ describe('Ingestion & query on different runtime', () => {
     await new Promise(resolve => setTimeout(resolve, 1000));
 
     // check dataset for ingested logs
-    const qResp = await axiom.query(`['${datasetName}'] | where ['test'] == "ingest_on_edge" | project _time, test, foo, bar`, {
-      startTime,
-    });
+    const qResp = await axiom.query(
+      `['${datasetName}'] | where ['test'] == "ingest_on_edge" | project _time, test, foo, bar`,
+      {
+        startTime,
+        format: 'tabular',
+      },
+    );
     expect(qResp.status).toBeDefined();
     expect(qResp.tables).toBeDefined();
     expect(qResp.tables).toHaveLength(1);

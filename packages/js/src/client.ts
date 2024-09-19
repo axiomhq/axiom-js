@@ -78,7 +78,7 @@ class BaseClient extends HTTPClient {
     }
   };
 
-  queryLegacy = (dataset: string, query: LegacyQuery, options?: QueryOptions): Promise<LegacyQueryResult> =>
+  queryLegacy = (dataset: string, query: QueryLegacy, options?: QueryOptions): Promise<QueryLegacyResult> =>
     this.client.post(
       this.localPath + '/datasets/' + dataset + '/query',
       {
@@ -95,7 +95,7 @@ class BaseClient extends HTTPClient {
    *
    * @param apl - the apl query
    * @param options - optional query options
-   * @returns result of the query, check: {@link QueryResult}
+   * @returns result of the query depending on the format in options, check: {@link QueryResult} and {@link TabularQueryResult}
    *
    * @example
    * ```
@@ -105,7 +105,7 @@ class BaseClient extends HTTPClient {
    */
   query = <
     TOptions extends QueryOptions,
-    TResult = TOptions['format'] extends 'tabular' ? Promise<QueryResult> : Promise<LegacyQueryResult>,
+    TResult = TOptions['format'] extends 'tabular' ? Promise<TabularQueryResult> : Promise<QueryResult>,
   >(
     apl: string,
     options?: TOptions,
@@ -146,7 +146,7 @@ class BaseClient extends HTTPClient {
    */
   aplQuery = <
     TOptions extends QueryOptions,
-    TResult = TOptions['format'] extends 'tabular' ? Promise<QueryResult> : Promise<LegacyQueryResult>,
+    TResult = TOptions['format'] extends 'tabular' ? Promise<TabularQueryResult> : Promise<QueryResult>,
   >(
     apl: string,
     options?: TOptions,
@@ -329,7 +329,7 @@ export interface QueryOptions extends QueryOptionsBase {
   format?: 'legacy' | 'tabular';
 }
 
-export interface LegacyQuery {
+export interface QueryLegacy {
   aggregations?: Array<Aggregation>;
   continuationToken?: string;
   cursor?: string;
@@ -349,6 +349,12 @@ export interface Aggregation {
   argument?: any;
   field: string;
   op: AggregationOp;
+}
+
+export interface TabularAggregation {
+  name: AggregationOp;
+  args: any[];
+  fields: string[];
 }
 
 export enum AggregationOp {
@@ -420,22 +426,37 @@ export interface VirtualColumn {
   expr: string;
 }
 
-export interface LegacyQueryResult {
+export interface QueryLegacyResult {
   buckets: Timeseries;
   matches?: Array<Entry>;
   status: Status;
 }
 
 export interface QueryResult {
+  request: QueryLegacy;
+
+  // Copied from QueryResult
+  buckets: Timeseries;
+  datasetNames: string[];
+  matches?: Array<Entry>;
+  status: Status;
+}
+
+export interface TabularQueryResult {
+  datasetNames: string[];
+  fieldsMetaMap: Record<
+    string,
+    Array<{ description: string; hidden: boolean; name: string; type: string; unit: string }>
+  >;
+  format: string;
   status: Status;
   tables: Array<APLResultTable>;
-  request: Query;
 }
 
 export interface APLResultTable {
   name: string;
   sources: Array<{ name: string }>;
-  fields: Array<{ name: string; type: string; agg?: Aggregation }>;
+  fields: Array<{ name: string; type: string; agg?: TabularAggregation }>;
   order: Array<{
     name: string;
     desc: boolean;
