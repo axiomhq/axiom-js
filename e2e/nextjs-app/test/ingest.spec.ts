@@ -44,9 +44,9 @@ describe('Ingestion & query on different runtime', () => {
     expect(qResp.tables).toBeDefined();
     expect(qResp.tables).toHaveLength(1);
     expect(qResp.tables[0].columns).toHaveLength(4);
-    expect(qResp.tables[0].columns[1][0]).toEqual('ingest_on_lambda');
-    expect(qResp.tables[0].columns[2][0]).toEqual('bar');
-    expect(qResp.tables[0].columns[3][1]).toEqual('baz');
+    expect(qResp.tables[0].columns?.[1][0]).toEqual('ingest_on_lambda');
+    expect(qResp.tables[0].columns?.[2][0]).toEqual('bar');
+    expect(qResp.tables[0].columns?.[3][1]).toEqual('baz');
   });
 
   it('ingest on a edge function should succeed', async () => {
@@ -72,7 +72,7 @@ describe('Ingestion & query on different runtime', () => {
     expect(qResp.tables).toBeDefined();
     expect(qResp.tables).toHaveLength(1);
     expect(qResp.tables[0].columns).toHaveLength(4);
-    expect(qResp.tables[0].columns[2][0]).toEqual('bar');
-    expect(qResp.tables[0].columns[3][1]).toEqual('baz');
+    expect(qResp.tables[0].columns?.[2][0]).toEqual('bar');
+    expect(qResp.tables[0].columns?.[3][1]).toEqual('baz');
   });
 });
