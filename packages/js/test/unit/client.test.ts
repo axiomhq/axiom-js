@@ -163,8 +163,8 @@ const tabularEvents = [
   {
     status_int: 500,
     _time: '2024-08-14T22:26:25Z',
-    _sysTime: '2024-08-14T22:26:27.691450448Z',
-    simplified_agent: 'Mozilla/4.0',
+    _sysTime: '2024-08-14T22:26:26.691450448Z',
+    simplified_agent: 'Mozilla/5.0',
   },
 ];
 
