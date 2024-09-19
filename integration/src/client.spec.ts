@@ -121,8 +121,7 @@ baz`,
     it('returns a valid response', async () => {
       const status = await axiom.ingest(datasetName, { test: 'apl' });
       expect(status.ingested).toEqual(1);
-      // wait 1 sec for ingestion to finish
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+
       const result = await axiom.query("['" + datasetName + "'] | where ['test'] == 'apl' | project _time, ['test']", {
         format: 'tabular',
       });

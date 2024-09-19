@@ -25,7 +25,7 @@ describe('Ingestion & query on different runtime', () => {
     const startTime = new Date(Date.now()).toISOString();
     // call route that ingests logs
     const resp = await fetch(process.env.TESTING_TARGET_URL + '/api/lambda');
-    expect(200).toEqual(resp.status);
+    expect(resp.status).toEqual(200);
     const payload = await resp.json();
     expect(payload.ingested).toEqual(2);
 
