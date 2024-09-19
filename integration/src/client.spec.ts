@@ -128,10 +128,10 @@ baz`,
 
       expect(result.status.rowsMatched).toEqual(1);
       expect(result.tables?.length).toEqual(1);
-      expect(result.tables[0].columns.length).toEqual(2); // _time and test
-      expect(result.tables[0].columns[0]).toBeDefined();
-      expect(result.tables[0].columns[1]).toBeDefined();
-      expect(result.tables[0].columns[1].length).toEqual(1); // only one row
+      expect(result.tables[0].columns?.length).toEqual(2); // _time and test
+      expect(result.tables[0].columns?.[0]).toBeDefined();
+      expect(result.tables[0].columns?.[1]).toBeDefined();
+      expect(result.tables[0].columns?.[1].length).toEqual(1); // only one row
     });
   });
 });
