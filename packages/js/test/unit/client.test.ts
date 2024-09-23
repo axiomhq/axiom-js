@@ -64,6 +64,110 @@ const queryResult = {
   ...queryLegacyResult,
 };
 
+const tabularQueryResult = {
+  format: 'tabular',
+  status: {
+    elapsedTime: 482939,
+    minCursor: '0d3fzkox77jls-075072aeef001913-00008ab9',
+    maxCursor: '0d3fzkox77jls-075072aeef001913-00008aba',
+    blocksExamined: 1024,
+    rowsExamined: 67083328,
+    rowsMatched: 36570280,
+    numGroups: 0,
+    isPartial: false,
+    cacheStatus: 1,
+    minBlockTime: '2024-08-14T22:23:58Z',
+    maxBlockTime: '2024-08-21T10:22:03Z',
+  },
+  tables: [
+    {
+      name: '0',
+      sources: [
+        {
+          name: 'sample-http-logs',
+        },
+      ],
+      fields: [
+        {
+          name: 'status_int',
+          type: 'integer',
+        },
+        {
+          name: '_time',
+          type: 'datetime',
+        },
+        {
+          name: '_sysTime',
+          type: 'datetime',
+        },
+        {
+          name: 'simplified_agent',
+          type: 'string',
+        },
+      ],
+      order: [
+        {
+          field: '_time',
+          desc: false,
+        },
+      ],
+      groups: [],
+      range: {
+        field: '_time',
+        start: '2024-08-14T22:26:24.091Z',
+        end: '2024-08-29T22:26:24.091Z',
+      },
+      columns: [
+        [301, 500],
+        ['2024-08-14T22:26:25Z', '2024-08-14T22:26:25Z'],
+        ['2024-08-14T22:26:26.691450448Z', '2024-08-14T22:26:26.691450448Z'],
+        ['Mozilla/5.0', 'Mozilla/5.0'],
+      ],
+    },
+  ],
+  datasetNames: ['sample-http-logs'],
+  fieldsMetaMap: {
+    'sample-http-logs': [
+      {
+        name: 'resp_body_size_bytes',
+        type: 'integer',
+        unit: 'decbytes',
+        hidden: false,
+        description: '',
+      },
+      {
+        name: 'req_duration_ms',
+        type: 'integer|float',
+        unit: 'ms',
+        hidden: false,
+        description: '',
+      },
+      {
+        name: 'resp_header_size_bytes',
+        type: 'integer',
+        unit: 'decbytes',
+        hidden: false,
+        description: '',
+      },
+    ],
+  },
+};
+
+const tabularEvents = [
+  {
+    status_int: 301,
+    _time: '2024-08-14T22:26:25Z',
+    _sysTime: '2024-08-14T22:26:26.691450448Z',
+    simplified_agent: 'Mozilla/5.0',
+  },
+  {
+    status_int: 500,
+    _time: '2024-08-14T22:26:25Z',
+    _sysTime: '2024-08-14T22:26:26.691450448Z',
+    simplified_agent: 'Mozilla/5.0',
+  },
+];
+
 const clientURL = 'http://axiom-js-retries.dev.local';
 
 describe('Axiom', () => {
@@ -266,6 +370,27 @@ describe('Axiom', () => {
       response = await axiom.query("['test'] | where response == 304", options);
       expect(response).not.toEqual('undefined');
       expect(response.matches).toHaveLength(2);
+    });
+
+    it('Tabular Query', async () => {
+      mockFetchResponse(tabularQueryResult);
+      // works without options
+      let response = await axiom.query("['sample-http-logs'] | where status_int != 200", { format: 'tabular' });
+      expect(response).not.toEqual('undefined');
+      expect(response.tables).toHaveLength(1);
+      expect(Array.from(response.tables[0].events())).toEqual(tabularEvents);
+
+      // works with options
+      const options = {
+        streamingDuration: '1m',
+        noCache: true,
+        format: 'tabular' as const,
+      };
+
+      mockFetchResponse(tabularQueryResult);
+      response = await axiom.query("['sample-http-logs'] | where status_int != 200", options);
+      expect(response).not.toEqual('undefined');
+      expect(response.tables).toHaveLength(1);
     });
   });
 

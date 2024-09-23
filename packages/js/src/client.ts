@@ -95,7 +95,7 @@ class BaseClient extends HTTPClient {
    *
    * @param apl - the apl query
    * @param options - optional query options
-   * @returns result of the query, check: {@link QueryResult}
+   * @returns result of the query depending on the format in options, check: {@link QueryResult} and {@link TabularQueryResult}
    *
    * @example
    * ```
@@ -103,7 +103,13 @@ class BaseClient extends HTTPClient {
    * ```
    *
    */
-  query = (apl: string, options?: QueryOptions): Promise<QueryResult> => {
+  query = <
+    TOptions extends QueryOptions,
+    TResult = TOptions['format'] extends 'tabular' ? Promise<TabularQueryResult> : Promise<QueryResult>,
+  >(
+    apl: string,
+    options?: TOptions,
+  ): Promise<TResult> => {
     const req: Query = { apl: apl };
     if (options?.startTime) {
       req.startTime = options?.startTime;
@@ -111,17 +117,53 @@ class BaseClient extends HTTPClient {
     if (options?.endTime) {
       req.endTime = options?.endTime;
     }
-    return this.client.post<QueryResult>(
-      this.localPath + '/datasets/_apl',
-      {
-        body: JSON.stringify(req),
-      },
-      {
-        'streaming-duration': options?.streamingDuration as string,
-        nocache: options?.noCache as boolean,
-        format: 'legacy',
-      },
-    );
+
+    return this.client
+      .post<TOptions['format'] extends 'tabular' ? RawTabularQueryResult : QueryResult>(
+        this.localPath + '/datasets/_apl',
+        {
+          body: JSON.stringify(req),
+        },
+        {
+          'streaming-duration': options?.streamingDuration as string,
+          nocache: options?.noCache as boolean,
+          format: options?.format ?? 'legacy',
+        },
+      )
+      .then((res) => {
+        if (options?.format !== 'tabular') {
+          return res;
+        }
+
+        const result = res as RawTabularQueryResult;
+        return {
+          ...res,
+          tables: result.tables.map((t) => {
+            return {
+              ...t,
+              events: function* () {
+                let iteration = 0;
+                if (!this.columns) {
+                  return;
+                }
+
+                while (iteration <= this.columns[0].length) {
+                  const value = Object.fromEntries(
+                    this.fields.map((field, fieldIdx) => [field.name, this.columns![fieldIdx][iteration]]),
+                  );
+
+                  if (iteration >= this.columns[0].length) {
+                    return value;
+                  }
+
+                  yield value;
+                  iteration++;
+                }
+              },
+            };
+          }),
+        };
+      }) as Promise<TResult>;
   };
 
   /**
@@ -137,7 +179,13 @@ class BaseClient extends HTTPClient {
    * await axiom.aplQuery("['dataset'] | count");
    * ```
    */
-  aplQuery = (apl: string, options?: QueryOptions): Promise<QueryResult> => this.query(apl, options);
+  aplQuery = <
+    TOptions extends QueryOptions,
+    TResult = TOptions['format'] extends 'tabular' ? Promise<TabularQueryResult> : Promise<QueryResult>,
+  >(
+    apl: string,
+    options?: TOptions,
+  ): Promise<TResult> => this.query(apl, options);
 }
 
 /**
@@ -313,6 +361,7 @@ export interface QueryOptionsBase {
 export interface QueryOptions extends QueryOptionsBase {
   startTime?: string;
   endTime?: string;
+  format?: 'legacy' | 'tabular';
 }
 
 export interface QueryLegacy {
@@ -335,6 +384,12 @@ export interface Aggregation {
   argument?: any;
   field: string;
   op: AggregationOp;
+}
+
+export interface TabularAggregation {
+  name: AggregationOp;
+  args: any[];
+  fields: string[];
 }
 
 export enum AggregationOp {
@@ -420,6 +475,49 @@ export interface QueryResult {
   datasetNames: string[];
   matches?: Array<Entry>;
   status: Status;
+}
+
+export interface RawTabularQueryResult {
+  datasetNames: string[];
+  fieldsMetaMap: Record<
+    string,
+    Array<{ description: string; hidden: boolean; name: string; type: string; unit: string }>
+  >;
+  format: string;
+  status: Status;
+  tables: Array<RawAPLResultTable>;
+}
+
+export interface TabularQueryResult extends RawTabularQueryResult {
+  tables: Array<APLResultTable>;
+}
+
+export interface RawAPLResultTable {
+  name: string;
+  sources: Array<{ name: string }>;
+  fields: Array<{ name: string; type: string; agg?: TabularAggregation }>;
+  order: Array<{
+    name: string;
+    desc: boolean;
+  }>;
+  groups: Array<{ name: string }>;
+  range?: {
+    field: string;
+    start: string;
+    end: string;
+  };
+  buckets?: { field: string; size: any };
+  columns?: Array<Array<any>>;
+}
+
+export interface APLResultTable extends RawAPLResultTable {
+  /**
+   * Returns an iterable that yields each row of the table as a record,
+   * where the keys are the field names and the values are the values in the columns.
+   *
+   * @returns {Generator<Record<string, any>, undefined, unknown>}
+   */
+  events: () => Generator<Record<string, any>, undefined, unknown>;
 }
 
 export interface Timeseries {

@@ -33,13 +33,20 @@ describe('Ingestion & query on different runtime', () => {
     await new Promise(r => setTimeout(r, 1000));
 
     // check dataset for ingested logs
-    const qResp = await axiom.query(`['${datasetName}'] | where ['test'] == "ingest_on_lambda"`, {
-      startTime,
-    });
-    expect(qResp.matches).toBeDefined();
-    expect(qResp.matches).toHaveLength(2);
-    expect(qResp.matches![0].data.foo).toEqual('bar');
-    expect(qResp.matches![1].data.bar).toEqual('baz');
+    const qResp = await axiom.query(
+      `['${datasetName}'] | where ['test'] == "ingest_on_lambda" | project _time, test, foo, bar`,
+      {
+        startTime,
+        format: 'tabular',
+      },
+    );
+    expect(qResp.status).toBeDefined();
+    expect(qResp.tables).toBeDefined();
+    expect(qResp.tables).toHaveLength(1);
+    expect(qResp.tables[0].columns).toHaveLength(4);
+    expect(qResp.tables[0].columns?.[1][0]).toEqual('ingest_on_lambda');
+    expect(qResp.tables[0].columns?.[2][0]).toEqual('bar');
+    expect(qResp.tables[0].columns?.[3][1]).toEqual('baz');
   });
 
   it('ingest on a edge function should succeed', async () => {
@@ -54,12 +61,18 @@ describe('Ingestion & query on different runtime', () => {
     await new Promise(resolve => setTimeout(resolve, 1000));
 
     // check dataset for ingested logs
-    const qResp = await axiom.query(`['${datasetName}'] | where ['test'] == "ingest_on_edge"`, {
-      startTime,
-    });
-    expect(qResp.matches).toBeDefined();
-    expect(qResp.matches).toHaveLength(2);
-    expect(qResp.matches![0].data.foo).toEqual('bar');
-    expect(qResp.matches![1].data.bar).toEqual('baz');
+    const qResp = await axiom.query(
+      `['${datasetName}'] | where ['test'] == "ingest_on_edge" | project _time, test, foo, bar`,
+      {
+        startTime,
+        format: 'tabular',
+      },
+    );
+    expect(qResp.status).toBeDefined();
+    expect(qResp.tables).toBeDefined();
+    expect(qResp.tables).toHaveLength(1);
+    expect(qResp.tables[0].columns).toHaveLength(4);
+    expect(qResp.tables[0].columns?.[2][0]).toEqual('bar');
+    expect(qResp.tables[0].columns?.[3][1]).toEqual('baz');
   });
 });
