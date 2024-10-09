@@ -60,7 +60,7 @@
         "turbo": "^1.12.5",
         "typescript": "^5.4.2",
         "vitest": "^0.34.6",
-        "winston": "^3.12.0"
+        "winston": "^3.14.2"
     },
     "workspaces": [
         "packages/*",
