@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.0] - 2024-09-23
+
+## Added
+
+- feat: Added support for quert tabular result format
+
+## [1.1.0] - 2024-08-15
+
+## Security
+
+- Warning against usage of personal tokens
+
+## [1.1.0] - 2024-07-12
+
+## Added
+
+- feate: Add referrer opt to dataset creation
 
 
 ## [1.0.0] - 2024-06-12
@@ -19,13 +36,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- fix: add BigInt support to JSON.stringify [#189] from lucassmuller/fix/json-stringify 
+- fix: add BigInt support to JSON.stringify [#189] from lucassmuller/fix/json-stringify
 
 ## [1.0.0-rc.3] - 2024-03-20
 
 ### Fixed
 
-- Fix fetch request init with retry 
+- Fix fetch request init with retry
 
 ## [1.0.0-rc.2] - 2024-02-09
 
