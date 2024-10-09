@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.0] - 2024-09-23
+
+- Update @axiomhq/js to v1.2.0
+
+## [1.1.0] - 2024-07-12
+
+- Update @axiomhq/js to v1.1.0
+
 ## [1.0.0] - 2024-06-12
 
 - Update @axiomhq/js to v1.0.0
@@ -18,7 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- fix: add BigInt support to JSON.stringify [#189] from lucassmuller/fix/json-stringify 
+- fix: add BigInt support to JSON.stringify [#189] from lucassmuller/fix/json-stringify
 
 ### Changed
 - Update @axiomhq/js to version 1.0.0-rc.3
