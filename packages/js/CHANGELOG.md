@@ -32,6 +32,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Added support for Annotations API
 
+## Migrate to v1.x
+
+- Pass the credentials as an object to Axiom client, this package no longer reads them from the environment variables.
+  do:
+  ```ts
+    const axiom = new Axiom({
+      token: process.env.AXIOM_TOKEN,
+    });
+  ```
+  instead of:
+  ```ts
+  const axiom = new Axiom();
+  ```
+
 ## [1.0.0-rc.4] - 2024-06-10
 
 ### Fixed
