@@ -7,9 +7,9 @@ export interface WinstonOptions extends TransportStreamOptions {
   token: string;
   orgId?: string;
   url?: string;
+  onError?: (err: Error) => void;
 }
 
-// TODO: @arne get the error handling changes from axiom-node package
 export class WinstonTransport extends Transport {
   client: AxiomWithoutBatching;
   dataset: string;
@@ -23,6 +23,7 @@ export class WinstonTransport extends Transport {
       token: opts.token,
       orgId: opts.orgId,
       url: opts.url,
+      onError: opts.onError,
     });
     this.dataset = opts?.dataset || process.env.AXIOM_DATASET || '';
   }
