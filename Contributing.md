@@ -40,7 +40,7 @@ npm run lint
 
 4. Do your best to have [well-formated](https://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html) commit messages for each change. This provides consistency throughout the project and ensures that commit messages are able to be formatted properly by various git tools.
 
-5. Finally, push the commits to your fork and submit a [pull request](https://docs.github.com/en/github/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request)
+5. Finally, push the commits to your fork and submit a [pull request](https://docs.github.com/en/github/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request-from-a-fork)
 
 ## Once you've filed the PR:
 
