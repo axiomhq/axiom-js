@@ -32,7 +32,16 @@ describe('WinstonTransport', () => {
     logger.log({
       level: 'info',
       message: 'Hello from winston',
+      callback: (err: Error) => {
+        console.error("winston failed to send logs", err)
+      }
     });
+
+    logger.end()
+
+    logger.on('finish', () => {
+      console.log('All logs have been sent');
+    })
 
     // Wait for the log to be sent
     await new Promise((resolve) => setTimeout(resolve, 1500));
@@ -40,15 +49,10 @@ describe('WinstonTransport', () => {
     const startTime = new Date(new Date().getTime() - 1000 * 60 * 60 * 24).toISOString();
     const endTime = new Date(new Date().getTime() + 1000 * 60 * 60 * 24).toISOString();
 
-    // const res = await axiom.datasets.query(`['${datasetName}']`, {
-    //     startTime, endTime, streamingDuration: 'auto', noCache: false,
-    // });
-
-    const res = await axiom.queryLegacy(datasetName, {
-      resolution: 'auto',
-      startTime,
-      endTime,
+    const res = await axiom.query(`['${datasetName}']`, {
+      startTime, endTime, streamingDuration: 'auto', noCache: false,
     });
+
     expect(res.matches).toHaveLength(1);
   });
 });
