@@ -27,6 +27,7 @@ export class FetchClient {
       headers,
       method,
       body: init.body ? init.body : undefined,
+      signal: AbortSignal.timeout(this.config.timeout),
       cache: 'no-cache',
     });
 
