@@ -88,6 +88,7 @@ class BaseClient extends HTTPClient {
         'streaming-duration': options?.streamingDuration as string,
         nocache: options?.noCache as boolean,
       },
+      60 * 1000,
     );
 
   /**
@@ -129,6 +130,7 @@ class BaseClient extends HTTPClient {
           nocache: options?.noCache as boolean,
           format: options?.format ?? 'legacy',
         },
+        60 * 1000,
       )
       .then((res) => {
         if (options?.format !== 'tabular') {
