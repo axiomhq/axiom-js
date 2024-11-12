@@ -323,11 +323,11 @@ describe('Axiom', () => {
       expect(true).toEqual(errorCaptured);
     }, 50000);
 
-    it('times out after 10s', async () => {
+    it('times out after 20s', async () => {
       // Can't use fake timers because they don't support AbortSignals https://github.com/sinonjs/fake-timers/issues/418
       const server = setupServer(
         http.post(`${clientURL}/*`, async () => {
-          await new Promise((resolve) => setTimeout(resolve, 11000));
+          await new Promise((resolve) => setTimeout(resolve, 21_000));
           return HttpResponse.json();
         }),
       );
@@ -350,7 +350,7 @@ describe('Axiom', () => {
       expect(error).toEqual('TimeoutError');
 
       server.close();
-    }, 11000);
+    }, 21_500);
   });
 
   describe('Querying', async () => {
@@ -424,11 +424,11 @@ describe('Axiom', () => {
       expect(response.tables).toHaveLength(1);
     });
 
-    it('times out query after 60s', async () => {
+    it('times out query after 120s', async () => {
       // Can't use fake timers because they don't support AbortSignals https://github.com/sinonjs/fake-timers/issues/418
       const server = setupServer(
         http.post(`${clientURL}/*`, async () => {
-          await new Promise((resolve) => setTimeout(resolve, 61000));
+          await new Promise((resolve) => setTimeout(resolve, 121_000));
           return HttpResponse.json();
         }),
       );
@@ -440,10 +440,10 @@ describe('Axiom', () => {
         token: 'test',
       });
 
-      await expect(axiom.query("['test'] | count")).rejects.toThrow('The operation was aborted due to timeout');
+      await expect(client.query("['test'] | count")).rejects.toThrow('The operation was aborted due to timeout');
 
       server.close();
-    }, 65000);
+    }, 125_000);
   });
 
   describe('Tokens', () => {

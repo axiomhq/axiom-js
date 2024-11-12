@@ -59,7 +59,7 @@ export default abstract class HTTPClient {
     this.client = new FetchClient({
       baseUrl,
       headers,
-      timeout: 10000,
+      timeout: 20_000,
     });
   }
 }
