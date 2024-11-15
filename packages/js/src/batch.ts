@@ -58,8 +58,15 @@ export class Batch {
       return;
     }
 
-    const res = await this.ingestFn(this.id, events, this.options);
-    this.lastFlush = new Date();
+    let res = null;
+    try {
+      res = await this.ingestFn(this.id, events, this.options);
+    } catch (e) {
+      throw e;
+    } finally {
+      this.lastFlush = new Date();
+    }
+
     return res;
   };
 }
