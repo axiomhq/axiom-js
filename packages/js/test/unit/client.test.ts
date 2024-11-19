@@ -1,4 +1,6 @@
 import { describe, expect, it, beforeEach, vi } from 'vitest';
+import { setupServer } from 'msw/node';
+import { http, HttpResponse } from 'msw';
 
 import { ContentType, ContentEncoding, Axiom, AxiomWithoutBatching } from '../../src/client';
 import { AxiomTooManyRequestsError } from '../../src/fetchClient';
@@ -320,6 +322,35 @@ describe('Axiom', () => {
 
       expect(true).toEqual(errorCaptured);
     }, 50000);
+
+    it('times out after 20s', async () => {
+      // Can't use fake timers because they don't support AbortSignals https://github.com/sinonjs/fake-timers/issues/418
+      const server = setupServer(
+        http.post(`${clientURL}/*`, async () => {
+          await new Promise((resolve) => setTimeout(resolve, 21_000));
+          return HttpResponse.json();
+        }),
+      );
+
+      server.listen();
+
+      let error: string | null = null;
+
+      let client = new AxiomWithoutBatching({
+        url: clientURL,
+        token: 'test',
+        onError: (err) => {
+          console.error('error callback has been called', err);
+          error = err.name;
+        },
+      });
+
+      await client.ingest('test', [{ name: 'test' }]);
+
+      expect(error).toEqual('TimeoutError');
+
+      server.close();
+    }, 21_500);
   });
 
   describe('Querying', async () => {
@@ -392,6 +423,27 @@ describe('Axiom', () => {
       expect(response).not.toEqual('undefined');
       expect(response.tables).toHaveLength(1);
     });
+
+    it('times out query after 120s', async () => {
+      // Can't use fake timers because they don't support AbortSignals https://github.com/sinonjs/fake-timers/issues/418
+      const server = setupServer(
+        http.post(`${clientURL}/*`, async () => {
+          await new Promise((resolve) => setTimeout(resolve, 121_000));
+          return HttpResponse.json();
+        }),
+      );
+
+      server.listen();
+
+      let client = new AxiomWithoutBatching({
+        url: clientURL,
+        token: 'test',
+      });
+
+      await expect(client.query("['test'] | count")).rejects.toThrow('The operation was aborted due to timeout');
+
+      server.close();
+    }, 125_000);
   });
 
   describe('Tokens', () => {

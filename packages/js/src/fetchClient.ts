@@ -9,6 +9,7 @@ export class FetchClient {
     method: string,
     init: RequestInit = {},
     searchParams: { [key: string]: string } = {},
+    timeout = this.config.timeout,
   ): Promise<T> {
     let finalUrl = `${this.config.baseUrl}${endpoint}`;
     const params = this._prepareSearchParams(searchParams);
@@ -27,6 +28,7 @@ export class FetchClient {
       headers,
       method,
       body: init.body ? init.body : undefined,
+      signal: AbortSignal.timeout(timeout),
       cache: 'no-cache',
     });
 
@@ -46,20 +48,20 @@ export class FetchClient {
     return (await resp.json()) as T;
   }
 
-  post<T>(url: string, init: RequestInit = {}, searchParams: any = {}): Promise<T> {
-    return this.doReq<T>(url, 'POST', init, searchParams);
+  post<T>(url: string, init: RequestInit = {}, searchParams: any = {}, timeout = this.config.timeout): Promise<T> {
+    return this.doReq<T>(url, 'POST', init, searchParams, timeout);
   }
 
-  get<T>(url: string, init: RequestInit = {}, searchParams: any = {}): Promise<T> {
-    return this.doReq<T>(url, 'GET', init, searchParams);
+  get<T>(url: string, init: RequestInit = {}, searchParams: any = {}, timeout = this.config.timeout): Promise<T> {
+    return this.doReq<T>(url, 'GET', init, searchParams, timeout);
   }
 
-  put<T>(url: string, init: RequestInit = {}, searchParams: any = {}): Promise<T> {
-    return this.doReq<T>(url, 'PUT', init, searchParams);
+  put<T>(url: string, init: RequestInit = {}, searchParams: any = {}, timeout = this.config.timeout): Promise<T> {
+    return this.doReq<T>(url, 'PUT', init, searchParams, timeout);
   }
 
-  delete<T>(url: string, init: RequestInit = {}, searchParams: any = {}): Promise<T> {
-    return this.doReq<T>(url, 'DELETE', init, searchParams);
+  delete<T>(url: string, init: RequestInit = {}, searchParams: any = {}, timeout = this.config.timeout): Promise<T> {
+    return this.doReq<T>(url, 'DELETE', init, searchParams, timeout);
   }
 
   _prepareSearchParams = (searchParams: { [key: string]: string }) => {
@@ -80,7 +82,10 @@ export class FetchClient {
 export class AxiomTooManyRequestsError extends Error {
   public message: string = '';
 
-  constructor(public limit: Limit, public shortcircuit = false) {
+  constructor(
+    public limit: Limit,
+    public shortcircuit = false,
+  ) {
     super();
     Object.setPrototypeOf(this, AxiomTooManyRequestsError.prototype); // https://github.com/Microsoft/TypeScript/wiki/Breaking-Changes#extending-built-ins-like-error-array-and-map-may-no-longer-work
     const retryIn = AxiomTooManyRequestsError.timeUntilReset(limit);
