@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.0] - 2024-11-20
+
+- Update @axiomhq/js to v1.3.0
+
 ## [1.2.0] - 2024-09-23
 
 - Update @axiomhq/js to v1.2.0
