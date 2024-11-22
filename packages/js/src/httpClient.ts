@@ -31,13 +31,19 @@ export interface ClientOptions {
    * need to change this unless you are using a self-hosted version of Axiom.
    */
   url?: string;
+  /**
+   * Disables the cache for the request, defaults to false.
+   * Fixes Cloudflare compatibility issue:
+   * https://developers.cloudflare.com/workers/configuration/compatibility-flags/#enable-cache-no-store-http-standard-api
+   */
+  disableFetchCacheNoStore?: boolean;
   onError?: (error: Error) => void;
 }
 
 export default abstract class HTTPClient {
   protected readonly client: FetchClient;
 
-  constructor({ orgId = '', token, url }: ClientOptions) {
+  constructor({ orgId = '', token, url, disableFetchCacheNoStore }: ClientOptions) {
     if (!token) {
       console.warn('Missing Axiom token');
     }
@@ -60,6 +66,7 @@ export default abstract class HTTPClient {
       baseUrl,
       headers,
       timeout: 20_000,
+      disableFetchCacheNoStore,
     });
   }
 }

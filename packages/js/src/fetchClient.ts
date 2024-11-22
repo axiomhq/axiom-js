@@ -2,7 +2,9 @@ import fetchRetry from 'fetch-retry';
 import { parseLimitFromResponse, Limit, LimitType } from './limit.js';
 
 export class FetchClient {
-  constructor(public config: { headers: HeadersInit; baseUrl: string; timeout: number }) {}
+  constructor(
+    public config: { headers: HeadersInit; baseUrl: string; timeout: number; disableFetchCashNoStore: boolean },
+  ) {}
 
   async doReq<T>(
     endpoint: string,
@@ -29,7 +31,7 @@ export class FetchClient {
       method,
       body: init.body ? init.body : undefined,
       signal: AbortSignal.timeout(timeout),
-      cache: 'no-cache',
+      ...(this.config.disableFetchCacheNoStore ? {} : { cache: 'no-cache' }),
     });
 
     if (resp.status === 204) {
