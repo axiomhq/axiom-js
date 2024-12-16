@@ -29,7 +29,7 @@ export class FetchClient {
       method,
       body: init.body ? init.body : undefined,
       signal: AbortSignal.timeout(timeout),
-      cache: 'no-cache',
+      cache: 'no-store',
     });
 
     if (resp.status === 204) {
