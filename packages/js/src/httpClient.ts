@@ -28,7 +28,7 @@ export interface ClientOptions {
   orgId?: string;
   /**
    * the URL of the Axiom API, defaults to https://api.axiom.co. You should not
-   * need to change this unless you are using a self-hosted version of Axiom.
+   * need to change this unless your organization uses a specific region or a self-hosted version of Axiom.
    */
   url?: string;
   onError?: (error: Error) => void;
