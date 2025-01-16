@@ -26,8 +26,8 @@ const levelColors: { [key: string]: any } = {
 
 export class ConsoleTransport implements Transport {
   private config: ConsoleTransportConfig;
-  constructor(config: ConsoleTransportConfig) {
-    this.config = config;
+  constructor(config?: ConsoleTransportConfig) {
+    this.config = { ...config };
   }
   log: Transport['log'] = (logs) => {
     logs.forEach((log) => {
