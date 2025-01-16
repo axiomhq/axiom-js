@@ -1,0 +1,21 @@
+{
+  "name": "@axiomhq/nextjs",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@axiomhq/logger": "workspace:^"
+  },
+  "devDependencies": {
+    "next": "15.1.4"
+  },
+  "peerDependencies": {
+    "next": "15.1.4"
+  }
+}
