@@ -1,5 +1,5 @@
 import { Logger } from '@axiomhq/logger';
-import { AxiomFetchTransport, ConsoleTransport } from '@axiomhq/logging/transports';
+import { AxiomFetchTransport, ConsoleTransport } from '@axiomhq/logger/transports';
 
 export const logger = new Logger({
   transports: [

@@ -1,8 +1,10 @@
-import { Transport, SimpleFetchTransport } from '.';
+import { Transport } from '.';
+import { SimpleFetchTransport } from './fetch';
 interface AxiomFetchConfig {
   dataset: string;
   token: string;
   url?: string;
+  autoFlush?: boolean | number;
 }
 
 const DEFAULT_URL = 'https://api.axiom.co';
@@ -14,6 +16,7 @@ export class AxiomFetchTransport extends SimpleFetchTransport implements Transpo
       init: {
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${config.token}` },
       },
+      autoFlush: config.autoFlush,
     });
   }
 }
