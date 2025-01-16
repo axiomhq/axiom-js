@@ -1,6 +1,4 @@
-import { Transport } from '.';
-import { LogEvent } from '..';
-
+import { Transport, SimpleFetchTransport } from '.';
 interface AxiomFetchConfig {
   dataset: string;
   token: string;
@@ -9,34 +7,13 @@ interface AxiomFetchConfig {
 
 const DEFAULT_URL = 'https://api.axiom.co';
 
-export class AxiomFetchTransport implements Transport {
-  private config: AxiomFetchConfig;
-  private events: LogEvent[] = [];
-
+export class AxiomFetchTransport extends SimpleFetchTransport implements Transport {
   constructor(config: AxiomFetchConfig) {
-    this.config = { url: DEFAULT_URL, ...config };
-  }
-
-  log: Transport['log'] = (logs) => {
-    this.events.push(...logs);
-  };
-
-  async flush() {
-    await fetch(`${this.config.url}/v1/datasets/${this.config.dataset}/ingest`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${this.config.token}`,
+    super({
+      input: `${config.url ?? DEFAULT_URL}/v1/datasets/${config.dataset}/ingest`,
+      init: {
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${config.token}` },
       },
-      body: JSON.stringify(this.events),
-    })
-      .then(async (res) => {
-        if (!res.ok) {
-          console.error(await res.text());
-          throw new Error('Failed to flush logs');
-        }
-        this.events = [];
-      })
-      .catch(console.error);
+    });
   }
 }
