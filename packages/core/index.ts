@@ -52,7 +52,6 @@ export type LoggerConfig = {
 };
 
 export class Logger {
-  private logEvents: LogEvent[] = [];
   children: Logger[] = [];
   public logLevel: LogLevel = LogLevel.debug;
   public config: LoggerConfig;
@@ -67,6 +66,9 @@ export class Logger {
     this.config = { ...initConfig };
   }
 
+  raw(log: LogEvent) {
+    this.config.transports.forEach((transport) => transport.log([log]));
+  }
   debug = (message: string, args: { [key: string]: any } = {}) => {
     this.log(LogLevel.debug, message, args);
   };

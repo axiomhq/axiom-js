@@ -1,1 +1,2 @@
-export * from "./withAxiom";
+export * from './withAxiom';
+export * from './proxyRouteHandler';
