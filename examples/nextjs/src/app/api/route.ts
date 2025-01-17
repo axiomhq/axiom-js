@@ -23,9 +23,10 @@ export const POST = axiomRouteHandler(
     } else {
       if (result.data.error instanceof Error) {
         logger.error(result.data.error.message, result.data.error);
-        const [message, report] = transformErrorResult(result.data);
-        logger[logErrorByStatusCode(report.statusCode)](message, report);
       }
+
+      const [message, report] = transformErrorResult(result.data);
+      logger[logErrorByStatusCode(report.statusCode)](message, report);
     }
   },
 );

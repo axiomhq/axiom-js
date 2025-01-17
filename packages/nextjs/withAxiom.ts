@@ -12,17 +12,22 @@ export type NextHandler<T = any> = (
 
 export const transformSuccessResult = (data: SuccessData): [message: string, report: Record<string, any>] => {
   const report = {
-    type: 'request',
-    method: data.req.method,
-    url: data.req.url,
-    statusCode: data.res.status,
-    durationMs: data.end - data.start,
-    path: new URL(data.req.url).pathname,
-    endTime: data.end,
-    startTime: data.start,
+    request: {
+      type: 'request',
+      method: data.req.method,
+      url: data.req.url,
+      statusCode: data.res.status,
+      durationMs: data.end - data.start,
+      path: new URL(data.req.url).pathname,
+      endTime: data.end,
+      startTime: data.start,
+    },
   };
 
-  return [`${data.req.method} ${report.path} ${report.statusCode} in ${report.endTime - report.startTime}ms`, report];
+  return [
+    `${data.req.method} ${report.request.path} ${report.request.statusCode} in ${report.request.endTime - report.request.startTime}ms`,
+    report,
+  ];
 };
 
 export const transformErrorResult = (data: ErrorData): [message: string, report: Record<string, any>] => {
