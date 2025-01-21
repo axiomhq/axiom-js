@@ -44,7 +44,22 @@ jobs:
       - run: pnpm build && pnpm build:cjs
       - run: pnpm lint
       - run: pnpm test
-  
+
+  preview-release:
+    name: Preview release
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+          cache: 'pnpm'
+      - run: pnpx pkg-pr-new publish --compact './packages/*'
+
   check-winston-example:
     name: Check Winston example
     runs-on: ubuntu-latest
