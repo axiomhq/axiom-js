@@ -1,4 +1,4 @@
-import { Logger } from '@axiomhq/logger';
+import { Logger } from '@axiomhq/logging';
 import { createUseLogger } from './use-logger';
 
 export const createClientSideHelpers = (logger: Logger) => {

@@ -1,4 +1,4 @@
-import { Logger } from '@axiomhq/logger';
+import { Logger } from '@axiomhq/logging';
 import { useEffect, useState } from 'react';
 
 export function createUseLogger(logger: Logger) {

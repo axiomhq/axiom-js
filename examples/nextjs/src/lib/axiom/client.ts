@@ -1,5 +1,5 @@
-import { Logger } from '@axiomhq/logger';
-import { AxiomProxyTransport, ConsoleTransport } from '@axiomhq/logger/transports';
+import { Logger } from '@axiomhq/logging';
+import { AxiomProxyTransport, ConsoleTransport } from '@axiomhq/logging/transports';
 import { createClientSideHelpers } from '@axiomhq/react';
 
 export const logger = new Logger({

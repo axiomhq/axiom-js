@@ -9,7 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@axiomhq/logger": "workspace:*",
+    "@axiomhq/logging": "workspace:*",
     "@axiomhq/nextjs": "workspace:^",
     "@axiomhq/react": "workspace:*",
     "next": "15.1.4",

@@ -1,4 +1,4 @@
-import { LogEvent, Logger } from '@axiomhq/logger';
+import { LogEvent, Logger } from '@axiomhq/logging';
 import { NextRequest } from 'next/server';
 
 export const createProxyRouteHandler = (logger: Logger) => {

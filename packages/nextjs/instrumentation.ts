@@ -1,5 +1,5 @@
 import { onRequestError } from '@/instrumentation';
-import { Logger } from '@axiomhq/logger';
+import { Logger } from '@axiomhq/logging';
 import { Instrumentation } from 'next';
 
 export const transformOnRequestError = (

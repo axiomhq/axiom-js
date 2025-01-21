@@ -1,4 +1,4 @@
-import { Logger } from '@axiomhq/logger';
+import { Logger } from '@axiomhq/logging';
 import { isRedirectError } from 'next/dist/client/components/redirect-error';
 import { isHTTPAccessFallbackError } from 'next/dist/client/components/http-access-fallback/http-access-fallback';
 import * as next from 'next/server';
