@@ -2,8 +2,35 @@
   "name": "@axiomhq/react",
   "version": "0.0.1",
   "description": "",
-  "main": "index.js",
+  "type": "module",
+  "main": "dist/cjs/index.cjs",
+  "module": "dist/esm/index.js",
+  "types": "dist/esm/index.d.ts",
+  "exports": {
+    "./transports": {
+      "import": {
+        "types": "./dist/esm/transports/index.d.ts",
+        "default": "./dist/esm/transports/index.js"
+      },
+      "require": {
+        "types": "./dist/cjs/transports/index.d.cts",
+        "default": "./dist/cjs/transports/index.cjs"
+      }
+    },
+    ".": {
+      "import": {
+        "types": "./dist/esm/index.d.ts",
+        "default": "./dist/esm/index.js"
+      },
+      "require": {
+        "types": "./dist/cjs/index.d.cts",
+        "default": "./dist/cjs/index.cjs"
+      }
+    },
+    "./package.json": "./package.json"
+  },
   "scripts": {
+    "build": "vite build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -17,5 +44,9 @@
     "react-dom": "^19.0.0",
     "use-deep-compare": "^1.3.0",
     "web-vitals": "^4.2.4"
+  },
+  "devDependencies": {
+    "@tanstack/config": "^0.16.0",
+    "vite": "^5.2.14"
   }
 }

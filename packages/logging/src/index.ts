@@ -1,5 +1,8 @@
 import { Version } from './shared';
-import { Transport } from './transports';
+export interface Transport {
+  log: (logs: LogEvent[]) => Promise<void> | void;
+  flush: () => Promise<void> | void;
+}
 
 const LOG_LEVEL = 'info';
 
@@ -96,7 +99,7 @@ export class Logger {
       _time: new Date(Date.now()).toISOString(),
       fields: this.config.args || {},
       '@app': {
-        'axiom-logging-version': Version,
+        'axiom-logging-version': Version ?? 'unknown',
       },
     };
 

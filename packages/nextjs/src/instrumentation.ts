@@ -1,4 +1,3 @@
-import { onRequestError } from '@/instrumentation';
 import { Logger } from '@axiomhq/logging';
 import { Instrumentation } from 'next';
 
