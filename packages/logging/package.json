@@ -16,16 +16,6 @@
         "types": "./dist/cjs/index.d.cts",
         "default": "./dist/cjs/index.cjs"
       }
-    },
-    "./transports": {
-      "import": {
-        "types": "./dist/esm/transports/index.d.ts",
-        "default": "./dist/esm/transports/index.js"
-      },
-      "require": {
-        "types": "./dist/cjs/transports/index.d.cts",
-        "default": "./dist/cjs/transports/index.cjs"
-      }
     }
   },
   "scripts": {

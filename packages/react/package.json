@@ -7,16 +7,6 @@
   "module": "dist/esm/index.js",
   "types": "dist/esm/index.d.ts",
   "exports": {
-    "./transports": {
-      "import": {
-        "types": "./dist/esm/transports/index.d.ts",
-        "default": "./dist/esm/transports/index.js"
-      },
-      "require": {
-        "types": "./dist/cjs/transports/index.d.cts",
-        "default": "./dist/cjs/transports/index.cjs"
-      }
-    },
     ".": {
       "import": {
         "types": "./dist/esm/index.d.ts",
