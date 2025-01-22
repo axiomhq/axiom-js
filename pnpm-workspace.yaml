@@ -3,3 +3,4 @@ packages:
   - 'examples/*'
   - 'integration'
   - 'e2e/*'
+  - 'internal/*'

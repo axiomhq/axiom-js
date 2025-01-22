@@ -1,6 +1,6 @@
 import { AxiomWithoutBatching } from '@axiomhq/js';
 
-const axiom = new AxiomWithoutBatching({ token: process.env.AXIOM_TOKEN || ''});
+const axiom = new AxiomWithoutBatching({ token: process.env.AXIOM_TOKEN || '' });
 
 async function ingest() {
   const events = [

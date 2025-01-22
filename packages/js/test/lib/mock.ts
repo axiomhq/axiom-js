@@ -1,4 +1,4 @@
-import { vi } from 'vitest';
+import { vi } from "vitest";
 
 export const mockFetchResponse = (body: any, statusCode: number = 200, headers = {}) => {
   const resp = new Response(JSON.stringify(body), { status: statusCode, headers });
@@ -6,7 +6,7 @@ export const mockFetchResponse = (body: any, statusCode: number = 200, headers =
     return Promise.resolve(resp);
   };
 
-  vi.spyOn(global, 'fetch').mockImplementationOnce(func);
+  vi.spyOn(global, "fetch").mockImplementationOnce(func);
 };
 
 export const mockFetchResponseErr = (statusCode = 500, headers = {}) => {
@@ -15,7 +15,7 @@ export const mockFetchResponseErr = (statusCode = 500, headers = {}) => {
     return Promise.reject(resp);
   };
 
-  vi.spyOn(global, 'fetch').mockImplementationOnce(func);
+  vi.spyOn(global, "fetch").mockImplementationOnce(func);
 };
 
 export const testMockedFetchCall = (test: any, body: any, statusCode: number = 200, headers = {}) => {
@@ -24,11 +24,11 @@ export const testMockedFetchCall = (test: any, body: any, statusCode: number = 2
     return Promise.resolve(new Response(JSON.stringify(body), { status: statusCode, headers }));
   };
 
-  vi.spyOn(global, 'fetch').mockImplementationOnce(func);
+  vi.spyOn(global, "fetch").mockImplementationOnce(func);
 };
 
 export const mockNoContentResponse = () => {
-  vi.spyOn(global, 'fetch').mockImplementationOnce(() => {
-    return Promise.resolve(new Response(null, { status: 204, statusText: 'No Content' }));
+  vi.spyOn(global, "fetch").mockImplementationOnce(() => {
+    return Promise.resolve(new Response(null, { status: 204, statusText: "No Content" }));
   });
 };

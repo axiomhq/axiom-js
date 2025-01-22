@@ -5,12 +5,15 @@
   "description": "examples on using axiom js sdk",
   "scripts": {
     "build": "tsc",
-    "format": "eslint ./src --ext .ts --quiet --fix",
-    "lint": "eslint ./src --ext .ts",
+    "format": "eslint ./src --quiet --fix",
+    "lint": "eslint ./src",
     "example": "ts-node"
   },
   "dependencies": {
     "@axiomhq/js": "workspace:*",
     "winston": "^3.14.2"
+  },
+  "devDependencies": {
+    "@repo/eslint-config": "workspace:^"
   }
 }

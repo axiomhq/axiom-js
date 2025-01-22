@@ -5,8 +5,16 @@ const datasetSuffix = process.env.AXIOM_DATASET_SUFFIX || 'local';
 
 describe('AnnotationsService', () => {
   const datasetName = `test-axiom-js-datasets-${datasetSuffix}`;
-  const datasetsClient = new datasets.Service({ token: process.env.AXIOM_TOKEN || '', url: process.env.AXIOM_URL, orgId: process.env.AXIOM_ORG_ID });
-  const client = new annotations.Service({ token: process.env.AXIOM_TOKEN || '', url: process.env.AXIOM_URL, orgId: process.env.AXIOM_ORG_ID });
+  const datasetsClient = new datasets.Service({
+    token: process.env.AXIOM_TOKEN || '',
+    url: process.env.AXIOM_URL,
+    orgId: process.env.AXIOM_ORG_ID,
+  });
+  const client = new annotations.Service({
+    token: process.env.AXIOM_TOKEN || '',
+    url: process.env.AXIOM_URL,
+    orgId: process.env.AXIOM_ORG_ID,
+  });
   let id: string = '';
 
   beforeAll(async () => {
@@ -32,7 +40,7 @@ describe('AnnotationsService', () => {
       });
 
       expect(result).not.toEqual(null);
-      expect(result.title).toEqual("test1");
+      expect(result.title).toEqual('test1');
 
       // set id
       id = result.id;
@@ -57,7 +65,7 @@ describe('AnnotationsService', () => {
     it('should get the annotation', async () => {
       const annotation = await client.get(id);
 
-      expect(annotation.title).toEqual("test1");
+      expect(annotation.title).toEqual('test1');
     });
   });
 

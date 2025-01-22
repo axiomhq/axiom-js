@@ -1,16 +1,15 @@
 {
-    "name": "examples-node",
-    "main": "main.cjs",
-    "scripts": {
-        "build": "rollup src/main.cjs --dir dist",
-        "dev": "node src/main.cjs",
-        "lint": "eslint src/main.cjs"
-    },
-    "dependencies": {
-        "@axiomhq/js": "workspace:*"
-    },
-    "devDependencies": {
-        "eslint-config-airbnb-base": "^15.0.0",
-        "eslint-plugin-import": "^2.25.2"
-    }
+  "name": "examples-node",
+  "main": "main.cjs",
+  "scripts": {
+    "build": "rollup src/main.cjs --dir dist",
+    "dev": "node src/main.cjs",
+    "lint": "eslint src/main.cjs"
+  },
+  "dependencies": {
+    "@axiomhq/js": "workspace:*"
+  },
+  "devDependencies": {
+    "@repo/eslint-config": "workspace:^"
+  }
 }

@@ -5,9 +5,7 @@ const logger = winston.createLogger({
   level: 'info',
   format: winston.format.json(),
   defaultMeta: { service: 'user-service' },
-  transports: [
-    new AxiomTransport({ token: process.env.AXIOM_TOKEN || '', dataset: process.env.AXIOM_DATASET }),
-  ],
+  transports: [new AxiomTransport({ token: process.env.AXIOM_TOKEN || '', dataset: process.env.AXIOM_DATASET })],
 });
 
 // Add the console logger if we're not in production

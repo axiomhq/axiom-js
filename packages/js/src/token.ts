@@ -1,5 +1,5 @@
 export function isAxiomPersonalToken(token: string): boolean {
-  if (token.startsWith('xapt')) {
+  if (token.startsWith("xapt")) {
     return true;
   }
 

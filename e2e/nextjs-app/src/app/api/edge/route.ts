@@ -11,19 +11,14 @@ export async function GET() {
     url: process.env.AXIOM_URL,
   });
 
-  const resp = await axiom.ingest(
-    'axiom-js-e2e-test',
-    [
-      { foo: "bar", test: "ingest_on_edge", request: { path: '/api/edge' } },
-      { bar: "baz", test: "ingest_on_edge", request: { path: '/api/edge' } }
-    ]
-  )
+  const resp = await axiom.ingest('axiom-js-e2e-test', [
+    { foo: 'bar', test: 'ingest_on_edge', request: { path: '/api/edge' } },
+    { bar: 'baz', test: 'ingest_on_edge', request: { path: '/api/edge' } },
+  ]);
 
   if (resp.ingested !== 2) {
     return NextResponse.json({ test: 'ingest_on_edge', error: 'ingest failed' }, { status: 500 });
   }
 
   return NextResponse.json({ test: 'ingest_on_edge', ...resp });
-
-
 }

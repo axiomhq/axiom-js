@@ -11,13 +11,10 @@ export async function GET() {
   });
 
   try {
-    const resp = await axiom.ingest(
-      'axiom-js-e2e-test',
-      [
-        { foo: "bar", test: "ingest_on_lambda", request: { path: '/api/lambda' } },
-        { bar: "baz", test: "ingest_on_lambda", request: { path: '/api/lambda' } }
-      ],
-    );
+    const resp = await axiom.ingest('axiom-js-e2e-test', [
+      { foo: 'bar', test: 'ingest_on_lambda', request: { path: '/api/lambda' } },
+      { bar: 'baz', test: 'ingest_on_lambda', request: { path: '/api/lambda' } },
+    ]);
 
     if (resp.ingested !== 2) {
       return NextResponse.json({ test: 'ingest_on_lambda', error: 'ingest failed' }, { status: 500 });

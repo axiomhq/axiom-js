@@ -1,4 +1,4 @@
-import HTTPClient from './httpClient.js';
+import HTTPClient from "./httpClient.js";
 
 export namespace users {
   export interface User {
@@ -8,6 +8,6 @@ export namespace users {
   }
 
   export class Service extends HTTPClient {
-    current = (): Promise<User> => this.client.get('/v1/user');
+    current = (): Promise<User> => this.client.get("/v1/user");
   }
 }

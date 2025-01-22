@@ -34,7 +34,6 @@ class BaseClient extends HTTPClient {
    * @param contentEncoding - optional content encoding, defaults to Identity
    * @param options - optional ingest options
    * @returns result a promise of ingest and its status, check: {@link IngestStatus}
-   *
    * @example
    * ```
    * import { AxiomWithoutBatching } from '@axiomhq/js';

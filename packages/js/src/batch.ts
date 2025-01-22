@@ -1,4 +1,4 @@
-import { IngestOptions, IngestStatus } from './client.js';
+import { IngestOptions, IngestStatus } from "./client.js";
 
 export type IngestFunction = (
   id: string,
@@ -7,7 +7,7 @@ export type IngestFunction = (
 ) => Promise<IngestStatus>;
 
 export function createBatchKey(id: string, options?: IngestOptions): string {
-  return `${id}:${options?.timestampField || '-'}:${options?.timestampFormat || '-'}:${options?.csvDelimiter || '-'}`;
+  return `${id}:${options?.timestampField || "-"}:${options?.timestampFormat || "-"}:${options?.csvDelimiter || "-"}`;
 }
 
 export class Batch {

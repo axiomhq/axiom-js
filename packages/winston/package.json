@@ -18,10 +18,11 @@
     "prepublish": "npm run build && npm run build:cjs"
   },
   "dependencies": {
-    "winston-transport": "^4.5.0",
-    "@axiomhq/js": "workspace:*"
+    "@axiomhq/js": "workspace:*",
+    "winston-transport": "^4.5.0"
   },
   "devDependencies": {
+    "@repo/eslint-config": "workspace:*",
     "winston": "^3.14.2"
   },
   "repository": {

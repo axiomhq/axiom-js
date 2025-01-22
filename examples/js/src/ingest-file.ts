@@ -1,7 +1,7 @@
 import fs from 'fs';
 import { ContentType, ContentEncoding, AxiomWithoutBatching } from '@axiomhq/js';
 
-const axiom = new AxiomWithoutBatching({ token: process.env.AXIOM_TOKEN || ''});
+const axiom = new AxiomWithoutBatching({ token: process.env.AXIOM_TOKEN || '' });
 
 async function ingestFile() {
   const buff = fs.readFileSync('logs.json');
