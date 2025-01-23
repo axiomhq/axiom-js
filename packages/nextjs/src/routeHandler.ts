@@ -34,17 +34,22 @@ export const transformErrorResult = (data: ErrorData): [message: string, report:
   const statusCode = data.error instanceof Error ? getNextErrorStatusCode(data.error) : 500;
 
   const report = {
-    type: 'request',
-    method: data.req.method,
-    url: data.req.url,
-    statusCode: statusCode,
-    durationMs: data.end - data.start,
-    path: new URL(data.req.url).pathname,
-    endTime: data.end,
-    startTime: data.start,
+    request: {
+      type: 'request',
+      method: data.req.method,
+      url: data.req.url,
+      statusCode: statusCode,
+      durationMs: data.end - data.start,
+      path: new URL(data.req.url).pathname,
+      endTime: data.end,
+      startTime: data.start,
+    },
   };
 
-  return [`${data.req.method} ${report.path} ${report.statusCode} in ${report.endTime - report.startTime}ms`, report];
+  return [
+    `${data.req.method} ${report.request.path} ${report.request.statusCode} in ${report.request.endTime - report.request.startTime}ms`,
+    report,
+  ];
 };
 
 export interface BaseData {
