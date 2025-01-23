@@ -1,27 +1,25 @@
 {
-    "name": "nextjs-app",
-    "private": true,
-    "description": "e2e tests for axiom-js",
-    "version": "0.1.0",
-    "scripts": {
-        "build": "next build",
-        "dev": "next dev",
-        "format": "eslint 'src/**/*.{js,ts}' --quiet --fix",
-        "lint": "eslint 'src/**/*.{js,ts}'",
-        "e2e": "vitest run test/*"
-    },
-    "dependencies": {
-        "@axiomhq/js": "workspace:*",
-        "@axiomhq/winston": "workspace:*",
-        "next": "^15.0.2",
-        "react": "18.2.0",
-        "react-dom": "18.3.1",
-        "winston-transport": "^4.5.0",
-        "eslint": "8.57.0",
-        "eslint-config-next": "14.2.3"
-    },
-    "devDependencies": {
-        "@types/react": "^18.2.17",
-        "eslint-config-next": "14.2.3"
-    }
+  "name": "nextjs-app",
+  "private": true,
+  "description": "e2e tests for axiom-js",
+  "version": "0.1.0",
+  "scripts": {
+    "build": "next build",
+    "dev": "next dev",
+    "format": "eslint 'src/**/*.{js,jsx,ts,tsx}' --quiet --fix",
+    "lint": "eslint 'src/**/*.{js,jsx,ts,tsx}'",
+    "e2e": "vitest run test/*"
+  },
+  "dependencies": {
+    "@axiomhq/js": "workspace:*",
+    "@axiomhq/winston": "workspace:*",
+    "next": "^15.0.2",
+    "react": "18.2.0",
+    "react-dom": "18.3.1",
+    "winston-transport": "^4.5.0"
+  },
+  "devDependencies": {
+    "@repo/eslint-config": "workspace:*",
+    "@types/react": "^18.2.17"
+  }
 }

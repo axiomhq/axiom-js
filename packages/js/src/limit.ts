@@ -1,27 +1,27 @@
-export const headerRateScope = 'X-RateLimit-Scope';
+export const headerRateScope = "X-RateLimit-Scope";
 
-export const headerAPILimit = 'X-RateLimit-Limit';
-export const headerAPIRateRemaining = 'X-RateLimit-Remaining';
-export const headerAPIRateReset = 'X-RateLimit-Reset';
+export const headerAPILimit = "X-RateLimit-Limit";
+export const headerAPIRateRemaining = "X-RateLimit-Remaining";
+export const headerAPIRateReset = "X-RateLimit-Reset";
 
-export const headerQueryLimit = 'X-QueryLimit-Limit';
-export const headerQueryRemaining = 'X-QueryLimit-Remaining';
-export const headerQueryReset = 'X-QueryLimit-Reset';
+export const headerQueryLimit = "X-QueryLimit-Limit";
+export const headerQueryRemaining = "X-QueryLimit-Remaining";
+export const headerQueryReset = "X-QueryLimit-Reset";
 
-export const headerIngestLimit = 'X-IngestLimit-Limit';
-export const headerIngestRemaining = 'X-IngestLimit-Remaining';
-export const headerIngestReset = 'X-IngestLimit-Reset';
+export const headerIngestLimit = "X-IngestLimit-Limit";
+export const headerIngestRemaining = "X-IngestLimit-Remaining";
+export const headerIngestReset = "X-IngestLimit-Reset";
 
 export enum LimitScope {
-  unknown = 'unknown',
-  user = 'user',
-  organization = 'organization',
-  anonymous = 'anonymous',
+  unknown = "unknown",
+  user = "user",
+  organization = "organization",
+  anonymous = "anonymous",
 }
 export enum LimitType {
-  api = 'api',
-  query = 'query',
-  ingest = 'ingest',
+  api = "api",
+  query = "query",
+  ingest = "ingest",
 }
 
 export class Limit {
@@ -38,11 +38,11 @@ export class Limit {
 export function parseLimitFromResponse(response: Response): Limit {
   let limit: Limit;
 
-  if (response.url?.endsWith('/ingest')) {
-    limit = parseLimitFromHeaders(response, '', headerIngestLimit, headerIngestRemaining, headerIngestReset);
+  if (response.url?.endsWith("/ingest")) {
+    limit = parseLimitFromHeaders(response, "", headerIngestLimit, headerIngestRemaining, headerIngestReset);
     limit.type = LimitType.ingest;
-  } else if (response.url?.endsWith('/query') || response.url?.endsWith('/_apl')) {
-    limit = parseLimitFromHeaders(response, '', headerQueryLimit, headerQueryRemaining, headerQueryReset);
+  } else if (response.url?.endsWith("/query") || response.url?.endsWith("/_apl")) {
+    limit = parseLimitFromHeaders(response, "", headerQueryLimit, headerQueryRemaining, headerQueryReset);
     limit.type = LimitType.query;
   } else {
     limit = parseLimitFromHeaders(
@@ -68,24 +68,24 @@ function parseLimitFromHeaders(
   headerRemaining: string,
   headerReset: string,
 ): Limit {
-  let limit: Limit = new Limit();
+  const limit: Limit = new Limit();
 
   const scope: string = response.headers.get(headerScope.toLowerCase()) || LimitScope.unknown;
   limit.scope = LimitScope[scope as keyof typeof LimitScope];
 
-  const limitValue = response.headers.get(headerLimit.toLowerCase()) || '';
+  const limitValue = response.headers.get(headerLimit.toLowerCase()) || "";
   const limitValueNumber = parseInt(limitValue, 10);
   if (!isNaN(limitValueNumber)) {
     limit.value = limitValueNumber;
   }
 
-  const remainingValue = response.headers.get(headerRemaining.toLowerCase()) || '';
+  const remainingValue = response.headers.get(headerRemaining.toLowerCase()) || "";
   const remainingValueNumber = parseInt(remainingValue, 10);
   if (!isNaN(remainingValueNumber)) {
     limit.remaining = remainingValueNumber;
   }
 
-  const resetValue = response.headers.get(headerReset.toLowerCase()) || '';
+  const resetValue = response.headers.get(headerReset.toLowerCase()) || "";
   const resetValueInt = parseInt(resetValue, 10);
   if (!isNaN(resetValueInt)) {
     limit.reset = new Date(resetValueInt * 1000);

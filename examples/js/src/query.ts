@@ -17,7 +17,7 @@ async function query() {
     return;
   }
 
-  for (let table of res.tables) {
+  for (const table of res.tables) {
     console.table(table);
   }
 }

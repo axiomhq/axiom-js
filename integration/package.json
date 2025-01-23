@@ -12,8 +12,11 @@
         "integration": "vitest run src/*"
     },
     "dependencies": {
-        "winston-transport": "^4.5.0",
+        "@axiomhq/js": "workspace:*",
         "@axiomhq/winston": "workspace:*",
-        "@axiomhq/js": "workspace:*"
+        "winston-transport": "^4.5.0"
+    },
+    "devDependencies": {
+        "@repo/eslint-config": "workspace:^"
     }
 }

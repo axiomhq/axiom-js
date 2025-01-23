@@ -1,6 +1,6 @@
 import { Axiom, ContentType, ContentEncoding } from '@axiomhq/js';
 
-const axiom = new Axiom({ token: process.env.AXIOM_TOKEN || ''});
+const axiom = new Axiom({ token: process.env.AXIOM_TOKEN || '' });
 
 async function ingestString() {
   const data = JSON.stringify([{ foo: 'bar' }, { foo: 'bar' }, { bar: 'baz' }]);

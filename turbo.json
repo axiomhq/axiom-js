@@ -1,54 +1,32 @@
 {
-    "$schema": "https://turbo.build/schema.json",
-    "pipeline": {
-        "lint": {},
-        "build": {
-            "dependsOn": [
-                "^build"
-            ],
-            "outputs": [
-                "dist/esm/**",
-                "dist/types/**"
-            ]
-        },
-        "build:cjs": {
-            "dependsOn": [
-                "^build:cjs"
-            ],
-            "outputs": [
-                "dist/cjs/**"
-            ]
-        },
-        "test": {
-            "dependsOn": [
-                "^build",
-                "^build:cjs"
-            ]
-        },
-        "integration": {
-            "dependsOn": [
-                "^build",
-                "^build:cjs"
-            ]
-        },
-        "e2e": {
-            "dependsOn": [
-                "^build"
-            ]
-        },
-        "dev": {
-            "cache": false,
-            "persistent": true
-        },
-        "nextjs-app#build": {
-            "dependsOn": [
-                "^build",
-                "^build:cjs"
-            ],
-            "outputs": [
-                ".next/**",
-                "!.next/cache/**"
-            ]
-        }
+  "$schema": "https://turbo.build/schema.json",
+  "pipeline": {
+    "lint": {},
+    "format": {},
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": ["dist/esm/**", "dist/types/**"]
+    },
+    "build:cjs": {
+      "dependsOn": ["^build:cjs"],
+      "outputs": ["dist/cjs/**"]
+    },
+    "test": {
+      "dependsOn": ["^build", "^build:cjs"]
+    },
+    "integration": {
+      "dependsOn": ["^build", "^build:cjs"]
+    },
+    "e2e": {
+      "dependsOn": ["^build"]
+    },
+    "dev": {
+      "cache": false,
+      "persistent": true
+    },
+    "nextjs-app#build": {
+      "dependsOn": ["^build", "^build:cjs"],
+      "outputs": [".next/**", "!.next/cache/**"]
     }
+  }
 }

@@ -42,5 +42,8 @@
   "dependencies": {
     "@axiomhq/js": "workspace:*",
     "pino-abstract-transport": "^1.2.0"
+  },
+  "devDependencies": {
+    "@repo/eslint-config": "workspace:^"
   }
 }

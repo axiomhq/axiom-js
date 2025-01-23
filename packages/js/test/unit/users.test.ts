@@ -1,17 +1,17 @@
-import { describe, expect, it } from 'vitest';
-import { users } from '../../src/users';
-import { mockFetchResponse } from '../lib/mock';
+import { describe, expect, it } from "vitest";
+import { users } from "../../src/users";
+import { mockFetchResponse } from "../lib/mock";
 
 const currentUser = {
-  id: 'e9cffaad-60e7-4b04-8d27-185e1808c38c',
-  name: 'Lukas Malkmus',
-  emails: ['lukas@axiom.co'],
+  id: "e9cffaad-60e7-4b04-8d27-185e1808c38c",
+  name: "Lukas Malkmus",
+  emails: ["lukas@axiom.co"],
 };
 
-describe('UsersService', () => {
-  const client = new users.Service({ url: 'http://axiom-js.dev.local' });
+describe("UsersService", () => {
+  const client = new users.Service({ url: "http://axiom-js.dev.local" });
 
-  it('Current', async () => {
+  it("Current", async () => {
     mockFetchResponse(currentUser);
     const response = await client.current();
     expect(response).toBeDefined();

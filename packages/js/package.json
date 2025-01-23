@@ -19,8 +19,8 @@
   "scripts": {
     "build": "rollup -c rollup.config.js",
     "build:cjs": "rollup -c rollup.config.cjs.js",
-    "format": "eslint '*/**/*.{js,ts}' --quiet --fix",
-    "lint": "eslint '*/**/*.{js,ts}'",
+    "format": "eslint './**/*.{js,ts}' --quiet --fix",
+    "lint": "eslint './**/*.{js,ts}'",
     "prepublish": "pnpm run build && pnpm run build:cjs",
     "test": "vitest run test/unit/* --coverage"
   },
@@ -53,6 +53,7 @@
     "default": "./dist/esm/index.js"
   },
   "devDependencies": {
+    "@repo/eslint-config": "workspace:*",
     "msw": "^2.6.2"
   }
 }
