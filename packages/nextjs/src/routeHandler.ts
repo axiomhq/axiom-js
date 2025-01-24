@@ -10,17 +10,27 @@ export type NextHandler<T = any> = (
   arg?: T,
 ) => Promise<Response> | Promise<next.NextResponse> | next.NextResponse | Response;
 
+const getRegion = (req: next.NextRequest) => {
+  let region = '';
+  if ('geo' in req) {
+    region = (req.geo as { region: string }).region ?? '';
+  }
+  return region;
+};
+
 export const transformSuccessResult = (data: SuccessData): [message: string, report: Record<string, any>] => {
   const report = {
     request: {
-      type: 'request',
+      startTime: new Date().getTime(),
+      endTime: new Date().getTime(),
+      path: data.req.nextUrl.pathname ?? new URL(data.req.url).pathname,
       method: data.req.method,
-      url: data.req.url,
+      host: data.req.headers.get('host'),
+      userAgent: data.req.headers.get('user-agent'),
+      scheme: data.req.url.split('://')[0],
+      ip: data.req.headers.get('x-forwarded-for'),
+      region: getRegion(data.req),
       statusCode: data.res.status,
-      durationMs: data.end - data.start,
-      path: new URL(data.req.url).pathname,
-      endTime: data.end,
-      startTime: data.start,
     },
   };
 
@@ -35,14 +45,16 @@ export const transformErrorResult = (data: ErrorData): [message: string, report:
 
   const report = {
     request: {
-      type: 'request',
+      startTime: new Date().getTime(),
+      endTime: new Date().getTime(),
+      path: data.req.nextUrl.pathname ?? new URL(data.req.url).pathname,
       method: data.req.method,
-      url: data.req.url,
+      host: data.req.headers.get('host'),
+      userAgent: data.req.headers.get('user-agent'),
+      scheme: data.req.url.split('://')[0],
+      ip: data.req.headers.get('x-forwarded-for'),
+      region: getRegion(data.req),
       statusCode: statusCode,
-      durationMs: data.end - data.start,
-      path: new URL(data.req.url).pathname,
-      endTime: data.end,
-      startTime: data.start,
     },
   };
 
