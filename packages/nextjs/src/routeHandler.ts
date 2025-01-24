@@ -1,4 +1,4 @@
-import { Logger } from '@axiomhq/logging';
+import { Logger, LogLevel } from '@axiomhq/logging';
 import { isRedirectError } from 'next/dist/client/components/redirect-error';
 import { isHTTPAccessFallbackError } from 'next/dist/client/components/http-access-fallback/http-access-fallback';
 import * as next from 'next/server';
@@ -86,18 +86,13 @@ export const getNextErrorStatusCode = (error: Error & { digest?: string }) => {
   }
 };
 
-export const logErrorByStatusCode = (statusCode: number) => {
-  switch (statusCode) {
-    case 404:
-    case 403:
-    case 401:
-      return 'warn';
-    case 307:
-    case 308:
-      return 'info';
-    default:
-      return 'error';
+export const getLogLevelFromStatusCode = (statusCode: number): LogLevel => {
+  if (statusCode >= 300 && statusCode < 400) {
+    return LogLevel.info;
+  } else if (statusCode >= 400 && statusCode < 500) {
+    return LogLevel.warn;
   }
+  return LogLevel.error;
 };
 
 export const createDefaultAxiomHandlerCallback = (logger: Logger): axiomHandlerCallback => {
@@ -108,7 +103,7 @@ export const createDefaultAxiomHandlerCallback = (logger: Logger): axiomHandlerC
       if (result.data.error instanceof Error) {
         logger.error(result.data.error.message, result.data.error);
         const [message, report] = transformErrorResult(result.data);
-        logger[logErrorByStatusCode(report.statusCode)](message, report);
+        logger.log(getLogLevelFromStatusCode(report.statusCode), message, report);
       }
     }
   };

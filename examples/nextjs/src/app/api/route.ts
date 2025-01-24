@@ -1,7 +1,7 @@
 import { logger } from '@/lib/axiom/server';
 import {
   createAxiomRouteHandler,
-  logErrorByStatusCode,
+  getLogLevelFromStatusCode,
   transformErrorResult,
   transformSuccessResult,
 } from '@axiomhq/nextjs';
@@ -26,7 +26,7 @@ export const POST = axiomRouteHandler(
       }
 
       const [message, report] = transformErrorResult(result.data);
-      logger[logErrorByStatusCode(report.statusCode)](message, report);
+      logger.log(getLogLevelFromStatusCode(report.statusCode), message, report);
     }
   },
 );
