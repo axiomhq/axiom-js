@@ -19,7 +19,8 @@
     }
   },
   "scripts": {
-    "build": "vite build"
+    "build": "vite build",
+    "test": "vitest ./test/unit/*"
   },
   "keywords": [],
   "author": "",
@@ -29,6 +30,7 @@
   },
   "devDependencies": {
     "@tanstack/config": "^0.16.0",
+    "msw": "^2.6.2",
     "vite": "^5.2.14"
   }
 }
