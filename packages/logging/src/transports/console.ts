@@ -31,7 +31,7 @@ export class ConsoleTransport implements Transport {
   }
   log: Transport['log'] = (logs) => {
     logs.forEach((log) => {
-      console.log(log);
+      this.prettyPrint(log);
     });
   };
 
