@@ -164,10 +164,10 @@ describe('SimpleFetchTransport', () => {
         autoFlush: 1000,
       });
 
-      transport.log([createLogEvent('first')]);
+      transport.log([createLogEvent('info', 'first')]);
 
       await vi.advanceTimersByTimeAsync(500);
-      transport.log([createLogEvent('second')]);
+      transport.log([createLogEvent('info', 'second')]);
 
       await vi.advanceTimersByTimeAsync(500);
       expect(receivedBody).toBeUndefined();
