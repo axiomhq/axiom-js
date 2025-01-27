@@ -2,6 +2,10 @@ import { Logger } from '@axiomhq/logging';
 import { useEffect, useState } from 'react';
 
 export function createUseLogger(logger: Logger) {
+  if (!logger) {
+    throw new Error('A logger must be provided to create useLogger');
+  }
+
   const useLogger = () => {
     const [path, setPath] = useState(typeof window !== 'undefined' ? window.location.pathname : '');
 
