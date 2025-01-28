@@ -85,7 +85,9 @@ export class Logger {
         stack: args.stack,
         name: args.name,
       };
-    } else if (typeof args === 'object' && args !== null && Object.keys(args).length > 0) {
+    }
+
+    if (typeof args === 'object' && args !== null && Object.keys(args).length > 0) {
       const parsedArgs = JSON.parse(JSON.stringify(args, jsonFriendlyErrorReplacer));
       logEvent.fields = { ...logEvent.fields, ...parsedArgs };
     } else if (args && args.length) {

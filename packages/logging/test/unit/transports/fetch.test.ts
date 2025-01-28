@@ -203,8 +203,6 @@ describe('SimpleFetchTransport', () => {
       transport.log([createLogEvent()]);
       await transport.flush();
 
-      console.log(receivedHeaders);
-
       expect(receivedHeaders.get('X-Custom-Header')).toBe('test');
       expect(receivedHeaders.get('Content-Type')).toBe('application/json');
     });
