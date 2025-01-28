@@ -118,6 +118,13 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
           cache: 'pnpm'
+      - name: Cache turbo build setup
+        uses: actions/cache@v4
+        with:
+          path: ./node_modules/.cache/turbo
+          key: ${{ runner.os }}-turbo-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-turbo-
       - run: pnpm install --frozen-lockfile
       - run: pnpm build && pnpm build:cjs
       - env:
@@ -165,6 +172,13 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
           cache: 'pnpm'
+      - name: Cache turbo build setup
+        uses: actions/cache@v4
+        with:
+          path: ./node_modules/.cache/turbo
+          key: ${{ runner.os }}-turbo-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-turbo-
       - run: pnpm install --frozen-lockfile
       - run: pnpm build && pnpm build:cjs # cjs build needed to run tests
       - env:
