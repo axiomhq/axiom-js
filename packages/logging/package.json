@@ -20,6 +20,8 @@
   },
   "scripts": {
     "build": "vite build",
+    "format": "eslint . --fix",
+    "lint": "eslint .",
     "test": "vitest ./test/unit/*"
   },
   "keywords": [],
@@ -29,6 +31,7 @@
     "@axiomhq/js": "^1.3.1"
   },
   "devDependencies": {
+    "@repo/eslint-config": "workspace:^",
     "@tanstack/config": "^0.16.0",
     "msw": "^2.6.2",
     "vite": "^5.2.14"

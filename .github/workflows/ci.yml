@@ -49,7 +49,7 @@ jobs:
             ${{ runner.os }}-turbo-
       - run: pnpm install --frozen-lockfile
       - run: pnpm build && pnpm build:cjs
-      # - run: pnpm lint # TODO: fix linting
+      - run: pnpm lint
       - run: pnpm test
 
   preview-release:

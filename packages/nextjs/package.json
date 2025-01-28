@@ -21,6 +21,8 @@
   },
   "scripts": {
     "build": "vite build",
+    "format": "eslint . --fix",
+    "lint": "eslint .",
     "test": "vitest run ./test/unit/*"
   },
   "keywords": [],
@@ -30,6 +32,7 @@
     "@axiomhq/logging": "workspace:^"
   },
   "devDependencies": {
+    "@repo/eslint-config": "workspace:^",
     "@tanstack/config": "^0.16.0",
     "next": "15.1.4",
     "vite": "^5.2.14",

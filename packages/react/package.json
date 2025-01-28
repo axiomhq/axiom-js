@@ -21,6 +21,8 @@
   },
   "scripts": {
     "build": "vite build",
+    "format": "eslint . --fix",
+    "lint": "eslint .",
     "test": "vitest",
     "test:watch": "vitest watch"
   },
@@ -37,6 +39,7 @@
     "web-vitals": "^4.2.4"
   },
   "devDependencies": {
+    "@repo/eslint-config": "workspace:^",
     "@tanstack/config": "^0.16.0",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.2.0",
