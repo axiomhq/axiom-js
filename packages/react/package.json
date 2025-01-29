@@ -1,7 +1,15 @@
 {
   "name": "@axiomhq/react",
   "version": "0.0.1",
-  "description": "",
+  "description": "The official React package for Axiom",
+  "author": "Axiom, Inc.",
+  "license": "MIT",
+  "contributors": [
+    "Lukas Malkmus <lukas@axiom.co>",
+    "Islam Shehata <islam@axiom.co>",
+    "Arne Bahlo <arne@axiom.co>",
+    "Gabriel De Andrade <gabriel@axiom.co>"
+  ],
   "type": "module",
   "main": "dist/cjs/index.cjs",
   "module": "dist/esm/index.js",
@@ -26,9 +34,25 @@
     "test": "vitest",
     "test:watch": "vitest watch"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/axiomhq/axiom-js.git"
+  },
+  "keywords": [
+    "axiom",
+    "api",
+    "rest",
+    "client",
+    "axiom-react",
+    "axiom sdk",
+    "axiom js",
+    "react",
+    "logging"
+  ],
+  "bugs": {
+    "url": "https://github.com/axiomhq/axiom-js/issues"
+  },
+  "homepage": "https://github.com/axiomhq/axiom-js/blob/main/packages/react/README.md",
   "dependencies": {
     "@axiomhq/logging": "workspace:*",
     "react": "^19.0.0",

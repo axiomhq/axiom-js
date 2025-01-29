@@ -1,9 +1,25 @@
 {
   "name": "@axiomhq/nextjs",
   "version": "0.0.1",
-  "description": "",
+  "author": "Axiom, Inc.",
+  "license": "MIT",
+  "description": "The official Next.js package for Axiom",
   "type": "module",
   "main": "dist/cjs/index.cjs",
+  "contributors": [
+    "Lukas Malkmus <lukas@axiom.co>",
+    "Islam Shehata <islam@axiom.co>",
+    "Arne Bahlo <arne@axiom.co>",
+    "Gabriel De Andrade <gabriel@axiom.co>"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/axiomhq/axiom-js.git"
+  },
+  "bugs": {
+    "url": "https://github.com/axiomhq/axiom-js/issues"
+  },
+  "homepage": "https://github.com/axiomhq/axiom-js/blob/main/packages/nextjs/README.md",
   "module": "dist/esm/index.js",
   "types": "dist/esm/index.d.ts",
   "exports": {
@@ -25,9 +41,18 @@
     "lint": "eslint .",
     "test": "vitest run ./test/unit/*"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": [
+    "axiom",
+    "api",
+    "rest",
+    "client",
+    "axiom-nextjs",
+    "axiom sdk",
+    "axiom js",
+    "next-axiom",
+    "nextjs",
+    "logging"
+  ],
   "dependencies": {
     "@axiomhq/logging": "workspace:*"
   },
