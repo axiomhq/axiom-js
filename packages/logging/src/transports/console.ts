@@ -1,6 +1,6 @@
 import { Transport } from '.';
 import { LogEvent } from '..';
-import { isBrowser } from '../shared';
+import { isBrowser } from '../runtime';
 export interface ConsoleTransportConfig {
   prettyPrint?: boolean;
 }

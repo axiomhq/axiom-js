@@ -1,6 +1,6 @@
 import { describe, beforeEach, afterEach, it, expect, vi, SpyInstance } from 'vitest';
 import { ConsoleTransport } from '../../../src/transports/console';
-import * as shared from '../../../src/shared';
+import * as shared from '../../../src/runtime';
 import { createLogEvent } from '../../lib/mock';
 
 describe('ConsoleTransport', () => {

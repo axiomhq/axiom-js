@@ -1,5 +1,5 @@
 import { Transport } from '.';
-import { Version } from './shared';
+import { Version } from './runtime';
 
 const LOG_LEVEL = 'info';
 
