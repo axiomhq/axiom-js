@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@axiomhq/logging": "workspace:*",
-    "@axiomhq/nextjs": "workspace:^",
+    "@axiomhq/nextjs": "workspace:*",
     "@axiomhq/react": "workspace:*",
     "next": "15.1.4",
     "react": "^19.0.0",

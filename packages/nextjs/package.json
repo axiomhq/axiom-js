@@ -29,10 +29,10 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@axiomhq/logging": "workspace:^"
+    "@axiomhq/logging": "workspace:*"
   },
   "devDependencies": {
-    "@repo/eslint-config": "workspace:^",
+    "@repo/eslint-config": "workspace:*",
     "@tanstack/config": "^0.16.0",
     "next": "15.1.4",
     "vite": "^5.2.14",

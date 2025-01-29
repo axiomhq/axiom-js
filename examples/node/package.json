@@ -10,6 +10,6 @@
     "@axiomhq/js": "workspace:*"
   },
   "devDependencies": {
-    "@repo/eslint-config": "workspace:^"
+    "@repo/eslint-config": "workspace:*"
   }
 }

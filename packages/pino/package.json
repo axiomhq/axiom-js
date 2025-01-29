@@ -44,6 +44,6 @@
     "pino-abstract-transport": "^1.2.0"
   },
   "devDependencies": {
-    "@repo/eslint-config": "workspace:^"
+    "@repo/eslint-config": "workspace:*"
   }
 }

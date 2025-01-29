@@ -98,7 +98,7 @@ importers:
         version: 3.14.2
     devDependencies:
       '@repo/eslint-config':
-        specifier: workspace:^
+        specifier: workspace:*
         version: link:../../internal/eslint-config
 
   examples/nextjs:
@@ -107,7 +107,7 @@ importers:
         specifier: workspace:*
         version: link:../../packages/logging
       '@axiomhq/nextjs':
-        specifier: workspace:^
+        specifier: workspace:*
         version: link:../../packages/nextjs
       '@axiomhq/react':
         specifier: workspace:*
@@ -160,7 +160,7 @@ importers:
         version: link:../../packages/js
     devDependencies:
       '@repo/eslint-config':
-        specifier: workspace:^
+        specifier: workspace:*
         version: link:../../internal/eslint-config
 
   examples/pino:
@@ -173,7 +173,7 @@ importers:
         version: 9.5.0
     devDependencies:
       '@repo/eslint-config':
-        specifier: workspace:^
+        specifier: workspace:*
         version: link:../../internal/eslint-config
 
   examples/vue-app:
@@ -208,7 +208,7 @@ importers:
         version: 3.14.2
     devDependencies:
       '@repo/eslint-config':
-        specifier: workspace:^
+        specifier: workspace:*
         version: link:../../internal/eslint-config
 
   integration:
@@ -224,7 +224,7 @@ importers:
         version: 4.7.0
     devDependencies:
       '@repo/eslint-config':
-        specifier: workspace:^
+        specifier: workspace:*
         version: link:../internal/eslint-config
 
   internal/eslint-config:
@@ -289,7 +289,7 @@ importers:
         version: 1.3.1
     devDependencies:
       '@repo/eslint-config':
-        specifier: workspace:^
+        specifier: workspace:*
         version: link:../../internal/eslint-config
       '@tanstack/config':
         specifier: ^0.16.0
@@ -304,11 +304,11 @@ importers:
   packages/nextjs:
     dependencies:
       '@axiomhq/logging':
-        specifier: workspace:^
+        specifier: workspace:*
         version: link:../logging
     devDependencies:
       '@repo/eslint-config':
-        specifier: workspace:^
+        specifier: workspace:*
         version: link:../../internal/eslint-config
       '@tanstack/config':
         specifier: ^0.16.0
@@ -333,7 +333,7 @@ importers:
         version: 1.2.0
     devDependencies:
       '@repo/eslint-config':
-        specifier: workspace:^
+        specifier: workspace:*
         version: link:../../internal/eslint-config
 
   packages/react:
@@ -361,7 +361,7 @@ importers:
         version: 4.2.4
     devDependencies:
       '@repo/eslint-config':
-        specifier: workspace:^
+        specifier: workspace:*
         version: link:../../internal/eslint-config
       '@tanstack/config':
         specifier: ^0.16.0
