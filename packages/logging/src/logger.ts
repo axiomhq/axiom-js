@@ -43,7 +43,7 @@ export class Logger {
     this.config = { ...initConfig };
   }
 
-  raw(log: LogEvent) {
+  raw(log: any) {
     this.config.transports.forEach((transport) => transport.log([log]));
   }
   debug = (message: string, args: { [key: string]: any } = {}) => {

@@ -1,8 +1,9 @@
-import { Transport } from '.';
-import { LogEvent } from '..';
+import { Transport } from './transport';
+import { LogEvent, LogLevel } from '..';
 import { isBrowser } from '../runtime';
 export interface ConsoleTransportConfig {
   prettyPrint?: boolean;
+  logLevel?: LogLevel;
 }
 
 const levelColors: { [key: string]: any } = {
@@ -26,12 +27,16 @@ const levelColors: { [key: string]: any } = {
 
 export class ConsoleTransport implements Transport {
   private config: ConsoleTransportConfig;
+
   constructor(config?: ConsoleTransportConfig) {
     this.config = { ...config };
   }
+
   log: Transport['log'] = (logs) => {
     logs.forEach((log) => {
-      this.prettyPrint(log);
+      if (LogLevel[log.level as keyof typeof LogLevel] >= (this.config.logLevel ?? LogLevel.info)) {
+        this.prettyPrint(log);
+      }
     });
   };
 
