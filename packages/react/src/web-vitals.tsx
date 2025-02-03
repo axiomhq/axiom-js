@@ -19,7 +19,7 @@ export function useReportWebVitals(reportWebVitalsFn: (metric: Metric) => void) 
   }, []);
 }
 
-const transformWebVitalsMetric = (metric: Metric): Record<string, any> => {
+export const transformWebVitalsMetric = (metric: Metric): Record<string, any> => {
   return {
     webVital: metric,
     _time: new Date().getTime(),
@@ -28,15 +28,18 @@ const transformWebVitalsMetric = (metric: Metric): Record<string, any> => {
   };
 };
 
-export const createWebVitalsComponent = (logger: Logger) => {
-  const reportWebVitals = (metric: Metric) => {
-    logger.raw(transformWebVitalsMetric(metric));
-    logger.flush();
-  };
+const WebVitals = ({ logger, reportWebVitals }: { logger: Logger; reportWebVitals?: (metric: Metric) => void }) => {
+  const callback = React.useCallback(
+    (metric: Metric) => {
+      logger.raw(transformWebVitalsMetric(metric));
+      logger.flush();
+    },
+    [logger],
+  );
 
-  return () => {
-    useReportWebVitals(reportWebVitals);
+  useReportWebVitals(reportWebVitals ?? callback);
 
-    return <></>;
-  };
+  return <></>;
 };
+
+export default WebVitals;

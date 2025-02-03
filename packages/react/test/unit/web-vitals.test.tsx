@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { renderHook, render } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { useReportWebVitals, createWebVitalsComponent } from '../../src/web-vitals';
+import WebVitals, { useReportWebVitals } from '../../src/web-vitals';
 import { Logger } from '@axiomhq/logging';
 import * as webVitals from 'web-vitals';
 
@@ -64,8 +64,7 @@ describe('Web Vitals', () => {
         flush: vi.fn(),
       } as unknown as Logger;
 
-      const WebVitals = createWebVitalsComponent(mockLogger);
-      render(<WebVitals />);
+      render(<WebVitals logger={mockLogger} />);
 
       // Verify that all web vitals are registered
       expect(webVitals.onCLS).toHaveBeenCalled();
@@ -82,8 +81,7 @@ describe('Web Vitals', () => {
         flush: vi.fn(),
       } as unknown as Logger;
 
-      const WebVitals = createWebVitalsComponent(mockLogger);
-      render(<WebVitals />);
+      render(<WebVitals logger={mockLogger} />);
 
       // Simulate a web vital metric being reported
       const mockMetric = {
@@ -112,10 +110,22 @@ describe('Web Vitals', () => {
         flush: vi.fn(),
       } as unknown as Logger;
 
-      const WebVitals = createWebVitalsComponent(mockLogger);
-      const { container } = render(<WebVitals />);
+      const { container } = render(<WebVitals logger={mockLogger} />);
 
       expect(container.firstChild).toBeNull();
+    });
+
+    it('should only be called once mounted and ignore re-renders', () => {
+      const mockLogger = {
+        raw: vi.fn(),
+        flush: vi.fn(),
+      } as unknown as Logger;
+
+      const { rerender } = render(<WebVitals logger={mockLogger} />);
+
+      rerender(<WebVitals logger={mockLogger} />);
+
+      expect(webVitals.onCLS).toHaveBeenCalledTimes(1);
     });
   });
 });
