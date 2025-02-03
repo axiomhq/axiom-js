@@ -4,8 +4,8 @@ import {
   createAxiomRouteHandler,
   getLogLevelFromStatusCode,
   getNextErrorStatusCode,
-  transformSuccessResult,
-  transformErrorResult,
+  transformRouteHandlerSuccessResult,
+  transformRouteHandlerErrorResult,
 } from '../../src/routeHandler';
 import { mockLogger } from '../lib/mock';
 import { LogLevel } from '@axiomhq/logging';
@@ -14,7 +14,7 @@ import { forbidden, notFound, permanentRedirect, redirect, unauthorized } from '
 describe('routeHandler', () => {
   describe('createAxiomRouteHandler', () => {
     it('should handle successful requests', async () => {
-      const withAxiom = createAxiomRouteHandler(mockLogger);
+      const withAxiom = createAxiomRouteHandler({ logger: mockLogger });
       const mockResponse = new NextResponse(null, { status: 200 });
       const handler = vi.fn().mockResolvedValue(mockResponse);
       const wrappedHandler = withAxiom(handler);
@@ -27,7 +27,7 @@ describe('routeHandler', () => {
     });
 
     it('should handle errors and rethrow them', async () => {
-      const withAxiom = createAxiomRouteHandler(mockLogger);
+      const withAxiom = createAxiomRouteHandler({ logger: mockLogger });
       const error = new Error('Test error');
       const handler = vi.fn().mockRejectedValue(error);
       const wrappedHandler = withAxiom(handler);
@@ -115,7 +115,7 @@ describe('routeHandler', () => {
         end: 1100,
       };
 
-      const [message, report] = transformSuccessResult(data);
+      const [message, report] = transformRouteHandlerSuccessResult(data);
 
       // Check message
       expect(message).toMatch(/GET \/test 200 in \d+ms/);
@@ -146,7 +146,7 @@ describe('routeHandler', () => {
         end: 1100,
       };
 
-      const [message, report] = transformErrorResult(data);
+      const [message, report] = transformRouteHandlerErrorResult(data);
 
       // Check message
       expect(message).toMatch(/GET \/test 500 in \d+ms/);

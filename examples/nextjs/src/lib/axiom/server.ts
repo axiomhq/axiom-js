@@ -1,4 +1,5 @@
 import { Logger, AxiomFetchTransport, ConsoleTransport } from '@axiomhq/logging';
+import { createAxiomRouteHandler, routeHandlerContextFormatter } from '@axiomhq/nextjs';
 
 export const logger = new Logger({
   transports: [
@@ -8,4 +9,7 @@ export const logger = new Logger({
     }),
     new ConsoleTransport(),
   ],
+  formatters: [routeHandlerContextFormatter],
 });
+
+export const withAxiom = createAxiomRouteHandler({ logger });

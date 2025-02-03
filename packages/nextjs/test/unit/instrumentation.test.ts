@@ -1,5 +1,5 @@
 import { transformOnRequestError, createOnRequestError } from '../../src/instrumentation';
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { InstrumentationOnRequestError } from 'next/dist/server/instrumentation/types';
 import { mockLogger } from '../lib/mock';
 
