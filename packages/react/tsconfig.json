@@ -5,12 +5,13 @@
     "module": "ESNext",
     "moduleResolution": "bundler",
     "baseUrl": ".",
-    "rootDir": "./src",
+    "rootDir": "./",
     "outDir": "dist/esm",
+    "jsx": "react",
     "declarationDir": "dist/esm/types",
     "resolveJsonModule": true,
     "declarationMap": true,
     "emitDeclarationOnly": true
   },
-  "include": ["src/**/*"]
+  "include": ["src/**/*", "test/**/*"]
 }
