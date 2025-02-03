@@ -25,6 +25,7 @@ export type LoggerConfig = {
   args?: { [key: string]: any };
   transports: [Transport, ...Transport[]];
   logLevel?: LogLevel;
+  formatters?: Array<(args: Record<string, any>) => Record<string, any>>;
 };
 
 export class Logger {
@@ -92,6 +93,10 @@ export class Logger {
       logEvent.fields = { ...logEvent.fields, ...parsedArgs };
     } else if (args && args.length) {
       logEvent.fields = { ...logEvent.fields, args: args };
+    }
+
+    if (this.config.formatters && this.config.formatters.length > 0) {
+      logEvent.fields = this.config.formatters.reduce((acc, formatter) => formatter(acc), logEvent.fields);
     }
 
     return logEvent;

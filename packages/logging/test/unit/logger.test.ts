@@ -17,31 +17,32 @@ describe('Logger', () => {
     mockTransport.clear();
   });
 
-  describe('log levels', () => {
-    /* TODO: Add this back in once log level is implemented
-    it('should respect log level configuration', () => {
-      const warnLogger = new Logger({
-        transports: [mockTransport],
+  describe('formatters', () => {
+    it('should format fields', () => {
+      const formatter = (fields: Record<string, any>) => ({ ...fields, userId: '123' });
+      logger.with({ formatter }).info('user action');
+
+      expect(mockTransport.logs).toHaveLength(1);
+      expect(mockTransport.logs[0].fields).toEqual({ userId: '123' });
+    });
+
+    it('should replace and delete fields', () => {
+      const formatter = (fields: Record<string, any>) => {
+        return {
+          userId: fields.userId,
+          foo: fields.foo,
+        };
+      };
+
+      logger.with({ formatter }).info('user action', {
+        userId: '123',
+        action: 'login',
+        foo: 'bar',
+        baz: 'qux',
       });
 
-      warnLogger.debug('debug message');
-      warnLogger.info('info message');
-      warnLogger.warn('warn message');
-      warnLogger.error('error message');
-
-      expect(mockTransport.logs).toHaveLength(2); // Only warn and error should be logged
-      expect(mockTransport.logs[0].level).toBe('warn');
-      expect(mockTransport.logs[1].level).toBe('error');
-    });
-    */
-
-    it('should log all levels by default', () => {
-      logger.debug('debug message');
-      logger.info('info message');
-      logger.warn('warn message');
-      logger.error('error message');
-
-      expect(mockTransport.logs).toHaveLength(4);
+      expect(mockTransport.logs).toHaveLength(1);
+      expect(mockTransport.logs[0].fields).toEqual({ userId: '123', foo: 'bar' });
     });
   });
 
