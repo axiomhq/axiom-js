@@ -4,6 +4,8 @@ import { isHTTPAccessFallbackError } from 'next/dist/client/components/http-acce
 import * as next from 'next/server';
 import { runWithContext } from 'src/context';
 
+import { crypto } from './lib/node-utils';
+
 const after = next.after;
 
 export type NextHandler<T = any> = (
