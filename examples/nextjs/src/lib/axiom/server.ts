@@ -7,7 +7,7 @@ export const logger = new Logger({
       dataset: process.env.AXIOM_DATASET!,
       token: process.env.AXIOM_TOKEN!,
     }),
-    new ConsoleTransport(),
+    new ConsoleTransport({ prettyPrint: true }),
   ],
   formatters: [routeHandlerContextFormatter],
 });

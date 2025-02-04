@@ -9,3 +9,7 @@ export async function middleware(request: NextRequest, event: NextFetchEvent) {
   event.waitUntil(logger.flush());
   return NextResponse.next();
 }
+
+export const config = {
+  matcher: ['/((?!api|_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt).*)'],
+};
