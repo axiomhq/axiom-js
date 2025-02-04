@@ -12,7 +12,7 @@ describe('AxiomJSTransport', () => {
       ingest: vi.fn(),
       flush: vi.fn().mockResolvedValue(undefined),
     };
-    transport = new AxiomJSTransport(mockAxiom, DATASET);
+    transport = new AxiomJSTransport({ axiom: mockAxiom, dataset: DATASET });
   });
 
   describe('log', () => {

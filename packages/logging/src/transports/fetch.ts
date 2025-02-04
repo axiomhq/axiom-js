@@ -1,5 +1,5 @@
 import { Transport } from './transport';
-import { LogEvent, LogLevel } from '..';
+import { LogEvent, LogLevel } from '../logger';
 
 interface FetchConfig {
   input: Parameters<typeof fetch>[0];

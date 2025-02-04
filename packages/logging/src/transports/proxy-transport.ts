@@ -1,6 +1,7 @@
 import { LogLevel } from '../logger';
 import { Transport } from './transport';
 import { SimpleFetchTransport } from './fetch';
+
 interface AxiomProxyConfig {
   url: string;
   autoFlush?: boolean | number;

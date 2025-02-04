@@ -1,6 +1,5 @@
 import { describe, beforeEach, afterEach, it, expect, vi, beforeAll, afterAll } from 'vitest';
 import { SimpleFetchTransport } from '../../../src/transports/fetch';
-import { LogEvent } from '../../../src';
 import { http, HttpResponse, HttpHandler } from 'msw';
 import { setupServer } from 'msw/node';
 import { createLogEvent } from '../../lib/mock';

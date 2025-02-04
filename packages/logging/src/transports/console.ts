@@ -1,5 +1,5 @@
 import { Transport } from './transport';
-import { LogEvent, LogLevel } from '..';
+import { LogEvent, LogLevel } from '../logger';
 import { isBrowser } from '../runtime';
 export interface ConsoleTransportConfig {
   prettyPrint?: boolean;
