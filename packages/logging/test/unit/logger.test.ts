@@ -20,7 +20,13 @@ describe('Logger', () => {
   describe('formatters', () => {
     it('should format fields', () => {
       const formatter = (fields: Record<string, any>) => ({ ...fields, userId: '123' });
-      logger.with({ formatter }).info('user action');
+
+      logger = new Logger({
+        transports: [mockTransport],
+        formatters: [formatter],
+      });
+
+      logger.info('user action');
 
       expect(mockTransport.logs).toHaveLength(1);
       expect(mockTransport.logs[0].fields).toEqual({ userId: '123' });
@@ -34,7 +40,12 @@ describe('Logger', () => {
         };
       };
 
-      logger.with({ formatter }).info('user action', {
+      logger = new Logger({
+        transports: [mockTransport],
+        formatters: [formatter],
+      });
+
+      logger.info('user action', {
         userId: '123',
         action: 'login',
         foo: 'bar',
