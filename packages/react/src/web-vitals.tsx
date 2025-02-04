@@ -4,18 +4,27 @@ import * as React from 'react';
 import { onLCP, onFID, onCLS, onINP, onFCP, onTTFB } from 'web-vitals';
 import type { Metric } from 'web-vitals';
 
-export function useReportWebVitals(reportWebVitalsFn: (metric: Metric) => void) {
-  const ref = React.useRef(reportWebVitalsFn);
-
-  ref.current = reportWebVitalsFn;
+export function useReportWebVitals(pushMetrics: (metric: Metric) => void, flushMetrics: () => void) {
+  const pushMetricsRef = React.useRef(pushMetrics);
+  const flushMetricsRef = React.useRef(flushMetrics);
 
   React.useEffect(() => {
-    onCLS(ref.current);
-    onFID(ref.current);
-    onLCP(ref.current);
-    onINP(ref.current);
-    onFCP(ref.current);
-    onTTFB(ref.current);
+    const effectFlushMetrics = () => {
+      flushMetricsRef.current();
+    };
+
+    onCLS(pushMetricsRef.current);
+    onFID(pushMetricsRef.current);
+    onLCP(pushMetricsRef.current);
+    onINP(pushMetricsRef.current);
+    onFCP(pushMetricsRef.current);
+    onTTFB(pushMetricsRef.current);
+
+    document.addEventListener('visibilitychange', effectFlushMetrics);
+
+    return () => {
+      document.removeEventListener('visibilitychange', effectFlushMetrics);
+    };
   }, []);
 }
 
@@ -28,18 +37,18 @@ export const transformWebVitalsMetric = (metric: Metric): Record<string, any> =>
   };
 };
 
-const WebVitals = ({ logger, reportWebVitals }: { logger: Logger; reportWebVitals?: (metric: Metric) => void }) => {
-  const callback = React.useCallback(
-    (metric: Metric) => {
-      logger.raw(transformWebVitalsMetric(metric));
-      logger.flush();
-    },
-    [logger],
-  );
+export const createWebVitalsComponent = (logger: Logger) => {
+  const sendMetrics = (metric: Metric) => {
+    logger.raw(transformWebVitalsMetric(metric));
+  };
 
-  useReportWebVitals(reportWebVitals ?? callback);
+  const flushMetrics = () => {
+    logger.flush();
+  };
 
-  return <></>;
+  return () => {
+    useReportWebVitals(sendMetrics, flushMetrics);
+
+    return <></>;
+  };
 };
-
-export default WebVitals;

@@ -1,9 +1,10 @@
 import * as React from 'react';
 import { renderHook, render } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import WebVitals, { useReportWebVitals } from '../../src/web-vitals';
+import { useReportWebVitals, createWebVitalsComponent, transformWebVitalsMetric } from '../../src/web-vitals';
 import { Logger } from '@axiomhq/logging';
 import * as webVitals from 'web-vitals';
+import { Metric } from 'web-vitals';
 
 // Mock all web-vitals functions
 vi.mock('web-vitals', () => ({
@@ -26,9 +27,12 @@ describe('Web Vitals', () => {
   });
 
   describe('useReportWebVitals', () => {
-    it('should register all web vitals metrics', () => {
+    it('should register all web vitals metrics and visibility change listener', () => {
       const reportFn = vi.fn();
-      renderHook(() => useReportWebVitals(reportFn));
+      const flushFn = vi.fn();
+      const addEventListenerSpy = vi.spyOn(document, 'addEventListener');
+
+      renderHook(() => useReportWebVitals(reportFn, flushFn));
 
       expect(webVitals.onCLS).toHaveBeenCalled();
       expect(webVitals.onFID).toHaveBeenCalled();
@@ -36,23 +40,45 @@ describe('Web Vitals', () => {
       expect(webVitals.onINP).toHaveBeenCalled();
       expect(webVitals.onFCP).toHaveBeenCalled();
       expect(webVitals.onTTFB).toHaveBeenCalled();
+      expect(addEventListenerSpy).toHaveBeenCalledWith('visibilitychange', expect.any(Function));
     });
 
-    it('should pass the report function to all web vitals', () => {
-      const reportFn = vi.fn();
-      renderHook(() => useReportWebVitals(reportFn));
+    it('should cleanup visibility change listener on unmount', () => {
+      const removeEventListenerSpy = vi.spyOn(document, 'removeEventListener');
+      const { unmount } = renderHook(() => useReportWebVitals(vi.fn(), vi.fn()));
 
-      const calls = [
-        webVitals.onCLS,
-        webVitals.onFID,
-        webVitals.onLCP,
-        webVitals.onINP,
-        webVitals.onFCP,
-        webVitals.onTTFB,
-      ];
+      unmount();
 
-      calls.forEach((call) => {
-        expect(call).toHaveBeenCalledWith(expect.any(Function));
+      expect(removeEventListenerSpy).toHaveBeenCalledWith('visibilitychange', expect.any(Function));
+    });
+
+    it('should call flush metrics when visibility changes', () => {
+      const flushFn = vi.fn();
+      renderHook(() => useReportWebVitals(vi.fn(), flushFn));
+
+      document.dispatchEvent(new Event('visibilitychange'));
+
+      expect(flushFn).toHaveBeenCalled();
+    });
+  });
+
+  describe('transformWebVitalsMetric', () => {
+    it('should transform web vital metric to expected format', () => {
+      const mockMetric = {
+        name: 'CLS',
+        value: 0.1,
+        id: 'test',
+      };
+      const now = 1234567890;
+      vi.spyOn(Date.prototype, 'getTime').mockReturnValue(now);
+
+      const result = transformWebVitalsMetric(mockMetric as Metric);
+
+      expect(result).toEqual({
+        webVital: mockMetric,
+        _time: now,
+        source: 'web-vital',
+        path: '/test-path',
       });
     });
   });
@@ -64,9 +90,9 @@ describe('Web Vitals', () => {
         flush: vi.fn(),
       } as unknown as Logger;
 
-      render(<WebVitals logger={mockLogger} />);
+      const WebVitals = createWebVitalsComponent(mockLogger);
+      render(<WebVitals />);
 
-      // Verify that all web vitals are registered
       expect(webVitals.onCLS).toHaveBeenCalled();
       expect(webVitals.onFID).toHaveBeenCalled();
       expect(webVitals.onLCP).toHaveBeenCalled();
@@ -75,32 +101,35 @@ describe('Web Vitals', () => {
       expect(webVitals.onTTFB).toHaveBeenCalled();
     });
 
-    it('should log and flush metrics when reported', () => {
+    it('should log transformed metrics and flush when reported', () => {
       const mockLogger = {
         raw: vi.fn(),
         flush: vi.fn(),
       } as unknown as Logger;
+      const WebVitals = createWebVitalsComponent(mockLogger);
+      const now = 1234567890;
+      vi.spyOn(Date.prototype, 'getTime').mockReturnValue(now);
 
-      render(<WebVitals logger={mockLogger} />);
+      render(<WebVitals />);
 
-      // Simulate a web vital metric being reported
       const mockMetric = {
         name: 'CLS',
         value: 0.1,
         id: 'test',
       };
 
-      // Get the callback passed to onCLS and call it
       const onCLSCallback = vi.mocked(webVitals.onCLS).mock.calls[0][0] as Function;
       onCLSCallback(mockMetric);
 
-      // Verify the metric was logged and flushed
       expect(mockLogger.raw).toHaveBeenCalledWith({
         webVital: mockMetric,
-        _time: expect.any(Number),
+        _time: now,
         source: 'web-vital',
         path: '/test-path',
       });
+
+      document.dispatchEvent(new Event('visibilitychange'));
+
       expect(mockLogger.flush).toHaveBeenCalled();
     });
 
@@ -110,7 +139,8 @@ describe('Web Vitals', () => {
         flush: vi.fn(),
       } as unknown as Logger;
 
-      const { container } = render(<WebVitals logger={mockLogger} />);
+      const WebVitals = createWebVitalsComponent(mockLogger);
+      const { container } = render(<WebVitals />);
 
       expect(container.firstChild).toBeNull();
     });
@@ -121,9 +151,10 @@ describe('Web Vitals', () => {
         flush: vi.fn(),
       } as unknown as Logger;
 
-      const { rerender } = render(<WebVitals logger={mockLogger} />);
+      const WebVitals = createWebVitalsComponent(mockLogger);
+      const { rerender } = render(<WebVitals />);
 
-      rerender(<WebVitals logger={mockLogger} />);
+      rerender(<WebVitals />);
 
       expect(webVitals.onCLS).toHaveBeenCalledTimes(1);
     });

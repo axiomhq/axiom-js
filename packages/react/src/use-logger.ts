@@ -1,3 +1,4 @@
+'use client';
 import { Logger } from '@axiomhq/logging';
 import { useEffect, useState } from 'react';
 

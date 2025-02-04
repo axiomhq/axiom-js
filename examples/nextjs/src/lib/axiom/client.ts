@@ -1,5 +1,7 @@
+'use client';
+
 import { Logger, AxiomProxyTransport, ConsoleTransport } from '@axiomhq/logging';
-import { createClientSideHelpers } from '@axiomhq/react';
+import { createUseLogger, createWebVitalsComponent } from '@axiomhq/react';
 
 export const logger = new Logger({
   transports: [
@@ -8,4 +10,7 @@ export const logger = new Logger({
   ],
 });
 
-export const { useLogger } = createClientSideHelpers(logger);
+const useLogger = createUseLogger(logger);
+const WebVitals = createWebVitalsComponent(logger);
+
+export { useLogger, WebVitals };
