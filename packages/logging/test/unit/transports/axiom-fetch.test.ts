@@ -3,6 +3,7 @@ import { AxiomFetchTransport } from '../../../src/transports/axiom-fetch';
 import { http, HttpResponse, HttpHandler } from 'msw';
 import { setupServer } from 'msw/node';
 import { createLogEvent } from '../../lib/mock';
+import { LogLevel } from 'src/logger';
 
 describe('AxiomFetchTransport', () => {
   const DATASET = 'test-dataset';
@@ -108,6 +109,36 @@ describe('AxiomFetchTransport', () => {
 
       await transport.flush();
       expect(requestCount).toBe(1);
+    });
+  });
+
+  describe('log level filtering', () => {
+    it('should filter logs based on logLevel', async () => {
+      let receivedLogs: any[] = [];
+      server.use(
+        http.post('*', async ({ request }) => {
+          receivedLogs = (await request.json()) as any[];
+          return HttpResponse.json({ success: true });
+        }),
+      );
+
+      const transport = new AxiomFetchTransport({
+        dataset: DATASET,
+        token: TOKEN,
+        logLevel: LogLevel.warn,
+      });
+
+      transport.log([
+        createLogEvent('debug', 'debug message'),
+        createLogEvent('info', 'info message'),
+        createLogEvent('warn', 'warn message'),
+        createLogEvent('error', 'error message'),
+      ]);
+
+      await transport.flush();
+
+      expect(receivedLogs).toHaveLength(2);
+      expect(receivedLogs.map((log) => log.level)).toEqual(['warn', 'error']);
     });
   });
 });

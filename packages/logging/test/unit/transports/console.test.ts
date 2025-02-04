@@ -117,4 +117,39 @@ describe('ConsoleTransport', () => {
       expect(transport.flush()).toBeUndefined();
     });
   });
+
+  describe('log level filtering', () => {
+    it('should filter logs based on logLevel', () => {
+      transport = new ConsoleTransport({
+        prettyPrint: false,
+        logLevel: LogLevel.warn,
+      });
+
+      transport.log([
+        createLogEvent('debug', 'debug message'),
+        createLogEvent('info', 'info message'),
+        createLogEvent('warn', 'warn message'),
+        createLogEvent('error', 'error message'),
+      ]);
+
+      expect(consoleSpy).toHaveBeenCalledTimes(2);
+      expect(consoleSpy).toHaveBeenCalledWith('warn - warn message');
+      expect(consoleSpy).toHaveBeenCalledWith('error - error message');
+    });
+
+    it('should use info as default logLevel', () => {
+      transport = new ConsoleTransport({ prettyPrint: false });
+
+      transport.log([
+        createLogEvent('debug', 'debug message'),
+        createLogEvent('info', 'info message'),
+        createLogEvent('warn', 'warn message'),
+      ]);
+
+      expect(consoleSpy).toHaveBeenCalledTimes(2);
+      expect(consoleSpy).not.toHaveBeenCalledWith('debug - debug message');
+      expect(consoleSpy).toHaveBeenCalledWith('info - info message');
+      expect(consoleSpy).toHaveBeenCalledWith('warn - warn message');
+    });
+  });
 });

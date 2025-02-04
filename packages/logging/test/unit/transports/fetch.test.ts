@@ -3,6 +3,7 @@ import { SimpleFetchTransport } from '../../../src/transports/fetch';
 import { http, HttpResponse, HttpHandler } from 'msw';
 import { setupServer } from 'msw/node';
 import { createLogEvent } from '../../lib/mock';
+import { LogLevel } from 'src/logger';
 
 describe('SimpleFetchTransport', () => {
   let transport: SimpleFetchTransport;
@@ -204,6 +205,58 @@ describe('SimpleFetchTransport', () => {
 
       expect(receivedHeaders.get('X-Custom-Header')).toBe('test');
       expect(receivedHeaders.get('Content-Type')).toBe('application/json');
+    });
+  });
+
+  describe('log level filtering', () => {
+    it('should filter logs based on logLevel', async () => {
+      let receivedLogs: any[] = [];
+      server.use(
+        http.post(API_URL, async ({ request }) => {
+          receivedLogs = (await request.json()) as any[];
+          return HttpResponse.json({ success: true });
+        }),
+      );
+
+      transport = new SimpleFetchTransport({
+        input: API_URL,
+        logLevel: LogLevel.warn,
+      });
+
+      transport.log([
+        createLogEvent('debug', 'debug message'),
+        createLogEvent('info', 'info message'),
+        createLogEvent('warn', 'warn message'),
+        createLogEvent('error', 'error message'),
+      ]);
+
+      await transport.flush();
+
+      expect(receivedLogs).toHaveLength(2);
+      expect(receivedLogs.map((log) => log.level)).toEqual(['warn', 'error']);
+    });
+
+    it('should use info as default logLevel', async () => {
+      let receivedLogs: any[] = [];
+      server.use(
+        http.post(API_URL, async ({ request }) => {
+          receivedLogs = (await request.json()) as any[];
+          return HttpResponse.json({ success: true });
+        }),
+      );
+
+      transport = new SimpleFetchTransport({ input: API_URL });
+
+      transport.log([
+        createLogEvent('debug', 'debug message'),
+        createLogEvent('info', 'info message'),
+        createLogEvent('warn', 'warn message'),
+      ]);
+
+      await transport.flush();
+
+      expect(receivedLogs).toHaveLength(2);
+      expect(receivedLogs.map((log) => log.level)).toEqual(['info', 'warn']);
     });
   });
 });
