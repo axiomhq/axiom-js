@@ -2,7 +2,7 @@ import { Logger, LogLevel } from '@axiomhq/logging';
 import { isRedirectError } from 'next/dist/client/components/redirect-error';
 import { isHTTPAccessFallbackError } from 'next/dist/client/components/http-access-fallback/http-access-fallback';
 import * as next from 'next/server';
-import { AsyncLocalStorage } from 'node:async_hooks';
+import { runWithContext } from 'src/context';
 
 const after = next.after;
 
@@ -124,8 +124,6 @@ const defaultRouteHandlerOnError = (logger: Logger, data: ErrorData) => {
   logger.flush();
 };
 
-const storage = new AsyncLocalStorage<Map<string, any> | undefined>();
-
 const getStore = async ({
   store,
   req,
@@ -137,7 +135,7 @@ const getStore = async ({
 }) => {
   if (!store) {
     const newStore = new Map();
-    newStore.set('traceId', crypto.randomUUID());
+    newStore.set('trace_id', crypto.randomUUID());
     return newStore;
   }
   if (typeof store === 'function') {
@@ -160,7 +158,8 @@ export const createAxiomRouteHandler = ({
   const withAxiom = (handler: NextHandler) => {
     return async (req: next.NextRequest, ctx: any) => {
       const store = await getStore({ store: argStore, req, ctx });
-      return storage.run(store, async () => {
+
+      return runWithContext(async () => {
         const start = Date.now();
 
         try {
@@ -199,17 +198,9 @@ export const createAxiomRouteHandler = ({
           }
           throw error;
         }
-      });
+      }, store);
     };
   };
 
   return withAxiom;
-};
-
-export const routeHandlerContextFormatter = (fields: Record<string, any>) => {
-  const store = storage.getStore() as Map<string, any>;
-  if (!store) {
-    return fields;
-  }
-  return { ...fields, ...Object.fromEntries(store.entries()) };
 };
