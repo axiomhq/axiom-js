@@ -38,5 +38,6 @@ export class AxiomJSTransport implements Transport {
     } else {
       await Promise.allSettled(this.promises);
     }
+    this.promises = [];
   }
 }

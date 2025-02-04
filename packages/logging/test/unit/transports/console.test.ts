@@ -2,6 +2,7 @@ import { describe, beforeEach, afterEach, it, expect, vi, SpyInstance } from 'vi
 import { ConsoleTransport } from '../../../src/transports/console';
 import * as shared from '../../../src/runtime';
 import { createLogEvent } from '../../lib/mock';
+import { LogLevel } from 'src/logger';
 
 describe('ConsoleTransport', () => {
   let consoleSpy: SpyInstance;
@@ -100,6 +101,7 @@ describe('ConsoleTransport', () => {
     });
 
     it('should handle all log levels with correct colors', () => {
+      transport = new ConsoleTransport({ logLevel: LogLevel.debug });
       const levels = ['debug', 'info', 'warn', 'error'];
       levels.forEach((level) => {
         consoleSpy.mockClear();
