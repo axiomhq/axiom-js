@@ -2,6 +2,7 @@ import { Logger, LogLevel } from '@axiomhq/logging';
 import { isRedirectError } from 'next/dist/client/components/redirect-error';
 import { isHTTPAccessFallbackError } from 'next/dist/client/components/http-access-fallback/http-access-fallback';
 import * as next from 'next/server';
+import { AsyncLocalStorage } from 'node:async_hooks';
 
 const after = next.after;
 
