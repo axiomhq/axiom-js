@@ -2,7 +2,7 @@ import { Logger, LogLevel } from '@axiomhq/logging';
 import { isRedirectError } from 'next/dist/client/components/redirect-error';
 import { isHTTPAccessFallbackError } from 'next/dist/client/components/http-access-fallback/http-access-fallback';
 import * as next from 'next/server';
-import { runWithContext } from 'src/context';
+import { runWithServerContext, ServerContextFields } from 'src/context';
 
 import { crypto } from './lib/node-utils';
 
@@ -131,13 +131,15 @@ const getStore = async ({
   req,
   ctx,
 }: {
-  store?: Map<string, any> | ((req: next.NextRequest, ctx: any) => Map<string, any> | Promise<Map<string, any>>);
+  store?:
+    | ServerContextFields
+    | ((req: next.NextRequest, ctx: any) => ServerContextFields | Promise<ServerContextFields>);
   req: next.NextRequest;
   ctx: any;
 }) => {
   if (!store) {
     const newStore = new Map();
-    newStore.set('trace_id', crypto.randomUUID());
+    newStore.set('request_id', crypto.randomUUID());
     return newStore;
   }
   if (typeof store === 'function') {
@@ -153,7 +155,9 @@ export const createAxiomRouteHandler = ({
   onError,
 }: {
   logger: Logger;
-  store?: Map<string, any> | ((req: next.NextRequest, ctx: any) => Map<string, any> | Promise<Map<string, any>>);
+  store?:
+    | ServerContextFields
+    | ((req: next.NextRequest, ctx: any) => ServerContextFields | Promise<ServerContextFields>);
   onSuccess?: (data: SuccessData) => void;
   onError?: (data: ErrorData) => void;
 }) => {
@@ -161,7 +165,7 @@ export const createAxiomRouteHandler = ({
     return async (req: next.NextRequest, ctx: any) => {
       const store = await getStore({ store: argStore, req, ctx });
 
-      return runWithContext(async () => {
+      return runWithServerContext(async () => {
         const start = Date.now();
 
         try {

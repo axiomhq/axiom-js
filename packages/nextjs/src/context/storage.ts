@@ -1,6 +1,7 @@
 import { AsyncLocalStorage } from '../lib/node-utils';
 
-export const storage = new AsyncLocalStorage<Map<string, any> | undefined>();
+export type ServerContextFields = Map<string, any> | Record<string, any>;
+export const storage = new AsyncLocalStorage<ServerContextFields | undefined>();
 
 /**
  * Adds custom fields like trace_id to the fields object in a logger
@@ -9,13 +10,18 @@ export const storage = new AsyncLocalStorage<Map<string, any> | undefined>();
  * @returns The merged fields
  */
 export const serverContextFieldsFormatter = (fields: Record<string, any>) => {
-  const store = storage.getStore() as Map<string, any>;
+  const store = storage.getStore();
   if (!store) {
     return fields;
   }
-  return { ...fields, ...Object.fromEntries(store.entries()) };
+
+  if (store instanceof Map) {
+    return { ...fields, ...Object.fromEntries(store.entries()) };
+  }
+
+  return { ...fields, ...store };
 };
 
-export const runWithContext = (callback: () => void, store: Map<string, any>) => {
+export const runWithServerContext = (callback: () => void, store: ReturnType<typeof storage.getStore>) => {
   return storage.run(store, callback);
 };
