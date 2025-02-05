@@ -1,5 +1,5 @@
 import { Transport } from './transport';
-import { LogEvent, LogLevel } from '../logger';
+import { LogEvent, LogLevelValue, LogLevel } from '../logger';
 
 interface FetchConfig {
   input: Parameters<typeof fetch>[0];
@@ -20,7 +20,8 @@ export class SimpleFetchTransport implements Transport {
   log: Transport['log'] = (logs) => {
     const filteredLogs = logs.filter(
       (log) =>
-        (LogLevel[log.level as keyof typeof LogLevel] ?? LogLevel.info) >= (this.fetchConfig.logLevel ?? LogLevel.info),
+        LogLevelValue[(log.level as LogLevel) ?? LogLevel.info] >=
+        LogLevelValue[this.fetchConfig.logLevel ?? LogLevel.info],
     );
 
     this.events.push(...filteredLogs);

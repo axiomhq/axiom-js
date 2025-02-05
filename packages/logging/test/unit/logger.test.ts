@@ -1,4 +1,4 @@
-import { Logger, LogLevel, LogEvent } from '../../src/logger';
+import { Logger, LogEvent, LogLevel } from '../../src/logger';
 import { describe, beforeEach, afterEach, it, expect, vi } from 'vitest';
 import { MockTransport } from '../lib/mock';
 

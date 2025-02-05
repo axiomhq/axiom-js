@@ -1,5 +1,5 @@
 import { Axiom, AxiomWithoutBatching } from '@axiomhq/js';
-import { LogLevel } from '../logger';
+import { LogLevel, LogLevelValue } from '../logger';
 import { Transport } from './transport';
 
 interface AxiomJSTransportConfig {
@@ -18,7 +18,7 @@ export class AxiomJSTransport implements Transport {
   log(logs: any[]) {
     const filteredLogs = logs.filter(
       (log) =>
-        (LogLevel[log.level as keyof typeof LogLevel] ?? LogLevel.info) >= (this.config.logLevel ?? LogLevel.info),
+        LogLevelValue[(log.level as LogLevel) ?? LogLevel.info] >= LogLevelValue[this.config.logLevel ?? LogLevel.info],
     );
 
     if (filteredLogs.length === 0) {

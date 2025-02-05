@@ -22,21 +22,21 @@ describe('ConsoleTransport', () => {
     });
 
     it('should log message with level', () => {
-      const event = createLogEvent('info', 'test message');
+      const event = createLogEvent(LogLevel.info, 'test message');
       transport.log([event]);
 
       expect(consoleSpy).toHaveBeenCalledWith('info - test message');
     });
 
     it('should include fields in log output', () => {
-      const event = createLogEvent('info', 'test message', { userId: '123' });
+      const event = createLogEvent(LogLevel.info, 'test message', { userId: '123' });
       transport.log([event]);
 
       expect(consoleSpy).toHaveBeenCalledWith('info - test message {"userId":"123"}');
     });
 
     it('should handle multiple log events', () => {
-      const events = [createLogEvent('info', 'first message'), createLogEvent('error', 'second message')];
+      const events = [createLogEvent(LogLevel.info, 'first message'), createLogEvent(LogLevel.error, 'second message')];
       transport.log(events);
 
       expect(consoleSpy).toHaveBeenCalledTimes(2);
@@ -56,20 +56,20 @@ describe('ConsoleTransport', () => {
       });
 
       it('should format info level with correct color', () => {
-        transport.log([createLogEvent('info', 'test message')]);
+        transport.log([createLogEvent(LogLevel.info, 'test message')]);
 
         expect(consoleSpy).toHaveBeenCalledWith('%c%s - %s', 'color: lightgreen;', 'info', 'test message');
       });
 
       it('should format error level with correct color', () => {
-        transport.log([createLogEvent('error', 'test message')]);
+        transport.log([createLogEvent(LogLevel.error, 'test message')]);
 
         expect(consoleSpy).toHaveBeenCalledWith('%c%s - %s', 'color: red;', 'error', 'test message');
       });
 
       it('should include fields as object in browser', () => {
         const fields = { userId: '123', action: 'login' };
-        transport.log([createLogEvent('info', 'test message', fields)]);
+        transport.log([createLogEvent(LogLevel.info, 'test message', fields)]);
 
         expect(consoleSpy).toHaveBeenCalledWith('%c%s - %s %o', 'color: lightgreen;', 'info', 'test message', fields);
       });
@@ -81,20 +81,20 @@ describe('ConsoleTransport', () => {
       });
 
       it('should format info level with correct color code', () => {
-        transport.log([createLogEvent('info', 'test message')]);
+        transport.log([createLogEvent(LogLevel.info, 'test message')]);
 
         expect(consoleSpy).toHaveBeenCalledWith('\x1b[32m%s\x1b[0m - %s', 'info', 'test message');
       });
 
       it('should format error level with correct color code', () => {
-        transport.log([createLogEvent('error', 'test message')]);
+        transport.log([createLogEvent(LogLevel.error, 'test message')]);
 
         expect(consoleSpy).toHaveBeenCalledWith('\x1b[31m%s\x1b[0m - %s', 'error', 'test message');
       });
 
       it('should include fields as object in terminal', () => {
         const fields = { userId: '123', action: 'login' };
-        transport.log([createLogEvent('info', 'test message', fields)]);
+        transport.log([createLogEvent(LogLevel.info, 'test message', fields)]);
 
         expect(consoleSpy).toHaveBeenCalledWith('\x1b[32m%s\x1b[0m - %s %o', 'info', 'test message', fields);
       });
@@ -102,7 +102,7 @@ describe('ConsoleTransport', () => {
 
     it('should handle all log levels with correct colors', () => {
       transport = new ConsoleTransport({ logLevel: LogLevel.debug });
-      const levels = ['debug', 'info', 'warn', 'error'];
+      const levels: LogLevel[] = [LogLevel.debug, LogLevel.info, LogLevel.warn, LogLevel.error];
       levels.forEach((level) => {
         consoleSpy.mockClear();
         transport.log([createLogEvent(level, 'test message')]);
@@ -126,10 +126,10 @@ describe('ConsoleTransport', () => {
       });
 
       transport.log([
-        createLogEvent('debug', 'debug message'),
-        createLogEvent('info', 'info message'),
-        createLogEvent('warn', 'warn message'),
-        createLogEvent('error', 'error message'),
+        createLogEvent(LogLevel.debug, 'debug message'),
+        createLogEvent(LogLevel.info, 'info message'),
+        createLogEvent(LogLevel.warn, 'warn message'),
+        createLogEvent(LogLevel.error, 'error message'),
       ]);
 
       expect(consoleSpy).toHaveBeenCalledTimes(2);
@@ -141,9 +141,9 @@ describe('ConsoleTransport', () => {
       transport = new ConsoleTransport({ prettyPrint: false });
 
       transport.log([
-        createLogEvent('debug', 'debug message'),
-        createLogEvent('info', 'info message'),
-        createLogEvent('warn', 'warn message'),
+        createLogEvent(LogLevel.debug, 'debug message'),
+        createLogEvent(LogLevel.info, 'info message'),
+        createLogEvent(LogLevel.warn, 'warn message'),
       ]);
 
       expect(consoleSpy).toHaveBeenCalledTimes(2);

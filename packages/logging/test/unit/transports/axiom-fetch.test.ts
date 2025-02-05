@@ -129,10 +129,10 @@ describe('AxiomFetchTransport', () => {
       });
 
       transport.log([
-        createLogEvent('debug', 'debug message'),
-        createLogEvent('info', 'info message'),
-        createLogEvent('warn', 'warn message'),
-        createLogEvent('error', 'error message'),
+        createLogEvent(LogLevel.debug, 'debug message'),
+        createLogEvent(LogLevel.info, 'info message'),
+        createLogEvent(LogLevel.warn, 'warn message'),
+        createLogEvent(LogLevel.error, 'error message'),
       ]);
 
       await transport.flush();

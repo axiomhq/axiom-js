@@ -2,6 +2,7 @@ import { describe, beforeEach, it, expect, vi } from 'vitest';
 import { AxiomJSTransport } from '../../../src/transports/axiom-js';
 import { createLogEvent } from '../../lib/mock';
 import { Axiom, AxiomWithoutBatching } from '@axiomhq/js';
+import { LogLevel } from 'src/logger';
 
 describe('AxiomJSTransport', () => {
   let mockAxiom: Axiom;
@@ -26,7 +27,7 @@ describe('AxiomJSTransport', () => {
 
     describe('log', () => {
       it('should forward logs to axiom client ingest method', () => {
-        const logs = [createLogEvent('first'), createLogEvent('second')];
+        const logs = [createLogEvent(LogLevel.info, 'first'), createLogEvent(LogLevel.info, 'second')];
 
         transport.log(logs);
 
@@ -50,7 +51,7 @@ describe('AxiomJSTransport', () => {
     });
 
     it('should forward logs to axiom client ingest method', () => {
-      const logs = [createLogEvent('first'), createLogEvent('second')];
+      const logs = [createLogEvent(LogLevel.info, 'first'), createLogEvent(LogLevel.info, 'second')];
 
       transport.log(logs);
 
@@ -59,7 +60,7 @@ describe('AxiomJSTransport', () => {
     });
 
     it('should resolve promises when flush is called', async () => {
-      const logs = [createLogEvent('first'), createLogEvent('second')];
+      const logs = [createLogEvent(LogLevel.info, 'first'), createLogEvent(LogLevel.info, 'second')];
 
       transport.log(logs);
 

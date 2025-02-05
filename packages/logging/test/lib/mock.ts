@@ -1,8 +1,8 @@
-import { LogEvent } from '../../src';
+import { LogEvent, LogLevel } from '../../src';
 import { Transport } from '../../src';
 
 export const createLogEvent = (
-  level: string = 'info',
+  level: LogLevel = LogLevel.info,
   message: string = 'test message',
   fields: any = {},
 ): LogEvent => ({

@@ -1,5 +1,5 @@
 import { Transport } from './transport';
-import { LogEvent, LogLevel } from '../logger';
+import { LogEvent, LogLevel, LogLevelValue } from '../logger';
 import { isBrowser } from '../runtime';
 export interface ConsoleTransportConfig {
   prettyPrint?: boolean;
@@ -34,7 +34,9 @@ export class ConsoleTransport implements Transport {
 
   log: Transport['log'] = (logs) => {
     logs.forEach((log) => {
-      if (LogLevel[log.level as keyof typeof LogLevel] >= (this.config.logLevel ?? LogLevel.info)) {
+      if (
+        LogLevelValue[(log.level as LogLevel) ?? LogLevel.info] >= LogLevelValue[this.config.logLevel ?? LogLevel.info]
+      ) {
         this.prettyPrint(log);
       }
     });

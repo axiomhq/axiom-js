@@ -13,13 +13,24 @@ export interface LogEvent {
   };
 }
 
-export enum LogLevel {
-  debug = 0,
-  info = 1,
-  warn = 2,
-  error = 3,
-  off = 100,
-}
+export const LogLevelValue = {
+  debug: 0,
+  info: 1,
+  warn: 2,
+  error: 3,
+  off: 100,
+} as const;
+
+export const LogLevel = {
+  debug: 'debug',
+  info: 'info',
+  warn: 'warn',
+  error: 'error',
+  off: 'off',
+} as const;
+
+export type LogLevelValue = (typeof LogLevelValue)[keyof typeof LogLevelValue];
+export type LogLevel = keyof typeof LogLevelValue;
 
 export type LoggerConfig = {
   args?: { [key: string]: any };
@@ -30,16 +41,15 @@ export type LoggerConfig = {
 
 export class Logger {
   children: Logger[] = [];
-  public logLevel: LogLevel = LogLevel.debug;
+  public logLevel: LogLevelValue = LogLevelValue.debug;
   public config: LoggerConfig;
 
   constructor(public initConfig: LoggerConfig) {
     // check if user passed a log level, if not the default init value will be used as is.
-    // TODO: LogLevel currently does nothing
-    if (this.initConfig.logLevel != undefined && this.initConfig.logLevel >= 0) {
-      this.logLevel = this.initConfig.logLevel;
+    if (this.initConfig.logLevel != undefined) {
+      this.logLevel = LogLevelValue[this.initConfig.logLevel];
     } else if (LOG_LEVEL) {
-      this.logLevel = LogLevel[LOG_LEVEL as keyof typeof LogLevel];
+      this.logLevel = LogLevelValue[LOG_LEVEL as LogLevel];
     }
     this.config = { ...initConfig };
   }

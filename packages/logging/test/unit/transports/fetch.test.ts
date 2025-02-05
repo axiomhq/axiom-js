@@ -164,10 +164,10 @@ describe('SimpleFetchTransport', () => {
         autoFlush: 1000,
       });
 
-      transport.log([createLogEvent('info', 'first')]);
+      transport.log([createLogEvent(LogLevel.info, 'first')]);
 
       await vi.advanceTimersByTimeAsync(500);
-      transport.log([createLogEvent('info', 'second')]);
+      transport.log([createLogEvent(LogLevel.info, 'second')]);
 
       await vi.advanceTimersByTimeAsync(500);
       expect(receivedBody).toBeUndefined();
@@ -224,10 +224,10 @@ describe('SimpleFetchTransport', () => {
       });
 
       transport.log([
-        createLogEvent('debug', 'debug message'),
-        createLogEvent('info', 'info message'),
-        createLogEvent('warn', 'warn message'),
-        createLogEvent('error', 'error message'),
+        createLogEvent(LogLevel.debug, 'debug message'),
+        createLogEvent(LogLevel.info, 'info message'),
+        createLogEvent(LogLevel.warn, 'warn message'),
+        createLogEvent(LogLevel.error, 'error message'),
       ]);
 
       await transport.flush();
@@ -248,9 +248,9 @@ describe('SimpleFetchTransport', () => {
       transport = new SimpleFetchTransport({ input: API_URL });
 
       transport.log([
-        createLogEvent('debug', 'debug message'),
-        createLogEvent('info', 'info message'),
-        createLogEvent('warn', 'warn message'),
+        createLogEvent(LogLevel.debug, 'debug message'),
+        createLogEvent(LogLevel.info, 'info message'),
+        createLogEvent(LogLevel.warn, 'warn message'),
       ]);
 
       await transport.flush();
