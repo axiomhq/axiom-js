@@ -42,15 +42,33 @@ export class ConsoleTransport implements Transport {
     });
   };
 
+  private isStandardLogEvent(log: any): log is LogEvent {
+    return typeof log === 'object' && log !== null && 'level' in log && 'message' in log && 'fields' in log;
+  }
+
   prettyPrint(ev: LogEvent) {
-    const hasFields = Object.keys(ev.fields).length > 0;
+    const hasFields = ev.fields && Object.keys(ev.fields).length > 0;
+
     // check whether pretty print is disabled
     if (!this.config.prettyPrint) {
+      if (!this.isStandardLogEvent(ev)) {
+        console.log(ev);
+        return;
+      }
       let msg = `${ev.level} - ${ev.message}`;
       if (hasFields) {
         msg += ' ' + JSON.stringify(ev.fields);
       }
       console.log(msg);
+      return;
+    }
+
+    if (!this.isStandardLogEvent(ev)) {
+      if (isBrowser) {
+        console.log('%c%s', `color: ${levelColors[LogLevel.info].browser};`, ev);
+      } else {
+        console.log(`\x1b[${levelColors[LogLevel.info].terminal}m%s\x1b[0m`, ev);
+      }
       return;
     }
     // print indented message, instead of [object]
