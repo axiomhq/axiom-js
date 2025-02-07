@@ -51,7 +51,6 @@ async function updateMonitor(id: string) {
     notifyByGroup: false,
     notifierIDs: [],
     intervalMinutes: 5,
-
     rangeMinutes: 10,
   });
   console.log(`Updated monitor name to: ${response.name}`);

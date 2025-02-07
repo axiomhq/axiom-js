@@ -24,7 +24,7 @@ export namespace monitors {
     disabledUntil?: string;
   }
 
-  export interface CreateRequest {
+  export interface CreateRequest extends Omit<Monitor, 'id' | 'createdAt' | 'createdBy'> {
     name: string;
     type: MonitorType;
     description?: string;
@@ -42,18 +42,18 @@ export namespace monitors {
   }
 
   export interface UpdateRequest {
-    name?: string;
-    type?: MonitorType;
+    name: string;
+    type: MonitorType;
     description?: string;
-    aplQuery?: string;
-    operator?: MonitorOperator;
-    threshold?: number;
-    alertOnNoData?: boolean;
-    notifyByGroup?: boolean;
+    aplQuery: string;
+    operator: MonitorOperator;
+    threshold: number;
+    alertOnNoData: boolean;
+    notifyByGroup: boolean;
     resolvable?: boolean;
-    notifierIDs?: string[];
-    intervalMinutes?: number;
-    rangeMinutes?: number;
+    notifierIDs: string[];
+    intervalMinutes: number;
+    rangeMinutes: number;
     disabled?: boolean;
     disabledUntil?: string;
   }
