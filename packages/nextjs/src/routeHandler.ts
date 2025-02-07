@@ -112,7 +112,7 @@ export const getLogLevelFromStatusCode = (statusCode: number): LogLevel => {
   return LogLevel.error;
 };
 
-export const defaultOnRouteHandlerSuccess = (logger: Logger, data: SuccessData) => {
+export const defaultRouteHandlerOnSuccess = (logger: Logger, data: SuccessData) => {
   logger.info(...transformRouteHandlerSuccessResult(data));
   logger.flush();
 };
@@ -148,19 +148,20 @@ const getStore = async ({
   return store;
 };
 
-export const createAxiomRouteHandler = ({
-  logger,
-  store: argStore,
-  onSuccess,
-  onError,
-}: {
-  logger: Logger;
-  store?:
-    | ServerContextFields
-    | ((req: next.NextRequest, ctx: any) => ServerContextFields | Promise<ServerContextFields>);
-  onSuccess?: (data: SuccessData) => void;
-  onError?: (data: ErrorData) => void;
-}) => {
+export const createAxiomRouteHandler = (
+  logger: Logger,
+  {
+    store: argStore,
+    onSuccess,
+    onError,
+  }: {
+    store?:
+      | ServerContextFields
+      | ((req: next.NextRequest, ctx: any) => ServerContextFields | Promise<ServerContextFields>);
+    onSuccess?: (data: SuccessData) => void;
+    onError?: (data: ErrorData) => void;
+  },
+) => {
   const withAxiom = (handler: NextHandler) => {
     return async (req: next.NextRequest, ctx: any) => {
       const store = await getStore({ store: argStore, req, ctx });
@@ -177,7 +178,7 @@ export const createAxiomRouteHandler = ({
             if (onSuccess) {
               onSuccess(httpData);
             } else {
-              defaultOnRouteHandlerSuccess(logger, httpData);
+              defaultRouteHandlerOnSuccess(logger, httpData);
             }
           };
           // TODO: this surely can be written better
