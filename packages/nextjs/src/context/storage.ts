@@ -22,6 +22,6 @@ export const serverContextFieldsFormatter = (fields: Record<string, any>) => {
   return { ...fields, ...store };
 };
 
-export const runWithServerContext = (callback: () => void, store: ReturnType<typeof storage.getStore>) => {
+export const runWithServerContext = (callback: () => any, store: ReturnType<typeof storage.getStore>) => {
   return storage.run(store, callback);
 };

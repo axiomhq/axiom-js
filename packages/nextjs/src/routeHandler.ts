@@ -2,7 +2,7 @@ import { Logger, LogLevel } from '@axiomhq/logging';
 import { isRedirectError } from 'next/dist/client/components/redirect-error';
 import { isHTTPAccessFallbackError } from 'next/dist/client/components/http-access-fallback/http-access-fallback';
 import * as next from 'next/server';
-import { runWithServerContext, ServerContextFields } from 'src/context';
+import { runWithServerContext, ServerContextFields } from './context';
 
 import { crypto } from './lib/node-utils';
 
@@ -150,11 +150,7 @@ const getStore = async ({
 
 export const createAxiomRouteHandler = (
   logger: Logger,
-  {
-    store: argStore,
-    onSuccess,
-    onError,
-  }: {
+  config?: {
     store?:
       | ServerContextFields
       | ((req: next.NextRequest, ctx: any) => ServerContextFields | Promise<ServerContextFields>);
@@ -162,6 +158,7 @@ export const createAxiomRouteHandler = (
     onError?: (data: ErrorData) => void;
   },
 ) => {
+  const { store: argStore, onSuccess, onError } = config ?? {};
   const withAxiom = (handler: NextHandler) => {
     return async (req: next.NextRequest, ctx: any) => {
       const store = await getStore({ store: argStore, req, ctx });
