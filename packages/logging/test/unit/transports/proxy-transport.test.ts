@@ -1,10 +1,10 @@
 import { describe, afterEach, it, expect, beforeAll, afterAll, vi } from 'vitest';
-import { AxiomProxyTransport } from '../../../src/transports/proxy-transport';
+import { ProxyTransport } from '../../../src/transports/proxy-transport';
 import { http, HttpResponse, HttpHandler } from 'msw';
 import { setupServer } from 'msw/node';
 import { createLogEvent } from '../../lib/mock';
 
-describe('AxiomProxyTransport', () => {
+describe('ProxyTransport', () => {
   const PROXY_URL = 'https://proxy.example.com/logs';
 
   const handlers: HttpHandler[] = [
@@ -32,7 +32,7 @@ describe('AxiomProxyTransport', () => {
         }),
       );
 
-      const transport = new AxiomProxyTransport({
+      const transport = new ProxyTransport({
         url: PROXY_URL,
       });
 
@@ -53,7 +53,7 @@ describe('AxiomProxyTransport', () => {
         }),
       );
 
-      const transport = new AxiomProxyTransport({
+      const transport = new ProxyTransport({
         url: PROXY_URL,
         autoFlush: false,
       });
@@ -73,7 +73,7 @@ describe('AxiomProxyTransport', () => {
         }),
       );
 
-      const transport = new AxiomProxyTransport({
+      const transport = new ProxyTransport({
         url: PROXY_URL,
       });
 

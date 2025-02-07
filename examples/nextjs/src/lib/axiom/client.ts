@@ -1,11 +1,11 @@
 'use client';
 
-import { Logger, AxiomProxyTransport, ConsoleTransport } from '@axiomhq/logging';
+import { Logger, ProxyTransport, ConsoleTransport } from '@axiomhq/logging';
 import { createUseLogger, createWebVitalsComponent } from '@axiomhq/react';
 
 export const logger = new Logger({
   transports: [
-    new AxiomProxyTransport({ url: process.env.NEXT_PUBLIC_AXIOM_PROXY_URL!, autoFlush: true }),
+    new ProxyTransport({ url: process.env.NEXT_PUBLIC_AXIOM_PROXY_URL!, autoFlush: true }),
     new ConsoleTransport(),
   ],
 });

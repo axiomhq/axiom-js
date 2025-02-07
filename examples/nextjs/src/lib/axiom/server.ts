@@ -1,5 +1,10 @@
 import { Logger, AxiomFetchTransport, ConsoleTransport } from '@axiomhq/logging';
-import { createAxiomRouteHandler, serverContextFieldsFormatter } from '@axiomhq/nextjs';
+import {
+  createAxiomRouteHandler,
+  getLogLevelFromStatusCode,
+  serverContextFieldsFormatter,
+  transformRouteHandlerErrorResult,
+} from '@axiomhq/nextjs';
 
 export const logger = new Logger({
   transports: [
@@ -12,4 +17,14 @@ export const logger = new Logger({
   formatters: [serverContextFieldsFormatter],
 });
 
-export const withAxiom = createAxiomRouteHandler({ logger });
+export const withAxiom = createAxiomRouteHandler({
+  logger,
+  onError: (error) => {
+    if (error.error instanceof Error) {
+      logger.error(error.error.message, error.error);
+    }
+    const [message, report] = transformRouteHandlerErrorResult(error);
+    logger.log(getLogLevelFromStatusCode(report.statusCode), message, report);
+    logger.flush();
+  },
+});
