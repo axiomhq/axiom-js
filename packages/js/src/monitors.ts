@@ -24,39 +24,9 @@ export namespace monitors {
     disabledUntil?: string;
   }
 
-  export interface CreateRequest extends Omit<Monitor, 'id' | 'createdAt' | 'createdBy'> {
-    name: string;
-    type: MonitorType;
-    description?: string;
-    aplQuery: string;
-    operator: MonitorOperator;
-    threshold: number;
-    alertOnNoData: boolean;
-    notifyByGroup: boolean;
-    resolvable?: boolean;
-    notifierIDs: string[];
-    intervalMinutes: number;
-    rangeMinutes: number;
-    disabled?: boolean;
-    disabledUntil?: string;
-  }
+  export interface CreateRequest extends Omit<Monitor, 'id' | 'createdAt' | 'createdBy'> {}
 
-  export interface UpdateRequest {
-    name: string;
-    type: MonitorType;
-    description?: string;
-    aplQuery: string;
-    operator: MonitorOperator;
-    threshold: number;
-    alertOnNoData: boolean;
-    notifyByGroup: boolean;
-    resolvable?: boolean;
-    notifierIDs: string[];
-    intervalMinutes: number;
-    rangeMinutes: number;
-    disabled?: boolean;
-    disabledUntil?: string;
-  }
+  export interface UpdateRequest extends Omit<Monitor, 'id' | 'createdAt' | 'createdBy'> {}
 
   export class Service extends HTTPClient {
     private readonly localPath = '/v2/monitors';
