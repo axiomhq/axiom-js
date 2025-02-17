@@ -1,25 +1,17 @@
 import { Logger, LogLevel } from '@axiomhq/logging';
-import { isRedirectError } from 'next/dist/client/components/redirect-error';
-import { isHTTPAccessFallbackError } from 'next/dist/client/components/http-access-fallback/http-access-fallback';
 import * as next from 'next/server';
 import { runWithServerContext, ServerContextFields } from './context';
-
 import { crypto } from './lib/node-utils';
+import { getAccessFallbackHTTPStatus, isHTTPAccessFallbackError } from 'src/lib/next-http-errors';
+import { getRedirectStatus, isRedirectError } from 'src/lib/next-redirect-errors';
+import { NextRequest, NextResponse } from 'next/server';
 
 const after = next.after;
 
-export type NextHandler<T = any> = (
-  req: next.NextRequest,
-  arg?: T,
-) => Promise<Response> | Promise<next.NextResponse> | next.NextResponse | Response;
-
-const getRegion = (req: next.NextRequest) => {
-  let region = '';
-  if ('geo' in req) {
-    region = (req.geo as { region: string }).region ?? '';
-  }
-  return region;
-};
+export type NextHandler<T = Request, A = any, R extends Response = Response> = (
+  req: T extends Request ? T : Request,
+  arg?: A,
+) => Promise<R> | Promise<NextResponse> | NextResponse | R;
 
 export const transformRouteHandlerSuccessResult = (
   data: SuccessData,
@@ -28,13 +20,13 @@ export const transformRouteHandlerSuccessResult = (
     request: {
       startTime: new Date().getTime(),
       endTime: new Date().getTime(),
-      path: data.req.nextUrl.pathname ?? new URL(data.req.url).pathname,
+      path: 'nextUrl' in data.req ? (data.req.nextUrl as URL).pathname : new URL(data.req.url).pathname,
       method: data.req.method,
       host: data.req.headers.get('host'),
       userAgent: data.req.headers.get('user-agent'),
       scheme: data.req.url.split('://')[0],
       ip: data.req.headers.get('x-forwarded-for'),
-      region: getRegion(data.req),
+      region: 'geo' in data.req ? (data.req.geo as { region: string }).region ?? undefined : undefined,
       statusCode: data.res.status,
     },
   };
@@ -52,13 +44,13 @@ export const transformRouteHandlerErrorResult = (data: ErrorData): [message: str
     request: {
       startTime: new Date().getTime(),
       endTime: new Date().getTime(),
-      path: data.req.nextUrl.pathname ?? new URL(data.req.url).pathname,
+      path: 'nextUrl' in data.req ? (data.req.nextUrl as URL).pathname : new URL(data.req.url).pathname,
       method: data.req.method,
       host: data.req.headers.get('host'),
       userAgent: data.req.headers.get('user-agent'),
       scheme: data.req.url.split('://')[0],
       ip: data.req.headers.get('x-forwarded-for'),
-      region: getRegion(data.req),
+      region: 'geo' in data.req ? (data.req.geo as { region: string }).region ?? '' : '',
       statusCode: statusCode,
     },
   };
@@ -69,38 +61,39 @@ export const transformRouteHandlerErrorResult = (data: ErrorData): [message: str
   ];
 };
 
-export interface BaseData {
-  req: next.NextRequest;
+export interface BaseData<T = Request> {
+  req: T extends Request ? T : Request;
   start: number;
   end: number;
 }
-export interface SuccessData extends BaseData {
-  res: next.NextResponse | Response;
+
+export interface SuccessData<T = Request, R extends Response = Response> extends BaseData<T> {
+  res: R;
 }
 
-export interface ErrorData extends BaseData {
+export interface ErrorData<T = Request> extends BaseData<T> {
   error: Error | unknown;
 }
 
-export type AxiomHandlerCallbackParams =
+export type AxiomHandlerCallbackParams<T = Request, R extends Response = Response> =
   | {
       ok: true;
-      data: SuccessData;
+      data: SuccessData<T, R>;
     }
-  | { ok: false; data: ErrorData };
+  | { ok: false; data: ErrorData<T> };
 
-export type axiomHandlerCallback = (result: AxiomHandlerCallbackParams) => void | Promise<void>;
+export type axiomHandlerCallback<T = Request, R extends Response = Response> = (
+  result: AxiomHandlerCallbackParams<T, R>,
+) => void | Promise<void>;
 
 export const getNextErrorStatusCode = (error: Error & { digest?: string }) => {
-  if (!error.digest) {
-    return 500;
+  if (isRedirectError(error)) {
+    return getRedirectStatus(error);
+  } else if (isHTTPAccessFallbackError(error)) {
+    return getAccessFallbackHTTPStatus(error);
   }
 
-  if (isRedirectError(error)) {
-    return error.digest.split(';')[3];
-  } else if (isHTTPAccessFallbackError(error)) {
-    return error.digest.split(';')[1];
-  }
+  return 500;
 };
 
 export const getLogLevelFromStatusCode = (statusCode: number): LogLevel => {
@@ -122,20 +115,20 @@ const defaultRouteHandlerOnError = (logger: Logger, data: ErrorData) => {
     logger.error(data.error.message, data.error);
   }
   const [message, report] = transformRouteHandlerErrorResult(data);
-  logger.log(getLogLevelFromStatusCode(report.statusCode), message, report);
+  logger.log(getLogLevelFromStatusCode(report.statusCsode), message, report);
   logger.flush();
 };
 
-const getStore = async ({
+const getStore = async <T = Request, C extends any = any>({
   store,
   req,
   ctx,
 }: {
   store?:
     | ServerContextFields
-    | ((req: next.NextRequest, ctx: any) => ServerContextFields | Promise<ServerContextFields>);
-  req: next.NextRequest;
-  ctx: any;
+    | ((req: T extends Request ? T : Request, ctx: C) => ServerContextFields | Promise<ServerContextFields>);
+  req: T extends Request ? T : Request;
+  ctx: C;
 }) => {
   if (!store) {
     const newStore = new Map();
@@ -148,19 +141,25 @@ const getStore = async ({
   return store;
 };
 
-export const createAxiomRouteHandler = (
+export const createAxiomRouteHandler = <TRequestCreateRouteHandler = NextRequest>(
   logger: Logger,
   config?: {
     store?:
       | ServerContextFields
-      | ((req: next.NextRequest, ctx: any) => ServerContextFields | Promise<ServerContextFields>);
+      | (<TRequestStore = TRequestCreateRouteHandler, C extends any = any>(
+          req: TRequestStore,
+          ctx: C,
+        ) => ServerContextFields | Promise<ServerContextFields>);
     onSuccess?: (data: SuccessData) => void;
     onError?: (data: ErrorData) => void;
   },
 ) => {
   const { store: argStore, onSuccess, onError } = config ?? {};
-  const withAxiom = (handler: NextHandler) => {
-    return async (req: next.NextRequest, ctx: any) => {
+  const withAxiom = <TRequestRouteHandler = TRequestCreateRouteHandler>(handler: NextHandler<TRequestRouteHandler>) => {
+    return async <C extends any = any>(
+      req: TRequestRouteHandler extends Request ? TRequestRouteHandler : Request,
+      ctx: C,
+    ) => {
       const store = await getStore({ store: argStore, req, ctx });
 
       return runWithServerContext(async () => {

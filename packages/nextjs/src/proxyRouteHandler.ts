@@ -1,8 +1,7 @@
 import { LogEvent, Logger } from '@axiomhq/logging';
-import { NextRequest } from 'next/server';
 
 export const createProxyRouteHandler = (logger: Logger) => {
-  return async (req: NextRequest) => {
+  return async <T extends Request>(req: T) => {
     try {
       const events = (await req.json()) as LogEvent[];
       events.forEach((event) => {

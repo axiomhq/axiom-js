@@ -59,10 +59,11 @@
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",
     "@tanstack/config": "^0.16.0",
+    "next": "^15.1.7",
     "vite": "^5.2.14",
     "vitest": "^0.34.6"
   },
   "peerDependencies": {
-    "next": "^15.1"
+    "next": "^15 || ^14 || ^13"
   }
 }
