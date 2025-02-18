@@ -53,9 +53,6 @@
     "nextjs",
     "logging"
   ],
-  "dependencies": {
-    "@axiomhq/logging": "workspace:*"
-  },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",
     "@tanstack/config": "^0.16.0",
@@ -64,6 +61,7 @@
     "vitest": "^0.34.6"
   },
   "peerDependencies": {
+    "@axiomhq/logging": "workspace:*",
     "next": "^15 || ^14 || ^13"
   }
 }
