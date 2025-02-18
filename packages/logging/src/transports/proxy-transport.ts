@@ -4,7 +4,7 @@ import { SimpleFetchTransport } from './fetch';
 
 interface ProxyTransportConfig {
   url: string;
-  autoFlush?: boolean | number;
+  autoFlush?: boolean | { durationMs: number };
   logLevel?: LogLevel;
 }
 export class ProxyTransport extends SimpleFetchTransport implements Transport {

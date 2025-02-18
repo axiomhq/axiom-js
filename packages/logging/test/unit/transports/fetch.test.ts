@@ -138,7 +138,7 @@ describe('SimpleFetchTransport', () => {
 
       transport = new SimpleFetchTransport({
         input: API_URL,
-        autoFlush: 1000,
+        autoFlush: { durationMs: 1000 },
       });
 
       transport.log([createLogEvent()]);
@@ -161,7 +161,7 @@ describe('SimpleFetchTransport', () => {
 
       transport = new SimpleFetchTransport({
         input: API_URL,
-        autoFlush: 1000,
+        autoFlush: { durationMs: 1000 },
       });
 
       transport.log([createLogEvent(LogLevel.info, 'first')]);
@@ -176,6 +176,29 @@ describe('SimpleFetchTransport', () => {
       expect(receivedBody).toBeDefined();
       expect(receivedBody[0].message).toBe('first');
       expect(receivedBody[1].message).toBe('second');
+    });
+
+    it('should auto-flush with custom duration from config object', async () => {
+      const requestSpy = vi.fn();
+      server.use(
+        http.post(API_URL, async () => {
+          requestSpy();
+          return HttpResponse.json({ success: true });
+        }),
+      );
+
+      transport = new SimpleFetchTransport({
+        input: API_URL,
+        autoFlush: { durationMs: 500 },
+      });
+
+      transport.log([createLogEvent()]);
+
+      await vi.advanceTimersByTimeAsync(499);
+      expect(requestSpy).not.toHaveBeenCalled();
+
+      await vi.advanceTimersByTimeAsync(1);
+      expect(requestSpy).toHaveBeenCalledTimes(1);
     });
   });
 

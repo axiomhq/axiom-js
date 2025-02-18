@@ -5,7 +5,7 @@ interface AxiomFetchConfig {
   dataset: string;
   token: string;
   url?: string;
-  autoFlush?: boolean | number;
+  autoFlush?: boolean | { durationMs: number };
   logLevel?: LogLevel;
 }
 

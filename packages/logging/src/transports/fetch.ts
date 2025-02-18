@@ -4,7 +4,7 @@ import { LogEvent, LogLevelValue, LogLevel } from '../logger';
 interface FetchConfig {
   input: Parameters<typeof fetch>[0];
   init?: Omit<Parameters<typeof fetch>[1], 'body'>;
-  autoFlush?: number | boolean;
+  autoFlush?: boolean | { durationMs: number };
   logLevel?: LogLevel;
 }
 
@@ -34,12 +34,11 @@ export class SimpleFetchTransport implements Transport {
       clearTimeout(this.timer);
     }
 
-    this.timer = setTimeout(
-      () => {
-        this.flush();
-      },
-      typeof this.fetchConfig.autoFlush === 'number' ? this.fetchConfig.autoFlush : 2000,
-    );
+    const flushDelay = typeof this.fetchConfig.autoFlush === 'boolean' ? 2000 : this.fetchConfig.autoFlush.durationMs;
+
+    this.timer = setTimeout(() => {
+      this.flush();
+    }, flushDelay);
   };
 
   async flush() {
