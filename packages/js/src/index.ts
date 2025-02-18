@@ -28,8 +28,9 @@ export {
   Status,
   Message,
   Query,
-} from "./client.js";
-export { ClientOptions } from "./httpClient.js";
-export { datasets } from "./datasets.js";
-export { annotations } from "./annotations.js";
-export { users } from "./users.js";
+} from './client.js';
+export { ClientOptions } from './httpClient.js';
+export { datasets } from './datasets.js';
+export { annotations } from './annotations.js';
+export { users } from './users.js';
+export { monitors } from './monitors.js';
