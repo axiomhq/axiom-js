@@ -54,6 +54,7 @@
     "logging"
   ],
   "devDependencies": {
+    "@axiomhq/logging": "workspace:*",
     "@repo/eslint-config": "workspace:*",
     "@tanstack/config": "^0.16.0",
     "next": "^15.1.7",

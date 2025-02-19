@@ -51,13 +51,19 @@
   "bugs": {
     "url": "https://github.com/axiomhq/axiom-js/issues"
   },
-  "dependencies": {
-    "@axiomhq/js": "workspace:*"
-  },
   "devDependencies": {
+    "@axiomhq/js": "workspace:*",
     "@repo/eslint-config": "workspace:*",
     "@tanstack/config": "^0.16.0",
     "msw": "^2.6.2",
     "vite": "^5.2.14"
+  },
+  "peerDependencies": {
+    "@axiomhq/js": "workspace:*"
+  },
+  "peerDependenciesMeta": {
+    "@axiomhq/js": {
+      "optional": true
+    }
   }
 }
