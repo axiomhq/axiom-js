@@ -7,6 +7,7 @@ interface ProxyTransportConfig {
   autoFlush?: boolean | { durationMs: number };
   logLevel?: LogLevel;
 }
+
 export class ProxyTransport extends SimpleFetchTransport implements Transport {
   constructor(config: ProxyTransportConfig) {
     super({
