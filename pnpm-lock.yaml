@@ -104,7 +104,7 @@ importers:
   examples/nextjs:
     dependencies:
       '@axiomhq/js':
-        specifier: workspace:^
+        specifier: workspace:*
         version: link:../../packages/js
       '@axiomhq/logging':
         specifier: workspace:*
