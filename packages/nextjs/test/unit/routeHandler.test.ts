@@ -14,7 +14,7 @@ import { forbidden, notFound, permanentRedirect, redirect, unauthorized } from '
 describe('routeHandler', () => {
   describe('createAxiomRouteHandler', () => {
     it('should handle successful requests', async () => {
-      const withAxiom = createAxiomRouteHandler({ logger: mockLogger });
+      const withAxiom = createAxiomRouteHandler(mockLogger);
       const mockResponse = new NextResponse(null, { status: 200 });
       const handler = vi.fn().mockResolvedValue(mockResponse);
       const wrappedHandler = withAxiom(handler);
@@ -27,7 +27,7 @@ describe('routeHandler', () => {
     });
 
     it('should handle errors and rethrow them', async () => {
-      const withAxiom = createAxiomRouteHandler({ logger: mockLogger });
+      const withAxiom = createAxiomRouteHandler(mockLogger);
       const error = new Error('Test error');
       const handler = vi.fn().mockRejectedValue(error);
       const wrappedHandler = withAxiom(handler);
@@ -66,27 +66,27 @@ describe('routeHandler', () => {
 
     it('should extract status code from temporary redirect error', async () => {
       const error = await getErrorFromFunction(() => redirect('/path'));
-      expect(getNextErrorStatusCode(error)).toBe('307');
+      expect(getNextErrorStatusCode(error)).toBe(307);
     });
 
     it('should extract status code from permanent redirect error', async () => {
       const error = await getErrorFromFunction(() => permanentRedirect('/path'));
-      expect(getNextErrorStatusCode(error)).toBe('308');
+      expect(getNextErrorStatusCode(error)).toBe(308);
     });
 
     it('should extract status code from not found error', async () => {
       const error = await getErrorFromFunction(() => notFound());
-      expect(getNextErrorStatusCode(error)).toBe('404');
+      expect(getNextErrorStatusCode(error)).toBe(404);
     });
 
     it('should extract status code from forbidden error', async () => {
       const error = await getErrorFromFunction(() => forbidden());
-      expect(getNextErrorStatusCode(error)).toBe('403');
+      expect(getNextErrorStatusCode(error)).toBe(403);
     });
 
     it('should extract status code from unahtorized error', async () => {
       const error = await getErrorFromFunction(() => unauthorized());
-      expect(getNextErrorStatusCode(error)).toBe('401');
+      expect(getNextErrorStatusCode(error)).toBe(401);
     });
   });
 
@@ -103,7 +103,6 @@ describe('routeHandler', () => {
       userAgent: 'test',
       scheme: 'http',
       ip: '127.0.0.1',
-      region: '',
     };
 
     it('should transform success result correctly', () => {
