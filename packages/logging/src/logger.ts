@@ -9,7 +9,7 @@ export interface LogEvent {
   fields: any;
   _time: string;
   '@app': {
-    'axiom-logging-version': string;
+    [key: FrameworkIdentifier['name']]: FrameworkIdentifier['version'];
   };
 }
 
@@ -32,11 +32,17 @@ export const LogLevel = {
 export type LogLevelValue = (typeof LogLevelValue)[keyof typeof LogLevelValue];
 export type LogLevel = keyof typeof LogLevelValue;
 
+export type FrameworkIdentifier = {
+  name: `${string}-version`;
+  version: string;
+};
+
 export type LoggerConfig = {
   args?: { [key: string]: any };
   transports: [Transport, ...Transport[]];
   logLevel?: LogLevel;
   formatters?: Array<(args: Record<string, any>) => Record<string, any>>;
+  frameworkIdentifier?: FrameworkIdentifier;
 };
 
 export class Logger {
@@ -83,9 +89,13 @@ export class Logger {
       message,
       _time: new Date(Date.now()).toISOString(),
       fields: this.config.args || {},
-      '@app': {
-        'axiom-logging-version': Version ?? 'unknown',
-      },
+      '@app': this.config.frameworkIdentifier
+        ? {
+            [this.config.frameworkIdentifier.name]: this.config.frameworkIdentifier.version,
+          }
+        : {
+            'axiom-logging-version': Version ?? 'unknown',
+          },
     };
 
     // check if passed args is an object, if its not an object, add it to fields.args

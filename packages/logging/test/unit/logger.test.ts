@@ -154,4 +154,20 @@ describe('Logger', () => {
       expect(mockTransport.logs[0]).toEqual(rawEvent);
     });
   });
+
+  describe('frameworkIdentifier', () => {
+    it('should add framework identifier to log events', () => {
+      const logger = new Logger({
+        transports: [mockTransport],
+        frameworkIdentifier: { name: 'test-framework-version', version: '1.0.0' },
+      });
+
+      logger.info('test message');
+
+      expect(mockTransport.logs).toHaveLength(1);
+      expect(mockTransport.logs[0]['@app']).toEqual({
+        'test-framework-version': '1.0.0',
+      });
+    });
+  });
 });
