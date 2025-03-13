@@ -4,3 +4,4 @@ export * from './middleware';
 export * from './instrumentation';
 export * from './context/index';
 export * from './identifier';
+export * from './formatters';

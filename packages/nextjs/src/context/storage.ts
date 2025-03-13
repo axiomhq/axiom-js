@@ -1,3 +1,4 @@
+import { Formatter } from '@axiomhq/logging';
 import { AsyncLocalStorage } from '../lib/node-utils';
 
 export type ServerContextFields = Map<string, any> | Record<string, any>;
@@ -9,17 +10,29 @@ export const storage = new AsyncLocalStorage<ServerContextFields | undefined>();
  * @param fields - The fields to merge
  * @returns The merged fields
  */
-export const serverContextFieldsFormatter = (fields: Record<string, any>) => {
+export const serverContextFieldsFormatter: Formatter = (logEvent) => {
   const store = storage.getStore();
   if (!store) {
-    return fields;
+    return logEvent;
   }
 
   if (store instanceof Map) {
-    return { ...fields, ...Object.fromEntries(store.entries()) };
+    return {
+      ...logEvent,
+      fields: {
+        ...logEvent.fields,
+        ...Object.fromEntries(store.entries()),
+      },
+    };
   }
 
-  return { ...fields, ...store };
+  return {
+    ...logEvent,
+    fields: {
+      ...logEvent.fields,
+      ...store,
+    },
+  };
 };
 
 export const runWithServerContext = (callback: () => any, store: ReturnType<typeof storage.getStore>) => {

@@ -1,3 +1,4 @@
+import { defaultFormatters } from 'src/default-formatters';
 import { Transport } from '.';
 import { Version } from './runtime';
 
@@ -32,6 +33,10 @@ export const LogLevel = {
 export type LogLevelValue = (typeof LogLevelValue)[keyof typeof LogLevelValue];
 export type LogLevel = keyof typeof LogLevelValue;
 
+export type Formatter<T extends Record<string, any> = LogEvent, U extends Record<string, any> = LogEvent> = (
+  logEvent: T,
+) => U;
+
 export type FrameworkIdentifier = {
   name: `${string}-version`;
   version: string;
@@ -41,8 +46,8 @@ export type LoggerConfig = {
   args?: { [key: string]: any };
   transports: [Transport, ...Transport[]];
   logLevel?: LogLevel;
-  formatters?: Array<(args: Record<string, any>) => Record<string, any>>;
-  frameworkIdentifier?: FrameworkIdentifier;
+  formatters?: Array<Formatter>;
+  overrideDefaultFormatters?: boolean;
 };
 
 export class Logger {
@@ -57,7 +62,12 @@ export class Logger {
     } else if (LOG_LEVEL) {
       this.logLevel = LogLevelValue[LOG_LEVEL as LogLevel];
     }
+
     this.config = { ...initConfig };
+
+    if (!this.config.overrideDefaultFormatters) {
+      this.config.formatters = [...defaultFormatters, ...(this.config.formatters ?? [])];
+    }
   }
 
   raw(log: any) {
@@ -89,13 +99,9 @@ export class Logger {
       message,
       _time: new Date(Date.now()).toISOString(),
       fields: this.config.args || {},
-      '@app': this.config.frameworkIdentifier
-        ? {
-            [this.config.frameworkIdentifier.name]: this.config.frameworkIdentifier.version,
-          }
-        : {
-            'axiom-logging-version': Version ?? 'unknown',
-          },
+      '@app': {
+        'axiom-logging-version': Version ?? 'unknown',
+      },
     };
 
     // check if passed args is an object, if its not an object, add it to fields.args

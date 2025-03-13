@@ -1,4 +1,4 @@
-import { Logger, LogEvent, LogLevel } from '../../src/logger';
+import { Logger, LogEvent, LogLevel, Formatter } from '../../src/logger';
 import { describe, beforeEach, afterEach, it, expect, vi } from 'vitest';
 import { MockTransport } from '../lib/mock';
 
@@ -19,7 +19,15 @@ describe('Logger', () => {
 
   describe('formatters', () => {
     it('should format fields', () => {
-      const formatter = (fields: Record<string, any>) => ({ ...fields, userId: '123' });
+      const formatter: Formatter = (logEvent) => {
+        return {
+          ...logEvent,
+          fields: {
+            ...logEvent.fields,
+            userId: '123',
+          },
+        };
+      };
 
       logger = new Logger({
         transports: [mockTransport],
@@ -33,10 +41,13 @@ describe('Logger', () => {
     });
 
     it('should replace and delete fields', () => {
-      const formatter = (fields: Record<string, any>) => {
+      const formatter: Formatter = (logEvent) => {
         return {
-          userId: fields.userId,
-          foo: fields.foo,
+          ...logEvent,
+          fields: {
+            userId: logEvent.fields.userId,
+            foo: logEvent.fields.foo,
+          },
         };
       };
 
@@ -152,22 +163,6 @@ describe('Logger', () => {
 
       expect(mockTransport.logs).toHaveLength(1);
       expect(mockTransport.logs[0]).toEqual(rawEvent);
-    });
-  });
-
-  describe('frameworkIdentifier', () => {
-    it('should add framework identifier to log events', () => {
-      const logger = new Logger({
-        transports: [mockTransport],
-        frameworkIdentifier: { name: 'test-framework-version', version: '1.0.0' },
-      });
-
-      logger.info('test message');
-
-      expect(mockTransport.logs).toHaveLength(1);
-      expect(mockTransport.logs[0]['@app']).toEqual({
-        'test-framework-version': '1.0.0',
-      });
     });
   });
 });
