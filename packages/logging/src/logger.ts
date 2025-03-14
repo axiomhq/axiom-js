@@ -1,6 +1,6 @@
 import { defaultFormatters } from 'src/default-formatters';
 import { Transport } from '.';
-import { Version } from './runtime';
+import { Version, isBrowser } from './runtime';
 
 const LOG_LEVEL = 'info';
 
@@ -244,6 +244,7 @@ export class Logger {
       '@app': {
         'axiom-logging-version': Version ?? 'unknown',
       },
+      source: isBrowser ? 'browser-log' : 'server-log',
     };
 
     // Apply root properties from logger config if present
