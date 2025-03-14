@@ -1,4 +1,4 @@
-import { Logger } from '@axiomhq/logging';
+import { EVENT, Logger } from '@axiomhq/logging';
 import { Instrumentation } from 'next';
 
 export const transformOnRequestError = (
@@ -14,8 +14,11 @@ export const transformOnRequestError = (
         cause: error.cause,
         stack: error.stack,
         digest: (error as Error & { digest?: string }).digest,
-        request: request,
         context: context,
+        [EVENT]: {
+          request: request,
+          source: 'error.tsx', // @TODO: discuss source
+        },
       },
     ];
   }
@@ -23,8 +26,11 @@ export const transformOnRequestError = (
     `${request.method} ${request.path} ${context.routeType}`,
     {
       error,
-      request: request,
       context: context,
+      [EVENT]: {
+        request: request,
+        source: 'error.tsx', // @TODO: discuss source
+      },
     },
   ];
 };

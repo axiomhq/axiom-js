@@ -1,3 +1,3 @@
 import { frameworkIdentifierFormatter } from 'src/identifier';
 
-export const clientFormatters = [frameworkIdentifierFormatter];
+export const nextJsFormatters = [frameworkIdentifierFormatter];

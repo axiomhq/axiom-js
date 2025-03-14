@@ -1,10 +1,11 @@
-import { Logger, LogLevel } from '@axiomhq/logging';
+import { EVENT, Logger, LogLevel } from '@axiomhq/logging';
 import * as next from 'next/server';
 import { runWithServerContext, ServerContextFields } from './context';
 import { crypto } from './lib/node-utils';
 import { getAccessFallbackHTTPStatus, isHTTPAccessFallbackError } from 'src/lib/next-http-errors';
 import { getRedirectStatus, isRedirectError } from 'src/lib/next-redirect-errors';
 import { NextRequest, NextResponse } from 'next/server';
+import { isEdgeRuntime } from 'src/lib/runtime';
 
 const after = next.after;
 
@@ -16,23 +17,25 @@ export type NextHandler<T = Request, A = any, R extends Response = Response> = (
 export const transformRouteHandlerSuccessResult = (
   data: SuccessData,
 ): [message: string, report: Record<string, any>] => {
+  const request = {
+    startTime: new Date().getTime(),
+    endTime: new Date().getTime(),
+    path: 'nextUrl' in data.req ? (data.req.nextUrl as URL).pathname : new URL(data.req.url).pathname,
+    method: data.req.method,
+    host: data.req.headers.get('host'),
+    userAgent: data.req.headers.get('user-agent'),
+    scheme: data.req.url.split('://')[0],
+    ip: data.req.headers.get('x-forwarded-for'),
+    region: 'geo' in data.req ? (data.req.geo as { region: string }).region ?? undefined : undefined,
+    statusCode: data.res.status,
+  };
+
   const report = {
-    request: {
-      startTime: new Date().getTime(),
-      endTime: new Date().getTime(),
-      path: 'nextUrl' in data.req ? (data.req.nextUrl as URL).pathname : new URL(data.req.url).pathname,
-      method: data.req.method,
-      host: data.req.headers.get('host'),
-      userAgent: data.req.headers.get('user-agent'),
-      scheme: data.req.url.split('://')[0],
-      ip: data.req.headers.get('x-forwarded-for'),
-      region: 'geo' in data.req ? (data.req.geo as { region: string }).region ?? undefined : undefined,
-      statusCode: data.res.status,
-    },
+    [EVENT]: { request, source: isEdgeRuntime ? 'edge' : 'lambda' },
   };
 
   return [
-    `${data.req.method} ${report.request.path} ${report.request.statusCode} in ${report.request.endTime - report.request.startTime}ms`,
+    `${request.method} ${request.path} ${request.statusCode} in ${request.endTime - request.startTime}ms`,
     report,
   ];
 };
@@ -40,23 +43,25 @@ export const transformRouteHandlerSuccessResult = (
 export const transformRouteHandlerErrorResult = (data: ErrorData): [message: string, report: Record<string, any>] => {
   const statusCode = data.error instanceof Error ? getNextErrorStatusCode(data.error) : 500;
 
+  const request = {
+    startTime: new Date().getTime(),
+    endTime: new Date().getTime(),
+    path: 'nextUrl' in data.req ? (data.req.nextUrl as URL).pathname : new URL(data.req.url).pathname,
+    method: data.req.method,
+    host: data.req.headers.get('host'),
+    userAgent: data.req.headers.get('user-agent'),
+    scheme: data.req.url.split('://')[0],
+    ip: data.req.headers.get('x-forwarded-for'),
+    region: 'geo' in data.req ? (data.req.geo as { region: string }).region ?? '' : '',
+    statusCode: statusCode,
+  };
+
   const report = {
-    request: {
-      startTime: new Date().getTime(),
-      endTime: new Date().getTime(),
-      path: 'nextUrl' in data.req ? (data.req.nextUrl as URL).pathname : new URL(data.req.url).pathname,
-      method: data.req.method,
-      host: data.req.headers.get('host'),
-      userAgent: data.req.headers.get('user-agent'),
-      scheme: data.req.url.split('://')[0],
-      ip: data.req.headers.get('x-forwarded-for'),
-      region: 'geo' in data.req ? (data.req.geo as { region: string }).region ?? '' : '',
-      statusCode: statusCode,
-    },
+    [EVENT]: { request, source: isEdgeRuntime ? 'edge' : 'lambda' },
   };
 
   return [
-    `${data.req.method} ${report.request.path} ${report.request.statusCode} in ${report.request.endTime - report.request.startTime}ms`,
+    `${request.method} ${request.path} ${request.statusCode} in ${request.endTime - request.startTime}ms`,
     report,
   ];
 };
@@ -133,11 +138,20 @@ const getStore = async <T = Request, C extends any = any>({
   if (!store) {
     const newStore = new Map();
     newStore.set('request_id', crypto.randomUUID());
+    newStore.set('source', isEdgeRuntime ? 'edge' : 'lambda');
     return newStore;
   }
   if (typeof store === 'function') {
     return await store(req, ctx);
   }
+
+  // Always add source to the store
+  if (store instanceof Map) {
+    store.set(EVENT, { source: isEdgeRuntime ? 'edge' : 'lambda' });
+  } else {
+    store[EVENT] = { source: isEdgeRuntime ? 'edge' : 'lambda' };
+  }
+
   return store;
 };
 

@@ -4,7 +4,24 @@ import { Version } from './runtime';
 
 const LOG_LEVEL = 'info';
 
-export interface LogEvent {
+/**
+ * Symbol used to specify properties that should be added to the root of the log event
+ * rather than to the fields property.
+ *
+ * @example
+ * const EVENT = Symbol.for('logging.event');
+ * logger.info("User logged in", {
+ *   userId: 123,
+ *   [EVENT]: { traceId: "abc123" }
+ * });
+ */
+export const EVENT = Symbol.for('logging.event');
+
+/**
+ * LogEvent interface representing a log entry.
+ * This interface defines the structure of log events processed by the logger.
+ */
+export interface LogEvent extends Record<string, any> {
   level: string;
   message: string;
   fields: any;
@@ -13,6 +30,12 @@ export interface LogEvent {
     [key: FrameworkIdentifier['name']]: FrameworkIdentifier['version'];
   };
 }
+
+/**
+ * Options that can be passed to log methods.
+ * Following the pattern of popular logging libraries like Pino and Winston.
+ */
+export type LogOptions = Record<string | symbol, any>;
 
 export const LogLevelValue = {
   debug: 0,
@@ -48,6 +71,7 @@ export type LoggerConfig = {
   logLevel?: LogLevel;
   formatters?: Array<Formatter>;
   overrideDefaultFormatters?: boolean;
+  [EVENT]?: Record<string, any>;
 };
 
 export class Logger {
@@ -73,27 +97,145 @@ export class Logger {
   raw(log: any) {
     this.config.transports.forEach((transport) => transport.log([log]));
   }
-  debug = (message: string, args: { [key: string]: any } = {}) => {
-    this.log(LogLevel.debug, message, args);
-  };
-  info = (message: string, args: { [key: string]: any } = {}) => {
-    this.log(LogLevel.info, message, args);
-  };
-  warn = (message: string, args: { [key: string]: any } = {}) => {
-    this.log(LogLevel.warn, message, args);
-  };
-  error = (message: string, args: { [key: string]: any } = {}) => {
-    this.log(LogLevel.error, message, args);
+
+  /**
+   * Log a debug message
+   * @param message The log message
+   * @param options Log options that can include fields and a special ROOT symbol
+   *
+   * @example
+   * // Add fields to the log event
+   * logger.debug("User action", { userId: 123 });
+   *
+   * @example
+   * // Add properties directly to the root of the log event using EVENT symbol
+   * import { EVENT } from '@axiomhq/logging';
+   * logger.debug("Custom debug log", {
+   *   userId: 123,
+   *   [EVENT]: {
+   *     traceId: "abc123",
+   *     _time: "2023-01-01T00:00:00Z"
+   *   }
+   * });
+   */
+  debug = (message: string, options: LogOptions = {}) => {
+    this.log(LogLevel.debug, message, options);
   };
 
-  with = (args: { [key: string]: any }) => {
-    const config = { ...this.config, args: { ...this.config.args, ...args } };
+  /**
+   * Log an info message
+   * @param message The log message
+   * @param options Log options that can include fields and a special ROOT symbol
+   *
+   * @example
+   * // Add fields to the log event
+   * logger.info("User logged in", { userId: 123 });
+   *
+   * @example
+   * // Add properties directly to the root of the log event using EVENT symbol
+   * import { EVENT } from '@axiomhq/logging';
+   * logger.info("Request processed", {
+   *   userId: 123,
+   *   [EVENT]: {
+   *     traceId: "abc123",
+   *     service: "auth-service"
+   *   }
+   * });
+   */
+  info = (message: string, options: LogOptions = {}) => {
+    this.log(LogLevel.info, message, options);
+  };
+
+  /**
+   * Log a warning message
+   * @param message The log message
+   * @param options Log options that can include fields and a special ROOT symbol
+   *
+   * @example
+   * // Add fields to the log event
+   * logger.warn("Rate limit approaching", { requestCount: 950 });
+   *
+   * @example
+   * // Add fields and root-level properties to the warning log
+   * import { EVENT } from '@axiomhq/logging';
+   * logger.warn("Service degradation", {
+   *   component: "database",
+   *   [EVENT]: {
+   *     alertId: "warn-123",
+   *     priority: "medium"
+   *   }
+   * });
+   */
+  warn = (message: string, options: LogOptions = {}) => {
+    this.log(LogLevel.warn, message, options);
+  };
+
+  /**
+   * Log an error message
+   * @param message The log message
+   * @param options Log options that can include fields and a special ROOT symbol
+   *
+   * @example
+   * // Log an error with stack trace
+   * try {
+   *   // some code that throws
+   * } catch (err) {
+   *   logger.error("Operation failed", err);
+   * }
+   *
+   * @example
+   * // Add fields and root-level properties to the error log
+   * import { EVENT } from '@axiomhq/logging';
+   * logger.error("API request failed", {
+   *   statusCode: 500,
+   *   [EVENT]: {
+   *     errorId: "err-123",
+   *     severity: "high"
+   *   }
+   * });
+   */
+  error = (message: string, options: LogOptions | Error = {}) => {
+    this.log(LogLevel.error, message, options);
+  };
+
+  /**
+   * Create a child logger with additional context fields
+   * @param fields Additional context fields to include in all logs from this logger
+   *
+   * @example
+   * // Create a child logger with additional fields
+   * const childLogger = logger.with({ userId: 123 });
+   *
+   * @example
+   * // Create a child logger with fields and root-level properties
+   * import { EVENT } from '@axiomhq/logging';
+   * const childLogger = logger.with({
+   *   userId: 123,
+   *   [EVENT]: {
+   *     traceId: "abc123",
+   *     service: "auth-service"
+   *   }
+   * });
+   */
+  with = (fields: Record<string | symbol, any>) => {
+    const config = { ...this.config };
+
+    // Handle special ROOT symbol for child loggers
+    if (fields[EVENT] && typeof fields[EVENT] === 'object') {
+      // Store root properties separately to be applied directly to log events
+      config[EVENT] = { ...(config[EVENT] || {}), ...fields[EVENT] };
+      delete fields[EVENT];
+    }
+
+    // Handle regular fields
+    config.args = { ...this.config.args, ...fields };
+
     const child = new Logger(config);
     this.children.push(child);
     return child;
   };
 
-  private _transformEvent = (level: LogLevel, message: string, args: { [key: string]: any } = {}) => {
+  private _transformEvent = (level: LogLevel, message: string, options: LogOptions | Error = {}) => {
     const logEvent: LogEvent = {
       level: LogLevel[level].toString(),
       message,
@@ -104,32 +246,65 @@ export class Logger {
       },
     };
 
-    // check if passed args is an object, if its not an object, add it to fields.args
-    if (args instanceof Error) {
-      logEvent.fields = {
-        ...logEvent.fields,
-        message: args.message,
-        stack: args.stack,
-        name: args.name,
-      };
+    // Apply root properties from logger config if present
+    if (this.config[EVENT] && typeof this.config[EVENT] === 'object') {
+      Object.assign(logEvent, this.config[EVENT]);
     }
 
-    if (typeof args === 'object' && args !== null && Object.keys(args).length > 0) {
-      const parsedArgs = JSON.parse(JSON.stringify(args, jsonFriendlyErrorReplacer));
-      logEvent.fields = { ...logEvent.fields, ...parsedArgs };
-    } else if (args && args.length) {
-      logEvent.fields = { ...logEvent.fields, args: args };
+    // Handle Error objects
+    if (options instanceof Error) {
+      logEvent.fields = {
+        ...logEvent.fields,
+        error: {
+          message: options.message,
+          stack: options.stack,
+          name: options.name,
+        },
+      };
+    }
+    // Handle options object
+    else if (typeof options === 'object' && options !== null) {
+      // Extract root properties before JSON serialization (since symbols are lost in JSON.stringify)
+      const rootProps = (options as Record<symbol, any>)[EVENT];
+
+      // Create a copy of options without the ROOT symbol
+      const optionsCopy = { ...options };
+      delete (optionsCopy as any)[EVENT];
+
+      // Process regular fields
+      const parsedOptions = JSON.parse(JSON.stringify(optionsCopy, jsonFriendlyErrorReplacer));
+
+      // Apply root properties directly to the root of logEvent
+      if (rootProps && typeof rootProps === 'object') {
+        Object.assign(logEvent, rootProps);
+      }
+
+      // Any remaining properties in options are treated as fields
+      if (Object.keys(parsedOptions).length > 0) {
+        logEvent.fields = { ...logEvent.fields, ...parsedOptions };
+      }
+    }
+    // Handle array-like values
+    else if (Array.isArray(options)) {
+      logEvent.fields = { ...logEvent.fields, data: options };
     }
 
     if (this.config.formatters && this.config.formatters.length > 0) {
-      logEvent.fields = this.config.formatters.reduce((acc, formatter) => formatter(acc), logEvent.fields);
+      // Apply formatters to the entire logEvent
+      return this.config.formatters.reduce((acc, formatter) => formatter(acc), logEvent);
     }
 
     return logEvent;
   };
 
-  log = (level: LogLevel, message: string, args: { [key: string]: any } = {}) => {
-    this.config.transports.forEach((transport) => transport.log([this._transformEvent(level, message, args)]));
+  /**
+   * Log a message with the specified level
+   * @param level The log level
+   * @param message The log message
+   * @param options Log options or Error object
+   */
+  log = (level: LogLevel, message: string, options: LogOptions | Error = {}) => {
+    this.config.transports.forEach((transport) => transport.log([this._transformEvent(level, message, options)]));
   };
 
   flush = async () => {

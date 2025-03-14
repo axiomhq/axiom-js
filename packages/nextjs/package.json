@@ -35,11 +35,11 @@
     },
     "./client": {
       "import": {
-        "types": "./dist/esm/index.d.ts",
+        "types": "./dist/esm/index.client.d.ts",
         "default": "./dist/esm/index.client.js"
       },
       "require": {
-        "types": "./dist/cjs/index.d.cts",
+        "types": "./dist/cjs/index.client.d.cts",
         "default": "./dist/cjs/index.client.cjs"
       }
     },
