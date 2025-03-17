@@ -3,7 +3,13 @@ import { logger } from '@/lib/axiom/server';
 import Link from 'next/link';
 import { after } from 'next/server';
 
-export default function Home() {
+export default async function Home({ params }: { params: Promise<{ path: string[] }> }) {
+  const path = await params;
+
+  if (path.path.includes('throw')) {
+    throw new Error('Test error');
+  }
+
   logger.info('Hello World!', { key: 'value' });
 
   after(() => {

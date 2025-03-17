@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { NextRequest } from 'next/server';
 import { transformMiddlewareRequest } from '../../src/middleware';
+import { EVENT } from '@axiomhq/logging';
 
 describe('transformMiddlewareRequest', () => {
   it('should transform a basic request correctly', () => {
@@ -18,15 +19,18 @@ describe('transformMiddlewareRequest', () => {
 
     expect(message).toBe('GET /test');
     expect(report).toEqual({
-      request: {
-        ip: '127.0.0.1',
-        region: 'CA',
-        method: 'GET',
-        host: 'example.com',
-        path: '/test',
-        scheme: 'https',
-        referer: 'https://previous-page.com',
-        userAgent: 'Mozilla/5.0',
+      [EVENT]: {
+        request: {
+          ip: '127.0.0.1',
+          region: 'CA',
+          method: 'GET',
+          host: 'example.com',
+          path: '/test',
+          scheme: 'https',
+          referer: 'https://previous-page.com',
+          userAgent: 'Mozilla/5.0',
+        },
+        source: 'middleware',
       },
     });
   });
@@ -40,15 +44,18 @@ describe('transformMiddlewareRequest', () => {
 
     expect(message).toBe('POST /api/data');
     expect(report).toEqual({
-      request: {
-        ip: undefined,
-        region: undefined,
-        method: 'POST',
-        host: 'example.com',
-        path: '/api/data',
-        scheme: 'http',
-        referer: null,
-        userAgent: null,
+      [EVENT]: {
+        request: {
+          ip: undefined,
+          region: undefined,
+          method: 'POST',
+          host: 'example.com',
+          path: '/api/data',
+          scheme: 'http',
+          referer: null,
+          userAgent: null,
+        },
+        source: 'middleware',
       },
     });
   });
@@ -61,7 +68,7 @@ describe('transformMiddlewareRequest', () => {
     const [message, report] = transformMiddlewareRequest(mockRequest);
 
     expect(message).toBe('DELETE /users/123');
-    expect(report.request.method).toBe('DELETE');
-    expect(report.request.path).toBe('/users/123');
+    expect(report[EVENT].request.method).toBe('DELETE');
+    expect(report[EVENT].request.path).toBe('/users/123');
   });
 });

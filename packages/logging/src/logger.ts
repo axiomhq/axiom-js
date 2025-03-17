@@ -1,18 +1,35 @@
+import { defaultFormatters } from 'src/default-formatters';
 import { Transport } from '.';
-import { Version } from './runtime';
+import { Version, isBrowser } from './runtime';
 
 const LOG_LEVEL = 'info';
 
-export interface LogEvent {
+/**
+ * Symbol used to specify properties that should be added to the root of the log event
+ * rather than to the fields property.
+ *
+ * @example
+ * const EVENT = Symbol.for('logging.event');
+ * logger.info("User logged in", {
+ *   userId: 123,
+ *   [EVENT]: { traceId: "abc123" }
+ * });
+ */
+export const EVENT = Symbol.for('logging.event');
+
+/**
+ * LogEvent interface representing a log entry.
+ * This interface defines the structure of log events processed by the logger.
+ */
+export interface LogEvent extends Record<string, any> {
   level: string;
   message: string;
   fields: any;
   _time: string;
   '@app': {
-    'axiom-logging-version': string;
+    [key: FrameworkIdentifier['name']]: FrameworkIdentifier['version'];
   };
 }
-
 export const LogLevelValue = {
   debug: 0,
   info: 1,
@@ -32,11 +49,21 @@ export const LogLevel = {
 export type LogLevelValue = (typeof LogLevelValue)[keyof typeof LogLevelValue];
 export type LogLevel = keyof typeof LogLevelValue;
 
+export type Formatter<T extends Record<string, any> = LogEvent, U extends Record<string, any> = LogEvent> = (
+  logEvent: T,
+) => U;
+
+export type FrameworkIdentifier = {
+  name: `${string}-version`;
+  version: string;
+};
+
 export type LoggerConfig = {
-  args?: { [key: string]: any };
+  args?: Record<string | symbol, any>;
   transports: [Transport, ...Transport[]];
   logLevel?: LogLevel;
-  formatters?: Array<(args: Record<string, any>) => Record<string, any>>;
+  formatters?: Array<Formatter>;
+  overrideDefaultFormatters?: boolean;
 };
 
 export class Logger {
@@ -51,44 +78,121 @@ export class Logger {
     } else if (LOG_LEVEL) {
       this.logLevel = LogLevelValue[LOG_LEVEL as LogLevel];
     }
+
     this.config = { ...initConfig };
+
+    if (!this.config.overrideDefaultFormatters) {
+      this.config.formatters = [...defaultFormatters, ...(this.config.formatters ?? [])];
+    }
   }
 
   raw(log: any) {
     this.config.transports.forEach((transport) => transport.log([log]));
   }
-  debug = (message: string, args: { [key: string]: any } = {}) => {
+
+  /**
+   * Log a debug message
+   * @param message The log message
+   * @param options Log options that can include fields and a special EVENT symbol
+   *
+   * @example
+   * // Add fields to the log event
+   * logger.debug("User action", { userId: 123 });
+   */
+  debug = (message: string, args: Record<string | symbol, any> = {}) => {
     this.log(LogLevel.debug, message, args);
   };
-  info = (message: string, args: { [key: string]: any } = {}) => {
+
+  /**
+   * Log an info message
+   * @param message The log message
+   * @param options Log options that can include fields and a special EVENT symbol
+   *
+   * @example
+   * // Add fields to the log event
+   * logger.info("User logged in", { userId: 123 });
+   */
+  info = (message: string, args: Record<string | symbol, any> = {}) => {
     this.log(LogLevel.info, message, args);
   };
-  warn = (message: string, args: { [key: string]: any } = {}) => {
+
+  /**
+   * Log a warning message
+   * @param message The log message
+   * @param options Log options that can include fields and a special EVENT symbol
+   *
+   * @example
+   * // Add fields to the log event
+   * logger.warn("Rate limit approaching", { requestCount: 950 });
+   */
+  warn = (message: string, args: Record<string | symbol, any> = {}) => {
     this.log(LogLevel.warn, message, args);
   };
-  error = (message: string, args: { [key: string]: any } = {}) => {
+
+  /**
+   * Log an error message
+   * @param message The log message
+   * @param options Log options that can include fields and a special EVENT symbol
+   *
+   * @example
+   * // Log an error with stack trace
+   * try {
+   *   // some code that throws
+   * } catch (err) {
+   *   logger.error("Operation failed", err);
+   * }
+   */
+  error = (message: string, args: Record<string | symbol, any> = {}) => {
     this.log(LogLevel.error, message, args);
   };
 
-  with = (args: { [key: string]: any }) => {
-    const config = { ...this.config, args: { ...this.config.args, ...args } };
-    const child = new Logger(config);
+  /**
+   * Create a child logger with additional context fields
+   * @param fields Additional context fields to include in all logs from this logger
+   *
+   * @example
+   * // Create a child logger with additional fields
+   * const childLogger = logger.with({ userId: 123 });
+   */
+  with = (fields: Record<string | symbol, any>) => {
+    const { [EVENT]: argsEventFields, ...argsRest } = this.config.args ?? {};
+    const { [EVENT]: _eventFields, ...rest } = fields;
+
+    const eventFields = { ...(argsEventFields ?? {}), ...(_eventFields ?? {}) };
+
+    const childConfig = { ...this.config, args: { ...argsRest, ...rest, [EVENT]: eventFields } };
+
+    const child = new Logger(childConfig);
     this.children.push(child);
     return child;
   };
 
-  private _transformEvent = (level: LogLevel, message: string, args: { [key: string]: any } = {}) => {
+  private _transformEvent = (level: LogLevel, message: string, args: Record<string | symbol, any> = {}) => {
+    let rootFields = {};
+    let fields = this.config.args ?? {};
+    if (this.config.args && EVENT in this.config.args) {
+      const { [EVENT]: argsEventFields, ...argsRest } = this.config.args ?? {};
+      rootFields = { ...(argsEventFields ?? {}) };
+      fields = argsRest;
+    }
+
     const logEvent: LogEvent = {
       level: LogLevel[level].toString(),
       message,
       _time: new Date(Date.now()).toISOString(),
-      fields: this.config.args || {},
+      fields: fields,
       '@app': {
         'axiom-logging-version': Version ?? 'unknown',
       },
+      source: isBrowser ? 'browser-log' : 'server-log',
     };
 
-    // check if passed args is an object, if its not an object, add it to fields.args
+    // Apply root properties from logger config if present
+    if (rootFields && typeof rootFields === 'object') {
+      Object.assign(logEvent, rootFields);
+    }
+
+    // Handle Error objects
     if (args instanceof Error) {
       logEvent.fields = {
         ...logEvent.fields,
@@ -98,21 +202,42 @@ export class Logger {
       };
     }
 
-    if (typeof args === 'object' && args !== null && Object.keys(args).length > 0) {
-      const parsedArgs = JSON.parse(JSON.stringify(args, jsonFriendlyErrorReplacer));
-      logEvent.fields = { ...logEvent.fields, ...parsedArgs };
-    } else if (args && args.length) {
+    if (typeof args === 'object' && args !== null) {
+      // Extract root properties before JSON serialization (since symbols are lost in JSON.stringify)
+      const { [EVENT]: rootArgs, ...fieldArgs } = args as Record<string | symbol, any>;
+
+      // Process regular fields
+      const parsedArgs = JSON.parse(JSON.stringify(fieldArgs, jsonFriendlyErrorReplacer));
+
+      // Apply root properties directly to the root of logEvent
+      if (rootArgs && typeof rootArgs === 'object' && rootArgs !== null) {
+        Object.assign(logEvent, rootArgs);
+      }
+
+      // Any remaining properties in options are treated as fields
+      if (Object.keys(parsedArgs).length > 0) {
+        logEvent.fields = { ...logEvent.fields, ...parsedArgs };
+      }
+      // Handle array-like values
+    } else if (Array.isArray(args)) {
       logEvent.fields = { ...logEvent.fields, args: args };
     }
 
     if (this.config.formatters && this.config.formatters.length > 0) {
-      logEvent.fields = this.config.formatters.reduce((acc, formatter) => formatter(acc), logEvent.fields);
+      // Apply formatters to the entire logEvent
+      return this.config.formatters.reduce((acc, formatter) => formatter(acc), logEvent);
     }
 
     return logEvent;
   };
 
-  log = (level: LogLevel, message: string, args: { [key: string]: any } = {}) => {
+  /**
+   * Log a message with the specified level
+   * @param level The log level
+   * @param message The log message
+   * @param options Log options or Error object
+   */
+  log = (level: LogLevel, message: string, args: Record<string | symbol, any> = {}) => {
     this.config.transports.forEach((transport) => transport.log([this._transformEvent(level, message, args)]));
   };
 

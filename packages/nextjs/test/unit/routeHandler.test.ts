@@ -8,7 +8,7 @@ import {
   transformRouteHandlerErrorResult,
 } from '../../src/routeHandler';
 import { mockLogger } from '../lib/mock';
-import { LogLevel } from '@axiomhq/logging';
+import { EVENT, LogLevel } from '@axiomhq/logging';
 import { forbidden, notFound, permanentRedirect, redirect, unauthorized } from 'next/navigation';
 
 describe('routeHandler', () => {
@@ -119,21 +119,23 @@ describe('routeHandler', () => {
       // Check message
       expect(message).toMatch(/GET \/test 200 in \d+ms/);
 
+      const request = report[EVENT].request;
+
       // Check report
-      expect(report.request).toMatchObject({
+      expect(request).toMatchObject({
         ...testReport,
         statusCode: 200,
       });
 
       // Check startTime
-      expect(report.request.startTime).toBeTypeOf('number');
-      expect(new Date(report.request.startTime)).toBeInstanceOf(Date);
-      expect(Number.isNaN(new Date(report.request.startTime).getTime())).toBe(false);
+      expect(request.startTime).toBeTypeOf('number');
+      expect(new Date(request.startTime)).toBeInstanceOf(Date);
+      expect(Number.isNaN(new Date(request.startTime).getTime())).toBe(false);
 
       // Check endTime
-      expect(report.request.endTime).toBeTypeOf('number');
-      expect(new Date(report.request.endTime)).toBeInstanceOf(Date);
-      expect(Number.isNaN(new Date(report.request.endTime).getTime())).toBe(false);
+      expect(request.endTime).toBeTypeOf('number');
+      expect(new Date(request.endTime)).toBeInstanceOf(Date);
+      expect(Number.isNaN(new Date(request.endTime).getTime())).toBe(false);
     });
 
     it('should transform error result correctly', () => {
@@ -150,21 +152,35 @@ describe('routeHandler', () => {
       // Check message
       expect(message).toMatch(/GET \/test 500 in \d+ms/);
 
+      const request = report[EVENT].request;
+
       // Check report
-      expect(report.request).toMatchObject({
+      expect(request).toMatchObject({
         ...testReport,
         statusCode: 500,
       });
 
       // Check startTime
-      expect(report.request.startTime).toBeTypeOf('number');
-      expect(new Date(report.request.startTime)).toBeInstanceOf(Date);
-      expect(Number.isNaN(new Date(report.request.startTime).getTime())).toBe(false);
+      expect(request.startTime).toBeTypeOf('number');
+      expect(new Date(request.startTime)).toBeInstanceOf(Date);
+      expect(Number.isNaN(new Date(request.startTime).getTime())).toBe(false);
 
       // Check endTime
-      expect(report.request.endTime).toBeTypeOf('number');
-      expect(new Date(report.request.endTime)).toBeInstanceOf(Date);
-      expect(Number.isNaN(new Date(report.request.endTime).getTime())).toBe(false);
+      expect(request.endTime).toBeTypeOf('number');
+      expect(new Date(request.endTime)).toBeInstanceOf(Date);
+      expect(Number.isNaN(new Date(request.endTime).getTime())).toBe(false);
+    });
+    it('should always have a source', () => {
+      const mockRes = new NextResponse(null, { status: 200 });
+      const data = {
+        req: mockReq,
+        res: mockRes,
+        start: 1000,
+        end: 1100,
+      };
+      const [_message, report] = transformRouteHandlerSuccessResult(data);
+      expect(report[EVENT].source).toBeDefined();
+      expect(report[EVENT].source).toBe('lambda');
     });
   });
 });

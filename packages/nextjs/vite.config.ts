@@ -2,13 +2,15 @@ import { defineConfig, mergeConfig } from 'vite';
 import { tanstackViteConfig } from '@tanstack/config/vite';
 
 const config = defineConfig({
-  // Framework plugins, vitest config, etc.
+  define: {
+    __PACKAGE_VERSION__: JSON.stringify(process.env.npm_package_version),
+  },
 });
 
 export default mergeConfig(
   config,
   tanstackViteConfig({
-    entry: './src/index.ts',
+    entry: ['./src/index.ts', './src/index.client.ts'],
     srcDir: './src',
   }),
 );
