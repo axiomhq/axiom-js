@@ -1,4 +1,4 @@
-import { Logger, LogEvent, LogLevel, Formatter } from '../../src/logger';
+import { Logger, LogEvent, LogLevel, Formatter, EVENT } from '../../src/logger';
 import { describe, beforeEach, afterEach, it, expect, vi } from 'vitest';
 import { MockTransport } from '../lib/mock';
 
@@ -90,6 +90,19 @@ describe('Logger', () => {
         action: 'login',
       });
     });
+
+    it('should merge multiple with calls with symbols', () => {
+      const childLogger = logger.with({ userId: '123' }).with({ action: 'login', [EVENT]: { foo: 'bar' } });
+
+      childLogger.info('user login');
+
+      expect(mockTransport.logs).toHaveLength(1);
+      expect(mockTransport.logs[0].fields).toEqual({
+        userId: '123',
+        action: 'login',
+      });
+      expect(mockTransport.logs[0]).toContain({ foo: 'bar' });
+    });
   });
 
   describe('error handling', () => {
@@ -144,6 +157,32 @@ describe('Logger', () => {
       await logger.flush();
 
       expect(flushSpy).toHaveBeenCalledTimes(2);
+    });
+  });
+
+  describe('Root fields injection using EVENT symbol', () => {
+    it('should inject root fields into log events', () => {
+      logger.info('user action', { [EVENT]: { userId: '123' } });
+
+      expect(mockTransport.logs).toHaveLength(1);
+      expect(mockTransport.logs[0]).toContain({ userId: '123' });
+    });
+
+    it('should inject root fields into child loggers', () => {
+      const childLogger = logger.with({ userId: '123' });
+      childLogger.info('user action', { [EVENT]: { action: 'login' } });
+
+      expect(mockTransport.logs).toHaveLength(1);
+      expect(mockTransport.logs[0]).toContain({ action: 'login' });
+      expect(mockTransport.logs[0].fields).toEqual({ userId: '123' });
+    });
+
+    it('should handle both root and and normal fields', () => {
+      logger.info('user action', { [EVENT]: { userId: '123' }, userName: 'John Doe' });
+
+      expect(mockTransport.logs).toHaveLength(1);
+      expect(mockTransport.logs[0]).toContain({ userId: '123' });
+      expect(mockTransport.logs[0].fields).toEqual({ userName: 'John Doe' });
     });
   });
 
