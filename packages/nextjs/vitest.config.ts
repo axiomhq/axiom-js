@@ -1,6 +1,7 @@
-import { defineConfig } from 'vitest/config';
+import { defineConfig, mergeConfig } from 'vitest/config';
+import viteConfig from './vite.config';
 
-export default defineConfig(() => ({
+const config = defineConfig({
   test: {
     environment: 'node',
     globals: true,
@@ -9,4 +10,6 @@ export default defineConfig(() => ({
       __NEXT_EXPERIMENTAL_AUTH_INTERRUPTS: 'true', // Allows for forbidden() and unauthorized() to work
     },
   },
-}));
+});
+
+export default mergeConfig(viteConfig, config);

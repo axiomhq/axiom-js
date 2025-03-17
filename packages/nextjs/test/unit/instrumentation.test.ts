@@ -2,6 +2,7 @@ import { transformOnRequestError, createOnRequestError } from '../../src/instrum
 import { describe, expect, it } from 'vitest';
 import { InstrumentationOnRequestError } from 'next/dist/server/instrumentation/types';
 import { mockLogger } from '../lib/mock';
+import { EVENT } from '@axiomhq/logging';
 
 describe('instrumentation', () => {
   const mockRequest: Parameters<InstrumentationOnRequestError>[1] = {
@@ -32,8 +33,11 @@ describe('instrumentation', () => {
         cause: 'Test cause',
         stack: testError.stack,
         digest: 'test-digest',
-        request: mockRequest,
         context: mockContext,
+        [EVENT]: {
+          request: mockRequest,
+          source: 'error.tsx',
+        },
       });
     });
 
@@ -45,8 +49,11 @@ describe('instrumentation', () => {
       expect(message).toBe('GET /test render');
       expect(report).toEqual({
         error: testError,
-        request: mockRequest,
         context: mockContext,
+        [EVENT]: {
+          request: mockRequest,
+          source: 'error.tsx',
+        },
       });
     });
   });
@@ -62,8 +69,11 @@ describe('instrumentation', () => {
         'Test error',
         expect.objectContaining({
           error: 'Error',
-          request: mockRequest,
           context: mockContext,
+          [EVENT]: {
+            request: mockRequest,
+            source: 'error.tsx',
+          },
         }),
       );
       expect(mockLogger.flush).toHaveBeenCalledOnce();
