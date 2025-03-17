@@ -3,7 +3,7 @@ import { NextRequest } from 'next/server';
 
 export const transformMiddlewareRequest = (
   request: NextRequest | Request,
-): [message: string, report: Record<string, any>] => {
+): [message: string, report: Record<string | symbol, any>] => {
   const url = 'nextUrl' in request ? request.nextUrl : new URL(request.url);
 
   const report = {

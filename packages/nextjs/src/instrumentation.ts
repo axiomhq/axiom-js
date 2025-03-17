@@ -3,7 +3,7 @@ import { Instrumentation } from 'next';
 
 export const transformOnRequestError = (
   ...args: Parameters<Instrumentation.onRequestError>
-): [message: string, report: Record<string, any>] => {
+): [message: string, report: Record<string | symbol, any>] => {
   const [error, request, context] = args;
   if (error instanceof Error) {
     return [
@@ -17,7 +17,7 @@ export const transformOnRequestError = (
         context: context,
         [EVENT]: {
           request: request,
-          source: 'error.tsx', // @TODO: discuss source
+          source: 'error.tsx',
         },
       },
     ];
@@ -29,7 +29,7 @@ export const transformOnRequestError = (
       context: context,
       [EVENT]: {
         request: request,
-        source: 'error.tsx', // @TODO: discuss source
+        source: 'error.tsx',
       },
     },
   ];

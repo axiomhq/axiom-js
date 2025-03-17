@@ -16,7 +16,7 @@ export type NextHandler<T = Request, A = any, R extends Response = Response> = (
 
 export const transformRouteHandlerSuccessResult = (
   data: SuccessData,
-): [message: string, report: Record<string, any>] => {
+): [message: string, report: Record<string | symbol, any>] => {
   const request = {
     startTime: new Date().getTime(),
     endTime: new Date().getTime(),
@@ -40,7 +40,9 @@ export const transformRouteHandlerSuccessResult = (
   ];
 };
 
-export const transformRouteHandlerErrorResult = (data: ErrorData): [message: string, report: Record<string, any>] => {
+export const transformRouteHandlerErrorResult = (
+  data: ErrorData,
+): [message: string, report: Record<string | symbol, any>] => {
   const statusCode = data.error instanceof Error ? getNextErrorStatusCode(data.error) : 500;
 
   const request = {
