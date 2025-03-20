@@ -6,14 +6,14 @@ The `@axiomhq/nextjs` package allows you to send data from a Next.js app to Axio
 // lib/axiom/server.ts
 import axiomClient from '@/lib/axiom/axiom';
 import { Logger, ConsoleTransport, AxiomJSTransport } from '@axiomhq/logging';
-import { createAxiomRouteHandler, serverContextFieldsFormatter } from '@axiomhq/nextjs';
+import { createAxiomRouteHandler, nextJsFormatters } from '@axiomhq/nextjs';
 
 export const logger = new Logger({
   transports: [
     new AxiomJSTransport({ axiom: axiomClient, dataset: process.env.NEXT_PUBLIC_AXIOM_DATASET! }),
     new ConsoleTransport({ prettyPrint: true }),
   ],
-  formatters: [serverContextFieldsFormatter],
+  formatters: nextJsFormatters,
 });
 
 export const withAxiom = createAxiomRouteHandler(logger);
