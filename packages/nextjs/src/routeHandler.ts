@@ -7,7 +7,11 @@ import { getRedirectStatus, isRedirectError } from 'src/lib/next-redirect-errors
 import { NextRequest, NextResponse } from 'next/server';
 import { isEdgeRuntime } from 'src/lib/runtime';
 
-const after = next.after;
+/**
+ * If we don't use a constant + access via bracket notation, webpack will throw an error when after is not exported
+ */
+const AFTER = 'after' as const;
+const after = AFTER in next ? next[AFTER] : undefined;
 
 export type NextHandler<T = Request, A = any, R extends Response = Response> = (
   req: T extends Request ? T : Request,

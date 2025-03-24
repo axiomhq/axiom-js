@@ -1,6 +1,6 @@
 {
   "name": "@axiomhq/nextjs",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "author": "Axiom, Inc.",
   "license": "MIT",
   "description": "The official Next.js package for Axiom",
