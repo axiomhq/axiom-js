@@ -5,7 +5,7 @@ import { isEdgeRuntime } from 'src/runtime';
 interface BasePlatform {
   environment?: string;
   region?: string;
-  // source: source, @TODO
+  source?: string;
 }
 
 type VercelLogEvent = LogEvent & {
@@ -42,11 +42,16 @@ export const injectPlatform: Formatter = (logEvent): PlatformLogEvent => {
 
   if (isVercel) {
     const vercelLogEvent = logEvent as VercelLogEvent;
-    vercelLogEvent.vercel.environment = environment;
-    vercelLogEvent.vercel.region = process.env.VERCEL_REGION;
-    vercelLogEvent.vercel.deploymentId = process.env.VERCEL_DEPLOYMENT_ID;
-    vercelLogEvent.vercel.deploymentUrl = process.env.NEXT_PUBLIC_VERCEL_URL;
-    vercelLogEvent.vercel.project = process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL;
+
+    vercelLogEvent.vercel = {
+      environment: process.env.VERCEL_ENV ?? environment,
+      region: process.env.VERCEL_REGION,
+      deploymentId: process.env.VERCEL_DEPLOYMENT_ID,
+      deploymentUrl: process.env.NEXT_PUBLIC_VERCEL_URL,
+      project: process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL,
+      source: logEvent.source,
+    };
+
     vercelLogEvent.git = {
       commit: process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA,
       repo: process.env.NEXT_PUBLIC_VERCEL_GIT_REPO_SLUG,
@@ -59,12 +64,14 @@ export const injectPlatform: Formatter = (logEvent): PlatformLogEvent => {
   if (isNetlify) {
     const netlifyLogEvent = logEvent as NetlifyLogEvent;
     netlifyLogEvent.netlify = {
+      environment: environment,
       region: isEdgeRuntime ? process.env.DENO_REGION : process.env.AWS_REGION,
       siteId: process.env.SITE_ID,
       buildId: process.env.BUILD_ID,
       context: process.env.CONTEXT,
       deploymentUrl: process.env.DEPLOYMENT_URL,
       deploymentId: isEdgeRuntime ? process.env.DENO_DEPLOYMENT_ID : process.env.NETLIFY_DEPLOYMENT_ID,
+      source: logEvent.source,
     };
 
     return netlifyLogEvent;
@@ -74,7 +81,7 @@ export const injectPlatform: Formatter = (logEvent): PlatformLogEvent => {
   genericLogEvent.platform = {
     environment: environment,
     region: region,
-    // source: source, @TODO
+    source: logEvent.source,
   };
 
   return genericLogEvent;
