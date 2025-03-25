@@ -1,11 +1,11 @@
 {
   "$schema": "https://turbo.build/schema.json",
-  "pipeline": {
+  "tasks": {
     "lint": {},
     "format": {},
     "build": {
       "dependsOn": ["^build"],
-      "outputs": ["dist/esm/**", "dist/types/**"]
+      "outputs": ["dist/**"]
     },
     "build:cjs": {
       "dependsOn": ["^build:cjs"],
