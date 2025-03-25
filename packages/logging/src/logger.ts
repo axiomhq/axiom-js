@@ -29,6 +29,7 @@ export interface LogEvent extends Record<string, any> {
   '@app': {
     [key: FrameworkIdentifier['name']]: FrameworkIdentifier['version'];
   };
+  source: string;
 }
 export const LogLevelValue = {
   debug: 0,
