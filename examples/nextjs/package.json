@@ -13,7 +13,7 @@
     "@axiomhq/logging": "workspace:*",
     "@axiomhq/nextjs": "workspace:*",
     "@axiomhq/react": "workspace:*",
-    "next": "15.1.4",
+    "next": "15.3.2",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },
