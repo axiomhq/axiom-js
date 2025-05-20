@@ -64,5 +64,5 @@
     "integration",
     "e2e/*"
   ],
-  "packageManager": "pnpm@10.4.1"
+  "packageManager": "pnpm@10.11.0"
 }

@@ -105,3 +105,6 @@ dist
 .vscode
 .envrc
 .turbo
+
+# Extra IDEs folders
+.idea/
