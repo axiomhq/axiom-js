@@ -1,4 +1,4 @@
-const crypto = globalThis.crypto ?? require('node:crypto').webcrypto;
-const AsyncLocalStorage = globalThis.AsyncLocalStorage ?? require('node:async_hooks').AsyncLocalStorage;
+const AsyncLocalStorage = globalThis.AsyncLocalStorage;
+const crypto = globalThis.crypto;
 
 export { crypto, AsyncLocalStorage };

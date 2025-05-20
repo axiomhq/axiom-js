@@ -1,5 +1,5 @@
 import { vi } from 'vitest';
-
+import { AsyncLocalStorage } from 'node:async_hooks';
 const hoistedMockAfter = vi.hoisted(() => {
   const mockAfter = vi.fn().mockImplementation((task: (() => any) | Promise<any>) => {
     if (task instanceof Promise) {
@@ -23,3 +23,5 @@ vi.mock('next/server', async () => {
     after: hoistedMockAfter.after,
   };
 });
+
+vi.stubGlobal('AsyncLocalStorage', AsyncLocalStorage);
