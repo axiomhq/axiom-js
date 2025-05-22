@@ -1,5 +1,6 @@
 import { vi } from 'vitest';
 import { AsyncLocalStorage } from 'node:async_hooks';
+
 const hoistedMockAfter = vi.hoisted(() => {
   const mockAfter = vi.fn().mockImplementation((task: (() => any) | Promise<any>) => {
     if (task instanceof Promise) {
@@ -23,5 +24,10 @@ vi.mock('next/server', async () => {
     after: hoistedMockAfter.after,
   };
 });
+
+// Adds crypto to globalThis if using Node.js v18
+if (process.version.startsWith('v18')) {
+  vi.stubGlobal('crypto', require('node:crypto'));
+}
 
 vi.stubGlobal('AsyncLocalStorage', AsyncLocalStorage);
