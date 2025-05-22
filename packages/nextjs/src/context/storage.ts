@@ -1,9 +1,8 @@
 import { Formatter } from '@axiomhq/logging';
-import { AsyncLocalStorage } from '../lib/node-utils';
 import { EVENT } from '@axiomhq/logging';
 
 export type ServerContextFields = Map<string | typeof EVENT, any> | Record<string | typeof EVENT, any>;
-export const storage = new AsyncLocalStorage<ServerContextFields | undefined>();
+export const storage = new globalThis.AsyncLocalStorage<ServerContextFields | undefined>();
 
 /**
  * Formatter that adds context fields from the server context to log events.
