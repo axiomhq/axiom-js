@@ -74,7 +74,7 @@ jobs:
             ${{ runner.os }}-turbo-
       - run: pnpm install --frozen-lockfile
       - run: pnpm run build --filter='./packages/*' && pnpm run build:cjs --filter='./packages/*'
-      - run: pnpx pkg-pr-new publish './packages/*'
+      - run: pnpx pkg-pr-new publish --compact --pnpm './packages/*'
 
   check-winston-example:
     name: Check Winston example
