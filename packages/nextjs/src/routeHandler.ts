@@ -1,7 +1,6 @@
 import { EVENT, Logger, LogLevel } from '@axiomhq/logging';
 import * as next from 'next/server';
 import { runWithServerContext, ServerContextFields } from './context';
-import { crypto } from './lib/node-utils';
 import { getAccessFallbackHTTPStatus, isHTTPAccessFallbackError } from 'src/lib/next-http-errors';
 import { getRedirectStatus, isRedirectError } from 'src/lib/next-redirect-errors';
 import { NextRequest, NextResponse } from 'next/server';
@@ -143,7 +142,7 @@ const getStore = async <T = Request, C extends any = any>({
 }) => {
   if (!store) {
     const newStore = new Map();
-    newStore.set('request_id', crypto.randomUUID());
+    newStore.set('request_id', globalThis.crypto.randomUUID());
     newStore.set('source', isEdgeRuntime ? 'edge' : 'lambda');
     return newStore;
   }

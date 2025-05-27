@@ -65,9 +65,10 @@
   ],
   "devDependencies": {
     "@axiomhq/logging": "workspace:*",
+    "@edge-runtime/vm": "^5.0.0",
     "@repo/eslint-config": "workspace:*",
     "@tanstack/config": "^0.16.0",
-    "next": "^15.1.7",
+    "next": "^15.3.2",
     "vite": "^5.2.14",
     "vitest": "^0.34.6"
   },

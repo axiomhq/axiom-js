@@ -1,3 +1,5 @@
+// @vitest-environment edge-runtime
+
 import { describe, it, expect } from 'vitest';
 import { NextRequest } from 'next/server';
 import { transformMiddlewareRequest } from '../../src/middleware';
