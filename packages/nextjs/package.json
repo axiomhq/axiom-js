@@ -69,7 +69,7 @@
     "@repo/eslint-config": "workspace:*",
     "@tanstack/config": "^0.16.0",
     "next": "^15.3.2",
-    "vite": "^5.2.14",
+    "vite": "^6.3.5",
     "vitest": "^0.34.6"
   },
   "peerDependencies": {
