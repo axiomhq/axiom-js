@@ -28,11 +28,5 @@
     "tailwindcss": "^3.4.1",
     "typescript": "^5",
     "vite": "^5.2.14"
-  },
-  "pnpm": {
-    "overrides": {
-      "@types/react": "19.1.5",
-      "@types/react-dom": "19.1.5"
-    }
   }
 }
