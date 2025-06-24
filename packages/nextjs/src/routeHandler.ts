@@ -115,18 +115,18 @@ export const getLogLevelFromStatusCode = (statusCode: number): LogLevel => {
   return LogLevel.error;
 };
 
-export const defaultRouteHandlerOnSuccess = (logger: Logger, data: SuccessData) => {
+export const defaultRouteHandlerOnSuccess = async (logger: Logger, data: SuccessData) => {
   logger.info(...transformRouteHandlerSuccessResult(data));
-  logger.flush();
+  await logger.flush();
 };
 
-const defaultRouteHandlerOnError = (logger: Logger, data: ErrorData) => {
+const defaultRouteHandlerOnError = async (logger: Logger, data: ErrorData) => {
   if (data.error instanceof Error) {
     logger.error(data.error.message, data.error);
   }
   const [message, report] = transformRouteHandlerErrorResult(data);
   logger.log(getLogLevelFromStatusCode(report.statusCsode), message, report);
-  logger.flush();
+  await logger.flush();
 };
 
 const getStore = async <T = Request, C extends any = any>({
