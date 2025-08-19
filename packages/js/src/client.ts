@@ -128,6 +128,7 @@ class BaseClient extends HTTPClient {
           'streaming-duration': options?.streamingDuration as string,
           nocache: options?.noCache as boolean,
           format: options?.format ?? 'legacy',
+          cursor: options?.cursor as string,
         },
         120_000,
       )
@@ -363,6 +364,7 @@ export interface QueryOptions extends QueryOptionsBase {
   startTime?: string;
   endTime?: string;
   format?: 'legacy' | 'tabular';
+  cursor?: string;
 }
 
 export interface QueryLegacy {
