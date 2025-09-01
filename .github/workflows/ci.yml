@@ -19,7 +19,7 @@ env:
   NEXT_PUBLIC_AXIOM_ORG_ID: ${{ secrets.TESTING_STAGING_E2E_ORG_ID }}
   AXIOM_DATASET_SUFFIX: ${{ github.run_id }}
   NODEVERSION: 22.x
-  PNPM_VERSION: 10.4.1
+  PNPM_VERSION: 10.11.0
 
 jobs:
   build:
@@ -28,9 +28,9 @@ jobs:
     strategy:
       matrix:
         node:
-          - 18.x
           - 20.x
           - 22.x
+          - 24.x
     steps:
       - uses: actions/checkout@v5
       - uses: pnpm/action-setup@v4
