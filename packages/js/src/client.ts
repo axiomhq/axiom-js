@@ -44,7 +44,7 @@ class BaseClient extends HTTPClient {
    */
   ingestRaw = async (
     dataset: string,
-    data: string | Buffer | ReadableStream,
+    data: string | Buffer | ReadableStream | BodyInit,
     contentType: ContentType = ContentType.JSON,
     contentEncoding: ContentEncoding = ContentEncoding.Identity,
     options?: IngestOptions,

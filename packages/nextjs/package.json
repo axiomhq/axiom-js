@@ -67,9 +67,9 @@
     "@axiomhq/logging": "workspace:*",
     "@edge-runtime/vm": "^5.0.0",
     "@repo/eslint-config": "workspace:*",
-    "@tanstack/config": "^0.16.0",
+    "@tanstack/config": "^0.20.1",
     "next": "^15.5.2",
-    "vite": "^5.2.14",
+    "vite": "^7.1.4",
     "vitest": "^0.34.6"
   },
   "peerDependencies": {
