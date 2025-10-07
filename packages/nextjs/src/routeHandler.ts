@@ -193,7 +193,7 @@ export const createAxiomRouteHandler = <TRequestCreateRouteHandler = NextRequest
             if (onSuccess) {
               onSuccess(httpData);
             } else {
-              defaultRouteHandlerOnSuccess(logger, httpData);
+              await defaultRouteHandlerOnSuccess(logger, httpData);
             }
           };
           // TODO: this surely can be written better
