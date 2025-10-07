@@ -1,5 +1,5 @@
 import { Formatter, LogEvent } from 'src/logger';
-import { environment, isNetlify, isVercel, region } from 'src/platform';
+import { environment, getEnv, isNetlify, isVercel, region } from 'src/platform';
 import { isEdgeRuntime } from 'src/runtime';
 
 interface BasePlatform {
@@ -44,18 +44,18 @@ export const injectPlatform: Formatter = (logEvent): PlatformLogEvent => {
     const vercelLogEvent = logEvent as VercelLogEvent;
 
     vercelLogEvent.vercel = {
-      environment: process.env.VERCEL_ENV ?? environment,
-      region: process.env.VERCEL_REGION,
-      deploymentId: process.env.VERCEL_DEPLOYMENT_ID,
-      deploymentUrl: process.env.NEXT_PUBLIC_VERCEL_URL,
-      project: process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL,
+      environment: getEnv('VERCEL_ENV') ?? environment,
+      region: getEnv('VERCEL_REGION'),
+      deploymentId: getEnv('VERCEL_DEPLOYMENT_ID'),
+      deploymentUrl: getEnv('NEXT_PUBLIC_VERCEL_URL'),
+      project: getEnv('NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL'),
       source: logEvent.source,
     };
 
     vercelLogEvent.git = {
-      commit: process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA,
-      repo: process.env.NEXT_PUBLIC_VERCEL_GIT_REPO_SLUG,
-      ref: process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_REF,
+      commit: getEnv('NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA'),
+      repo: getEnv('NEXT_PUBLIC_VERCEL_GIT_REPO_SLUG'),
+      ref: getEnv('NEXT_PUBLIC_VERCEL_GIT_COMMIT_REF'),
     };
 
     return vercelLogEvent;
@@ -65,12 +65,12 @@ export const injectPlatform: Formatter = (logEvent): PlatformLogEvent => {
     const netlifyLogEvent = logEvent as NetlifyLogEvent;
     netlifyLogEvent.netlify = {
       environment: environment,
-      region: isEdgeRuntime ? process.env.DENO_REGION : process.env.AWS_REGION,
-      siteId: process.env.SITE_ID,
-      buildId: process.env.BUILD_ID,
-      context: process.env.CONTEXT,
-      deploymentUrl: process.env.DEPLOYMENT_URL,
-      deploymentId: isEdgeRuntime ? process.env.DENO_DEPLOYMENT_ID : process.env.NETLIFY_DEPLOYMENT_ID,
+      region: isEdgeRuntime ? getEnv('DENO_REGION') : getEnv('AWS_REGION'),
+      siteId: getEnv('SITE_ID'),
+      buildId: getEnv('BUILD_ID'),
+      context: getEnv('CONTEXT'),
+      deploymentUrl: getEnv('DEPLOYMENT_URL'),
+      deploymentId: isEdgeRuntime ? getEnv('DENO_DEPLOYMENT_ID') : getEnv('NETLIFY_DEPLOYMENT_ID'),
       source: logEvent.source,
     };
 
