@@ -44,8 +44,8 @@ export class FetchClient {
       const payload = (await resp.json().catch(() => null)) as { message: string } | null;
       if (!payload) {
         const tryText = await resp.text().catch(() => null);
-        if (!tryText) {
-          return Promise.reject(new Error('Unknown error'));
+        if (!tryText || tryText.length === 0) {
+          return Promise.reject(new Error(`Unknown ${resp.status} error`));
         }
         return Promise.reject(new Error(tryText));
       }
