@@ -96,6 +96,9 @@ importers:
       winston:
         specifier: ^3.14.2
         version: 3.14.2
+      zod:
+        specifier: ^4.1.5
+        version: 4.1.12
     devDependencies:
       '@repo/eslint-config':
         specifier: workspace:*
@@ -281,6 +284,9 @@ importers:
 
   packages/js:
     dependencies:
+      '@standard-schema/spec':
+        specifier: ^1.0.0
+        version: 1.0.0
       fetch-retry:
         specifier: ^6.0.0
         version: 6.0.0
@@ -294,6 +300,9 @@ importers:
       msw:
         specifier: ^2.6.2
         version: 2.6.2(@types/node@24.7.0)(typescript@5.9.3)
+      zod:
+        specifier: ^4.1.5
+        version: 4.1.12
 
   packages/logging:
     devDependencies:
@@ -1638,6 +1647,9 @@ packages:
 
   '@sinclair/typebox@0.27.8':
     resolution: {integrity: sha512-+Fj43pSMwJs4KRrH/938Uf+uAELIgVBmQzg/q1YG10djyfA3TnrU8N8XzqCh/okZdszqBQTZf96idMfE5lnwTA==}
+
+  '@standard-schema/spec@1.0.0':
+    resolution: {integrity: sha512-m2bOd0f2RT9k8QJx1JN85cZYyH1RqFBdlwtkSlf4tBDYLCiiZnv1fIIwacK6cqwXavOydf0NPToMQgpKq+dVlA==}
 
   '@stylistic/eslint-plugin-js@2.13.0':
     resolution: {integrity: sha512-GPPDK4+fcbsQD58a3abbng2Dx+jBoxM5cnYjBM4T24WFZRZdlNSKvR19TxP8CPevzMOodQ9QVzNeqWvMXzfJRA==}
@@ -5050,6 +5062,9 @@ packages:
     resolution: {integrity: sha512-cYVsTjKl8b+FrnidjibDWskAv7UKOfcwaVZdp/it9n1s9fU3IkgDbhdIRKCW4JDsAlECJY0ytoVPT3sK6kideA==}
     engines: {node: '>=18'}
 
+  zod@4.1.12:
+    resolution: {integrity: sha512-JInaHOamG8pt5+Ey8kGmdcAcg3OL9reK8ltczgHTAwNhMys/6ThXHityHxVV2p3fkw/c+MAvBHFVYHFZDmjMCQ==}
+
 snapshots:
 
   '@adobe/css-tools@4.4.1': {}
@@ -6097,6 +6112,8 @@ snapshots:
   '@shikijs/vscode-textmate@10.0.1': {}
 
   '@sinclair/typebox@0.27.8': {}
+
+  '@standard-schema/spec@1.0.0': {}
 
   '@stylistic/eslint-plugin-js@2.13.0(eslint@9.37.0(jiti@2.4.2))':
     dependencies:
@@ -10434,3 +10451,5 @@ snapshots:
   yocto-queue@1.0.0: {}
 
   yoctocolors-cjs@2.1.2: {}
+
+  zod@4.1.12: {}

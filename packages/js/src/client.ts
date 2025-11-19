@@ -1,28 +1,61 @@
 import { datasets } from './datasets.js';
 import { users } from './users.js';
 import { Batch, createBatchKey } from './batch.js';
-import HTTPClient, { ClientOptions } from './httpClient.js';
+import HTTPClient, { ClientOptions, InferOutput } from './httpClient.js';
 import { isAxiomPersonalToken } from './token.js';
+import type { StandardSchemaV1 } from '@standard-schema/spec';
 
-class BaseClient extends HTTPClient {
+class BaseClient<TSchema extends StandardSchemaV1 = never> extends HTTPClient {
   datasets: datasets.Service;
   users: users.Service;
   localPath = '/v1';
   onError = console.error;
+  protected schema?: TSchema;
 
-  constructor(options: ClientOptions) {
+  constructor(options: ClientOptions<TSchema>) {
     if (options.token && isAxiomPersonalToken(options.token)) {
       console.warn(
         'Using a personal token (`xapt-...`) is deprecated for security reasons. Please use an API token (`xaat-...`) instead. Support for personal tokens will be removed in a future release.',
       );
     }
 
-    super(options);
-    this.datasets = new datasets.Service(options);
-    this.users = new users.Service(options);
+    const { schema, ...baseOptions } = options;
+    super(baseOptions);
+    this.datasets = new datasets.Service(baseOptions);
+    this.users = new users.Service(baseOptions);
     if (options.onError) {
       this.onError = options.onError;
     }
+    if (schema) {
+      this.schema = schema;
+    }
+  }
+
+  /**
+   * Validates an event against the schema if one is provided.
+   * @param event - event to validate
+   * @returns validated event
+   * @throws error if validation fails
+   */
+  protected async validateEvent(event: unknown): Promise<InferOutput<TSchema>> {
+    if (!this.schema) {
+      return event as InferOutput<TSchema>;
+    }
+
+    const result = await this.schema['~standard'].validate(event);
+
+    if (result.issues) {
+      const errorMessages = result.issues
+        .map((issue) => {
+          const path =
+            issue.path?.map((p) => (typeof p === 'object' && 'key' in p ? p.key : String(p))).join('.') || 'root';
+          return `${path}: ${issue.message}`;
+        })
+        .join(', ');
+      throw new Error(`Schema validation failed: ${errorMessages}`);
+    }
+
+    return ('value' in result ? result.value : event) as InferOutput<TSchema>;
   }
 
   /**
@@ -57,7 +90,7 @@ class BaseClient extends HTTPClient {
             'Content-Type': contentType,
             'Content-Encoding': contentEncoding,
           },
-          body: data,
+          body: data as BodyInit,
         },
         {
           'timestamp-field': options?.timestampField as string,
@@ -198,7 +231,7 @@ class BaseClient extends HTTPClient {
  * @param options - The {@link ClientOptions} to configure authentication
  *
  */
-export class AxiomWithoutBatching extends BaseClient {
+export class AxiomWithoutBatching<TSchema extends StandardSchemaV1 = never> extends BaseClient<TSchema> {
   /**
    * Ingest event(s) asynchronously
    *
@@ -216,10 +249,33 @@ export class AxiomWithoutBatching extends BaseClient {
    * ```
    *
    */
-  async ingest(dataset: string, events: Array<object> | object, options?: IngestOptions): Promise<IngestStatus> {
+  async ingest(
+    dataset: string,
+    events: [TSchema] extends [never] ? object | object[] : InferOutput<TSchema> | InferOutput<TSchema>[],
+    options?: IngestOptions,
+  ): Promise<IngestStatus> {
     const array = Array.isArray(events) ? events : [events];
-    const json = array.map((v) => JSON.stringify(v)).join('\n');
 
+    // Validate events if schema is provided
+    if (this.schema) {
+      try {
+        const validatedEvents = await Promise.all(array.map((event) => this.validateEvent(event)));
+        const json = validatedEvents.map((v) => JSON.stringify(v)).join('\n');
+        return this.ingestRaw(dataset, json, ContentType.NDJSON, ContentEncoding.Identity, options);
+      } catch (err) {
+        this.onError(err as Error);
+        return await Promise.resolve({
+          ingested: 0,
+          failed: array.length,
+          processedBytes: 0,
+          blocksCreated: 0,
+          walLength: 0,
+        });
+      }
+    }
+
+    // No schema validation - use as is
+    const json = array.map((v) => JSON.stringify(v)).join('\n');
     return this.ingestRaw(dataset, json, ContentType.NDJSON, ContentEncoding.Identity, options);
   }
 }
@@ -231,7 +287,7 @@ export class AxiomWithoutBatching extends BaseClient {
  * @param options - The options passed to the client
  *
  */
-export class Axiom extends BaseClient {
+export class Axiom<TSchema extends StandardSchemaV1 = never> extends BaseClient<TSchema> {
   batch: { [id: string]: Batch } = {};
 
   /**
@@ -247,7 +303,38 @@ export class Axiom extends BaseClient {
    * @returns void, as the events are sent in the background
    *
    */
-  ingest = (dataset: string, events: Array<object> | object, options?: IngestOptions) => {
+  ingest = async (
+    dataset: string,
+    events: [TSchema] extends [never] ? object | object[] : InferOutput<TSchema> | InferOutput<TSchema>[],
+    options?: IngestOptions,
+  ) => {
+    // Validate events if schema is provided
+    if (this.schema) {
+      const array = Array.isArray(events) ? events : [events];
+      try {
+        const validatedEvents = await Promise.all(array.map((event) => this.validateEvent(event)));
+        // Continue with validated events
+        const key = createBatchKey(dataset, options);
+        if (!this.batch[key]) {
+          this.batch[key] = new Batch(
+            (dataset, events, options) => {
+              const array = Array.isArray(events) ? events : [events];
+              const json = array.map((v) => JSON.stringify(v)).join('\n');
+              return this.ingestRaw(dataset, json, ContentType.NDJSON, ContentEncoding.Identity, options);
+            },
+            dataset,
+            options,
+          );
+        }
+        // Cast to object array since we know validated events are objects
+        return this.batch[key].ingest(validatedEvents as object[]);
+      } catch (err) {
+        this.onError(err as Error);
+        return;
+      }
+    }
+
+    // No schema validation - use as is
     const key = createBatchKey(dataset, options);
     if (!this.batch[key]) {
       this.batch[key] = new Batch(
@@ -260,7 +347,7 @@ export class Axiom extends BaseClient {
         options,
       );
     }
-    return this.batch[key].ingest(events);
+    return this.batch[key].ingest(events as object | object[]);
   };
 
   /**

@@ -1,7 +1,11 @@
 import { FetchClient } from "./fetchClient.js";
+import type { StandardSchemaV1 } from '@standard-schema/spec';
 
 const Version = "AXIOM_VERSION";
 const AxiomURL = "https://api.axiom.co";
+
+// Helper type to infer the output type from a StandardSchemaV1
+type InferOutput<TSchema> = TSchema extends StandardSchemaV1<infer TOutput> ? TOutput : never;
 
 /**
  * ClientOptions is used to configure the HTTPClient and provide the necessary
@@ -15,7 +19,7 @@ const AxiomURL = "https://api.axiom.co";
  * })
  * ```
  */
-export interface ClientOptions {
+export interface ClientOptions<TSchema extends StandardSchemaV1 = never> {
   /**
    * an API or personal token to use for authentication, you can get one
    * from @{link: Axiom settings | https://app.axiom.co/api-tokens}.
@@ -32,7 +36,30 @@ export interface ClientOptions {
    */
   url?: string;
   onError?: (error: Error) => void;
+  /**
+   * optional schema for validating ingested events. Supports standard-schema compatible
+   * validators like Zod, Valibot, ArkType, etc.
+   * 
+   * @example
+   * ```
+   * import { z } from 'zod';
+   * 
+   * const LogSchema = z.object({
+   *   level: z.string(),
+   *   message: z.string(),
+   *   userId: z.string().optional()
+   * });
+   * 
+   * const axiom = new Axiom({
+   *   token: "my-token",
+   *   schema: LogSchema
+   * });
+   * ```
+   */
+  schema?: TSchema;
 }
+
+export type { InferOutput };
 
 export default abstract class HTTPClient {
   protected readonly client: FetchClient;
