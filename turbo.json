@@ -1,14 +1,5 @@
 {
-  "$schema": "https://turbo.build/schema.json",
-  "globalPassThroughEnv": [
-    "AXIOM_TOKEN",
-    "AXIOM_URL",
-    "AXIOM_ORG_ID",
-    "NEXT_PUBLIC_AXIOM_TOKEN",
-    "NEXT_PUBLIC_AXIOM_URL",
-    "NEXT_PUBLIC_AXIOM_ORG_ID",
-    "AXIOM_DATASET_SUFFIX"
-  ],
+  "$schema": "https://turborepo.com/schema.json",
   "tasks": {
     "lint": {},
     "format": {},
@@ -24,10 +15,18 @@
       "dependsOn": ["^build", "^build:cjs"]
     },
     "integration": {
+      "env": ["AXIOM_TOKEN", "AXIOM_URL", "AXIOM_ORG_ID", "AXIOM_DATASET_SUFFIX"],
       "dependsOn": ["^build", "^build:cjs"]
     },
     "e2e": {
-      "dependsOn": ["^build"]
+      "dependsOn": ["^build"],
+      "env": [
+        "NEXT_PUBLIC_AXIOM_TOKEN",
+        "NEXT_PUBLIC_AXIOM_URL",
+        "NEXT_PUBLIC_AXIOM_ORG_ID",
+        "AXIOM_DATASET_SUFFIX",
+        "TESTING_TARGET_URL"
+      ]
     },
     "dev": {
       "cache": false,
