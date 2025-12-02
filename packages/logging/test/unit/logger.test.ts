@@ -101,7 +101,7 @@ describe('Logger', () => {
         userId: '123',
         action: 'login',
       });
-      expect(mockTransport.logs[0]).toContain({ foo: 'bar' });
+      expect(mockTransport.logs[0]).toMatchObject({ foo: 'bar' });
     });
   });
 
@@ -165,7 +165,7 @@ describe('Logger', () => {
       logger.info('user action', { [EVENT]: { userId: '123' } });
 
       expect(mockTransport.logs).toHaveLength(1);
-      expect(mockTransport.logs[0]).toContain({ userId: '123' });
+      expect(mockTransport.logs[0]).toMatchObject({ userId: '123' });
     });
 
     it('should inject root fields into child loggers', () => {
@@ -173,7 +173,7 @@ describe('Logger', () => {
       childLogger.info('user action', { [EVENT]: { action: 'login' } });
 
       expect(mockTransport.logs).toHaveLength(1);
-      expect(mockTransport.logs[0]).toContain({ action: 'login' });
+      expect(mockTransport.logs[0]).toMatchObject({ action: 'login' });
       expect(mockTransport.logs[0].fields).toEqual({ userId: '123' });
     });
 
@@ -181,7 +181,7 @@ describe('Logger', () => {
       logger.info('user action', { [EVENT]: { userId: '123' }, userName: 'John Doe' });
 
       expect(mockTransport.logs).toHaveLength(1);
-      expect(mockTransport.logs[0]).toContain({ userId: '123' });
+      expect(mockTransport.logs[0]).toMatchObject({ userId: '123' });
       expect(mockTransport.logs[0].fields).toEqual({ userName: 'John Doe' });
     });
   });
@@ -196,6 +196,7 @@ describe('Logger', () => {
         '@app': {
           'axiom-logging-version': 'test',
         },
+        source: 'test',
       };
 
       logger.raw(rawEvent);
