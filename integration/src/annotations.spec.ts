@@ -4,7 +4,7 @@ import { datasets, annotations } from '@axiomhq/js';
 const datasetSuffix = process.env.AXIOM_DATASET_SUFFIX || 'local';
 
 describe('AnnotationsService', () => {
-  const datasetName = `test-axiom-js-datasets-${datasetSuffix}`;
+  const datasetName = `test-axiom-js-annotations-${datasetSuffix}`;
   const datasetsClient = new datasets.Service({
     token: process.env.AXIOM_TOKEN || '',
     url: process.env.AXIOM_URL,
