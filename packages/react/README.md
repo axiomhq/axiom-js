@@ -23,6 +23,10 @@ const WebVitals = createWebVitalsComponent(logger);
 export { useLogger, WebVitals };
 ```
 
+## Requirements
+
+Node.js 20 or higher is required. Node.js 18 is no longer supported.
+
 ## Install
 
 ```bash

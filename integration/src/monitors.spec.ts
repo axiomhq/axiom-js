@@ -4,15 +4,17 @@ import { monitors, datasets } from '@axiomhq/js';
 const datasetSuffix = process.env.AXIOM_DATASET_SUFFIX || 'local';
 
 describe('MonitorsService', () => {
-  const datasetName = `test-axiom-js-datasets-${datasetSuffix}`;
+  const datasetName = `test-axiom-js-monitors-${datasetSuffix}`;
   const datasetsClient = new datasets.Service({
     token: process.env.AXIOM_TOKEN || '',
     url: process.env.AXIOM_URL,
     orgId: process.env.AXIOM_ORG_ID,
   });
+
   const client = new monitors.Service({
     token: process.env.AXIOM_TOKEN || '',
     orgId: process.env.AXIOM_ORG_ID,
+    url: process.env.AXIOM_URL,
   });
 
   let monitorId = '';

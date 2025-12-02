@@ -21,8 +21,8 @@ export const transformRouteHandlerSuccessResult = (
   data: SuccessData,
 ): [message: string, report: Record<string | symbol, any>] => {
   const request = {
-    startTime: new Date().getTime(),
-    endTime: new Date().getTime(),
+    startTime: data.start,
+    endTime: data.end,
     path: 'nextUrl' in data.req ? (data.req.nextUrl as URL).pathname : new URL(data.req.url).pathname,
     method: data.req.method,
     host: data.req.headers.get('host'),
@@ -49,8 +49,8 @@ export const transformRouteHandlerErrorResult = (
   const statusCode = data.error instanceof Error ? getNextErrorStatusCode(data.error) : 500;
 
   const request = {
-    startTime: new Date().getTime(),
-    endTime: new Date().getTime(),
+    startTime: data.start,
+    endTime: data.end,
     path: 'nextUrl' in data.req ? (data.req.nextUrl as URL).pathname : new URL(data.req.url).pathname,
     method: data.req.method,
     host: data.req.headers.get('host'),
@@ -193,7 +193,7 @@ export const createAxiomRouteHandler = <TRequestCreateRouteHandler = NextRequest
             if (onSuccess) {
               onSuccess(httpData);
             } else {
-              defaultRouteHandlerOnSuccess(logger, httpData);
+              await defaultRouteHandlerOnSuccess(logger, httpData);
             }
           };
           // TODO: this surely can be written better

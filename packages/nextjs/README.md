@@ -29,6 +29,10 @@ export const GET = withAxiom(async () => {
 });
 ```
 
+## Requirements
+
+Node.js 20 or higher is required. Node.js 18 is no longer supported.
+
 ## Install
 
 ```bash

@@ -22,7 +22,7 @@
     "url": "git+https://github.com/axiomhq/axiom-js.git"
   },
   "engines": {
-    "node": ">=16"
+    "node": ">=20"
   },
   "keywords": [
     "pino",

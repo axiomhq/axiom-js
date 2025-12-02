@@ -1,6 +1,6 @@
 {
   "name": "@axiomhq/nextjs",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "author": "Axiom, Inc.",
   "license": "MIT",
   "description": "The official Next.js package for Axiom",
@@ -20,6 +20,9 @@
     "url": "https://github.com/axiomhq/axiom-js/issues"
   },
   "homepage": "https://github.com/axiomhq/axiom-js/blob/main/packages/nextjs/README.md",
+  "engines": {
+    "node": ">=20"
+  },
   "module": "dist/esm/index.js",
   "types": "dist/esm/index.d.ts",
   "exports": {
@@ -69,7 +72,7 @@
     "@repo/eslint-config": "workspace:*",
     "@tanstack/config": "^0.16.0",
     "next": "^15.5.2",
-    "vite": "^5.2.14",
+    "vite": "^7.2.6",
     "vitest": "^0.34.6"
   },
   "peerDependencies": {
