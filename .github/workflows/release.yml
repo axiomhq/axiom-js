@@ -5,6 +5,8 @@ on: workflow_dispatch
 env:
   NODEVERSION: 20.x
   PNPM_VERSION: 10.4.1
+  TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+  TURBO_TEAM: ${{ vars.TURBO_TEAM }}
 
 jobs:
   publish:
@@ -22,6 +24,6 @@ jobs:
           cache: 'pnpm'
       - run: pnpm install --frozen-lockfile
       - run: pnpm build && pnpm build:cjs
-      - run: pnpm publish --access public --filter "./packages/**"
+      - run: pnpm publish --access public --filter "./packages/**" --no-git-checks
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTOMATION_TOKEN }}
