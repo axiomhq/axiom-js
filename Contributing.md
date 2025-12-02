@@ -10,6 +10,10 @@ Bugs, feature requests, and development-related questions should be directed to 
 
 When reporting a bug, please try and provide as much context as possible such as your operating system, NodeJS version and anything else that might be relevant to the bug. For feature requests, please explain what you're trying to do and how the requested feature would help you do that.
 
+## Requirements
+
+Node.js 20 or higher is required. Node.js 18 is no longer supported.
+
 ## Setup
 
 [Fork](https://github.com/axiomhq/axiom-js), then clone this repository:

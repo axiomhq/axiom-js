@@ -10,7 +10,7 @@
     "Arne Bahlo <arne@axiom.co>"
   ],
   "engines": {
-    "node": ">=16"
+    "node": ">=20"
   },
   "type": "module",
   "types": "dist/esm/types/index.d.ts",

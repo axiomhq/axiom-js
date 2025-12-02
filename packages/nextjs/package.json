@@ -20,6 +20,9 @@
     "url": "https://github.com/axiomhq/axiom-js/issues"
   },
   "homepage": "https://github.com/axiomhq/axiom-js/blob/main/packages/nextjs/README.md",
+  "engines": {
+    "node": ">=20"
+  },
   "module": "dist/esm/index.js",
   "types": "dist/esm/index.d.ts",
   "exports": {

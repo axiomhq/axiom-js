@@ -48,6 +48,9 @@
     "logging"
   ],
   "homepage": "https://github.com/axiomhq/axiom-js/blob/main/packages/logging/README.md",
+  "engines": {
+    "node": ">=20"
+  },
   "bugs": {
     "url": "https://github.com/axiomhq/axiom-js/issues"
   },
