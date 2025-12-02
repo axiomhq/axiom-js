@@ -1,5 +1,13 @@
 {
   "$schema": "https://turbo.build/schema.json",
+  "globalPassThroughEnv": [
+    "AXIOM_TOKEN",
+    "AXIOM_URL",
+    "AXIOM_ORG_ID",
+    "NEXT_PUBLIC_AXIOM_TOKEN",
+    "NEXT_PUBLIC_AXIOM_URL",
+    "NEXT_PUBLIC_AXIOM_ORG_ID"
+  ],
   "tasks": {
     "lint": {},
     "format": {},
