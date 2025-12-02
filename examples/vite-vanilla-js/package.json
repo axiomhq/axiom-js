@@ -9,7 +9,7 @@
     "preview": "vite preview"
   },
   "devDependencies": {
-    "vite": "^5.4.21"
+    "vite": "^7.2.6"
   },
   "dependencies": {
     "@axiomhq/logging": "workspace:^"

@@ -9,6 +9,10 @@ This is a monorepo consisting of the following projects:
 * [`@axiomhq/winston`](./packages/winston): A [winston](https://github.com/winstonjs/winston) transport which sends logs to Axiom.
 * [`@axiomhq/pino`](./packages/pino): A [pino](https://github.com/pinojs/pino) transport which sends logs to Axiom.
 
+## Requirements
+
+Node.js 20 or higher is required. Node.js 18 is no longer supported.
+
 ## License
 
 Distributed under the [MIT License](LICENSE).

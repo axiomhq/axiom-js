@@ -30,7 +30,6 @@ jobs:
     strategy:
       matrix:
         node:
-          - 18.x
           - 20.x
           - 22.x
     steps:
@@ -41,7 +40,7 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: ${{ matrix.node }}
-          cache: "pnpm"
+          cache: 'pnpm'
       - name: Cache turbo build setup
         uses: actions/cache@v4
         with:
@@ -66,7 +65,7 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: 20.x
-          cache: "pnpm"
+          cache: 'pnpm'
       - name: Cache turbo build setup
         uses: actions/cache@v4
         with:
@@ -84,8 +83,8 @@ jobs:
     strategy:
       matrix:
         node:
-          - 18.x
           - 20.x
+          - 22.x
     steps:
       - uses: actions/checkout@v6
       - uses: pnpm/action-setup@v4
@@ -94,7 +93,7 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: ${{ matrix.node }}
-          cache: "pnpm"
+          cache: 'pnpm'
       - run: pnpm install --frozen-lockfile
       - run: pnpm build && pnpm build:cjs
       - run: cd examples/winston && pnpm example
@@ -107,8 +106,8 @@ jobs:
     strategy:
       matrix:
         node:
-          - 18.x
           - 20.x
+          - 22.x
       max-parallel: 1
       fail-fast: false
     steps:
@@ -119,7 +118,7 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: ${{ matrix.node }}
-          cache: "pnpm"
+          cache: 'pnpm'
       - name: Cache turbo build setup
         uses: actions/cache@v4
         with:
@@ -176,7 +175,7 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: ${{ matrix.node }}
-          cache: "pnpm"
+          cache: 'pnpm'
       - name: Cache turbo build setup
         uses: actions/cache@v4
         with:
