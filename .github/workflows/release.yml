@@ -5,6 +5,8 @@ on: workflow_dispatch
 env:
   NODEVERSION: 20.x
   PNPM_VERSION: 10.4.1
+  TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+  TURBO_TEAM: ${{ vars.TURBO_TEAM }}
 
 jobs:
   publish:
