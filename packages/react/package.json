@@ -71,8 +71,8 @@
     "@types/react-dom": "^19.1.5",
     "@vitejs/plugin-react": "^4.3.4",
     "happy-dom": "^20.0.10",
-    "react": "^19.1.0",
-    "react-dom": "^19.1.0",
+    "react": "^19.1.4",
+    "react-dom": "^19.1.4",
     "vite": "^7.2.6",
     "vitest": "^4.0.14"
   },
