@@ -71,12 +71,12 @@
     "@edge-runtime/vm": "^5.0.0",
     "@repo/eslint-config": "workspace:*",
     "@tanstack/config": "^0.16.0",
-    "next": "^15.5.9",
+    "next": "^16.1.0",
     "vite": "^7.2.6",
     "vitest": "^4.0.14"
   },
   "peerDependencies": {
     "@axiomhq/logging": "workspace:*",
-    "next": "^15 || ^14 || ^13"
+    "next": "^16 || ^15 || ^14 || ^13"
   }
 }
