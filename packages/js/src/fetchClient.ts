@@ -39,7 +39,7 @@ export class FetchClient {
 
       return Promise.reject(new AxiomTooManyRequestsError(limit));
     } else if (resp.status === 401) {
-      return Promise.reject(new Error("Forbidden"));
+      return Promise.reject(new Error("forbidden"));
     } else if (resp.status >= 400) {
       const payload = (await resp.json()) as { message: string };
       return Promise.reject(new Error(payload.message));
