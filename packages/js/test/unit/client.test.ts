@@ -204,7 +204,7 @@ describe('Axiom', () => {
       mockFetchResponse({}, 401);
       // global.fetch = mockFetchResponse([{ name: 'test' }], 200);
 
-      await expect(axiom.datasets.list).rejects.toThrow(new Error('Forbidden'));
+      await expect(axiom.datasets.list).rejects.toThrow(new Error('forbidden'));
 
       // create another request to ensure that
       // the fetch mock was not consumed before
