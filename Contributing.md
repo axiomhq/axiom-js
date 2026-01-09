@@ -26,7 +26,7 @@ cd axiom-js
 ### Install development dependencies
 
 ```
-npm install
+pnpm install
 ```
 
 ## Submitting Modifications
@@ -38,15 +38,16 @@ npm install
 3. Make sure that the tests and the linters pass by running:
 
 ```
-npm run test
-npm run lint
+pnpm build
+pnpm test
+pnpm lint
 ```
 
-4. Do your best to have [well-formated](https://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html) commit messages for each change. This provides consistency throughout the project and ensures that commit messages are able to be formatted properly by various git tools.
+1. Do your best to have [well-formated](https://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html) commit messages for each change. This provides consistency throughout the project and ensures that commit messages are able to be formatted properly by various git tools.
 
-5. Finally, push the commits to your fork and submit a [pull request](https://docs.github.com/en/github/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request-from-a-fork)
+2. Finally, push the commits to your fork and submit a [pull request](https://docs.github.com/en/github/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request-from-a-fork)
 
-## Once you've filed the PR:
+## Once you've filed the PR
 
 - One or more maintainers will use GitHub's review feature to review your PR.
 - If the maintainer asks for any changes, edit your changes, push, and ask for another review.
