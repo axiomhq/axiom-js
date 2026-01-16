@@ -20,7 +20,7 @@ const AxiomURL = "https://api.axiom.co";
  * // Using a regional edge endpoint for lower latency ingestion
  * const axiom = new Axiom({
  *     token: "my-token",
- *     region: "eu-central-1.aws.edge.axiom.co",
+ *     edgeRegion: "eu-central-1.aws.edge.axiom.co",
  * })
  * ```
  */
@@ -36,59 +36,47 @@ export interface ClientOptions {
    */
   orgId?: string;
   /**
-   * the URL of the Axiom API, defaults to https://api.axiom.co. You should not
-   * need to change this unless your organization uses a specific region or a self-hosted version of Axiom.
+   * URI of the Axiom endpoint to send data to.
    *
-   * If a path is provided, the URL is used as-is for ingest.
+   * If a path is provided, the URL is used as-is.
    * If no path (or only `/`) is provided, `/v1/datasets/{dataset}/ingest` is appended for backwards compatibility.
-   * Cannot be used together with `region`.
+   * This takes precedence over `edgeRegion` if both are set (but both should not be set).
+   *
+   * @example "https://api.eu.axiom.co"
+   * @example "http://localhost:3400/ingest"
    */
   url?: string;
   /**
    * The Axiom regional edge domain to use for ingestion.
    *
    * Specify the domain name only (no scheme, no path).
-   * When set, data is sent to `https://{region}/v1/ingest/{dataset}`.
+   * When set, data is sent to `https://{edgeRegion}/v1/ingest/{dataset}`.
    * Cannot be used together with `url`.
    *
    * @example "mumbai.axiom.co"
    * @example "eu-central-1.aws.edge.axiom.co"
    */
-  region?: string;
-  /**
-   * The base URL of the Axiom edge endpoint for ingest and query operations.
-   *
-   * When set, this URL is used for ingest (`{edgeUrl}/ingest/{dataset}`) and
-   * query (`{edgeUrl}/query`) operations.
-   * Cannot be used together with `url` or `region`.
-   *
-   * @example "https://eu-central-1.aws.edge.axiom.co/v1"
-   */
-  edgeUrl?: string;
+  edgeRegion?: string;
   onError?: (error: Error) => void;
 }
 
 /**
  * Resolves the ingest endpoint URL based on the client options.
  *
- * Priority: edgeUrl > url > region > default cloud endpoint
+ * Priority: url > edgeRegion > default cloud endpoint
  *
  * @param options - The client options
  * @param dataset - The dataset name to ingest into
  * @returns The full URL to use for ingestion
  */
-export function resolveIngestUrl(options: Pick<ClientOptions, 'url' | 'region' | 'edgeUrl'>, dataset: string): string {
-  // If edgeUrl is set, use edge ingest path format
-  if (options.edgeUrl) {
-    const edgeUrl = options.edgeUrl.replace(/\/+$/, ''); // trim trailing slashes
-    return `${edgeUrl}/ingest/${dataset}`;
-  }
-
+export function resolveIngestUrl(options: Pick<ClientOptions, 'url' | 'edgeRegion'>, dataset: string): string {
   // If url is set, check if it has a path
   if (options.url) {
     const url = options.url.replace(/\/+$/, ''); // trim trailing slashes
 
     // Parse URL to check if path is provided
+    // If path is empty or just "/", append the legacy format for backwards compatibility
+    // Otherwise, use the URL as-is
     try {
       const parsed = new URL(url);
       const path = parsed.pathname;
@@ -106,10 +94,10 @@ export function resolveIngestUrl(options: Pick<ClientOptions, 'url' | 'region' |
     }
   }
 
-  // If region is set, build the regional edge endpoint
-  if (options.region) {
-    const region = options.region.replace(/\/+$/, ''); // trim trailing slashes
-    return `https://${region}/v1/ingest/${dataset}`;
+  // If edgeRegion is set, build the regional edge endpoint
+  if (options.edgeRegion) {
+    const edgeRegion = options.edgeRegion.replace(/\/+$/, ''); // trim trailing slashes
+    return `https://${edgeRegion}/v1/ingest/${dataset}`;
   }
 
   // Default: use cloud endpoint with legacy path format
@@ -117,18 +105,12 @@ export function resolveIngestUrl(options: Pick<ClientOptions, 'url' | 'region' |
 }
 
 /**
- * Validates that only one of url, region, or edgeUrl is set.
- * @throws Error if multiple endpoint options are set
+ * Validates that url and edgeRegion are not both set.
+ * @throws Error if both url and edgeRegion are set
  */
-export function validateUrlOrRegion(options: Pick<ClientOptions, 'url' | 'region' | 'edgeUrl'>): void {
-  const setOptions = [
-    options.url && 'url',
-    options.region && 'region',
-    options.edgeUrl && 'edgeUrl',
-  ].filter(Boolean);
-
-  if (setOptions.length > 1) {
-    throw new Error(`Cannot set multiple endpoint options (${setOptions.join(', ')}). Please use only one.`);
+export function validateUrlOrRegion(options: Pick<ClientOptions, 'url' | 'edgeRegion'>): void {
+  if (options.url && options.edgeRegion) {
+    throw new Error('Cannot set both `url` and `edgeRegion`. Please use only one.');
   }
 }
 
@@ -137,20 +119,20 @@ export default abstract class HTTPClient {
   protected readonly clientOptions: ClientOptions;
 
   constructor(options: ClientOptions) {
-    const { orgId = "", token, url, region, edgeUrl } = options;
+    const { orgId = "", token, url, edgeRegion } = options;
 
     if (!token) {
       console.warn("Missing Axiom token");
     }
 
-    // Validate that only one endpoint option is set
-    validateUrlOrRegion({ url, region, edgeUrl });
+    // Validate that url and edgeRegion are not both set
+    validateUrlOrRegion({ url, edgeRegion });
 
     // Store options for use in ingest URL resolution
     this.clientOptions = options;
 
-    // For the main API client, always use url or default (never region)
-    // Region only affects ingest endpoints, not other API calls
+    // For the main API client, always use url or default (never edgeRegion)
+    // edgeRegion only affects ingest endpoints, not other API calls
     const baseUrl = url ? url.replace(/\/+$/, '') : AxiomURL;
 
     const headers: HeadersInit = {
