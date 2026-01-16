@@ -56,32 +56,32 @@ export interface ClientOptions {
    */
   region?: string;
   /**
-   * The full URL of the Axiom edge ingest endpoint.
+   * The base URL of the Axiom edge endpoint for ingest and query operations.
    *
-   * When set, this URL is used directly for ingestion (with `/{dataset}` appended).
-   * Use this for explicit control over the edge endpoint.
+   * When set, this URL is used for ingest (`{edgeUrl}/ingest/{dataset}`) and
+   * query (`{edgeUrl}/query`) operations.
    * Cannot be used together with `url` or `region`.
    *
-   * @example "https://eu-central-1.aws.edge.axiom.co/v1/ingest"
+   * @example "https://eu-central-1.aws.edge.axiom.co/v1"
    */
-  ingestUrl?: string;
+  edgeUrl?: string;
   onError?: (error: Error) => void;
 }
 
 /**
  * Resolves the ingest endpoint URL based on the client options.
  *
- * Priority: ingestUrl > url > region > default cloud endpoint
+ * Priority: edgeUrl > url > region > default cloud endpoint
  *
  * @param options - The client options
  * @param dataset - The dataset name to ingest into
  * @returns The full URL to use for ingestion
  */
-export function resolveIngestUrl(options: Pick<ClientOptions, 'url' | 'region' | 'ingestUrl'>, dataset: string): string {
-  // If ingestUrl is set, use it directly with dataset appended
-  if (options.ingestUrl) {
-    const ingestUrl = options.ingestUrl.replace(/\/+$/, ''); // trim trailing slashes
-    return `${ingestUrl}/${dataset}`;
+export function resolveIngestUrl(options: Pick<ClientOptions, 'url' | 'region' | 'edgeUrl'>, dataset: string): string {
+  // If edgeUrl is set, use edge ingest path format
+  if (options.edgeUrl) {
+    const edgeUrl = options.edgeUrl.replace(/\/+$/, ''); // trim trailing slashes
+    return `${edgeUrl}/ingest/${dataset}`;
   }
 
   // If url is set, check if it has a path
@@ -117,14 +117,14 @@ export function resolveIngestUrl(options: Pick<ClientOptions, 'url' | 'region' |
 }
 
 /**
- * Validates that only one of url, region, or ingestUrl is set.
+ * Validates that only one of url, region, or edgeUrl is set.
  * @throws Error if multiple endpoint options are set
  */
-export function validateUrlOrRegion(options: Pick<ClientOptions, 'url' | 'region' | 'ingestUrl'>): void {
+export function validateUrlOrRegion(options: Pick<ClientOptions, 'url' | 'region' | 'edgeUrl'>): void {
   const setOptions = [
     options.url && 'url',
     options.region && 'region',
-    options.ingestUrl && 'ingestUrl',
+    options.edgeUrl && 'edgeUrl',
   ].filter(Boolean);
 
   if (setOptions.length > 1) {
@@ -137,14 +137,14 @@ export default abstract class HTTPClient {
   protected readonly clientOptions: ClientOptions;
 
   constructor(options: ClientOptions) {
-    const { orgId = "", token, url, region, ingestUrl } = options;
+    const { orgId = "", token, url, region, edgeUrl } = options;
 
     if (!token) {
       console.warn("Missing Axiom token");
     }
 
     // Validate that only one endpoint option is set
-    validateUrlOrRegion({ url, region, ingestUrl });
+    validateUrlOrRegion({ url, region, edgeUrl });
 
     // Store options for use in ingest URL resolution
     this.clientOptions = options;

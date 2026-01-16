@@ -64,35 +64,35 @@ describe('resolveIngestUrl', () => {
     });
   });
 
-  describe('ingestUrl configuration', () => {
-    it('appends dataset to ingestUrl', () => {
-      const url = resolveIngestUrl({ ingestUrl: 'https://eu-central-1.aws.edge.axiom.co/v1/ingest' }, 'my-dataset');
+  describe('edgeUrl configuration', () => {
+    it('builds edge ingest URL with edgeUrl base', () => {
+      const url = resolveIngestUrl({ edgeUrl: 'https://eu-central-1.aws.edge.axiom.co/v1' }, 'my-dataset');
       expect(url).toBe('https://eu-central-1.aws.edge.axiom.co/v1/ingest/my-dataset');
     });
 
-    it('trims trailing slashes from ingestUrl', () => {
-      const url = resolveIngestUrl({ ingestUrl: 'https://edge.axiom.co/v1/ingest/' }, 'test');
+    it('trims trailing slashes from edgeUrl', () => {
+      const url = resolveIngestUrl({ edgeUrl: 'https://edge.axiom.co/v1/' }, 'test');
       expect(url).toBe('https://edge.axiom.co/v1/ingest/test');
     });
 
     it('works with custom edge endpoints', () => {
-      const url = resolveIngestUrl({ ingestUrl: 'https://my-custom-edge.example.com/ingest' }, 'logs');
-      expect(url).toBe('https://my-custom-edge.example.com/ingest/logs');
+      const url = resolveIngestUrl({ edgeUrl: 'https://my-custom-edge.example.com/v1' }, 'logs');
+      expect(url).toBe('https://my-custom-edge.example.com/v1/ingest/logs');
     });
   });
 
-  describe('priority: ingestUrl > url > region > default', () => {
-    it('ingestUrl takes precedence over url', () => {
+  describe('priority: edgeUrl > url > region > default', () => {
+    it('edgeUrl takes precedence over url', () => {
       const url = resolveIngestUrl(
-        { ingestUrl: 'https://edge.axiom.co/v1/ingest', url: 'https://api.axiom.co' },
+        { edgeUrl: 'https://edge.axiom.co/v1', url: 'https://api.axiom.co' },
         'test'
       );
       expect(url).toBe('https://edge.axiom.co/v1/ingest/test');
     });
 
-    it('ingestUrl takes precedence over region', () => {
+    it('edgeUrl takes precedence over region', () => {
       const url = resolveIngestUrl(
-        { ingestUrl: 'https://edge.axiom.co/v1/ingest', region: 'mumbai.axiom.co' },
+        { edgeUrl: 'https://edge.axiom.co/v1', region: 'mumbai.axiom.co' },
         'test'
       );
       expect(url).toBe('https://edge.axiom.co/v1/ingest/test');
@@ -129,8 +129,8 @@ describe('validateUrlOrRegion', () => {
     expect(() => validateUrlOrRegion({ region: 'mumbai.axiom.co' })).not.toThrow();
   });
 
-  it('does not throw when only ingestUrl is set', () => {
-    expect(() => validateUrlOrRegion({ ingestUrl: 'https://edge.axiom.co/v1/ingest' })).not.toThrow();
+  it('does not throw when only edgeUrl is set', () => {
+    expect(() => validateUrlOrRegion({ edgeUrl: 'https://edge.axiom.co/v1' })).not.toThrow();
   });
 
   it('throws when both url and region are set', () => {
@@ -139,15 +139,15 @@ describe('validateUrlOrRegion', () => {
     ).toThrow('Cannot set multiple endpoint options');
   });
 
-  it('throws when both url and ingestUrl are set', () => {
+  it('throws when both url and edgeUrl are set', () => {
     expect(() =>
-      validateUrlOrRegion({ url: 'https://api.axiom.co', ingestUrl: 'https://edge.axiom.co/v1/ingest' })
+      validateUrlOrRegion({ url: 'https://api.axiom.co', edgeUrl: 'https://edge.axiom.co/v1' })
     ).toThrow('Cannot set multiple endpoint options');
   });
 
-  it('throws when both region and ingestUrl are set', () => {
+  it('throws when both region and edgeUrl are set', () => {
     expect(() =>
-      validateUrlOrRegion({ region: 'mumbai.axiom.co', ingestUrl: 'https://edge.axiom.co/v1/ingest' })
+      validateUrlOrRegion({ region: 'mumbai.axiom.co', edgeUrl: 'https://edge.axiom.co/v1' })
     ).toThrow('Cannot set multiple endpoint options');
   });
 
@@ -156,7 +156,7 @@ describe('validateUrlOrRegion', () => {
       validateUrlOrRegion({ 
         url: 'https://api.axiom.co', 
         region: 'mumbai.axiom.co', 
-        ingestUrl: 'https://edge.axiom.co/v1/ingest' 
+        edgeUrl: 'https://edge.axiom.co/v1' 
       })
     ).toThrow('Cannot set multiple endpoint options');
   });
@@ -173,12 +173,12 @@ describe('AxiomWithoutBatching client endpoint options', () => {
     ).toThrow('Cannot set multiple endpoint options');
   });
 
-  it('throws when both url and ingestUrl are set in constructor', () => {
+  it('throws when both url and edgeUrl are set in constructor', () => {
     expect(() =>
       new AxiomWithoutBatching({
         token: 'test-token',
         url: 'https://api.axiom.co',
-        ingestUrl: 'https://edge.axiom.co/v1/ingest',
+        edgeUrl: 'https://edge.axiom.co/v1',
       })
     ).toThrow('Cannot set multiple endpoint options');
   });
@@ -201,11 +201,11 @@ describe('AxiomWithoutBatching client endpoint options', () => {
     ).not.toThrow();
   });
 
-  it('accepts ingestUrl without other options', () => {
+  it('accepts edgeUrl without other options', () => {
     expect(() =>
       new AxiomWithoutBatching({
         token: 'test-token',
-        ingestUrl: 'https://edge.axiom.co/v1/ingest',
+        edgeUrl: 'https://edge.axiom.co/v1',
       })
     ).not.toThrow();
   });
