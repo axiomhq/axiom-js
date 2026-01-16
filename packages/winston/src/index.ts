@@ -11,12 +11,20 @@ export interface WinstonOptions extends TransportStreamOptions {
    * The Axiom regional edge domain to use for ingestion.
    * Specify the domain name only (no scheme, no path).
    * When set, data is sent to `https://{region}/v1/ingest/{dataset}`.
-   * Cannot be used together with `url`.
+   * Cannot be used together with `url` or `ingestUrl`.
    *
    * @example "mumbai.axiom.co"
    * @example "eu-central-1.aws.edge.axiom.co"
    */
   region?: string;
+  /**
+   * The full URL of the Axiom edge ingest endpoint.
+   * When set, this URL is used directly for ingestion (with `/{dataset}` appended).
+   * Cannot be used together with `url` or `region`.
+   *
+   * @example "https://eu-central-1.aws.edge.axiom.co/v1/ingest"
+   */
+  ingestUrl?: string;
   onError?: (err: Error) => void;
 }
 
@@ -34,6 +42,7 @@ export class WinstonTransport extends Transport {
       orgId: opts.orgId,
       url: opts.url,
       region: opts.region,
+      ingestUrl: opts.ingestUrl,
       onError: opts.onError,
     });
     this.dataset = opts?.dataset || process.env.AXIOM_DATASET || '';

@@ -64,7 +64,40 @@ describe('resolveIngestUrl', () => {
     });
   });
 
-  describe('priority: url > region > default', () => {
+  describe('ingestUrl configuration', () => {
+    it('appends dataset to ingestUrl', () => {
+      const url = resolveIngestUrl({ ingestUrl: 'https://eu-central-1.aws.edge.axiom.co/v1/ingest' }, 'my-dataset');
+      expect(url).toBe('https://eu-central-1.aws.edge.axiom.co/v1/ingest/my-dataset');
+    });
+
+    it('trims trailing slashes from ingestUrl', () => {
+      const url = resolveIngestUrl({ ingestUrl: 'https://edge.axiom.co/v1/ingest/' }, 'test');
+      expect(url).toBe('https://edge.axiom.co/v1/ingest/test');
+    });
+
+    it('works with custom edge endpoints', () => {
+      const url = resolveIngestUrl({ ingestUrl: 'https://my-custom-edge.example.com/ingest' }, 'logs');
+      expect(url).toBe('https://my-custom-edge.example.com/ingest/logs');
+    });
+  });
+
+  describe('priority: ingestUrl > url > region > default', () => {
+    it('ingestUrl takes precedence over url', () => {
+      const url = resolveIngestUrl(
+        { ingestUrl: 'https://edge.axiom.co/v1/ingest', url: 'https://api.axiom.co' },
+        'test'
+      );
+      expect(url).toBe('https://edge.axiom.co/v1/ingest/test');
+    });
+
+    it('ingestUrl takes precedence over region', () => {
+      const url = resolveIngestUrl(
+        { ingestUrl: 'https://edge.axiom.co/v1/ingest', region: 'mumbai.axiom.co' },
+        'test'
+      );
+      expect(url).toBe('https://edge.axiom.co/v1/ingest/test');
+    });
+
     it('url takes precedence over region when url has custom path', () => {
       const url = resolveIngestUrl(
         { url: 'http://localhost:3400/ingest', region: 'mumbai.axiom.co' },
@@ -84,7 +117,7 @@ describe('resolveIngestUrl', () => {
 });
 
 describe('validateUrlOrRegion', () => {
-  it('does not throw when neither url nor region is set', () => {
+  it('does not throw when no options are set', () => {
     expect(() => validateUrlOrRegion({})).not.toThrow();
   });
 
@@ -96,14 +129,40 @@ describe('validateUrlOrRegion', () => {
     expect(() => validateUrlOrRegion({ region: 'mumbai.axiom.co' })).not.toThrow();
   });
 
+  it('does not throw when only ingestUrl is set', () => {
+    expect(() => validateUrlOrRegion({ ingestUrl: 'https://edge.axiom.co/v1/ingest' })).not.toThrow();
+  });
+
   it('throws when both url and region are set', () => {
     expect(() =>
       validateUrlOrRegion({ url: 'https://api.axiom.co', region: 'mumbai.axiom.co' })
-    ).toThrow('Cannot set both `url` and `region`. Please use only one.');
+    ).toThrow('Cannot set multiple endpoint options');
+  });
+
+  it('throws when both url and ingestUrl are set', () => {
+    expect(() =>
+      validateUrlOrRegion({ url: 'https://api.axiom.co', ingestUrl: 'https://edge.axiom.co/v1/ingest' })
+    ).toThrow('Cannot set multiple endpoint options');
+  });
+
+  it('throws when both region and ingestUrl are set', () => {
+    expect(() =>
+      validateUrlOrRegion({ region: 'mumbai.axiom.co', ingestUrl: 'https://edge.axiom.co/v1/ingest' })
+    ).toThrow('Cannot set multiple endpoint options');
+  });
+
+  it('throws when all three options are set', () => {
+    expect(() =>
+      validateUrlOrRegion({ 
+        url: 'https://api.axiom.co', 
+        region: 'mumbai.axiom.co', 
+        ingestUrl: 'https://edge.axiom.co/v1/ingest' 
+      })
+    ).toThrow('Cannot set multiple endpoint options');
   });
 });
 
-describe('AxiomWithoutBatching client with region', () => {
+describe('AxiomWithoutBatching client endpoint options', () => {
   it('throws when both url and region are set in constructor', () => {
     expect(() =>
       new AxiomWithoutBatching({
@@ -111,10 +170,20 @@ describe('AxiomWithoutBatching client with region', () => {
         url: 'https://api.axiom.co',
         region: 'mumbai.axiom.co',
       })
-    ).toThrow('Cannot set both `url` and `region`. Please use only one.');
+    ).toThrow('Cannot set multiple endpoint options');
   });
 
-  it('accepts region without url', () => {
+  it('throws when both url and ingestUrl are set in constructor', () => {
+    expect(() =>
+      new AxiomWithoutBatching({
+        token: 'test-token',
+        url: 'https://api.axiom.co',
+        ingestUrl: 'https://edge.axiom.co/v1/ingest',
+      })
+    ).toThrow('Cannot set multiple endpoint options');
+  });
+
+  it('accepts region without other options', () => {
     expect(() =>
       new AxiomWithoutBatching({
         token: 'test-token',
@@ -123,11 +192,20 @@ describe('AxiomWithoutBatching client with region', () => {
     ).not.toThrow();
   });
 
-  it('accepts url without region', () => {
+  it('accepts url without other options', () => {
     expect(() =>
       new AxiomWithoutBatching({
         token: 'test-token',
         url: 'https://api.eu.axiom.co',
+      })
+    ).not.toThrow();
+  });
+
+  it('accepts ingestUrl without other options', () => {
+    expect(() =>
+      new AxiomWithoutBatching({
+        token: 'test-token',
+        ingestUrl: 'https://edge.axiom.co/v1/ingest',
       })
     ).not.toThrow();
   });
