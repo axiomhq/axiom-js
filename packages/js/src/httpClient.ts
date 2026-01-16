@@ -14,6 +14,15 @@ const AxiomURL = "https://api.axiom.co";
  *     orgId: "my-org-id",
  * })
  * ```
+ *
+ * @example
+ * ```
+ * // Using a regional edge endpoint for lower latency ingestion
+ * const axiom = new Axiom({
+ *     token: "my-token",
+ *     region: "eu-central-1.aws.edge.axiom.co",
+ * })
+ * ```
  */
 export interface ClientOptions {
   /**
@@ -29,20 +38,98 @@ export interface ClientOptions {
   /**
    * the URL of the Axiom API, defaults to https://api.axiom.co. You should not
    * need to change this unless your organization uses a specific region or a self-hosted version of Axiom.
+   *
+   * If a path is provided, the URL is used as-is for ingest.
+   * If no path (or only `/`) is provided, `/v1/datasets/{dataset}/ingest` is appended for backwards compatibility.
+   * Cannot be used together with `region`.
    */
   url?: string;
+  /**
+   * The Axiom regional edge domain to use for ingestion.
+   *
+   * Specify the domain name only (no scheme, no path).
+   * When set, data is sent to `https://{region}/v1/ingest/{dataset}`.
+   * Cannot be used together with `url`.
+   *
+   * @example "mumbai.axiom.co"
+   * @example "eu-central-1.aws.edge.axiom.co"
+   */
+  region?: string;
   onError?: (error: Error) => void;
+}
+
+/**
+ * Resolves the ingest endpoint URL based on the client options.
+ *
+ * Priority: url > region > default cloud endpoint
+ *
+ * @param options - The client options
+ * @param dataset - The dataset name to ingest into
+ * @returns The full URL to use for ingestion
+ */
+export function resolveIngestUrl(options: Pick<ClientOptions, 'url' | 'region'>, dataset: string): string {
+  // If url is set, check if it has a path
+  if (options.url) {
+    const url = options.url.replace(/\/+$/, ''); // trim trailing slashes
+
+    // Parse URL to check if path is provided
+    try {
+      const parsed = new URL(url);
+      const path = parsed.pathname;
+
+      if (path === '' || path === '/') {
+        // Backwards compatibility: append legacy path format
+        return `${url}/v1/datasets/${dataset}/ingest`;
+      }
+
+      // URL has a custom path, use as-is
+      return url;
+    } catch {
+      // If URL parsing fails, append legacy path format
+      return `${url}/v1/datasets/${dataset}/ingest`;
+    }
+  }
+
+  // If region is set, build the regional edge endpoint
+  if (options.region) {
+    const region = options.region.replace(/\/+$/, ''); // trim trailing slashes
+    return `https://${region}/v1/ingest/${dataset}`;
+  }
+
+  // Default: use cloud endpoint with legacy path format
+  return `${AxiomURL}/v1/datasets/${dataset}/ingest`;
+}
+
+/**
+ * Validates that url and region are not both set.
+ * @throws Error if both url and region are set
+ */
+export function validateUrlOrRegion(options: Pick<ClientOptions, 'url' | 'region'>): void {
+  if (options.url && options.region) {
+    throw new Error('Cannot set both `url` and `region`. Please use only one.');
+  }
 }
 
 export default abstract class HTTPClient {
   protected readonly client: FetchClient;
+  protected readonly clientOptions: ClientOptions;
 
-  constructor({ orgId = "", token, url }: ClientOptions) {
+  constructor(options: ClientOptions) {
+    const { orgId = "", token, url, region } = options;
+
     if (!token) {
       console.warn("Missing Axiom token");
     }
 
-    const baseUrl = url ?? AxiomURL;
+    // Validate that url and region are not both set
+    validateUrlOrRegion({ url, region });
+
+    // Store options for use in ingest URL resolution
+    this.clientOptions = options;
+
+    // For the main API client, always use url or default (never region)
+    // Region only affects ingest endpoints, not other API calls
+    const baseUrl = url ? url.replace(/\/+$/, '') : AxiomURL;
 
     const headers: HeadersInit = {
       Accept: "application/json",

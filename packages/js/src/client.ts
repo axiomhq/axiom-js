@@ -1,7 +1,7 @@
 import { datasets } from './datasets.js';
 import { users } from './users.js';
 import { Batch, createBatchKey } from './batch.js';
-import HTTPClient, { ClientOptions } from './httpClient.js';
+import HTTPClient, { ClientOptions, resolveIngestUrl } from './httpClient.js';
 import { isAxiomPersonalToken } from './token.js';
 
 class BaseClient extends HTTPClient {
@@ -50,8 +50,9 @@ class BaseClient extends HTTPClient {
     options?: IngestOptions,
   ): Promise<IngestStatus> => {
     try {
-      return await this.client.post<IngestStatus>(
-        this.localPath + '/datasets/' + dataset + '/ingest',
+      const ingestUrl = resolveIngestUrl(this.clientOptions, dataset);
+      return await this.client.postToUrl<IngestStatus>(
+        ingestUrl,
         {
           headers: {
             'Content-Type': contentType,

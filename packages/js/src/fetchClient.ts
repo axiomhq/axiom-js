@@ -17,6 +17,32 @@ export class FetchClient {
       finalUrl += `?${params.toString()}`;
     }
 
+    return this._executeRequest<T>(finalUrl, method, init, timeout);
+  }
+
+  async doReqToUrl<T>(
+    url: string,
+    method: string,
+    init: RequestInit = {},
+    searchParams: { [key: string]: string } = {},
+    timeout = this.config.timeout,
+  ): Promise<T> {
+    let finalUrl = url;
+    const params = this._prepareSearchParams(searchParams);
+    if (params) {
+      finalUrl += `?${params.toString()}`;
+    }
+
+    return this._executeRequest<T>(finalUrl, method, init, timeout);
+  }
+
+  private async _executeRequest<T>(
+    finalUrl: string,
+    method: string,
+    init: RequestInit = {},
+    timeout = this.config.timeout,
+  ): Promise<T> {
+
     const headers = { ...this.config.headers, ...init.headers };
 
     const resp = await fetchRetry(fetch)(finalUrl, {
@@ -50,6 +76,10 @@ export class FetchClient {
 
   post<T>(url: string, init: RequestInit = {}, searchParams: any = {}, timeout = this.config.timeout): Promise<T> {
     return this.doReq<T>(url, "POST", init, searchParams, timeout);
+  }
+
+  postToUrl<T>(url: string, init: RequestInit = {}, searchParams: any = {}, timeout = this.config.timeout): Promise<T> {
+    return this.doReqToUrl<T>(url, "POST", init, searchParams, timeout);
   }
 
   get<T>(url: string, init: RequestInit = {}, searchParams: any = {}, timeout = this.config.timeout): Promise<T> {
