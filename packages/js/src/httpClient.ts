@@ -118,9 +118,7 @@ export default abstract class HTTPClient {
   protected readonly client: FetchClient;
   protected readonly clientOptions: ClientOptions;
 
-  constructor(options: ClientOptions) {
-    const { orgId = "", token, url, edgeRegion } = options;
-
+  constructor({ orgId = "", token, url, edgeRegion, onError }: ClientOptions) {
     if (!token) {
       console.warn("Missing Axiom token");
     }
@@ -129,7 +127,7 @@ export default abstract class HTTPClient {
     validateUrlOrRegion({ url, edgeRegion });
 
     // Store options for use in ingest URL resolution
-    this.clientOptions = options;
+    this.clientOptions = { orgId, token, url, edgeRegion, onError };
 
     // For the main API client, always use url or default (never edgeRegion)
     // edgeRegion only affects ingest endpoints, not other API calls

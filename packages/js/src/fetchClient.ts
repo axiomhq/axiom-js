@@ -10,38 +10,13 @@ export class FetchClient {
     init: RequestInit = {},
     searchParams: { [key: string]: string } = {},
     timeout = this.config.timeout,
+    useAbsoluteUrl = false,
   ): Promise<T> {
-    let finalUrl = `${this.config.baseUrl}${endpoint}`;
+    let finalUrl = useAbsoluteUrl ? endpoint : `${this.config.baseUrl}${endpoint}`;
     const params = this._prepareSearchParams(searchParams);
     if (params) {
       finalUrl += `?${params.toString()}`;
     }
-
-    return this._executeRequest<T>(finalUrl, method, init, timeout);
-  }
-
-  async doReqToUrl<T>(
-    url: string,
-    method: string,
-    init: RequestInit = {},
-    searchParams: { [key: string]: string } = {},
-    timeout = this.config.timeout,
-  ): Promise<T> {
-    let finalUrl = url;
-    const params = this._prepareSearchParams(searchParams);
-    if (params) {
-      finalUrl += `?${params.toString()}`;
-    }
-
-    return this._executeRequest<T>(finalUrl, method, init, timeout);
-  }
-
-  private async _executeRequest<T>(
-    finalUrl: string,
-    method: string,
-    init: RequestInit = {},
-    timeout = this.config.timeout,
-  ): Promise<T> {
 
     const headers = { ...this.config.headers, ...init.headers };
 
@@ -74,12 +49,8 @@ export class FetchClient {
     return (await resp.json()) as T;
   }
 
-  post<T>(url: string, init: RequestInit = {}, searchParams: any = {}, timeout = this.config.timeout): Promise<T> {
-    return this.doReq<T>(url, "POST", init, searchParams, timeout);
-  }
-
-  postToUrl<T>(url: string, init: RequestInit = {}, searchParams: any = {}, timeout = this.config.timeout): Promise<T> {
-    return this.doReqToUrl<T>(url, "POST", init, searchParams, timeout);
+  post<T>(url: string, init: RequestInit = {}, searchParams: any = {}, timeout = this.config.timeout, useAbsoluteUrl = false): Promise<T> {
+    return this.doReq<T>(url, "POST", init, searchParams, timeout, useAbsoluteUrl);
   }
 
   get<T>(url: string, init: RequestInit = {}, searchParams: any = {}, timeout = this.config.timeout): Promise<T> {

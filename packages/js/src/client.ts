@@ -51,7 +51,7 @@ class BaseClient extends HTTPClient {
   ): Promise<IngestStatus> => {
     try {
       const ingestUrl = resolveIngestUrl(this.clientOptions, dataset);
-      return await this.client.postToUrl<IngestStatus>(
+      return await this.client.post<IngestStatus>(
         ingestUrl,
         {
           headers: {
@@ -65,6 +65,8 @@ class BaseClient extends HTTPClient {
           'timestamp-format': options?.timestampFormat as string,
           'csv-delimiter': options?.csvDelimiter as string,
         },
+        undefined, // use default timeout
+        true, // useAbsoluteUrl
       );
     } catch (err) {
       this.onError(err);
