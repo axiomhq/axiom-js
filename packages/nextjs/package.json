@@ -77,6 +77,6 @@
   },
   "peerDependencies": {
     "@axiomhq/logging": "workspace:*",
-    "next": "^15 || ^14 || ^13"
+    "next": ">=13"
   }
 }
