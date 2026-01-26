@@ -29,7 +29,7 @@ export {
   Message,
   Query,
 } from './client.js';
-export { ClientOptions, resolveIngestUrl, validateUrlOrRegion } from './httpClient.js';
+export { ClientOptions, resolveIngestUrl } from './httpClient.js';
 export { datasets } from './datasets.js';
 export { annotations } from './annotations.js';
 export { users } from './users.js';

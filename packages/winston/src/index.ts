@@ -8,12 +8,12 @@ export interface WinstonOptions extends TransportStreamOptions {
   orgId?: string;
   url?: string;
   /**
-   * The Axiom regional edge URL to use for ingestion.
+   * The Axiom edge URL to use for ingestion and query.
    * Specify the full URL with scheme (https://).
-   * When set, data is sent to this endpoint using the same path resolution as `url`.
-   * Cannot be used together with `url`.
+   * When set, ingest and query operations are sent to this endpoint for lower latency.
+   * Can be used together with `url` - in that case, `url` handles API operations
+   * while `edgeUrl` handles ingest/query.
    *
-   * @example "https://mumbai.axiom.co"
    * @example "https://eu-central-1.aws.edge.axiom.co"
    */
   edgeUrl?: string;

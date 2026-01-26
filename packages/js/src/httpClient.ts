@@ -17,9 +17,19 @@ const AxiomURL = "https://api.axiom.co";
  *
  * @example
  * ```
- * // Using a regional edge endpoint for lower latency ingestion
+ * // Using an edge endpoint for lower latency ingestion
  * const axiom = new Axiom({
  *     token: "my-token",
+ *     edgeUrl: "https://eu-central-1.aws.edge.axiom.co",
+ * })
+ * ```
+ *
+ * @example
+ * ```
+ * // Using both url (for API operations) and edgeUrl (for ingest/query)
+ * const axiom = new Axiom({
+ *     token: "my-token",
+ *     url: "https://api.eu.axiom.co",
  *     edgeUrl: "https://eu-central-1.aws.edge.axiom.co",
  * })
  * ```
@@ -36,39 +46,25 @@ export interface ClientOptions {
    */
   orgId?: string;
   /**
-   * URI of the Axiom endpoint to send data to.
-   *
-   * If a path is provided, the URL is used as-is.
-   * If no path (or only `/`) is provided, `/v1/datasets/{dataset}/ingest` is appended for backwards compatibility.
-   * This takes precedence over `edgeUrl` if both are set (but both should not be set).
+   * URI of the Axiom API endpoint. Used for all API operations (datasets, users, etc.).
+   * When `edgeUrl` is also set, this is used for non-ingest/query operations only.
    *
    * @example "https://api.eu.axiom.co"
-   * @example "http://localhost:3400/ingest"
    */
   url?: string;
   /**
-   * The Axiom regional edge URL to use for ingestion.
-   *
+   * The Axiom edge URL to use for ingestion and query operations.
    * Specify the full URL with scheme (https://).
-   * When set, data is sent to this endpoint using the same path resolution as `url`.
-   * Cannot be used together with `url`.
+   * When set, ingest and query operations are sent to this endpoint for lower latency.
+   * Can be used together with `url` - in that case, `url` handles API operations
+   * while `edgeUrl` handles ingest/query.
    *
-   * @example "https://mumbai.axiom.co"
    * @example "https://eu-central-1.aws.edge.axiom.co"
    */
   edgeUrl?: string;
   onError?: (error: Error) => void;
 }
 
-/**
- * Resolves the ingest endpoint URL based on the client options.
- *
- * Priority: url > edgeUrl > default cloud endpoint
- *
- * @param options - The client options
- * @param dataset - The dataset name to ingest into
- * @returns The full URL to use for ingestion
- */
 /**
  * Helper to build an ingest URL from a base URL string.
  * Uses the URL API to properly handle query params and fragments.
@@ -94,29 +90,28 @@ function buildIngestUrl(baseUrl: string, dataset: string): string {
   }
 }
 
+/**
+ * Resolves the ingest/query endpoint URL based on the client options.
+ *
+ * Priority: edgeUrl > url > default cloud endpoint
+ *
+ * @param options - The client options
+ * @param dataset - The dataset name to ingest into
+ * @returns The full URL to use for ingestion
+ */
 export function resolveIngestUrl(options: Pick<ClientOptions, 'url' | 'edgeUrl'>, dataset: string): string {
+  // If edgeUrl is set, use it for ingest/query (takes precedence)
+  if (options.edgeUrl) {
+    return buildIngestUrl(options.edgeUrl, dataset);
+  }
+
   // If url is set, use it
   if (options.url) {
     return buildIngestUrl(options.url, dataset);
   }
 
-  // If edgeUrl is set, use it
-  if (options.edgeUrl) {
-    return buildIngestUrl(options.edgeUrl, dataset);
-  }
-
   // Default: use cloud endpoint with legacy path format
   return `${AxiomURL}/v1/datasets/${dataset}/ingest`;
-}
-
-/**
- * Validates that url and edgeUrl are not both set.
- * @throws Error if both url and edgeUrl are set
- */
-export function validateUrlOrRegion(options: Pick<ClientOptions, 'url' | 'edgeUrl'>): void {
-  if (options.url && options.edgeUrl) {
-    throw new Error('Cannot set both `url` and `edgeUrl`. Please use only one.');
-  }
 }
 
 export default abstract class HTTPClient {
@@ -127,9 +122,6 @@ export default abstract class HTTPClient {
     if (!token) {
       console.warn("Missing Axiom token");
     }
-
-    // Validate that url and edgeUrl are not both set
-    validateUrlOrRegion({ url, edgeUrl });
 
     // Store options for use in ingest URL resolution
     this.clientOptions = { orgId, token, url, edgeUrl, onError };
