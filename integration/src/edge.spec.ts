@@ -2,18 +2,25 @@ import { describe, expect, it, beforeAll, afterAll } from 'vitest';
 import { AxiomWithoutBatching, Axiom } from '@axiomhq/js';
 
 const datasetSuffix = process.env.AXIOM_DATASET_SUFFIX || 'local';
+
+// Edge configuration
 const edge = process.env.AXIOM_EDGE;
 const edgeUrl = process.env.AXIOM_EDGE_URL;
+const edgeToken = process.env.AXIOM_EDGE_TOKEN;
+const edgeDatasetRegion = process.env.AXIOM_EDGE_DATASET_REGION;
 
-// Skip if neither edge nor edgeUrl is configured
+// Skip if edge is not configured
 const hasEdgeConfig = edge || edgeUrl;
 
 describe.skipIf(!hasEdgeConfig)('Edge Ingestion', () => {
   const datasetName = `test-axiom-js-edge-${datasetSuffix}`;
-  
+
+  // Use edge token if available, otherwise fall back to main token
+  const token = edgeToken || process.env.AXIOM_TOKEN || '';
+
   // Client with both url (for API) and edge options (for ingest/query)
   const axiom = new AxiomWithoutBatching({
-    token: process.env.AXIOM_TOKEN || '',
+    token: token,
     url: process.env.AXIOM_URL,
     orgId: process.env.AXIOM_ORG_ID,
     edge: edge,
@@ -22,7 +29,7 @@ describe.skipIf(!hasEdgeConfig)('Edge Ingestion', () => {
 
   // Batch client with edge options
   const axiomBatch = new Axiom({
-    token: process.env.AXIOM_TOKEN || '',
+    token: token,
     url: process.env.AXIOM_URL,
     orgId: process.env.AXIOM_ORG_ID,
     edge: edge,
@@ -30,10 +37,15 @@ describe.skipIf(!hasEdgeConfig)('Edge Ingestion', () => {
   });
 
   beforeAll(async () => {
-    await axiom.datasets.create({
+    // Create dataset with region if specified
+    const createRequest: { name: string; description: string; region?: string } = {
       name: datasetName,
       description: 'Test dataset for edge ingestion integration tests.',
-    });
+    };
+    if (edgeDatasetRegion) {
+      createRequest.region = edgeDatasetRegion;
+    }
+    await axiom.datasets.create(createRequest);
   });
 
   afterAll(async () => {
@@ -72,8 +84,22 @@ describe.skipIf(!hasEdgeConfig)('Edge Ingestion', () => {
       await new Promise((resolve) => setTimeout(resolve, 2000));
 
       const result = await axiom.query(`['${datasetName}'] | where source == 'edge-test'`);
-      
+
       expect(result.status.rowsMatched).toBeGreaterThanOrEqual(3);
+    });
+  });
+
+  describe('main API still works with edge configured', () => {
+    it('can list datasets via main API', async () => {
+      const datasets = await axiom.datasets.list();
+      expect(datasets).toBeDefined();
+      expect(Array.isArray(datasets)).toBe(true);
+    });
+
+    it('can get current user via main API', async () => {
+      const user = await axiom.users.current();
+      expect(user).toBeDefined();
+      expect(user.id).toBeDefined();
     });
   });
 });

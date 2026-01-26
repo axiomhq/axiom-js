@@ -16,7 +16,16 @@
       "dependsOn": ["^build", "^build:cjs"]
     },
     "integration": {
-      "env": ["AXIOM_TOKEN", "AXIOM_URL", "AXIOM_ORG_ID", "AXIOM_EDGE", "AXIOM_EDGE_URL", "AXIOM_DATASET_SUFFIX"],
+      "env": [
+        "AXIOM_TOKEN",
+        "AXIOM_URL",
+        "AXIOM_ORG_ID",
+        "AXIOM_EDGE",
+        "AXIOM_EDGE_URL",
+        "AXIOM_EDGE_TOKEN",
+        "AXIOM_EDGE_DATASET_REGION",
+        "AXIOM_DATASET_SUFFIX"
+      ],
       "dependsOn": ["^build", "^build:cjs"]
     },
     "e2e": {

@@ -127,6 +127,8 @@ jobs:
       AXIOM_ORG_ID: ${{ secrets[format('TESTING_{0}_ORG_ID', matrix.slug)] }}
       AXIOM_EDGE: ${{ vars[format('TESTING_{0}_EDGE', matrix.slug)] }}
       AXIOM_EDGE_URL: ${{ vars[format('TESTING_{0}_EDGE_URL', matrix.slug)] }}
+      AXIOM_EDGE_TOKEN: ${{ secrets[format('TESTING_{0}_EDGE_TOKEN', matrix.slug)] }}
+      AXIOM_EDGE_DATASET_REGION: ${{ vars[format('TESTING_{0}_EDGE_DATASET_REGION', matrix.slug)] }}
       AXIOM_DATASET_SUFFIX: ${{ github.run_id }}-${{ matrix.node }}-${{ matrix.environment }}
     steps:
       - uses: actions/checkout@v6

@@ -9,6 +9,7 @@ export namespace datasets {
     description?: string;
     who?: string;
     created: string;
+    region?: string;
   }
 
   export interface Field {
@@ -24,6 +25,7 @@ export namespace datasets {
   export interface CreateRequest {
     name: string;
     description?: string;
+    region?: string;
   }
 
   export interface CreateOptions {
