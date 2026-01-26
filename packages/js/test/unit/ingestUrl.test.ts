@@ -35,6 +35,26 @@ describe('resolveIngestUrl', () => {
       const url = resolveIngestUrl({ url: 'http://localhost:3400/ingest/' }, 'meh');
       expect(url).toBe('http://localhost:3400/ingest');
     });
+
+    it('preserves query params when url has no path', () => {
+      const url = resolveIngestUrl({ url: 'https://api.eu.axiom.co?org=my-org' }, 'qoo');
+      expect(url).toBe('https://api.eu.axiom.co/v1/datasets/qoo/ingest?org=my-org');
+    });
+
+    it('preserves query params when url has custom path', () => {
+      const url = resolveIngestUrl({ url: 'http://localhost:3400/ingest?debug=true' }, 'meh');
+      expect(url).toBe('http://localhost:3400/ingest?debug=true');
+    });
+
+    it('preserves fragment when url has no path', () => {
+      const url = resolveIngestUrl({ url: 'https://api.eu.axiom.co#section' }, 'qoo');
+      expect(url).toBe('https://api.eu.axiom.co/v1/datasets/qoo/ingest#section');
+    });
+
+    it('preserves both query params and fragment', () => {
+      const url = resolveIngestUrl({ url: 'https://api.eu.axiom.co?org=test#section' }, 'qoo');
+      expect(url).toBe('https://api.eu.axiom.co/v1/datasets/qoo/ingest?org=test#section');
+    });
   });
 
   describe('edgeUrl configuration', () => {
@@ -66,6 +86,11 @@ describe('resolveIngestUrl', () => {
     it('uses edgeUrl as-is when it has a custom path', () => {
       const url = resolveIngestUrl({ edgeUrl: 'https://mumbai.axiom.co/custom/path' }, 'test-dataset');
       expect(url).toBe('https://mumbai.axiom.co/custom/path');
+    });
+
+    it('preserves query params when edgeUrl has no path', () => {
+      const url = resolveIngestUrl({ edgeUrl: 'https://mumbai.axiom.co?org=my-org' }, 'test-dataset');
+      expect(url).toBe('https://mumbai.axiom.co/v1/datasets/test-dataset/ingest?org=my-org');
     });
   });
 

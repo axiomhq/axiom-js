@@ -69,53 +69,40 @@ export interface ClientOptions {
  * @param dataset - The dataset name to ingest into
  * @returns The full URL to use for ingestion
  */
-export function resolveIngestUrl(options: Pick<ClientOptions, 'url' | 'edgeUrl'>, dataset: string): string {
-  // If url is set, check if it has a path
-  if (options.url) {
-    const url = options.url.replace(/\/+$/, ''); // trim trailing slashes
+/**
+ * Helper to build an ingest URL from a base URL string.
+ * Uses the URL API to properly handle query params and fragments.
+ */
+function buildIngestUrl(baseUrl: string, dataset: string): string {
+  try {
+    const parsed = new URL(baseUrl);
+    const path = parsed.pathname;
 
-    // Parse URL to check if path is provided
-    // If path is empty or just "/", append the legacy format for backwards compatibility
-    // Otherwise, use the URL as-is
-    try {
-      const parsed = new URL(url);
-      const path = parsed.pathname;
-
-      if (path === '' || path === '/') {
-        // Backwards compatibility: append legacy path format
-        return `${url}/v1/datasets/${dataset}/ingest`;
-      }
-
-      // URL has a custom path, use as-is
-      return url;
-    } catch {
-      // If URL parsing fails, append legacy path format
-      return `${url}/v1/datasets/${dataset}/ingest`;
+    if (path === '' || path === '/') {
+      // Append legacy path format, preserving query/hash
+      parsed.pathname = `/v1/datasets/${dataset}/ingest`;
+      return parsed.toString();
     }
+
+    // URL has a custom path, use as-is (trim trailing slashes)
+    parsed.pathname = path.replace(/\/+$/, '');
+    return parsed.toString();
+  } catch {
+    // If URL parsing fails, do simple string concatenation as fallback
+    const trimmed = baseUrl.replace(/\/+$/, '');
+    return `${trimmed}/v1/datasets/${dataset}/ingest`;
+  }
+}
+
+export function resolveIngestUrl(options: Pick<ClientOptions, 'url' | 'edgeUrl'>, dataset: string): string {
+  // If url is set, use it
+  if (options.url) {
+    return buildIngestUrl(options.url, dataset);
   }
 
-  // If edgeUrl is set, use the same logic as url
+  // If edgeUrl is set, use it
   if (options.edgeUrl) {
-    const edgeUrl = options.edgeUrl.replace(/\/+$/, ''); // trim trailing slashes
-
-    // Parse URL to check if path is provided
-    // If path is empty or just "/", append the legacy format
-    // Otherwise, use the URL as-is
-    try {
-      const parsed = new URL(edgeUrl);
-      const path = parsed.pathname;
-
-      if (path === '' || path === '/') {
-        // Append legacy path format
-        return `${edgeUrl}/v1/datasets/${dataset}/ingest`;
-      }
-
-      // URL has a custom path, use as-is
-      return edgeUrl;
-    } catch {
-      // If URL parsing fails, append legacy path format
-      return `${edgeUrl}/v1/datasets/${dataset}/ingest`;
-    }
+    return buildIngestUrl(options.edgeUrl, dataset);
   }
 
   // Default: use cloud endpoint with legacy path format
