@@ -103,13 +103,29 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     if: github.event.pull_request.head.repo.full_name == github.repository
+    concurrency:
+      group: ${{ matrix.environment }}
+      cancel-in-progress: false
+    continue-on-error: ${{ matrix.environment == 'development' }}
     strategy:
+      fail-fast: true
       matrix:
         node:
           - 20.x
           - 22.x
-      max-parallel: 1
-      fail-fast: false
+        environment:
+          - development
+        include:
+          - environment: development
+            slug: DEV
+    env:
+      AXIOM_TOKEN: ${{ secrets[format('TESTING_{0}_API_TOKEN', matrix.slug)] }}
+      AXIOM_URL: ${{ secrets[format('TESTING_{0}_API_URL', matrix.slug)] }}
+      AXIOM_ORG_ID: ${{ secrets[format('TESTING_{0}_ORG_ID', matrix.slug)] }}
+      AXIOM_EDGE: ${{ vars[format('TESTING_{0}_EDGE', matrix.slug)] }}
+      AXIOM_EDGE_URL: ${{ vars[format('TESTING_{0}_EDGE_URL', matrix.slug)] }}
+      AXIOM_EDGE_DATASET_REGION: ${{ vars[format('TESTING_{0}_EDGE_DATASET_REGION', matrix.slug)] }}
+      AXIOM_DATASET_SUFFIX: ${{ github.run_id }}-${{ matrix.node }}-${{ matrix.environment }}
     steps:
       - uses: actions/checkout@v6
       - uses: pnpm/action-setup@v4
@@ -128,12 +144,7 @@ jobs:
             ${{ runner.os }}-turbo-
       - run: pnpm install --frozen-lockfile
       - run: pnpm build && pnpm build:cjs
-      - env:
-          AXIOM_TOKEN: ${{ secrets.TESTING_DEV_API_TOKEN }}
-          AXIOM_URL: ${{ secrets.TESTING_DEV_API_URL }}
-          AXIOM_ORG_ID: ${{ secrets.TESTING_DEV_ORG_ID }}
-          AXIOM_DATASET_SUFFIX: ${{ github.run_id }}-${{ matrix.node }}
-        run: pnpm integration
+      - run: pnpm integration
 
   deploy-e2e-apps:
     name: Deploy E2E apps
