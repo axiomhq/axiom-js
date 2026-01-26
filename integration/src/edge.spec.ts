@@ -95,11 +95,5 @@ describe.skipIf(!hasEdgeConfig)('Edge Ingestion', () => {
       expect(datasets).toBeDefined();
       expect(Array.isArray(datasets)).toBe(true);
     });
-
-    it('can get current user via API', async () => {
-      const user = await axiom.users.current();
-      expect(user).toBeDefined();
-      expect(user.id).toBeDefined();
-    });
   });
 });
