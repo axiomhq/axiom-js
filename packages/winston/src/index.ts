@@ -8,11 +8,16 @@ export interface WinstonOptions extends TransportStreamOptions {
   orgId?: string;
   url?: string;
   /**
-   * The Axiom edge URL to use for ingestion and query.
-   * Specify the full URL with scheme (https://).
-   * When set, ingest and query operations are sent to this endpoint for lower latency.
-   * Can be used together with `url` - in that case, `url` handles API operations
-   * while `edgeUrl` handles ingest/query.
+   * The Axiom edge domain for ingestion.
+   * Specify just the domain without scheme (https:// is added automatically).
+   *
+   * @example "eu-central-1.aws.edge.axiom.co"
+   */
+  edge?: string;
+  /**
+   * The Axiom edge URL for ingestion.
+   * Specify the full URL with scheme.
+   * Takes precedence over `edge` if both are set.
    *
    * @example "https://eu-central-1.aws.edge.axiom.co"
    */
@@ -33,6 +38,7 @@ export class WinstonTransport extends Transport {
       token: opts.token,
       orgId: opts.orgId,
       url: opts.url,
+      edge: opts.edge,
       edgeUrl: opts.edgeUrl,
       onError: opts.onError,
     });
