@@ -3,7 +3,7 @@ name: Release
 on: workflow_dispatch
 
 env:
-  NODEVERSION: 20.x
+  NODEVERSION: 24.x
   PNPM_VERSION: 10.4.1
   TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
   TURBO_TEAM: ${{ vars.TURBO_TEAM }}
@@ -12,6 +12,9 @@ jobs:
   publish:
     name: Publish
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
     steps:
       - uses: actions/checkout@v6
       - uses: pnpm/action-setup@v4
@@ -20,10 +23,8 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODEVERSION }}
-          registry-url: 'https://registry.npmjs.org'
-          cache: 'pnpm'
+          registry-url: "https://registry.npmjs.org"
+          cache: "pnpm"
       - run: pnpm install --frozen-lockfile
       - run: pnpm build && pnpm build:cjs
-      - run: pnpm publish --access public --filter "./packages/**" --no-git-checks
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTOMATION_TOKEN }}
+      - run: pnpm publish --access public --filter "./packages/**" --no-git-checks --provenance
