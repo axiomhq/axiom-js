@@ -12,8 +12,8 @@ const edgeDatasetRegion = process.env.AXIOM_EDGE_DATASET_REGION;
 // Main API token (for dataset management)
 const mainToken = process.env.AXIOM_TOKEN || '';
 
-// Skip if edge is not configured
-const hasEdgeConfig = edge || edgeUrl;
+// Skip if edge is not configured - need both edge endpoint AND edge token
+const hasEdgeConfig = (edge || edgeUrl) && edgeToken;
 
 describe.skipIf(!hasEdgeConfig)('Edge Ingestion', () => {
   const datasetName = `test-axiom-js-edge-${datasetSuffix}`;
@@ -25,9 +25,9 @@ describe.skipIf(!hasEdgeConfig)('Edge Ingestion', () => {
     orgId: process.env.AXIOM_ORG_ID,
   });
 
-  // Edge client for ingest/query (uses edge token if available)
+  // Edge client for ingest/query (uses edge token)
   const edgeAxiom = new AxiomWithoutBatching({
-    token: edgeToken || mainToken,
+    token: edgeToken!,
     url: process.env.AXIOM_URL,
     orgId: process.env.AXIOM_ORG_ID,
     edge: edge,
@@ -36,7 +36,7 @@ describe.skipIf(!hasEdgeConfig)('Edge Ingestion', () => {
 
   // Batch client with edge options
   const edgeAxiomBatch = new Axiom({
-    token: edgeToken || mainToken,
+    token: edgeToken!,
     url: process.env.AXIOM_URL,
     orgId: process.env.AXIOM_ORG_ID,
     edge: edge,
@@ -44,12 +44,13 @@ describe.skipIf(!hasEdgeConfig)('Edge Ingestion', () => {
   });
 
   beforeAll(async () => {
-    // Create dataset with region if specified (uses main token)
+    // Create dataset (uses main token, optionally with region for edge)
     const createRequest: { name: string; description: string; region?: string } = {
       name: datasetName,
       description: 'Test dataset for edge ingestion integration tests.',
     };
-    if (edgeDatasetRegion) {
+    // Only set region if explicitly configured and non-empty
+    if (edgeDatasetRegion && edgeDatasetRegion.trim() !== '') {
       createRequest.region = edgeDatasetRegion;
     }
     await mainAxiom.datasets.create(createRequest);
