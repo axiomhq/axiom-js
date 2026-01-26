@@ -115,12 +115,9 @@ jobs:
           - 22.x
         environment:
           - development
-          - staging
         include:
           - environment: development
             slug: DEV
-          - environment: staging
-            slug: STAGING
     env:
       AXIOM_TOKEN: ${{ secrets[format('TESTING_{0}_API_TOKEN', matrix.slug)] }}
       AXIOM_URL: ${{ secrets[format('TESTING_{0}_API_URL', matrix.slug)] }}
