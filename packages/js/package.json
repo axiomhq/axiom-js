@@ -21,7 +21,6 @@
     "build:cjs": "rollup -c rollup.config.cjs.js",
     "format": "eslint './**/*.{js,ts}' --quiet --fix",
     "lint": "eslint './**/*.{js,ts}'",
-    "prepublish": "pnpm run build && pnpm run build:cjs",
     "test": "vitest run test/unit/* --coverage"
   },
   "repository": {
