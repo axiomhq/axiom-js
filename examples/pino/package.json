@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@axiomhq/pino": "workspace:*",
-    "pino": "^9.5.0"
+    "pino": "^10.1.0"
   },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*"
