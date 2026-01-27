@@ -1,0 +1,40 @@
+{
+  "packages": {
+    "packages/js": {
+      "release-type": "node",
+      "versioning-strategy": "always-bump-patch",
+      "include-v-in-tag": false,
+      "release-group": "core"
+    },
+    "packages/pino": {
+      "release-type": "node",
+      "versioning-strategy": "always-bump-patch",
+      "include-v-in-tag": false,
+      "release-group": "core"
+    },
+    "packages/winston": {
+      "release-type": "node",
+      "versioning-strategy": "always-bump-patch",
+      "include-v-in-tag": false,
+      "release-group": "core"
+    },
+    "packages/logging": {
+      "release-type": "node",
+      "versioning-strategy": "always-bump-patch",
+      "include-v-in-tag": false,
+      "release-group": "integrations"
+    },
+    "packages/react": {
+      "release-type": "node",
+      "versioning-strategy": "always-bump-patch",
+      "include-v-in-tag": false,
+      "release-group": "integrations"
+    },
+    "packages/nextjs": {
+      "release-type": "node",
+      "versioning-strategy": "always-bump-patch",
+      "include-v-in-tag": false,
+      "release-group": "integrations"
+    }
+  }
+}
