@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.0](https://github.com/axiomhq/axiom-js/compare/js-1.3.1...js-1.4.0) (2026-02-24)
+
+
+### Features
+
+* add js bindings to /v2/monitors ([aa49c64](https://github.com/axiomhq/axiom-js/commit/aa49c64bf5b66a579b141be694698cb0a64f0c7f))
+* add support for edge endpoints ([#389](https://github.com/axiomhq/axiom-js/issues/389)) ([1902498](https://github.com/axiomhq/axiom-js/commit/190249815787d14478725fa89a4addea8ba1a44b))
+
+
+### Bug Fixes
+
+* Forbidden to lowercase f ([#385](https://github.com/axiomhq/axiom-js/issues/385)) ([b7166ff](https://github.com/axiomhq/axiom-js/commit/b7166ff9aa54d81817ef3f8ab574b0de4430b376)), closes [#288](https://github.com/axiomhq/axiom-js/issues/288)
+* remove prepublish scripts from winston and pino packages ([#396](https://github.com/axiomhq/axiom-js/issues/396)) ([77bbada](https://github.com/axiomhq/axiom-js/commit/77bbada6cff05359caaebe0d5dc714ba7c6469fb))
+
 ## [Unreleased]
 
 ## [1.3.0] - 2024-09-20

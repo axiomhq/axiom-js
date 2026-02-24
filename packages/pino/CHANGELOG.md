@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.0](https://github.com/axiomhq/axiom-js/compare/pino-1.3.1...pino-1.4.0) (2026-02-24)
+
+
+### Features
+
+* Add axiom logging, nextjs and react libraries ([5d29223](https://github.com/axiomhq/axiom-js/commit/5d292235f203eadf0e0f63978952cf00b54ea49c))
+
+
+### Bug Fixes
+
+* remove prepublish scripts from winston and pino packages ([#396](https://github.com/axiomhq/axiom-js/issues/396)) ([77bbada](https://github.com/axiomhq/axiom-js/commit/77bbada6cff05359caaebe0d5dc714ba7c6469fb))
+
 ## [Unreleased]
 
 ## [1.3.0] - 2024-11-20
