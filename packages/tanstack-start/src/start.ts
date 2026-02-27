@@ -824,3 +824,11 @@ export const createAxiomStartFunctionMiddleware = (
 
   return createMiddleware({ type: 'function' }).server(serverMiddleware);
 };
+
+// Short aliases for app-level usage while keeping explicit Start-prefixed APIs available.
+export const createAxiomRequestMiddleware = createAxiomStartRequestMiddleware;
+export const createAxiomMiddleware = createAxiomStartFunctionMiddleware;
+export const createAxiomFunctionCorrelationMiddleware = createAxiomStartFunctionCorrelationMiddleware;
+export const createAxiomProxyHandler = createAxiomStartProxyHandler;
+export const createAxiomUncaughtErrorHandler = createAxiomStartUncaughtErrorHandler;
+export const captureError = withAxiomStartErrorCapture;

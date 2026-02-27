@@ -5,7 +5,7 @@ This example demonstrates how to use [`@axiomhq/tanstack-start`](../../packages/
 It covers both observability paths:
 
 1. TanStack Router SPA navigation events (`observeTanStackRouter`)
-2. TanStack Start request/function middleware (including client+server correlation via `createAxiomStartFunctionMiddleware(..., { correlation: true })`)
+2. TanStack Start request/function middleware (including client+server correlation via `createAxiomMiddleware(..., { correlation: true })`)
 3. TanStack Start API route handlers (`server.handlers` on file routes, e.g. `GET /api/time`)
 
 ## Run
