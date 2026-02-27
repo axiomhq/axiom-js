@@ -4,5 +4,6 @@
   "packages/winston": "1.3.1",
   "packages/logging": "0.1.7",
   "packages/react": "0.1.7",
-  "packages/nextjs": "0.1.7"
+  "packages/nextjs": "0.1.7",
+  "packages/tanstack-start": "0.1.0"
 }

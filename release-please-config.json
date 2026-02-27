@@ -35,6 +35,12 @@
       "versioning-strategy": "always-bump-patch",
       "include-v-in-tag": false,
       "release-group": "integrations"
+    },
+    "packages/tanstack-start": {
+      "release-type": "node",
+      "versioning-strategy": "always-bump-patch",
+      "include-v-in-tag": false,
+      "release-group": "integrations"
     }
   }
 }

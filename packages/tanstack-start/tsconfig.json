@@ -1,0 +1,17 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "baseUrl": ".",
+    "rootDir": "./",
+    "outDir": "dist/esm",
+    "declarationDir": "dist/esm/types",
+    "resolveJsonModule": true,
+    "declarationMap": true,
+    "emitDeclarationOnly": true,
+    "useDefineForClassFields": false
+  },
+  "include": ["src/**/*", "test/**/*"]
+}
