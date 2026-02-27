@@ -81,7 +81,7 @@ export const transformRouterNavigationResult = (
   ];
 };
 
-export const observeTanStackRouter = (router: RouterLike, logger: Logger, options: RouterObserverOptions = {}) => {
+const observeRouter = (router: RouterLike, logger: Logger, options: RouterObserverOptions = {}) => {
   const {
     eventType = DEFAULT_EVENT,
     flushOnNavigation = false,
@@ -124,6 +124,10 @@ export const observeTanStackRouter = (router: RouterLike, logger: Logger, option
   });
 };
 
+export const observeTanStackRouter = (logger: Logger, options: RouterObserverOptions = {}) => {
+  return (router: RouterLike) => observeRouter(router, logger, options);
+};
+
 export const createAxiomRouterObserver = (logger: Logger, options: RouterObserverOptions = {}) => {
-  return (router: RouterLike) => observeTanStackRouter(router, logger, options);
+  return observeTanStackRouter(logger, options);
 };

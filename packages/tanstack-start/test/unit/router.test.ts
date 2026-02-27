@@ -90,7 +90,8 @@ describe('router observers', () => {
   it('observes onResolved navigation and skips unchanged paths by default', () => {
     const { router, emit } = createMockRouter('/first');
 
-    const unsubscribe = observeTanStackRouter(router, mockLogger);
+    const observe = observeTanStackRouter(mockLogger);
+    const unsubscribe = observe(router);
 
     emit('onResolved', '/second');
     emit('onResolved', '/second');
@@ -115,13 +116,14 @@ describe('router observers', () => {
   it('supports custom event type, source, message and flush behavior', () => {
     const { router, emit } = createMockRouter('/one');
 
-    observeTanStackRouter(router, mockLogger, {
+    const observe = observeTanStackRouter(mockLogger, {
       eventType: 'onLoad',
       flushOnNavigation: true,
       logUnchangedNavigations: true,
       source: 'custom-source',
       getMessage: (data) => `Custom navigation to ${data.to}`,
     });
+    observe(router);
 
     emit('onResolved', '/two');
     emit('onLoad', '/two');

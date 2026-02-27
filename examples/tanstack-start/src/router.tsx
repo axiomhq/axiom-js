@@ -13,10 +13,11 @@ export function getRouter() {
   })
 
   if (typeof window !== 'undefined') {
-    observeTanStackRouter(router, routerLogger, {
+    const observe = observeTanStackRouter(routerLogger, {
       eventType: 'onResolved',
       source: 'tanstack-router-spa',
     })
+    observe(router)
   }
 
   return router
