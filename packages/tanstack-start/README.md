@@ -25,7 +25,8 @@ const logger = new Logger({
   formatters: tanStackRouterFormatters,
 });
 
-const unsubscribe = observeTanStackRouter(router, logger);
+const observe = observeTanStackRouter(logger);
+const unsubscribe = observe(router);
 ```
 
 ## TanStack Start (request/function middleware)
