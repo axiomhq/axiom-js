@@ -1,5 +1,5 @@
 import { createRouter as createTanStackRouter } from '@tanstack/react-router'
-import { observeTanStackRouter } from '@axiomhq/tanstack-start/router'
+import { observeTanStackRouter } from '@axiomhq/tanstack-start'
 import { routeTree } from './routeTree.gen'
 import { routerLogger } from './lib/logger'
 

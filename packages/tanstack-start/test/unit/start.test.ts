@@ -1,6 +1,11 @@
 import { EVENT, LogLevel } from '@axiomhq/logging';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
+  captureError,
+  createAxiomMiddleware,
+  createAxiomProxyHandler,
+  createAxiomRequestMiddleware,
+  createAxiomUncaughtErrorHandler,
   createAxiomStartFunctionCorrelationMiddleware,
   createAxiomStartProxyHandler,
   createAxiomStartUncaughtErrorHandler,
@@ -636,5 +641,13 @@ describe('start middleware', () => {
     expect(onError).toHaveBeenCalledTimes(1);
     expect(mockLogger.error).not.toHaveBeenCalled();
     expect(mockLogger.flush).toHaveBeenCalledTimes(1);
+  });
+
+  it('exports short aliases for start helpers', () => {
+    expect(createAxiomRequestMiddleware).toBe(createAxiomStartRequestMiddleware);
+    expect(createAxiomMiddleware).toBe(createAxiomStartFunctionMiddleware);
+    expect(createAxiomProxyHandler).toBe(createAxiomStartProxyHandler);
+    expect(createAxiomUncaughtErrorHandler).toBe(createAxiomStartUncaughtErrorHandler);
+    expect(captureError).toBe(withAxiomStartErrorCapture);
   });
 });

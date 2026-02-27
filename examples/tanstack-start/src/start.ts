@@ -1,16 +1,16 @@
 import { createMiddleware, createStart } from '@tanstack/react-start'
 import {
-  createAxiomStartFunctionMiddleware,
-  createAxiomStartRequestMiddleware,
-} from '@axiomhq/tanstack-start/start'
+  createAxiomMiddleware,
+  createAxiomRequestMiddleware,
+} from '@axiomhq/tanstack-start'
 import { startLogger } from './lib/logger'
 
 export const startInstance = createStart(() => ({
   requestMiddleware: [
-    createAxiomStartRequestMiddleware(createMiddleware, startLogger),
+    createAxiomRequestMiddleware(createMiddleware, startLogger),
   ],
   functionMiddleware: [
-    createAxiomStartFunctionMiddleware(createMiddleware, startLogger, {
+    createAxiomMiddleware(createMiddleware, startLogger, {
       correlation: true,
     }),
   ],

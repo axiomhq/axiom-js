@@ -1,8 +1,7 @@
 import { Axiom } from '@axiomhq/js'
 import { AxiomJSTransport, ConsoleTransport, Logger } from '@axiomhq/logging'
 import type { Transport } from '@axiomhq/logging'
-import { tanStackRouterFormatters } from '@axiomhq/tanstack-start'
-import { tanStackStartServerFormatters } from '@axiomhq/tanstack-start/start'
+import { tanStackRouterFormatters, tanStackStartServerFormatters } from '@axiomhq/tanstack-start'
 
 function createTransports(): [Transport, ...Transport[]] {
   const token = import.meta.env.VITE_AXIOM_TOKEN ?? ''

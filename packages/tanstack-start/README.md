@@ -13,19 +13,44 @@ The `@axiomhq/tanstack-start` package provides observability utilities for TanSt
 npm install @axiomhq/js @axiomhq/logging @axiomhq/tanstack-start
 ```
 
-## TanStack Router (SPA)
+## Suggested File Layout
+
+Use this structure in your app:
+
+- `src/lib/axiom/logger.ts`: logger instances and transports
+- `src/router.tsx`: TanStack Router creation + SPA observer
+- `src/start.ts`: TanStack Start middleware wiring
+- `src/routes/api/axiom.ts`: optional proxy ingestion route
+- `src/entry-server.ts` or server-entry file: uncaught server-entry capture
+
+## Logger Setup
 
 ```ts
 import { Logger, ConsoleTransport } from '@axiomhq/logging';
-import { observeTanStackRouter } from '@axiomhq/tanstack-start/router';
-import { tanStackRouterFormatters } from '@axiomhq/tanstack-start';
+import { tanStackRouterFormatters, tanStackStartServerFormatters } from '@axiomhq/tanstack-start';
 
-const logger = new Logger({
+export const routerLogger = new Logger({
   transports: [new ConsoleTransport()],
   formatters: tanStackRouterFormatters,
 });
 
-const observe = observeTanStackRouter(logger);
+export const startLogger = new Logger({
+  transports: [new ConsoleTransport()],
+  formatters: tanStackStartServerFormatters,
+});
+```
+
+## TanStack Router (SPA)
+
+```ts
+import { observeTanStackRouter } from '@axiomhq/tanstack-start';
+import { routerLogger } from '@/lib/axiom/logger';
+
+const observe = observeTanStackRouter(routerLogger, {
+  eventType: 'onResolved',
+  source: 'tanstack-router-spa',
+});
+
 const unsubscribe = observe(router);
 ```
 
@@ -33,28 +58,21 @@ const unsubscribe = observe(router);
 
 ```ts
 import { createMiddleware } from '@tanstack/react-start';
-import { Logger, ConsoleTransport } from '@axiomhq/logging';
 import {
-  createAxiomStartRequestMiddleware,
-  createAxiomStartFunctionMiddleware,
-  createAxiomStartProxyHandler,
-  tanStackStartServerFormatters,
-} from '@axiomhq/tanstack-start/start';
-
-const logger = new Logger({
-  transports: [new ConsoleTransport()],
-  formatters: tanStackStartServerFormatters,
-});
+  createAxiomRequestMiddleware,
+  createAxiomMiddleware,
+} from '@axiomhq/tanstack-start';
+import { startLogger } from '@/lib/axiom/logger';
 
 export const requestMiddleware = [
-  createAxiomStartRequestMiddleware(createMiddleware, logger, {
+  createAxiomRequestMiddleware(createMiddleware, startLogger, {
     include: ['/api/*', '/_server/*'],
     exclude: ['/api/health', '/api/internal/*'],
     shouldLog: (ctx) => ctx.request.method !== 'OPTIONS',
   }),
 ];
 export const functionMiddleware = [
-  createAxiomStartFunctionMiddleware(createMiddleware, logger, {
+  createAxiomMiddleware(createMiddleware, startLogger, {
     correlation: true,
   }),
 ];
@@ -62,7 +80,7 @@ export const functionMiddleware = [
 
 Set `correlation: true` to add a correlation ID to function calls on the client, forward it to the server (`request_id` context + `x-axiom-correlation-id` header), and align request/function logs.
 
-If you want correlation as a standalone middleware, you can still use `createAxiomStartFunctionCorrelationMiddleware(createMiddleware)`.
+If you want correlation as a standalone middleware, use `createAxiomFunctionCorrelationMiddleware(createMiddleware)`.
 
 ## Uncaught Server Errors (Server Entry)
 
@@ -70,10 +88,11 @@ Wrap your `createServerEntry` fetch handler to capture uncaught server-entry err
 
 ```ts
 import handler, { createServerEntry } from '@tanstack/react-start/server-entry';
-import { withAxiomStartErrorCapture } from '@axiomhq/tanstack-start/start';
+import { captureError } from '@axiomhq/tanstack-start';
+import { startLogger } from '@/lib/axiom/logger';
 
 export default createServerEntry({
-  fetch: withAxiomStartErrorCapture(handler.fetch, logger),
+  fetch: captureError(handler.fetch, startLogger),
 });
 ```
 
@@ -83,9 +102,10 @@ Use this helper in a TanStack Start API route to ingest batched client logs thro
 
 ```ts
 import { createFileRoute } from '@tanstack/react-router';
-import { createAxiomStartProxyHandler } from '@axiomhq/tanstack-start/start';
+import { createAxiomProxyHandler } from '@axiomhq/tanstack-start';
+import { startLogger } from '@/lib/axiom/logger';
 
-const proxyHandler = createAxiomStartProxyHandler(logger);
+const proxyHandler = createAxiomProxyHandler(startLogger);
 
 export const Route = createFileRoute('/api/axiom')({
   server: {
