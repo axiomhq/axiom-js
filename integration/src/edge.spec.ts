@@ -36,13 +36,13 @@ describe.skipIf(!hasEdgeConfig)('Edge Ingestion', () => {
 
   beforeAll(async () => {
     // Create dataset (API call goes to main URL, not edge)
-    const createRequest: { name: string; description: string; region?: string } = {
+    const createRequest: { name: string; description: string; edgeDeployment?: string } = {
       name: datasetName,
       description: 'Test dataset for edge ingestion integration tests.',
     };
-    // Only set region if explicitly configured and non-empty
+    // Only set edgeDeployment if explicitly configured and non-empty
     if (edgeDatasetRegion && edgeDatasetRegion.trim() !== '') {
-      createRequest.region = edgeDatasetRegion;
+      createRequest.edgeDeployment = edgeDatasetRegion;
     }
     await axiom.datasets.create(createRequest);
   });
