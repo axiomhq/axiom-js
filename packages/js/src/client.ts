@@ -107,13 +107,14 @@ class BaseClient extends HTTPClient {
    *
    */
   query = <
-    TOptions extends QueryOptions,
-    TResult = TOptions['format'] extends 'tabular' ? Promise<TabularQueryResult> : Promise<QueryResult>,
+    TOptions extends QueryOptions = QueryOptions & { format?: 'tabular' },
+    TResult = TOptions['format'] extends 'legacy' ? Promise<QueryResult> : Promise<TabularQueryResult>,
   >(
     apl: string,
     options?: TOptions,
   ): Promise<TResult> => {
     const req: Query = { apl: apl };
+    const format = options?.format ?? 'tabular';
     if (options?.startTime) {
       req.startTime = options?.startTime;
     }
@@ -122,7 +123,7 @@ class BaseClient extends HTTPClient {
     }
 
     return this.client
-      .post<TOptions['format'] extends 'tabular' ? RawTabularQueryResult : QueryResult>(
+      .post<TOptions['format'] extends 'legacy' ? QueryResult : RawTabularQueryResult>(
         this.localPath + '/datasets/_apl',
         {
           body: JSON.stringify(req),
@@ -130,13 +131,13 @@ class BaseClient extends HTTPClient {
         {
           'streaming-duration': options?.streamingDuration as string,
           nocache: options?.noCache as boolean,
-          format: options?.format ?? 'legacy',
+          format,
           cursor: options?.cursor as string,
         },
         120_000,
       )
       .then((res) => {
-        if (options?.format !== 'tabular') {
+        if (format !== 'tabular') {
           return res;
         }
 
@@ -185,8 +186,8 @@ class BaseClient extends HTTPClient {
    * ```
    */
   aplQuery = <
-    TOptions extends QueryOptions,
-    TResult = TOptions['format'] extends 'tabular' ? Promise<TabularQueryResult> : Promise<QueryResult>,
+    TOptions extends QueryOptions = QueryOptions & { format?: 'tabular' },
+    TResult = TOptions['format'] extends 'legacy' ? Promise<QueryResult> : Promise<TabularQueryResult>,
   >(
     apl: string,
     options?: TOptions,
