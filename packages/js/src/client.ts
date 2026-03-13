@@ -218,8 +218,10 @@ class BaseClient extends HTTPClient {
    * ```
    *
    */
+  query(apl: string, options: QueryOptions & { format: 'legacy' }): Promise<QueryResult>;
   query(apl: string, options: QueryOptions & { format: 'tabular' }): Promise<TabularQueryResult>;
-  query(apl: string, options?: QueryOptions): Promise<QueryResult>;
+  query(apl: string, options?: QueryOptions & { format?: undefined }): Promise<TabularQueryResult>;
+  query(apl: string, options: QueryOptions): Promise<QueryResult | TabularQueryResult>;
   query(mpl: string, options: MetricsQueryOptions): Promise<MetricsResult>;
   query(
     query: string,
@@ -232,11 +234,12 @@ class BaseClient extends HTTPClient {
     return this.queryApl(query, options);
   }
 
-  private queryApl = <TOptions extends QueryOptions>(
+  private queryApl = (
     apl: string,
-    options?: TOptions,
-  ): Promise<TOptions['format'] extends 'tabular' ? TabularQueryResult : QueryResult> => {
+    options?: QueryOptions,
+  ): Promise<QueryResult | TabularQueryResult> => {
     const req: Query = { apl: apl };
+    const format = options?.format ?? 'tabular';
     if (options?.startTime) {
       req.startTime = options?.startTime;
     }
@@ -245,7 +248,7 @@ class BaseClient extends HTTPClient {
     }
 
     return this.client
-      .post<TOptions['format'] extends 'tabular' ? RawTabularQueryResult : QueryResult>(
+      .post<QueryResult | RawTabularQueryResult>(
         resolveAplQueryUrl(this.clientOptions),
         {
           body: JSON.stringify(req),
@@ -253,14 +256,14 @@ class BaseClient extends HTTPClient {
         {
           'streaming-duration': options?.streamingDuration as string,
           nocache: options?.noCache as boolean,
-          format: options?.format ?? 'legacy',
+          format,
           cursor: options?.cursor as string,
         },
         120_000,
         true,
       )
       .then((res) => {
-        if (options?.format !== 'tabular') {
+        if (format !== 'tabular') {
           return res;
         }
 
@@ -292,7 +295,7 @@ class BaseClient extends HTTPClient {
             };
           }),
         };
-      }) as Promise<TOptions['format'] extends 'tabular' ? TabularQueryResult : QueryResult>;
+      }) as Promise<QueryResult | TabularQueryResult>;
   };
 
   private queryMpl = async (mpl: string, options: MetricsQueryOptions): Promise<MetricsResult> => {
@@ -336,10 +339,12 @@ class BaseClient extends HTTPClient {
    * await axiom.aplQuery("['dataset'] | count");
    * ```
    */
+  aplQuery(apl: string, options: QueryOptions & { format: 'legacy' }): Promise<QueryResult>;
   aplQuery(apl: string, options: QueryOptions & { format: 'tabular' }): Promise<TabularQueryResult>;
-  aplQuery(apl: string, options?: QueryOptions): Promise<QueryResult>;
+  aplQuery(apl: string, options?: QueryOptions & { format?: undefined }): Promise<TabularQueryResult>;
+  aplQuery(apl: string, options: QueryOptions): Promise<QueryResult | TabularQueryResult>;
   aplQuery(apl: string, options?: QueryOptions): Promise<QueryResult | TabularQueryResult> {
-    return this.query(apl, options);
+    return this.queryApl(apl, options);
   }
 }
 

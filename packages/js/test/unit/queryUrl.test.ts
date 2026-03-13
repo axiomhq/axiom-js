@@ -8,18 +8,10 @@ const customApiUrl = 'http://axiom-js-query.dev.local';
 const customQueryPath = 'http://axiom-js-query.dev.local/query-proxy';
 const edgeDomain = 'eu-central-1.aws.edge.axiom.co';
 const edgeUrl = 'https://eu-central-1.aws.edge.axiom.co';
-const queryResult = {
-  buckets: {
-    series: [],
-    totals: [],
-  },
+const tabularQueryResult = {
   datasetNames: ['test'],
-  matches: [],
-  request: {
-    startTime: '2026-06-02T10:31:37-04:00',
-    endTime: '2026-06-03T10:31:37-04:00',
-    resolution: 'auto',
-  },
+  fieldsMetaMap: {},
+  format: 'tabular',
   status: {
     elapsedTime: 1,
     blocksExamined: 1,
@@ -31,6 +23,7 @@ const queryResult = {
     minBlockTime: '2026-06-02T00:00:00Z',
     maxBlockTime: '2026-06-02T00:00:01Z',
   },
+  tables: [],
 };
 const metricsResult = {
   status: {
@@ -44,8 +37,8 @@ describe('APL query URL behavior', () => {
     const client = new AxiomWithoutBatching({ token: 'test-token' });
 
     testMockedFetchCall((url: string) => {
-      expect(url).toEqual(`${defaultApiUrl}/v1/datasets/_apl?format=legacy`);
-    }, queryResult);
+      expect(url).toEqual(`${defaultApiUrl}/v1/datasets/_apl?format=tabular`);
+    }, tabularQueryResult);
 
     await client.query("['test'] | count");
   });
@@ -55,9 +48,9 @@ describe('APL query URL behavior', () => {
 
     testMockedFetchCall((url: string) => {
       expect(url).toEqual(
-        `${customApiUrl}/v1/datasets/_apl?streaming-duration=1m&nocache=true&format=legacy&cursor=abc123`,
+        `${customApiUrl}/v1/datasets/_apl?streaming-duration=1m&nocache=true&format=tabular&cursor=abc123`,
       );
-    }, queryResult);
+    }, tabularQueryResult);
 
     await client.query("['test'] | count", {
       cursor: 'abc123',
@@ -70,8 +63,8 @@ describe('APL query URL behavior', () => {
     const client = new AxiomWithoutBatching({ token: 'test-token', edge: edgeDomain });
 
     testMockedFetchCall((url: string) => {
-      expect(url).toEqual(`https://${edgeDomain}/v1/query/_apl?format=legacy`);
-    }, queryResult);
+      expect(url).toEqual(`https://${edgeDomain}/v1/query/_apl?format=tabular`);
+    }, tabularQueryResult);
 
     await client.query("['test'] | count");
   });
@@ -85,8 +78,8 @@ describe('APL query URL behavior', () => {
     });
 
     testMockedFetchCall((url: string) => {
-      expect(url).toEqual(`${edgeUrl}/v1/query/_apl?format=legacy`);
-    }, queryResult);
+      expect(url).toEqual(`${edgeUrl}/v1/query/_apl?format=tabular`);
+    }, tabularQueryResult);
 
     await client.query("['test'] | count");
   });
@@ -95,8 +88,8 @@ describe('APL query URL behavior', () => {
     const client = new AxiomWithoutBatching({ token: 'test-token', edge: edgeDomain });
 
     testMockedFetchCall((url: string) => {
-      expect(url).toEqual(`https://${edgeDomain}/v1/query/_apl?format=legacy`);
-    }, queryResult);
+      expect(url).toEqual(`https://${edgeDomain}/v1/query/_apl?format=tabular`);
+    }, tabularQueryResult);
 
     await client.aplQuery("['test'] | count");
   });
@@ -105,7 +98,7 @@ describe('APL query URL behavior', () => {
     const client = new AxiomWithoutBatching({ token: 'test-token', url: customApiUrl });
 
     testMockedFetchCall((url: string, init: RequestInit) => {
-      expect(url).toEqual(`${customApiUrl}/v1/datasets/_apl?format=legacy`);
+      expect(url).toEqual(`${customApiUrl}/v1/datasets/_apl?format=tabular`);
       expect(init.body).toEqual(
         JSON.stringify({
           apl: 'metrics:http_requests_total',
@@ -113,7 +106,7 @@ describe('APL query URL behavior', () => {
           endTime: '2026-06-03T10:31:37-04:00',
         }),
       );
-    }, queryResult);
+    }, tabularQueryResult);
 
     await client.query('metrics:http_requests_total', {
       startTime: '2026-06-02T10:31:37-04:00',
@@ -125,8 +118,8 @@ describe('APL query URL behavior', () => {
     const client = new AxiomWithoutBatching({ token: 'test-token', edgeUrl: `${customQueryPath}/` });
 
     testMockedFetchCall((url: string) => {
-      expect(url).toEqual(`${customQueryPath}?format=legacy`);
-    }, queryResult);
+      expect(url).toEqual(`${customQueryPath}?format=tabular`);
+    }, tabularQueryResult);
 
     await client.query("['test'] | count");
   });
