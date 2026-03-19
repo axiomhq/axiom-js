@@ -4,4 +4,4 @@ export const isVercel = getEnv('NEXT_PUBLIC_VERCEL') || getEnv('VERCEL');
 export const isNetlify = getEnv('NETLIFY') == 'true';
 
 export const environment = getEnv('NODE_ENV');
-export const region = getEnv('EDGE_DEPLOYMENT') || undefined;
+export const region = getEnv('REGION') || undefined;
