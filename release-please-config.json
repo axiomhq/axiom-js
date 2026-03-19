@@ -1,40 +1,46 @@
 {
+  "plugins": [
+    {
+      "type": "linked-versions",
+      "groupName": "integrations",
+      "components": ["react", "nextjs", "logging"]
+    },
+    {
+      "type": "linked-versions",
+      "groupName": "core",
+      "components": ["pino", "winston", "js"]
+    }
+  ],
   "packages": {
     "packages/js": {
       "release-type": "node",
       "versioning-strategy": "always-bump-patch",
-      "include-v-in-tag": false,
-      "release-group": "core"
+      "include-v-in-tag": false
     },
     "packages/pino": {
       "release-type": "node",
       "versioning-strategy": "always-bump-patch",
-      "include-v-in-tag": false,
-      "release-group": "core"
+      "include-v-in-tag": false
     },
     "packages/winston": {
       "release-type": "node",
       "versioning-strategy": "always-bump-patch",
-      "include-v-in-tag": false,
-      "release-group": "core"
+      "include-v-in-tag": false
     },
     "packages/logging": {
       "release-type": "node",
       "versioning-strategy": "always-bump-patch",
-      "include-v-in-tag": false,
-      "release-group": "integrations"
+      "include-v-in-tag": false
     },
     "packages/react": {
       "release-type": "node",
       "versioning-strategy": "always-bump-patch",
-      "include-v-in-tag": false,
-      "release-group": "integrations"
+      "include-v-in-tag": false
     },
     "packages/nextjs": {
       "release-type": "node",
       "versioning-strategy": "always-bump-patch",
-      "include-v-in-tag": false,
-      "release-group": "integrations"
+      "include-v-in-tag": false
     }
   }
 }
