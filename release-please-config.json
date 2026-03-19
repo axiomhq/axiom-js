@@ -1,5 +1,4 @@
 {
-  "last-release-sha": "074d1fb79f1f4fa96508325399a4d118035b1754",
   "plugins": [
     {
       "type": "linked-versions",
