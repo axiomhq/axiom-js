@@ -2,6 +2,18 @@ name: Release on Tag
 
 on:
   workflow_dispatch:
+    inputs:
+      package:
+        description: Package to publish when running manually
+        required: true
+        type: choice
+        options:
+          - js
+          - pino
+          - winston
+          - logging
+          - react
+          - nextjs
   push:
     tags:
       - "js-*"
@@ -18,6 +30,7 @@ env:
 
 jobs:
   publish:
+    name: Publish tagged package
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -32,6 +45,60 @@ jobs:
           node-version: 24.x
           registry-url: "https://registry.npmjs.org"
           cache: "pnpm"
+      - name: Resolve tagged package
+        run: |
+          package_ref="${GITHUB_REF_NAME}"
+          if [ "${GITHUB_EVENT_NAME}" = "workflow_dispatch" ]; then
+            package_ref="${{ inputs.package }}"
+          fi
+
+          case "${package_ref}" in
+            js-*)
+              echo "PACKAGE_DIR=packages/js" >> "$GITHUB_ENV"
+              ;;
+            js)
+              echo "PACKAGE_DIR=packages/js" >> "$GITHUB_ENV"
+              ;;
+            pino-*)
+              echo "PACKAGE_DIR=packages/pino" >> "$GITHUB_ENV"
+              ;;
+            pino)
+              echo "PACKAGE_DIR=packages/pino" >> "$GITHUB_ENV"
+              ;;
+            winston-*)
+              echo "PACKAGE_DIR=packages/winston" >> "$GITHUB_ENV"
+              ;;
+            winston)
+              echo "PACKAGE_DIR=packages/winston" >> "$GITHUB_ENV"
+              ;;
+            logging-*)
+              echo "PACKAGE_DIR=packages/logging" >> "$GITHUB_ENV"
+              ;;
+            logging)
+              echo "PACKAGE_DIR=packages/logging" >> "$GITHUB_ENV"
+              ;;
+            react-*)
+              echo "PACKAGE_DIR=packages/react" >> "$GITHUB_ENV"
+              ;;
+            react)
+              echo "PACKAGE_DIR=packages/react" >> "$GITHUB_ENV"
+              ;;
+            nextjs-*)
+              echo "PACKAGE_DIR=packages/nextjs" >> "$GITHUB_ENV"
+              ;;
+            nextjs)
+              echo "PACKAGE_DIR=packages/nextjs" >> "$GITHUB_ENV"
+              ;;
+            *)
+              echo "Unsupported package ref: ${package_ref}" >&2
+              exit 1
+              ;;
+          esac
       - run: pnpm install --frozen-lockfile
       - run: pnpm build && pnpm build:cjs
-      - run: pnpm publish --access public --filter "./packages/**" --no-git-checks --provenance
+      - name: Validate package
+        working-directory: ${{ env.PACKAGE_DIR }}
+        run: pnpm pack
+      - name: Publish package
+        working-directory: ${{ env.PACKAGE_DIR }}
+        run: pnpm publish --access public --no-git-checks --provenance
