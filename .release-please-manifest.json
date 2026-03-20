@@ -1,7 +1,7 @@
 {
-  "packages/js": "1.4.0",
-  "packages/pino": "1.4.0",
-  "packages/winston": "1.4.0",
+  "packages/js": "1.5.0",
+  "packages/pino": "1.5.0",
+  "packages/winston": "1.5.0",
   "packages/logging": "0.2.0",
   "packages/react": "0.2.0",
   "packages/nextjs": "0.2.0"
