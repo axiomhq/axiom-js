@@ -1,0 +1,47 @@
+name: Publish package
+
+on:
+  workflow_call:
+    inputs:
+      package_dir:
+        description: Workspace package directory to publish
+        required: true
+        type: string
+
+env:
+  PNPM_VERSION: 10.4.1
+  TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+  TURBO_TEAM: ${{ vars.TURBO_TEAM }}
+
+jobs:
+  publish:
+    name: Publish ${{ inputs.package_dir }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v6
+      - uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24.x
+          registry-url: 'https://registry.npmjs.org'
+          cache: 'pnpm'
+      - name: Cache turbo build setup
+        uses: actions/cache@v4
+        with:
+          path: ./node_modules/.cache/turbo
+          key: ${{ runner.os }}-turbo-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-turbo-
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build && pnpm build:cjs
+      - name: Validate package
+        working-directory: ${{ inputs.package_dir }}
+        run: pnpm pack
+      - name: Publish package
+        working-directory: ${{ inputs.package_dir }}
+        run: pnpm publish --access public --no-git-checks --provenance
