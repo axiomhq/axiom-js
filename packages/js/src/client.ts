@@ -31,7 +31,7 @@ class BaseClient extends HTTPClient {
    * @param dataset - name of the dataset to ingest events into
    * @param data - data to be ingested
    * @param contentType - optional content type, defaults to JSON
-   * @param contentEncoding - optional content encoding, defaults to Identity
+   * @param contentEncoding - optional content encoding, defaults to Auto
    * @param options - optional ingest options
    * @returns result a promise of ingest and its status, check: {@link IngestStatus}
    * @example
@@ -44,21 +44,22 @@ class BaseClient extends HTTPClient {
    */
   ingestRaw = async (
     dataset: string,
-    data: string | Buffer | ReadableStream,
+    data: string | Buffer | Uint8Array | ReadableStream,
     contentType: ContentType = ContentType.JSON,
-    contentEncoding: ContentEncoding = ContentEncoding.Identity,
+    contentEncoding: ContentEncoding = ContentEncoding.Auto,
     options?: IngestOptions,
   ): Promise<IngestStatus> => {
     try {
+      const encoded = await this.encodeIngestPayload(data, contentEncoding);
       const ingestUrl = resolveIngestUrl(this.clientOptions, dataset);
       return await this.client.post<IngestStatus>(
         ingestUrl,
         {
           headers: {
             'Content-Type': contentType,
-            'Content-Encoding': contentEncoding,
+            'Content-Encoding': encoded.contentEncoding,
           },
-          body: data,
+          body: encoded.data,
         },
         {
           'timestamp-field': options?.timestampField as string,
@@ -78,6 +79,82 @@ class BaseClient extends HTTPClient {
         walLength: 0,
       });
     }
+  };
+
+  protected encodeIngestPayload = async (
+    data: string | Buffer | Uint8Array | ReadableStream,
+    contentEncoding: ContentEncoding,
+  ): Promise<{ data: string | Buffer | Uint8Array | ReadableStream; contentEncoding: ContentEncoding }> => {
+    if (contentEncoding !== ContentEncoding.Auto) {
+      return { data, contentEncoding };
+    }
+
+    if (typeof CompressionStream === 'undefined') {
+      return { data, contentEncoding: ContentEncoding.Identity };
+    }
+
+    try {
+      const source = this.resolveCompressionSource(data);
+      if (!source) {
+        return { data, contentEncoding: ContentEncoding.Identity };
+      }
+      const stream = source.pipeThrough(new CompressionStream('gzip'));
+      const compressed = new Uint8Array(await new Response(stream).arrayBuffer());
+      return { data: compressed, contentEncoding: ContentEncoding.GZIP };
+    } catch (err) {
+      this.onError(err as Error);
+      return { data, contentEncoding: ContentEncoding.Identity };
+    }
+  };
+
+  protected resolveCompressionSource = (
+    data: string | Buffer | Uint8Array | ReadableStream,
+  ): ReadableStream | null => {
+    if (typeof ReadableStream !== 'undefined' && data instanceof ReadableStream) {
+      return data;
+    }
+
+    if (this.isAsyncIterable(data)) {
+      return new ReadableStream({
+        start: async (controller) => {
+          for await (const chunk of data) {
+            controller.enqueue(this.normalizeChunk(chunk));
+          }
+          controller.close();
+        },
+      });
+    }
+
+    if (typeof data === 'string' || data instanceof Uint8Array) {
+      return new Blob([data]).stream();
+    }
+
+    return null;
+  };
+
+  protected isAsyncIterable = (value: unknown): value is AsyncIterable<unknown> => {
+    return (
+      value !== null &&
+      typeof value === 'object' &&
+      Symbol.asyncIterator in value &&
+      typeof (value as AsyncIterable<unknown>)[Symbol.asyncIterator] === 'function'
+    );
+  };
+
+  protected normalizeChunk = (chunk: unknown): Uint8Array => {
+    if (chunk instanceof Uint8Array) {
+      return chunk;
+    }
+
+    if (chunk instanceof ArrayBuffer) {
+      return new Uint8Array(chunk);
+    }
+
+    if (typeof chunk === 'string') {
+      return new TextEncoder().encode(chunk);
+    }
+
+    return new TextEncoder().encode(String(chunk));
   };
 
   queryLegacy = (dataset: string, query: QueryLegacy, options?: QueryOptions): Promise<QueryLegacyResult> =>
@@ -222,8 +299,7 @@ export class AxiomWithoutBatching extends BaseClient {
   async ingest(dataset: string, events: Array<object> | object, options?: IngestOptions): Promise<IngestStatus> {
     const array = Array.isArray(events) ? events : [events];
     const json = array.map((v) => JSON.stringify(v)).join('\n');
-
-    return this.ingestRaw(dataset, json, ContentType.NDJSON, ContentEncoding.Identity, options);
+    return this.ingestRaw(dataset, json, ContentType.NDJSON, ContentEncoding.Auto, options);
   }
 }
 
@@ -257,7 +333,7 @@ export class Axiom extends BaseClient {
         (dataset, events, options) => {
           const array = Array.isArray(events) ? events : [events];
           const json = array.map((v) => JSON.stringify(v)).join('\n');
-          return this.ingestRaw(dataset, json, ContentType.NDJSON, ContentEncoding.Identity, options);
+          return this.ingestRaw(dataset, json, ContentType.NDJSON, ContentEncoding.Auto, options);
         },
         dataset,
         options,
@@ -299,6 +375,7 @@ export enum ContentType {
 }
 
 export enum ContentEncoding {
+  Auto = 'auto',
   Identity = '',
   GZIP = 'gzip',
 }
