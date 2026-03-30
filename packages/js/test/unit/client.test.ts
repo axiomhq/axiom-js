@@ -255,8 +255,8 @@ describe('Axiom', () => {
       testMockedFetchCall((_: string, init: RequestInit) => {
         const headers = new Headers(init.headers);
         expect(headers.get('Content-Type')).toEqual(ContentType.JSON);
-        expect(headers.get('Content-Encoding')).toEqual(ContentEncoding.GZIP);
-        expect(decodeGzipBody(init.body)).toEqual(JSON.stringify(query));
+        expect(headers.get('Content-Encoding')).toEqual(ContentEncoding.Identity);
+        expect(init.body).toEqual(JSON.stringify(query));
       }, ingestStatus);
 
       const response = await axiom.ingestRaw('test', JSON.stringify(query), ContentType.JSON, ContentEncoding.Identity);
@@ -279,11 +279,35 @@ describe('Axiom', () => {
       testMockedFetchCall((_: string, init: RequestInit) => {
         const headers = new Headers(init.headers);
         expect(headers.get('Content-Type')).toEqual(ContentType.JSON);
+        expect(headers.get('Content-Encoding')).toEqual(ContentEncoding.Identity);
+        expect(init.body).toEqual(JSON.stringify(query));
+      }, ingestStatus);
+
+      const response = await axiom.ingestRaw('test', JSON.stringify(query), ContentType.JSON, ContentEncoding.Identity);
+      expect(response).toBeDefined();
+      expect(response.ingested).toEqual(2);
+      expect(response.failed).toEqual(0);
+    });
+
+    it('IngestRaw auto encoding compresses payloads', async () => {
+      const query = [{ foo: 'bar' }, { foo: 'baz' }];
+      const ingestStatus = {
+        ingested: 2,
+        failed: 0,
+        failures: [],
+        processedBytes: 630,
+        blocksCreated: 0,
+        walLength: 2,
+      };
+
+      testMockedFetchCall((_: string, init: RequestInit) => {
+        const headers = new Headers(init.headers);
+        expect(headers.get('Content-Type')).toEqual(ContentType.JSON);
         expect(headers.get('Content-Encoding')).toEqual(ContentEncoding.GZIP);
         expect(decodeGzipBody(init.body)).toEqual(JSON.stringify(query));
       }, ingestStatus);
 
-      const response = await axiom.ingestRaw('test', JSON.stringify(query), ContentType.JSON, ContentEncoding.Identity);
+      const response = await axiom.ingestRaw('test', JSON.stringify(query), ContentType.JSON, ContentEncoding.Auto);
       expect(response).toBeDefined();
       expect(response.ingested).toEqual(2);
       expect(response.failed).toEqual(0);

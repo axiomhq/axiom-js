@@ -31,7 +31,7 @@ class BaseClient extends HTTPClient {
    * @param dataset - name of the dataset to ingest events into
    * @param data - data to be ingested
    * @param contentType - optional content type, defaults to JSON
-   * @param contentEncoding - optional content encoding, defaults to Identity
+   * @param contentEncoding - optional content encoding, defaults to Auto
    * @param options - optional ingest options
    * @returns result a promise of ingest and its status, check: {@link IngestStatus}
    * @example
@@ -46,7 +46,7 @@ class BaseClient extends HTTPClient {
     dataset: string,
     data: string | Buffer | Uint8Array | ReadableStream,
     contentType: ContentType = ContentType.JSON,
-    contentEncoding: ContentEncoding = ContentEncoding.Identity,
+    contentEncoding: ContentEncoding = ContentEncoding.Auto,
     options?: IngestOptions,
   ): Promise<IngestStatus> => {
     try {
@@ -85,8 +85,12 @@ class BaseClient extends HTTPClient {
     data: string | Buffer | Uint8Array | ReadableStream,
     contentEncoding: ContentEncoding,
   ): Promise<{ data: string | Buffer | Uint8Array | ReadableStream; contentEncoding: ContentEncoding }> => {
-    if (contentEncoding !== ContentEncoding.Identity || typeof CompressionStream === 'undefined') {
+    if (contentEncoding !== ContentEncoding.Auto) {
       return { data, contentEncoding };
+    }
+
+    if (typeof CompressionStream === 'undefined') {
+      return { data, contentEncoding: ContentEncoding.Identity };
     }
 
     try {
@@ -96,7 +100,7 @@ class BaseClient extends HTTPClient {
       return { data: compressed, contentEncoding: ContentEncoding.GZIP };
     } catch (err) {
       this.onError(err as Error);
-      return { data, contentEncoding };
+      return { data, contentEncoding: ContentEncoding.Identity };
     }
   };
 
@@ -242,7 +246,7 @@ export class AxiomWithoutBatching extends BaseClient {
   async ingest(dataset: string, events: Array<object> | object, options?: IngestOptions): Promise<IngestStatus> {
     const array = Array.isArray(events) ? events : [events];
     const json = array.map((v) => JSON.stringify(v)).join('\n');
-    return this.ingestRaw(dataset, json, ContentType.NDJSON, ContentEncoding.Identity, options);
+    return this.ingestRaw(dataset, json, ContentType.NDJSON, ContentEncoding.Auto, options);
   }
 }
 
@@ -276,7 +280,7 @@ export class Axiom extends BaseClient {
         (dataset, events, options) => {
           const array = Array.isArray(events) ? events : [events];
           const json = array.map((v) => JSON.stringify(v)).join('\n');
-          return this.ingestRaw(dataset, json, ContentType.NDJSON, ContentEncoding.Identity, options);
+          return this.ingestRaw(dataset, json, ContentType.NDJSON, ContentEncoding.Auto, options);
         },
         dataset,
         options,
@@ -318,6 +322,7 @@ export enum ContentType {
 }
 
 export enum ContentEncoding {
+  Auto = 'auto',
   Identity = '',
   GZIP = 'gzip',
 }
