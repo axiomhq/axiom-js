@@ -50,15 +50,16 @@ class BaseClient extends HTTPClient {
     options?: IngestOptions,
   ): Promise<IngestStatus> => {
     try {
+      const encoded = await this.encodeIngestPayload(data, contentEncoding);
       const ingestUrl = resolveIngestUrl(this.clientOptions, dataset);
       return await this.client.post<IngestStatus>(
         ingestUrl,
         {
           headers: {
             'Content-Type': contentType,
-            'Content-Encoding': contentEncoding,
+            'Content-Encoding': encoded.contentEncoding,
           },
-          body: data,
+          body: encoded.data,
         },
         {
           'timestamp-field': options?.timestampField as string,
@@ -80,23 +81,22 @@ class BaseClient extends HTTPClient {
     }
   };
 
-  protected encodeEventsForIngest = async (
-    events: Array<object> | object,
-  ): Promise<{ data: string | Uint8Array; contentEncoding: ContentEncoding }> => {
-    const array = Array.isArray(events) ? events : [events];
-    const json = array.map((v) => JSON.stringify(v)).join('\n');
-
-    if (typeof CompressionStream === 'undefined') {
-      return { data: json, contentEncoding: ContentEncoding.Identity };
+  protected encodeIngestPayload = async (
+    data: string | Buffer | Uint8Array | ReadableStream,
+    contentEncoding: ContentEncoding,
+  ): Promise<{ data: string | Buffer | Uint8Array | ReadableStream; contentEncoding: ContentEncoding }> => {
+    if (contentEncoding !== ContentEncoding.Identity || typeof CompressionStream === 'undefined') {
+      return { data, contentEncoding };
     }
 
     try {
-      const stream = new Blob([json]).stream().pipeThrough(new CompressionStream('gzip'));
+      const source = data instanceof ReadableStream ? data : new Blob([data]).stream();
+      const stream = source.pipeThrough(new CompressionStream('gzip'));
       const compressed = new Uint8Array(await new Response(stream).arrayBuffer());
       return { data: compressed, contentEncoding: ContentEncoding.GZIP };
     } catch (err) {
       this.onError(err as Error);
-      return { data: json, contentEncoding: ContentEncoding.Identity };
+      return { data, contentEncoding };
     }
   };
 
@@ -240,8 +240,9 @@ export class AxiomWithoutBatching extends BaseClient {
    *
    */
   async ingest(dataset: string, events: Array<object> | object, options?: IngestOptions): Promise<IngestStatus> {
-    const encoded = await this.encodeEventsForIngest(events);
-    return this.ingestRaw(dataset, encoded.data, ContentType.NDJSON, encoded.contentEncoding, options);
+    const array = Array.isArray(events) ? events : [events];
+    const json = array.map((v) => JSON.stringify(v)).join('\n');
+    return this.ingestRaw(dataset, json, ContentType.NDJSON, ContentEncoding.Identity, options);
   }
 }
 
@@ -272,9 +273,10 @@ export class Axiom extends BaseClient {
     const key = createBatchKey(dataset, options);
     if (!this.batch[key]) {
       this.batch[key] = new Batch(
-        async (dataset, events, options) => {
-          const encoded = await this.encodeEventsForIngest(events);
-          return this.ingestRaw(dataset, encoded.data, ContentType.NDJSON, encoded.contentEncoding, options);
+        (dataset, events, options) => {
+          const array = Array.isArray(events) ? events : [events];
+          const json = array.map((v) => JSON.stringify(v)).join('\n');
+          return this.ingestRaw(dataset, json, ContentType.NDJSON, ContentEncoding.Identity, options);
         },
         dataset,
         options,

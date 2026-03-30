@@ -1,7 +1,7 @@
 import { describe, expect, it, beforeEach, vi } from 'vitest';
 import { setupServer } from 'msw/node';
 import { http, HttpResponse } from 'msw';
-import { gunzipSync } from 'zlib';
+import { gunzipSync, gzipSync } from 'zlib';
 
 import { ContentType, ContentEncoding, Axiom, AxiomWithoutBatching } from '../../src/client';
 import { AxiomTooManyRequestsError } from '../../src/fetchClient';
@@ -253,8 +253,10 @@ describe('Axiom', () => {
         walLength: 2,
       };
       testMockedFetchCall((_: string, init: RequestInit) => {
-        expect(init.headers).toHaveProperty('Content-Type');
-        expect(init.body).toEqual(JSON.stringify(query));
+        const headers = new Headers(init.headers);
+        expect(headers.get('Content-Type')).toEqual(ContentType.JSON);
+        expect(headers.get('Content-Encoding')).toEqual(ContentEncoding.GZIP);
+        expect(decodeGzipBody(init.body)).toEqual(JSON.stringify(query));
       }, ingestStatus);
 
       const response = await axiom.ingestRaw('test', JSON.stringify(query), ContentType.JSON, ContentEncoding.Identity);
@@ -275,11 +277,38 @@ describe('Axiom', () => {
         walLength: 2,
       };
       testMockedFetchCall((_: string, init: RequestInit) => {
-        expect(init.headers).toHaveProperty('Content-Type');
-        expect(init.body).toEqual(JSON.stringify(query));
+        const headers = new Headers(init.headers);
+        expect(headers.get('Content-Type')).toEqual(ContentType.JSON);
+        expect(headers.get('Content-Encoding')).toEqual(ContentEncoding.GZIP);
+        expect(decodeGzipBody(init.body)).toEqual(JSON.stringify(query));
       }, ingestStatus);
 
       const response = await axiom.ingestRaw('test', JSON.stringify(query), ContentType.JSON, ContentEncoding.Identity);
+      expect(response).toBeDefined();
+      expect(response.ingested).toEqual(2);
+      expect(response.failed).toEqual(0);
+    });
+
+    it('IngestRaw keeps explicit gzip payload unchanged', async () => {
+      const query = [{ foo: 'bar' }, { foo: 'baz' }];
+      const compressed = gzipSync(JSON.stringify(query));
+      const ingestStatus = {
+        ingested: 2,
+        failed: 0,
+        failures: [],
+        processedBytes: 630,
+        blocksCreated: 0,
+        walLength: 2,
+      };
+
+      testMockedFetchCall((_: string, init: RequestInit) => {
+        const headers = new Headers(init.headers);
+        expect(headers.get('Content-Type')).toEqual(ContentType.JSON);
+        expect(headers.get('Content-Encoding')).toEqual(ContentEncoding.GZIP);
+        expect(init.body).toEqual(compressed);
+      }, ingestStatus);
+
+      const response = await axiom.ingestRaw('test', compressed, ContentType.JSON, ContentEncoding.GZIP);
       expect(response).toBeDefined();
       expect(response.ingested).toEqual(2);
       expect(response.failed).toEqual(0);
