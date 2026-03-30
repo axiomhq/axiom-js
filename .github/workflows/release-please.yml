@@ -12,9 +12,65 @@ permissions:
 jobs:
   release-please:
     runs-on: ubuntu-latest
+    outputs:
+      js_released: ${{ steps.release.outputs['packages/js--release_created'] }}
+      pino_released: ${{ steps.release.outputs['packages/pino--release_created'] }}
+      winston_released: ${{ steps.release.outputs['packages/winston--release_created'] }}
+      logging_released: ${{ steps.release.outputs['packages/logging--release_created'] }}
+      react_released: ${{ steps.release.outputs['packages/react--release_created'] }}
+      nextjs_released: ${{ steps.release.outputs['packages/nextjs--release_created'] }}
     steps:
-      - uses: googleapis/release-please-action@v4
+      - id: release
+        uses: googleapis/release-please-action@v4
         with:
           token: ${{ secrets.AXIOM_AUTOMATION_TOKEN }}
           manifest-file: .release-please-manifest.json
           config-file: release-please-config.json
+
+  publish-js:
+    needs: release-please
+    if: ${{ needs.release-please.outputs.js_released == 'true' }}
+    uses: ./.github/workflows/publish-package.yml
+    secrets: inherit
+    with:
+      package_dir: packages/js
+
+  publish-pino:
+    needs: release-please
+    if: ${{ needs.release-please.outputs.pino_released == 'true' }}
+    uses: ./.github/workflows/publish-package.yml
+    secrets: inherit
+    with:
+      package_dir: packages/pino
+
+  publish-winston:
+    needs: release-please
+    if: ${{ needs.release-please.outputs.winston_released == 'true' }}
+    uses: ./.github/workflows/publish-package.yml
+    secrets: inherit
+    with:
+      package_dir: packages/winston
+
+  publish-logging:
+    needs: release-please
+    if: ${{ needs.release-please.outputs.logging_released == 'true' }}
+    uses: ./.github/workflows/publish-package.yml
+    secrets: inherit
+    with:
+      package_dir: packages/logging
+
+  publish-react:
+    needs: release-please
+    if: ${{ needs.release-please.outputs.react_released == 'true' }}
+    uses: ./.github/workflows/publish-package.yml
+    secrets: inherit
+    with:
+      package_dir: packages/react
+
+  publish-nextjs:
+    needs: release-please
+    if: ${{ needs.release-please.outputs.nextjs_released == 'true' }}
+    uses: ./.github/workflows/publish-package.yml
+    secrets: inherit
+    with:
+      package_dir: packages/nextjs
