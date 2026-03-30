@@ -94,7 +94,10 @@ class BaseClient extends HTTPClient {
     }
 
     try {
-      const source = data instanceof ReadableStream ? data : new Blob([data]).stream();
+      const source = this.resolveCompressionSource(data);
+      if (!source) {
+        return { data, contentEncoding: ContentEncoding.Identity };
+      }
       const stream = source.pipeThrough(new CompressionStream('gzip'));
       const compressed = new Uint8Array(await new Response(stream).arrayBuffer());
       return { data: compressed, contentEncoding: ContentEncoding.GZIP };
@@ -102,6 +105,56 @@ class BaseClient extends HTTPClient {
       this.onError(err as Error);
       return { data, contentEncoding: ContentEncoding.Identity };
     }
+  };
+
+  protected resolveCompressionSource = (
+    data: string | Buffer | Uint8Array | ReadableStream,
+  ): ReadableStream | null => {
+    if (typeof ReadableStream !== 'undefined' && data instanceof ReadableStream) {
+      return data;
+    }
+
+    if (this.isAsyncIterable(data)) {
+      return new ReadableStream({
+        start: async (controller) => {
+          for await (const chunk of data) {
+            controller.enqueue(this.normalizeChunk(chunk));
+          }
+          controller.close();
+        },
+      });
+    }
+
+    if (typeof data === 'string' || data instanceof Uint8Array) {
+      return new Blob([data]).stream();
+    }
+
+    return null;
+  };
+
+  protected isAsyncIterable = (value: unknown): value is AsyncIterable<unknown> => {
+    return (
+      value !== null &&
+      typeof value === 'object' &&
+      Symbol.asyncIterator in value &&
+      typeof (value as AsyncIterable<unknown>)[Symbol.asyncIterator] === 'function'
+    );
+  };
+
+  protected normalizeChunk = (chunk: unknown): Uint8Array => {
+    if (chunk instanceof Uint8Array) {
+      return chunk;
+    }
+
+    if (chunk instanceof ArrayBuffer) {
+      return new Uint8Array(chunk);
+    }
+
+    if (typeof chunk === 'string') {
+      return new TextEncoder().encode(chunk);
+    }
+
+    return new TextEncoder().encode(String(chunk));
   };
 
   queryLegacy = (dataset: string, query: QueryLegacy, options?: QueryOptions): Promise<QueryLegacyResult> =>

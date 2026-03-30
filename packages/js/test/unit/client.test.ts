@@ -1,6 +1,7 @@
 import { describe, expect, it, beforeEach, vi } from 'vitest';
 import { setupServer } from 'msw/node';
 import { http, HttpResponse } from 'msw';
+import { Readable } from 'node:stream';
 import { gunzipSync, gzipSync } from 'zlib';
 
 import { ContentType, ContentEncoding, Axiom, AxiomWithoutBatching } from '../../src/client';
@@ -311,6 +312,37 @@ describe('Axiom', () => {
       expect(response).toBeDefined();
       expect(response.ingested).toEqual(2);
       expect(response.failed).toEqual(0);
+    });
+
+    it('IngestRaw auto encoding keeps Node readable stream payload content', async () => {
+      const payload = JSON.stringify([{ foo: 'bar' }, { foo: 'baz' }]);
+      const stream = Readable.from([payload]);
+      let decodedBody: string | null = null;
+      const ingestStatus = {
+        ingested: 2,
+        failed: 0,
+        failures: [],
+        processedBytes: 630,
+        blocksCreated: 0,
+        walLength: 2,
+      };
+
+      testMockedFetchCall((_: string, init: RequestInit) => {
+        const headers = new Headers(init.headers);
+        expect(headers.get('Content-Type')).toEqual(ContentType.JSON);
+        expect(headers.get('Content-Encoding')).toEqual(ContentEncoding.GZIP);
+        if (!(init.body instanceof Uint8Array)) {
+          decodedBody = null;
+          return;
+        }
+        decodedBody = gunzipSync(Buffer.from(init.body)).toString('utf-8');
+      }, ingestStatus);
+
+      const response = await axiom.ingestRaw('test', stream as unknown as ReadableStream, ContentType.JSON, ContentEncoding.Auto);
+      expect(response).toBeDefined();
+      expect(response.ingested).toEqual(2);
+      expect(response.failed).toEqual(0);
+      expect(decodedBody).toEqual(payload);
     });
 
     it('IngestRaw keeps explicit gzip payload unchanged', async () => {
