@@ -44,7 +44,7 @@ class BaseClient extends HTTPClient {
    */
   ingestRaw = async (
     dataset: string,
-    data: string | Buffer | ReadableStream,
+    data: string | Buffer | Uint8Array | ReadableStream,
     contentType: ContentType = ContentType.JSON,
     contentEncoding: ContentEncoding = ContentEncoding.Identity,
     options?: IngestOptions,
@@ -77,6 +77,26 @@ class BaseClient extends HTTPClient {
         blocksCreated: 0,
         walLength: 0,
       });
+    }
+  };
+
+  protected encodeEventsForIngest = async (
+    events: Array<object> | object,
+  ): Promise<{ data: string | Uint8Array; contentEncoding: ContentEncoding }> => {
+    const array = Array.isArray(events) ? events : [events];
+    const json = array.map((v) => JSON.stringify(v)).join('\n');
+
+    if (typeof CompressionStream === 'undefined') {
+      return { data: json, contentEncoding: ContentEncoding.Identity };
+    }
+
+    try {
+      const stream = new Blob([json]).stream().pipeThrough(new CompressionStream('gzip'));
+      const compressed = new Uint8Array(await new Response(stream).arrayBuffer());
+      return { data: compressed, contentEncoding: ContentEncoding.GZIP };
+    } catch (err) {
+      this.onError(err as Error);
+      return { data: json, contentEncoding: ContentEncoding.Identity };
     }
   };
 
@@ -220,10 +240,8 @@ export class AxiomWithoutBatching extends BaseClient {
    *
    */
   async ingest(dataset: string, events: Array<object> | object, options?: IngestOptions): Promise<IngestStatus> {
-    const array = Array.isArray(events) ? events : [events];
-    const json = array.map((v) => JSON.stringify(v)).join('\n');
-
-    return this.ingestRaw(dataset, json, ContentType.NDJSON, ContentEncoding.Identity, options);
+    const encoded = await this.encodeEventsForIngest(events);
+    return this.ingestRaw(dataset, encoded.data, ContentType.NDJSON, encoded.contentEncoding, options);
   }
 }
 
@@ -254,10 +272,9 @@ export class Axiom extends BaseClient {
     const key = createBatchKey(dataset, options);
     if (!this.batch[key]) {
       this.batch[key] = new Batch(
-        (dataset, events, options) => {
-          const array = Array.isArray(events) ? events : [events];
-          const json = array.map((v) => JSON.stringify(v)).join('\n');
-          return this.ingestRaw(dataset, json, ContentType.NDJSON, ContentEncoding.Identity, options);
+        async (dataset, events, options) => {
+          const encoded = await this.encodeEventsForIngest(events);
+          return this.ingestRaw(dataset, encoded.data, ContentType.NDJSON, encoded.contentEncoding, options);
         },
         dataset,
         options,

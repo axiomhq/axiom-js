@@ -1,6 +1,7 @@
 import { describe, expect, it, beforeEach, vi } from 'vitest';
 import { setupServer } from 'msw/node';
 import { http, HttpResponse } from 'msw';
+import { gunzipSync } from 'zlib';
 
 import { ContentType, ContentEncoding, Axiom, AxiomWithoutBatching } from '../../src/client';
 import { AxiomTooManyRequestsError } from '../../src/fetchClient';
@@ -172,6 +173,14 @@ const tabularEvents = [
 
 const clientURL = 'http://axiom-js-retries.dev.local';
 
+const decodeGzipBody = (body: BodyInit | null | undefined): string => {
+  if (!(body instanceof Uint8Array)) {
+    throw new Error(`Expected gzip body to be Uint8Array, received ${typeof body}`);
+  }
+
+  return gunzipSync(Buffer.from(body)).toString('utf-8');
+};
+
 describe('Axiom', () => {
   let axiom = new AxiomWithoutBatching({ url: clientURL, token: '' });
   expect(axiom).toBeDefined();
@@ -274,6 +283,53 @@ describe('Axiom', () => {
       expect(response).toBeDefined();
       expect(response.ingested).toEqual(2);
       expect(response.failed).toEqual(0);
+    });
+
+    it('Ingest uses gzip encoding by default', async () => {
+      const events = [{ foo: 'bar' }, { foo: 'baz' }];
+      const ingestStatus = {
+        ingested: 2,
+        failed: 0,
+        failures: [],
+        processedBytes: 630,
+        blocksCreated: 0,
+        walLength: 2,
+      };
+
+      testMockedFetchCall((_: string, init: RequestInit) => {
+        const headers = new Headers(init.headers);
+        expect(headers.get('Content-Type')).toEqual(ContentType.NDJSON);
+        expect(headers.get('Content-Encoding')).toEqual(ContentEncoding.GZIP);
+        expect(decodeGzipBody(init.body)).toEqual(events.map((event) => JSON.stringify(event)).join('\n'));
+      }, ingestStatus);
+
+      const response = await axiom.ingest('test', events);
+      expect(response).toBeDefined();
+      expect(response.ingested).toEqual(2);
+      expect(response.failed).toEqual(0);
+    });
+
+    it('Batch ingest uses gzip encoding by default', async () => {
+      const events = [{ foo: 'bar' }, { foo: 'baz' }];
+      const ingestStatus = {
+        ingested: 2,
+        failed: 0,
+        failures: [],
+        processedBytes: 630,
+        blocksCreated: 0,
+        walLength: 2,
+      };
+
+      const client = new Axiom({ url: clientURL, token: '' });
+      testMockedFetchCall((_: string, init: RequestInit) => {
+        const headers = new Headers(init.headers);
+        expect(headers.get('Content-Type')).toEqual(ContentType.NDJSON);
+        expect(headers.get('Content-Encoding')).toEqual(ContentEncoding.GZIP);
+        expect(decodeGzipBody(init.body)).toEqual(events.map((event) => JSON.stringify(event)).join('\n'));
+      }, ingestStatus);
+
+      client.ingest('test', events);
+      await client.flush();
     });
 
     it('does not throw exception on ingest (50x failure)', async () => {
