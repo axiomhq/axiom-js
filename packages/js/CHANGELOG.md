@@ -5,6 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.0](https://github.com/axiomhq/axiom-js/compare/js-1.5.0...js-1.6.0) (2026-03-30)
+
+
+### Features
+
+* **js:** gzip-compress default ingest payloads ([#413](https://github.com/axiomhq/axiom-js/issues/413)) ([3e76027](https://github.com/axiomhq/axiom-js/commit/3e7602781742b2fd8374701e90180e8d585068f2))
+
+## [1.5.0](https://github.com/axiomhq/axiom-js/compare/js-1.4.0...js-1.5.0) (2026-03-20)
+
+
+### Features
+
+* edge deployment in favor of region ([#405](https://github.com/axiomhq/axiom-js/issues/405)) ([0edc449](https://github.com/axiomhq/axiom-js/commit/0edc44998cd3c16d5c33af71defa6101ffb8008e))
+
+
+### Bug Fixes
+
+* remove prepublish scripts from winston and pino packages ([#396](https://github.com/axiomhq/axiom-js/issues/396)) ([77bbada](https://github.com/axiomhq/axiom-js/commit/77bbada6cff05359caaebe0d5dc714ba7c6469fb))
+
 ## [Unreleased]
 
 ## [1.3.0] - 2024-09-20
