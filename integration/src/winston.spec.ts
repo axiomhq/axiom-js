@@ -67,6 +67,7 @@ describe('WinstonTransport', () => {
       noCache: false,
     });
 
-    expect(res.matches).toHaveLength(1);
+    expect(res.tables).toHaveLength(1);
+    expect(Array.from(res.tables[0].events())).toHaveLength(1);
   });
 });
