@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.1](https://github.com/axiomhq/axiom-js/compare/js-1.6.0...js-1.6.1) (2026-04-13)
+
+
+### Bug Fixes
+
+* **js:** overall batching logic ([#419](https://github.com/axiomhq/axiom-js/issues/419)) ([a2b3f17](https://github.com/axiomhq/axiom-js/commit/a2b3f172f12494706f4ecfff476e23db0b6be069))
+
 ## [1.6.0](https://github.com/axiomhq/axiom-js/compare/js-1.5.0...js-1.6.0) (2026-03-30)
 
 
