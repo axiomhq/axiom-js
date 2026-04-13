@@ -337,6 +337,7 @@ export class Axiom extends BaseClient {
         },
         dataset,
         options,
+        { onError: this.onError },
       );
     }
     return this.batch[key].ingest(events);
