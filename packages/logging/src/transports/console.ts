@@ -1,6 +1,7 @@
 import { Transport } from './transport';
 import { LogEvent, LogLevel, LogLevelValue } from '../logger';
 import { isBrowser } from '../runtime';
+import { safeStringify } from '../internal/safe-stringify';
 export interface ConsoleTransportConfig {
   prettyPrint?: boolean;
   logLevel?: LogLevel;
@@ -57,7 +58,7 @@ export class ConsoleTransport implements Transport {
       }
       let msg = `${ev.level} - ${ev.message}`;
       if (hasFields) {
-        msg += ' ' + JSON.stringify(ev.fields);
+        msg += ' ' + safeStringify(ev.fields);
       }
       console.log(msg);
       return;
