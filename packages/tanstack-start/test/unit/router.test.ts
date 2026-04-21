@@ -1,11 +1,11 @@
 import { EVENT } from '@axiomhq/logging';
-import type { RouterEvent, RouterEvents } from '@tanstack/react-router';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import type { RouterEvent, RouterEvents } from '@tanstack/router-core';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
-  createAxiomRouterObserver,
   getRouterPath,
   observeTanStackRouter,
   transformRouterNavigationResult,
+  transformRouterPerformanceResult,
   type RouterLike,
 } from '../../src/router';
 import { mockLogger } from '../lib/mock';
@@ -63,6 +63,10 @@ const createMockRouter = (initialPath: string) => {
 };
 
 describe('router observers', () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
   beforeEach(() => {
     vi.clearAllMocks();
   });
@@ -82,6 +86,36 @@ describe('router observers', () => {
         source: 'tanstack-router',
         navigation: {
           timestamp: 123,
+        },
+      },
+    });
+  });
+
+  it('transforms performance timing data into an event payload', () => {
+    const [message, report] = transformRouterPerformanceResult({
+      durationMs: 42,
+      endEventType: 'onResolved',
+      endTime: 142,
+      from: '/from',
+      startEventType: 'onBeforeNavigate',
+      startTime: 100,
+      timestamp: 142,
+      to: '/to',
+    });
+
+    expect(message).toBe('Navigation /to completed in 42ms');
+    expect(report).toEqual({
+      from: '/from',
+      to: '/to',
+      [EVENT]: {
+        source: 'tanstack-router-timing',
+        navigation: {
+          durationMs: 42,
+          endEventType: 'onResolved',
+          endTime: 142,
+          startEventType: 'onBeforeNavigate',
+          startTime: 100,
+          timestamp: 142,
         },
       },
     });
@@ -140,16 +174,35 @@ describe('router observers', () => {
     );
   });
 
-  it('creates an observer factory via createAxiomRouterObserver', () => {
-    const { router, emit } = createMockRouter('/factory');
+  it('emits paired route timing events when performance tracking is enabled', () => {
+    const { router, emit } = createMockRouter('/first');
+    vi.spyOn(Date, 'now')
+      .mockReturnValueOnce(100)
+      .mockReturnValueOnce(130)
+      .mockReturnValueOnce(160);
 
-    const observe = createAxiomRouterObserver(mockLogger);
-    const unsubscribe = observe(router);
+    const observe = observeTanStackRouter(mockLogger, {
+      performance: true,
+    });
+    observe(router);
 
-    emit('onResolved', '/next');
-    expect(mockLogger.info).toHaveBeenCalledTimes(1);
+    emit('onBeforeNavigate', '/second');
+    emit('onResolved', '/second');
 
-    unsubscribe();
+    expect(mockLogger.info).toHaveBeenCalledTimes(2);
+
+    const [message, report] = vi.mocked(mockLogger.info).mock.calls[1] as [string, Record<string | symbol, unknown>];
+    expect(message).toBe('Navigation /second completed in 60ms');
+    expect(report[EVENT]).toEqual(
+      expect.objectContaining({
+        source: 'tanstack-router-timing',
+        navigation: expect.objectContaining({
+          durationMs: 60,
+          startEventType: 'onBeforeNavigate',
+          endEventType: 'onResolved',
+        }),
+      }),
+    );
   });
 
   it('extracts path from router state location', () => {

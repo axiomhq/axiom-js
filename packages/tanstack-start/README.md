@@ -1,11 +1,6 @@
-# Axiom TanStack Start/Router library
+# Axiom TanStack Start
 
-The `@axiomhq/tanstack-start` package provides observability utilities for TanStack Router (SPA) and TanStack Start (server request/function middleware).
-
-## Requirements
-
-- Node.js 20 or higher for this package
-- TanStack Start may require a newer Node.js version depending on your `@tanstack/react-start` version
+The `@axiomhq/tanstack-start` package provides observability helpers for TanStack Start applications across React and Solid.
 
 ## Install
 
@@ -13,21 +8,63 @@ The `@axiomhq/tanstack-start` package provides observability utilities for TanSt
 npm install @axiomhq/js @axiomhq/logging @axiomhq/tanstack-start
 ```
 
-## Suggested File Layout
+## Package Surface
 
-Use this structure in your app:
+### Root: shared TanStack Start core
 
-- `src/lib/axiom/logger.ts`: logger instances and transports
-- `src/router.tsx`: TanStack Router creation + SPA observer
-- `src/start.ts`: TanStack Start middleware wiring
-- `src/routes/api/axiom.ts`: optional proxy ingestion route
-- `src/entry-server.ts` or server-entry file: uncaught server-entry capture
+Use the root package for framework-neutral Start observability:
+
+- `createAxiomRequestMiddleware`
+- `createAxiomMiddleware`
+- `createAxiomFunctionCorrelationMiddleware`
+- `createAxiomProxyHandler`
+- `createAxiomUncaughtErrorHandler`
+- `captureError`
+- `tanStackStartServerFormatters`
+- `tanStackStartClientFormatters`
+
+```ts
+import { createMiddleware } from '@tanstack/react-start';
+import {
+  createAxiomMiddleware,
+  createAxiomRequestMiddleware,
+  tanStackStartServerFormatters,
+} from '@axiomhq/tanstack-start';
+```
+
+### `@axiomhq/tanstack-start/router`
+
+Use the explicit router subpath for TanStack Router navigation and timing helpers:
+
+- `observeTanStackRouter`
+- `tanStackRouterFormatters`
+
+```ts
+import { observeTanStackRouter, tanStackRouterFormatters } from '@axiomhq/tanstack-start/router';
+```
+
+### `@axiomhq/tanstack-start/react`
+
+Use the React adapter to report errors from TanStack Router `defaultErrorComponent`, per-route `errorComponent`, or broader app-level boundaries:
+
+```ts
+import { createAxiomReactErrorHandler } from '@axiomhq/tanstack-start/react';
+```
+
+### `@axiomhq/tanstack-start/solid`
+
+Use the Solid adapter to report errors from TanStack Router `defaultErrorComponent`, per-route `errorComponent`, or broader app-level boundaries:
+
+```ts
+import { createAxiomSolidErrorHandler } from '@axiomhq/tanstack-start/solid';
+```
 
 ## Logger Setup
 
 ```ts
 import { Logger, ConsoleTransport } from '@axiomhq/logging';
-import { tanStackRouterFormatters, tanStackStartServerFormatters } from '@axiomhq/tanstack-start';
+import { tanStackStartServerFormatters } from '@axiomhq/tanstack-start';
+import { tanStackRouterFormatters } from '@axiomhq/tanstack-start/router';
 
 export const routerLogger = new Logger({
   transports: [new ConsoleTransport()],
@@ -40,37 +77,24 @@ export const startLogger = new Logger({
 });
 ```
 
-## TanStack Router (SPA)
+## Shared Start Middleware
 
-```ts
-import { observeTanStackRouter } from '@axiomhq/tanstack-start';
-import { routerLogger } from '@/lib/axiom/logger';
-
-const observe = observeTanStackRouter(routerLogger, {
-  eventType: 'onResolved',
-  source: 'tanstack-router-spa',
-});
-
-const unsubscribe = observe(router);
-```
-
-## TanStack Start (request/function middleware)
+The Start middleware APIs are framework-neutral because they build on TanStack Start core contracts.
 
 ```ts
 import { createMiddleware } from '@tanstack/react-start';
 import {
-  createAxiomRequestMiddleware,
   createAxiomMiddleware,
+  createAxiomRequestMiddleware,
 } from '@axiomhq/tanstack-start';
-import { startLogger } from '@/lib/axiom/logger';
 
 export const requestMiddleware = [
   createAxiomRequestMiddleware(createMiddleware, startLogger, {
     include: ['/api/*', '/_server/*'],
-    exclude: ['/api/health', '/api/internal/*'],
-    shouldLog: (ctx) => ctx.request.method !== 'OPTIONS',
+    exclude: ['/api/health'],
   }),
 ];
+
 export const functionMiddleware = [
   createAxiomMiddleware(createMiddleware, startLogger, {
     correlation: true,
@@ -78,43 +102,100 @@ export const functionMiddleware = [
 ];
 ```
 
-Set `correlation: true` to add a correlation ID to function calls on the client, forward it to the server (`request_id` context + `x-axiom-correlation-id` header), and align request/function logs.
+Request and function middleware currently await `logger.flush()` before resolving. When we want non-blocking delivery later, the clean path is to introduce an injected `waitUntil`-style primitive instead of expanding the public config surface.
 
-If you want correlation as a standalone middleware, use `createAxiomFunctionCorrelationMiddleware(createMiddleware)`.
-
-## Uncaught Server Errors (Server Entry)
-
-Wrap your `createServerEntry` fetch handler to capture uncaught server-entry errors.
+## Router Observer
 
 ```ts
-import handler, { createServerEntry } from '@tanstack/react-start/server-entry';
-import { captureError } from '@axiomhq/tanstack-start';
-import { startLogger } from '@/lib/axiom/logger';
+import { observeTanStackRouter } from '@axiomhq/tanstack-start/router';
 
-export default createServerEntry({
-  fetch: captureError(handler.fetch, startLogger),
+const observe = observeTanStackRouter(routerLogger, {
+  eventType: 'onResolved',
+  source: 'tanstack-router-spa',
+  performance: true,
+});
+
+const unsubscribe = observe(router);
+```
+
+When `performance` is enabled, the observer pairs router lifecycle events and emits route timing logs in addition to navigation logs.
+
+## Client Error Boundaries
+
+TanStack Start's built-in pattern is to catch route render and loader errors with TanStack Router `defaultErrorComponent` or route `errorComponent`. The adapters below are designed to plug into that boundary model first.
+
+### React
+
+```ts
+import { ErrorComponent, createRouter, type ErrorComponentProps } from '@tanstack/react-router';
+import { useEffect } from 'react';
+import { createAxiomReactErrorHandler } from '@axiomhq/tanstack-start/react';
+
+const handleClientError = createAxiomReactErrorHandler(startLogger);
+
+function RouterErrorBoundary({ error, reset }: ErrorComponentProps) {
+  useEffect(() => {
+    handleClientError(error);
+  }, [error]);
+
+  return <ErrorComponent error={error} />;
+}
+
+const router = createRouter({
+  routeTree,
+  defaultErrorComponent: RouterErrorBoundary,
 });
 ```
 
-## Proxy API Route Helper
+### Solid
 
-Use this helper in a TanStack Start API route to ingest batched client logs through your server.
+```tsx
+import { ErrorComponent, createRouter, type ErrorComponentProps } from '@tanstack/solid-router';
+import { onMount } from 'solid-js';
+import { createAxiomSolidErrorHandler } from '@axiomhq/tanstack-start/solid';
 
-```ts
-import { createFileRoute } from '@tanstack/react-router';
-import { createAxiomProxyHandler } from '@axiomhq/tanstack-start';
-import { startLogger } from '@/lib/axiom/logger';
+const handleClientError = createAxiomSolidErrorHandler(startLogger);
 
-const proxyHandler = createAxiomProxyHandler(startLogger);
+function RouterErrorBoundary(props: ErrorComponentProps) {
+  onMount(() => handleClientError(props.error, props.reset));
+  return <ErrorComponent error={props.error} />;
+}
 
-export const Route = createFileRoute('/api/axiom')({
-  server: {
-    handlers: {
-      POST: ({ request }) => proxyHandler(request),
-    },
-  },
+const router = createRouter({
+  routeTree,
+  defaultErrorComponent: RouterErrorBoundary,
 });
 ```
+
+If you also want to catch client errors outside TanStack Router route boundaries, you can still use the same adapter helpers from a broader framework-level boundary.
+
+## Observability Coverage
+
+SDK-backed:
+
+- request middleware
+- server-function middleware
+- request/function correlation
+- router navigation logs
+- router timing logs
+- proxy ingestion
+- uncaught server-entry capture
+- React and Solid client error-boundary helpers
+
+App-pattern only:
+
+- health checks
+- debug headers
+- environment-specific logging policies
+
+## Examples
+
+- React: [`examples/tanstack-start`](../../examples/tanstack-start)
+- Solid: [`examples/tanstack-start-solid`](../../examples/tanstack-start-solid)
+
+## Migration Note
+
+Router instrumentation is now intentionally explicit. Import router helpers from `@axiomhq/tanstack-start/router` instead of the root package.
 
 ## License
 

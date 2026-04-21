@@ -1,0 +1,35 @@
+{
+  "name": "tanstack-start-solid",
+  "private": true,
+  "type": "module",
+  "imports": {
+    "#/*": "./src/*"
+  },
+  "scripts": {
+    "dev": "vite dev --port 3001",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "vitest run --passWithNoTests",
+    "lint": "eslint",
+    "format": "prettier --check .",
+    "check": "prettier --write . && eslint --fix"
+  },
+  "dependencies": {
+    "@axiomhq/js": "workspace:*",
+    "@axiomhq/logging": "workspace:*",
+    "@axiomhq/tanstack-start": "workspace:*",
+    "@tanstack/solid-router": "^1.162.9",
+    "@tanstack/solid-start": "^1.162.9",
+    "solid-js": "^1.9.12"
+  },
+  "devDependencies": {
+    "@tanstack/eslint-config": "^0.3.0",
+    "@types/node": "^22.10.2",
+    "prettier": "^3.5.3",
+    "typescript": "^5.7.2",
+    "vite": "^7.1.7",
+    "vite-plugin-solid": "^2.11.8",
+    "vite-tsconfig-paths": "^5.1.4",
+    "vitest": "^3.0.5"
+  }
+}

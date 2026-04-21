@@ -519,7 +519,7 @@ const defaultUncaughtOnError = async (logger: Logger, data: StartUncaughtErrorDa
   await logger.flush();
 };
 
-export const createAxiomStartUncaughtErrorHandler = (
+export const createAxiomUncaughtErrorHandler = (
   logger: Logger,
   config: StartUncaughtErrorCaptureConfig = {},
 ) => {
@@ -537,13 +537,13 @@ export const createAxiomStartUncaughtErrorHandler = (
   };
 };
 
-export const withAxiomStartErrorCapture = <TArgs extends unknown[], TResult>(
+export const captureError = <TArgs extends unknown[], TResult>(
   handler: (request: Request, ...args: TArgs) => MaybePromise<TResult>,
   logger: Logger,
   config: StartUncaughtErrorCaptureConfig = {},
 ): ((request: Request, ...args: TArgs) => Promise<TResult | Response>) => {
   const { phase = 'server-entry', rethrow = true, createResponse } = config;
-  const onUncaughtError = createAxiomStartUncaughtErrorHandler(logger, config);
+  const onUncaughtError = createAxiomUncaughtErrorHandler(logger, config);
 
   return async (request: Request, ...args: TArgs) => {
     try {
@@ -599,13 +599,21 @@ const defaultRequestOnError = async (
   await logger.flush();
 };
 
-const defaultFunctionOnSuccess = async (logger: Logger, data: StartFunctionSuccessData, includeData = false) => {
+const defaultFunctionOnSuccess = async (
+  logger: Logger,
+  data: StartFunctionSuccessData,
+  includeData = false,
+) => {
   const [message, report] = transformStartFunctionSuccessResult(data, includeData);
   logger.info(message, report);
   await logger.flush();
 };
 
-const defaultFunctionOnError = async (logger: Logger, data: StartFunctionErrorData, includeData = false) => {
+const defaultFunctionOnError = async (
+  logger: Logger,
+  data: StartFunctionErrorData,
+  includeData = false,
+) => {
   if (data.error instanceof Error) {
     logger.error(data.error.message, data.error);
   }
@@ -615,7 +623,7 @@ const defaultFunctionOnError = async (logger: Logger, data: StartFunctionErrorDa
   await logger.flush();
 };
 
-export const createAxiomStartRequestMiddleware = (
+export const createAxiomRequestMiddleware = (
   createMiddleware: TanStackCreateMiddleware,
   logger: Logger,
   config: StartRequestMiddlewareConfig = {},
@@ -686,7 +694,7 @@ const isLogEventArray = (value: unknown): value is LogEvent[] => {
   return Array.isArray(value);
 };
 
-export const createAxiomStartProxyHandler = (logger: Logger, config: StartProxyHandlerConfig = {}) => {
+export const createAxiomProxyHandler = (logger: Logger, config: StartProxyHandlerConfig = {}) => {
   const { onSuccess, onError } = config;
 
   return async (request: Request) => {
@@ -749,14 +757,14 @@ const createFunctionCorrelationClientHandler = (config: StartFunctionCorrelation
   };
 };
 
-export const createAxiomStartFunctionCorrelationMiddleware = (
+export const createAxiomFunctionCorrelationMiddleware = (
   createMiddleware: TanStackCreateMiddleware,
   config: StartFunctionCorrelationMiddlewareConfig = {},
 ) => {
   return createMiddleware({ type: 'function' }).client(createFunctionCorrelationClientHandler(config));
 };
 
-export const createAxiomStartFunctionMiddleware = (
+export const createAxiomMiddleware = (
   createMiddleware: TanStackCreateMiddleware,
   logger: Logger,
   config: StartFunctionMiddlewareConfig = {},
@@ -824,11 +832,3 @@ export const createAxiomStartFunctionMiddleware = (
 
   return createMiddleware({ type: 'function' }).server(serverMiddleware);
 };
-
-// Short aliases for app-level usage while keeping explicit Start-prefixed APIs available.
-export const createAxiomRequestMiddleware = createAxiomStartRequestMiddleware;
-export const createAxiomMiddleware = createAxiomStartFunctionMiddleware;
-export const createAxiomFunctionCorrelationMiddleware = createAxiomStartFunctionCorrelationMiddleware;
-export const createAxiomProxyHandler = createAxiomStartProxyHandler;
-export const createAxiomUncaughtErrorHandler = createAxiomStartUncaughtErrorHandler;
-export const captureError = withAxiomStartErrorCapture;

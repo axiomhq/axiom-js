@@ -14,8 +14,10 @@ function About() {
       </p>
       <ul className="list-disc space-y-2 pl-6 text-slate-300">
         <li>Client-side route navigation logs via router observer.</li>
+        <li>Route timing logs via router performance pairing.</li>
         <li>Server request logs via request middleware.</li>
         <li>Server function logs via function middleware.</li>
+        <li>Route error logs via TanStack Router defaultErrorComponent and the React adapter.</li>
         <li>API route logs via Start server handlers.</li>
       </ul>
     </div>

@@ -13,8 +13,13 @@ export const Route = createFileRoute('/')({ component: Home })
 function Home() {
   const [serverTime, setServerTime] = useState<string | null>(null)
   const [apiTime, setApiTime] = useState<string | null>(null)
+  const [crashRouteBoundary, setCrashRouteBoundary] = useState(false)
   const [loading, setLoading] = useState(false)
   const [apiLoading, setApiLoading] = useState(false)
+
+  if (crashRouteBoundary) {
+    throw new Error('React route boundary demo triggered from the TanStack Start example')
+  }
 
   const fetchServerTime = async () => {
     setLoading(true)
@@ -102,6 +107,21 @@ function Home() {
             API time: <code>{apiTime}</code>
           </p>
         ) : null}
+      </div>
+
+      <div className="mt-8 rounded-xl border border-slate-700 bg-slate-900/60 p-6">
+        <h2 className="mb-2 text-2xl font-semibold">4. TanStack Route Error Boundary</h2>
+        <p className="mb-4 text-slate-300">
+          Trigger a route render error and let TanStack Router&apos;s
+          <code> defaultErrorComponent</code> pass it through the React adapter
+          from <code> @axiomhq/tanstack-start/react</code>.
+        </p>
+        <button
+          onClick={() => setCrashRouteBoundary(true)}
+          className="rounded-md bg-rose-500 px-4 py-2 font-medium text-white hover:bg-rose-600"
+        >
+          Trigger route error
+        </button>
       </div>
     </div>
   )
