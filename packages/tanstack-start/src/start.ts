@@ -1,4 +1,11 @@
-import { EVENT, Logger, LogLevel, type Formatter, type LogEvent, type LogLevel as LogLevelType } from '@axiomhq/logging';
+import {
+  EVENT,
+  Logger,
+  LogLevel,
+  type Formatter,
+  type LogEvent,
+  type LogLevel as LogLevelType,
+} from '@axiomhq/logging';
 import type {
   FunctionMiddlewareClientFnOptions,
   FunctionMiddlewareServerFnOptions,
@@ -16,8 +23,8 @@ import {
 const START_REQUEST_SOURCE = 'tanstack-start-request';
 const START_FUNCTION_SOURCE = 'tanstack-start-function';
 const START_UNCAUGHT_SOURCE = 'tanstack-start-uncaught';
-const START_CORRELATION_HEADER = 'x-axiom-correlation-id';
-const START_CORRELATION_CONTEXT_KEY = 'axiom_correlation_id';
+const START_CORRELATION_HEADER = 'x-logging-correlation-id';
+const START_CORRELATION_CONTEXT_KEY = 'logging_correlation_id';
 const REQUEST_ID_FIELD = 'request_id';
 
 type MaybePromise<T> = T | Promise<T>;
@@ -328,7 +335,9 @@ const shouldLogRequest = async (
 
   const includeMatchers = asArray(include);
   if (includeMatchers.length > 0) {
-    const includeResults = await Promise.all(includeMatchers.map((matcher) => matchesRequestMatcher(matcher, requestContext)));
+    const includeResults = await Promise.all(
+      includeMatchers.map((matcher) => matchesRequestMatcher(matcher, requestContext)),
+    );
     if (!includeResults.some(Boolean)) {
       return false;
     }
@@ -336,7 +345,9 @@ const shouldLogRequest = async (
 
   const excludeMatchers = asArray(exclude);
   if (excludeMatchers.length > 0) {
-    const excludeResults = await Promise.all(excludeMatchers.map((matcher) => matchesRequestMatcher(matcher, requestContext)));
+    const excludeResults = await Promise.all(
+      excludeMatchers.map((matcher) => matchesRequestMatcher(matcher, requestContext)),
+    );
     if (excludeResults.some(Boolean)) {
       return false;
     }
@@ -418,7 +429,13 @@ export const transformStartRequestSuccessResult = (
 
 export const transformStartRequestErrorResult = (data: StartRequestErrorData): [message: string, report: LogReport] => {
   const statusCode = getStatusCodeFromError(data.error);
-  const request = getRequestMetadata(data.request, statusCode, data.startTime, data.endTime, getRequestIdFromRequest(data.request));
+  const request = getRequestMetadata(
+    data.request,
+    statusCode,
+    data.startTime,
+    data.endTime,
+    getRequestIdFromRequest(data.request),
+  );
 
   return [
     `${request.method} ${request.path} ${request.statusCode} in ${request.durationMs}ms`,
@@ -513,10 +530,7 @@ const defaultUncaughtOnError = async (logger: Logger, data: StartUncaughtErrorDa
   await logger.flush();
 };
 
-export const createAxiomUncaughtErrorHandler = (
-  logger: Logger,
-  config: StartUncaughtErrorCaptureConfig = {},
-) => {
+export const createAxiomUncaughtErrorHandler = (logger: Logger, config: StartUncaughtErrorCaptureConfig = {}) => {
   const { onError, source = START_UNCAUGHT_SOURCE } = config;
 
   return async (data: StartUncaughtErrorData) => {
@@ -572,7 +586,9 @@ const defaultRequestOnSuccess = async (
   logLevelByStatusCode?: StartRequestMiddlewareConfig['logLevelByStatusCode'],
 ) => {
   const [message, report] = transformStartRequestSuccessResult(data);
-  const logLevel = logLevelByStatusCode ? logLevelByStatusCode(data.response.status, data) : getLogLevelFromStatusCode(data.response.status);
+  const logLevel = logLevelByStatusCode
+    ? logLevelByStatusCode(data.response.status, data)
+    : getLogLevelFromStatusCode(data.response.status);
   logger.log(logLevel, message, report);
   await logger.flush();
 };
@@ -588,7 +604,9 @@ const defaultRequestOnError = async (
 
   const [message, report] = transformStartRequestErrorResult(data);
   const statusCode = getStatusCodeFromError(data.error);
-  const logLevel = logLevelByStatusCode ? logLevelByStatusCode(statusCode, data) : getLogLevelFromStatusCode(statusCode);
+  const logLevel = logLevelByStatusCode
+    ? logLevelByStatusCode(statusCode, data)
+    : getLogLevelFromStatusCode(statusCode);
   logger.log(logLevel, message, report);
   await logger.flush();
 };
@@ -757,7 +775,8 @@ const createFunctionCorrelationClientHandler = (config: StartFunctionCorrelation
 
   return async (functionContext: StartFunctionClientContext) => {
     const existingRequestId =
-      getStringField(functionContext.sendContext, REQUEST_ID_FIELD) ?? getStringField(functionContext.sendContext, contextKey);
+      getStringField(functionContext.sendContext, REQUEST_ID_FIELD) ??
+      getStringField(functionContext.sendContext, contextKey);
     const requestId = existingRequestId ?? createId();
 
     const sendContext =
@@ -817,7 +836,13 @@ export const createAxiomMiddleware = (
 
         if (onSuccess) {
           const [, report] = transformStartFunctionSuccessResult(data);
-          const transformedReport = await applyResultReportTransform(logger, 'success', data, report, transformSuccessResult);
+          const transformedReport = await applyResultReportTransform(
+            logger,
+            'success',
+            data,
+            report,
+            transformSuccessResult,
+          );
           await onSuccess(data, transformedReport);
         } else {
           await defaultFunctionOnSuccess(logger, data, transformSuccessResult);
@@ -836,7 +861,13 @@ export const createAxiomMiddleware = (
 
         if (onError) {
           const [, report] = transformStartFunctionErrorResult(data);
-          const transformedReport = await applyResultReportTransform(logger, 'error', data, report, transformErrorResult);
+          const transformedReport = await applyResultReportTransform(
+            logger,
+            'error',
+            data,
+            report,
+            transformErrorResult,
+          );
           await onError(data, transformedReport);
         } else {
           await defaultFunctionOnError(logger, data, transformErrorResult);
