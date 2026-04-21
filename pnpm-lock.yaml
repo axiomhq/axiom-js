@@ -354,6 +354,9 @@ importers:
       '@repo/eslint-config':
         specifier: workspace:*
         version: link:../../internal/eslint-config
+      tsx:
+        specifier: ^4.0.0
+        version: 4.21.0
 
   integration:
     dependencies:
@@ -12800,7 +12803,7 @@ snapshots:
   tsx@4.21.0:
     dependencies:
       esbuild: 0.27.3
-      get-tsconfig: 4.10.0
+      get-tsconfig: 4.13.6
     optionalDependencies:
       fsevents: 2.3.3
 

@@ -1,8 +1,6 @@
 import { createEffect } from 'solid-js'
-import {
-  ErrorComponent,
-  type ErrorComponentProps,
-} from '@tanstack/solid-router'
+import { ErrorComponent } from '@tanstack/solid-router'
+import type { ErrorComponentProps } from '@tanstack/solid-router'
 import { createAxiomSolidErrorHandler } from '@axiomhq/tanstack-start/solid'
 import { startLogger } from '../lib/logger'
 

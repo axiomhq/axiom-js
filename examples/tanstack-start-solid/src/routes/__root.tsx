@@ -1,4 +1,5 @@
-import { Suspense, type JSXElement } from 'solid-js'
+import { Suspense } from 'solid-js'
+import type { JSXElement } from 'solid-js'
 import { HydrationScript } from 'solid-js/web'
 import {
   HeadContent,
