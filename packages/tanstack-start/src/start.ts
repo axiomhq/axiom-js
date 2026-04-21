@@ -23,6 +23,7 @@ const REQUEST_ID_FIELD = 'request_id';
 type MaybePromise<T> = T | Promise<T>;
 
 type LogReport = Record<string | symbol, unknown>;
+type ResultReportTransformer<TData> = (data: TData, report: LogReport) => MaybePromise<LogReport | void>;
 
 type ContextStoreFactory<TContext> = (context: TContext) => MaybePromise<ServerContextFields>;
 type StartRequestMatcher = string | RegExp | ((context: StartRequestContext) => MaybePromise<boolean>);
@@ -93,9 +94,10 @@ export interface StartRequestMiddlewareConfig {
 }
 
 export interface StartFunctionMiddlewareConfig {
-  includeData?: boolean;
   correlation?: boolean | StartFunctionCorrelationMiddlewareConfig;
   store?: ServerContextFields | ContextStoreFactory<StartFunctionContext>;
+  transformSuccessResult?: ResultReportTransformer<StartFunctionSuccessData>;
+  transformErrorResult?: ResultReportTransformer<StartFunctionErrorData>;
   onSuccess?: (data: StartFunctionSuccessData, report: LogReport) => MaybePromise<void>;
   onError?: (data: StartFunctionErrorData, report: LogReport) => MaybePromise<void>;
 }
@@ -431,40 +433,32 @@ export const transformStartRequestErrorResult = (data: StartRequestErrorData): [
 
 export const transformStartFunctionSuccessResult = (
   data: StartFunctionSuccessData,
-  includeData = false,
 ): [message: string, report: LogReport] => {
   const fn = getFunctionMetadata(data.context, data.startTime, data.endTime);
-  const report: LogReport = {
-    [EVENT]: {
-      function: fn,
-      source: START_FUNCTION_SOURCE,
+  return [
+    `${fn.functionId ?? 'server function'} completed in ${fn.durationMs}ms`,
+    {
+      [EVENT]: {
+        function: fn,
+        source: START_FUNCTION_SOURCE,
+      },
     },
-  };
-
-  if (includeData) {
-    report.data = data.context.data;
-  }
-
-  return [`${fn.functionId ?? 'server function'} completed in ${fn.durationMs}ms`, report];
+  ];
 };
 
 export const transformStartFunctionErrorResult = (
   data: StartFunctionErrorData,
-  includeData = false,
 ): [message: string, report: LogReport] => {
   const fn = getFunctionMetadata(data.context, data.startTime, data.endTime);
-  const report: LogReport = {
-    [EVENT]: {
-      function: fn,
-      source: START_FUNCTION_SOURCE,
+  return [
+    `${fn.functionId ?? 'server function'} failed in ${fn.durationMs}ms`,
+    {
+      [EVENT]: {
+        function: fn,
+        source: START_FUNCTION_SOURCE,
+      },
     },
-  };
-
-  if (includeData) {
-    report.data = data.context.data;
-  }
-
-  return [`${fn.functionId ?? 'server function'} failed in ${fn.durationMs}ms`, report];
+  ];
 };
 
 const getUncaughtRequestMetadata = (request: Request) => {
@@ -599,27 +593,54 @@ const defaultRequestOnError = async (
   await logger.flush();
 };
 
+const applyResultReportTransform = async <TData>(
+  logger: Logger,
+  phase: 'success' | 'error',
+  data: TData,
+  report: LogReport,
+  transform?: ResultReportTransformer<TData>,
+): Promise<LogReport> => {
+  if (!transform) {
+    return report;
+  }
+
+  try {
+    const transformedReport = await transform(data, report);
+    return transformedReport ?? report;
+  } catch (error) {
+    if (error instanceof Error) {
+      logger.error(`Failed to transform TanStack Start function ${phase} report`, error);
+    } else {
+      logger.error(`Failed to transform TanStack Start function ${phase} report`, { error });
+    }
+
+    return report;
+  }
+};
+
 const defaultFunctionOnSuccess = async (
   logger: Logger,
   data: StartFunctionSuccessData,
-  includeData = false,
+  transformSuccessResult?: StartFunctionMiddlewareConfig['transformSuccessResult'],
 ) => {
-  const [message, report] = transformStartFunctionSuccessResult(data, includeData);
-  logger.info(message, report);
+  const [message, report] = transformStartFunctionSuccessResult(data);
+  const transformedReport = await applyResultReportTransform(logger, 'success', data, report, transformSuccessResult);
+  logger.info(message, transformedReport);
   await logger.flush();
 };
 
 const defaultFunctionOnError = async (
   logger: Logger,
   data: StartFunctionErrorData,
-  includeData = false,
+  transformErrorResult?: StartFunctionMiddlewareConfig['transformErrorResult'],
 ) => {
   if (data.error instanceof Error) {
     logger.error(data.error.message, data.error);
   }
 
-  const [message, report] = transformStartFunctionErrorResult(data, includeData);
-  logger.error(message, report);
+  const [message, report] = transformStartFunctionErrorResult(data);
+  const transformedReport = await applyResultReportTransform(logger, 'error', data, report, transformErrorResult);
+  logger.error(message, transformedReport);
   await logger.flush();
 };
 
@@ -769,7 +790,7 @@ export const createAxiomMiddleware = (
   logger: Logger,
   config: StartFunctionMiddlewareConfig = {},
 ) => {
-  const { includeData = false, correlation = false, store, onSuccess, onError } = config;
+  const { correlation = false, store, onSuccess, onError, transformSuccessResult, transformErrorResult } = config;
   const correlationConfig = correlation === true ? {} : correlation || undefined;
 
   const serverMiddleware = async (functionContext: StartFunctionContext) => {
@@ -795,10 +816,11 @@ export const createAxiomMiddleware = (
         } satisfies StartFunctionSuccessData;
 
         if (onSuccess) {
-          const [, report] = transformStartFunctionSuccessResult(data, includeData);
-          await onSuccess(data, report);
+          const [, report] = transformStartFunctionSuccessResult(data);
+          const transformedReport = await applyResultReportTransform(logger, 'success', data, report, transformSuccessResult);
+          await onSuccess(data, transformedReport);
         } else {
-          await defaultFunctionOnSuccess(logger, data, includeData);
+          await defaultFunctionOnSuccess(logger, data, transformSuccessResult);
         }
 
         return result;
@@ -813,10 +835,11 @@ export const createAxiomMiddleware = (
         } satisfies StartFunctionErrorData;
 
         if (onError) {
-          const [, report] = transformStartFunctionErrorResult(data, includeData);
-          await onError(data, report);
+          const [, report] = transformStartFunctionErrorResult(data);
+          const transformedReport = await applyResultReportTransform(logger, 'error', data, report, transformErrorResult);
+          await onError(data, transformedReport);
         } else {
-          await defaultFunctionOnError(logger, data, includeData);
+          await defaultFunctionOnError(logger, data, transformErrorResult);
         }
 
         throw error;

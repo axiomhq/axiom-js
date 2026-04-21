@@ -11,6 +11,8 @@ import {
   transformStartUncaughtErrorResult,
   type StartFunctionClientContext,
   type StartFunctionContext,
+  type StartFunctionErrorData,
+  type StartFunctionSuccessData,
   type StartRequestContext,
   type StartUncaughtErrorData,
   type TanStackCreateMiddleware,
@@ -269,10 +271,14 @@ describe('start middleware', () => {
     expect(report.data).toBeUndefined();
   });
 
-  it('includes function data when includeData is enabled', async () => {
+  it('supports function success report transforms', async () => {
     const createMiddleware = createMockCreateMiddleware();
+    const transformSuccessResult = vi.fn((data: StartFunctionSuccessData, report: Record<string | symbol, any>) => ({
+      ...report,
+      functionData: data.context.data,
+    }));
     const middleware = createAxiomMiddleware(createMiddleware, mockLogger, {
-      includeData: true,
+      transformSuccessResult,
     }) as unknown as (context: StartFunctionContext) => Promise<unknown>;
 
     const result = {
@@ -294,8 +300,75 @@ describe('start middleware', () => {
 
     await middleware(context);
 
+    expect(transformSuccessResult).toHaveBeenCalledTimes(1);
     const [, report] = vi.mocked(mockLogger.info).mock.calls[0] as [string, Record<string | symbol, any>];
-    expect(report.data).toEqual({ requestId: 'abc' });
+    expect(report.functionData).toEqual({ requestId: 'abc' });
+  });
+
+  it('supports function error report transforms', async () => {
+    const createMiddleware = createMockCreateMiddleware();
+    const transformErrorResult = vi.fn((data: StartFunctionErrorData, report: Record<string | symbol, any>) => ({
+      ...report,
+      contextMethod: data.context.method,
+    }));
+    const middleware = createAxiomMiddleware(createMiddleware, mockLogger, {
+      transformErrorResult,
+    }) as unknown as (context: StartFunctionContext) => Promise<unknown>;
+
+    const error = new Error('function failed');
+
+    const context = {
+      data: { id: 1 },
+      method: 'POST',
+      signal: new AbortController().signal,
+      context: {},
+      serverFnMeta: {
+        id: 'fn-fail',
+      },
+      next: vi.fn().mockRejectedValue(error),
+    } as unknown as StartFunctionContext;
+
+    await expect(middleware(context)).rejects.toThrow(error);
+
+    expect(transformErrorResult).toHaveBeenCalledTimes(1);
+    const lastErrorCall = vi.mocked(mockLogger.error).mock.calls.at(-1) as [string, Record<string | symbol, any>];
+    expect(lastErrorCall[1].contextMethod).toBe('POST');
+  });
+
+  it('falls back to default function report when transform throws', async () => {
+    const createMiddleware = createMockCreateMiddleware();
+    const middleware = createAxiomMiddleware(createMiddleware, mockLogger, {
+      transformSuccessResult: () => {
+        throw new Error('transform failed');
+      },
+    }) as unknown as (context: StartFunctionContext) => Promise<unknown>;
+
+    const result = {
+      'use functions must return the result of next()': true,
+      context: {},
+      sendContext: {},
+    };
+
+    const context = {
+      data: { requestId: 'abc' },
+      method: 'POST',
+      signal: new AbortController().signal,
+      context: {},
+      serverFnMeta: {
+        id: 'fn-id',
+      },
+      next: vi.fn().mockResolvedValue(result),
+    } as unknown as StartFunctionContext;
+
+    await middleware(context);
+
+    expect(mockLogger.error).toHaveBeenCalledWith(
+      'Failed to transform TanStack Start function success report',
+      expect.any(Error),
+    );
+    const [message, report] = vi.mocked(mockLogger.info).mock.calls[0] as [string, Record<string | symbol, any>];
+    expect(message).toMatch(/completed in \d+ms/);
+    expect(report[EVENT].source).toBe('tanstack-start-function');
   });
 
   it('awaits function flush before resolving', async () => {
