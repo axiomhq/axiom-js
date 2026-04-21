@@ -3,6 +3,7 @@ import { HydrationScript } from 'solid-js/web'
 import {
   HeadContent,
   Link,
+  Outlet,
   Scripts,
   createRootRoute,
 } from '@tanstack/solid-router'
@@ -29,17 +30,25 @@ export const Route = createRootRoute({
       },
     ],
   }),
-  shellComponent: RootDocument,
+  component: RootComponent,
 })
+
+function RootComponent() {
+  return (
+    <RootDocument>
+      <Outlet />
+    </RootDocument>
+  )
+}
 
 function RootDocument(props: { children: JSXElement }) {
   return (
     <html lang="en">
       <head>
-        <HeadContent />
         <HydrationScript />
       </head>
       <body class="shell">
+        <HeadContent />
         <header class="header">
           <div class="brand">Axiom + TanStack Start (Solid)</div>
           <nav class="nav">

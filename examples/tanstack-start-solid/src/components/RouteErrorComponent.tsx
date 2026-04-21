@@ -1,4 +1,4 @@
-import { onMount } from 'solid-js'
+import { createEffect } from 'solid-js'
 import {
   ErrorComponent,
   type ErrorComponentProps,
@@ -11,7 +11,7 @@ const handleClientError = createAxiomSolidErrorHandler(startLogger, {
 })
 
 export default function RouteErrorComponent(props: ErrorComponentProps) {
-  onMount(() => {
+  createEffect(() => {
     handleClientError(props.error, props.reset)
   })
 
