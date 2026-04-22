@@ -175,7 +175,7 @@ describe('start middleware', () => {
     const request = new Request('https://example.com/api/correlation', {
       method: 'POST',
       headers: {
-        'x-axiom-correlation-id': 'corr-123',
+        'x-logging-correlation-id': 'corr-123',
       },
     });
     const response = new Response('ok', { status: 200 });
@@ -448,10 +448,10 @@ describe('start middleware', () => {
     expect(next).toHaveBeenCalledWith({
       sendContext: {
         request_id: 'corr-generated',
-        axiom_correlation_id: 'corr-generated',
+        logging_correlation_id: 'corr-generated',
       },
       headers: {
-        'x-axiom-correlation-id': 'corr-generated',
+        'x-logging-correlation-id': 'corr-generated',
       },
     });
   });
@@ -485,10 +485,10 @@ describe('start middleware', () => {
     expect(next).toHaveBeenCalledWith({
       sendContext: {
         request_id: 'corr-existing',
-        axiom_correlation_id: 'corr-existing',
+        logging_correlation_id: 'corr-existing',
       },
       headers: {
-        'x-axiom-correlation-id': 'corr-existing',
+        'x-logging-correlation-id': 'corr-existing',
       },
     });
   });
@@ -533,10 +533,10 @@ describe('start middleware', () => {
     expect(next).toHaveBeenCalledWith({
       sendContext: {
         request_id: 'corr-from-config',
-        axiom_correlation_id: 'corr-from-config',
+        logging_correlation_id: 'corr-from-config',
       },
       headers: {
-        'x-axiom-correlation-id': 'corr-from-config',
+        'x-logging-correlation-id': 'corr-from-config',
       },
     });
   });
