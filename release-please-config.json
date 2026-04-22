@@ -3,7 +3,7 @@
     {
       "type": "linked-versions",
       "groupName": "integrations",
-      "components": ["react", "nextjs", "logging"]
+      "components": ["react", "nextjs", "logging", "tanstack-start"]
     },
     {
       "type": "linked-versions",
@@ -38,6 +38,11 @@
       "include-v-in-tag": false
     },
     "packages/nextjs": {
+      "release-type": "node",
+      "versioning-strategy": "always-bump-patch",
+      "include-v-in-tag": false
+    },
+    "packages/tanstack-start": {
       "release-type": "node",
       "versioning-strategy": "always-bump-patch",
       "include-v-in-tag": false

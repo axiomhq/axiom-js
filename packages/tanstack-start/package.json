@@ -1,0 +1,123 @@
+{
+  "name": "@axiomhq/tanstack-start",
+  "version": "0.1.0",
+  "description": "The official TanStack Start package for Axiom",
+  "author": "Axiom, Inc.",
+  "license": "MIT",
+  "contributors": [
+    "Lukas Malkmus <lukas@axiom.co>",
+    "Islam Shehata <islam@axiom.co>",
+    "Arne Bahlo <arne@axiom.co>",
+    "Gabriel De Andrade <gabriel@axiom.co>"
+  ],
+  "type": "module",
+  "main": "dist/cjs/index.cjs",
+  "module": "dist/esm/index.js",
+  "types": "dist/esm/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/esm/index.d.ts",
+        "default": "./dist/esm/index.js"
+      },
+      "require": {
+        "types": "./dist/cjs/index.d.cts",
+        "default": "./dist/cjs/index.cjs"
+      }
+    },
+    "./router": {
+      "import": {
+        "types": "./dist/esm/router.d.ts",
+        "default": "./dist/esm/router.js"
+      },
+      "require": {
+        "types": "./dist/cjs/router.d.cts",
+        "default": "./dist/cjs/router.cjs"
+      }
+    },
+    "./react": {
+      "import": {
+        "types": "./dist/esm/react.d.ts",
+        "default": "./dist/esm/react.js"
+      },
+      "require": {
+        "types": "./dist/cjs/react.d.cts",
+        "default": "./dist/cjs/react.cjs"
+      }
+    },
+    "./solid": {
+      "import": {
+        "types": "./dist/esm/solid.d.ts",
+        "default": "./dist/esm/solid.js"
+      },
+      "require": {
+        "types": "./dist/cjs/solid.d.cts",
+        "default": "./dist/cjs/solid.cjs"
+      }
+    },
+    "./start": {
+      "import": {
+        "types": "./dist/esm/start.d.ts",
+        "default": "./dist/esm/start.js"
+      },
+      "require": {
+        "types": "./dist/cjs/start.d.cts",
+        "default": "./dist/cjs/start.cjs"
+      }
+    },
+    "./package.json": "./package.json"
+  },
+  "scripts": {
+    "build": "vite build",
+    "format": "eslint . --fix",
+    "lint": "eslint .",
+    "test": "vitest run ./test/unit/*"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/axiomhq/axiom-js.git"
+  },
+  "keywords": [
+    "axiom",
+    "logging",
+    "tanstack",
+    "router-core",
+    "tanstack-router",
+    "tanstack-start",
+    "solid"
+  ],
+  "homepage": "https://github.com/axiomhq/axiom-js/blob/main/packages/tanstack-start/README.md",
+  "engines": {
+    "node": ">=20"
+  },
+  "bugs": {
+    "url": "https://github.com/axiomhq/axiom-js/issues"
+  },
+  "peerDependencies": {
+    "@axiomhq/logging": "workspace:*",
+    "@tanstack/router-core": ">=1",
+    "@tanstack/start-client-core": ">=1",
+    "react": ">=18",
+    "solid-js": ">=1.8"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    },
+    "solid-js": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@axiomhq/logging": "workspace:*",
+    "@repo/eslint-config": "workspace:*",
+    "@tanstack/config": "^0.16.0",
+    "@tanstack/router-core": "^1.162.9",
+    "@tanstack/start-client-core": "^1.162.9",
+    "@types/react": "^19.2.2",
+    "react": "^19.2.0",
+    "solid-js": "^1.9.12",
+    "vite": "^7.2.6",
+    "vitest": "^4.0.14"
+  }
+}
