@@ -23,6 +23,59 @@ logger.info('Hello World!');
 
 `AxiomJSTransport` appends logging package usage to the Axiom client's `X-Axiom-Client` header. With the example above, requests use an `X-Axiom-Client` header like `axiom-js/<version> axiom-logging/<version> my-app/1.0`.
 
+## Schema validation
+
+`Logger` can validate and type log `fields` using any validator that implements Standard Schema v1 (for example `zod`).
+
+```ts
+import { z } from 'zod';
+import { Logger, ConsoleTransport } from '@axiomhq/logging';
+
+const LogFieldsSchema = z
+  .object({
+    userId: z.string(),
+    action: z.enum(['login', 'logout']),
+  })
+  .strict();
+
+const logger = new Logger({
+  transports: [new ConsoleTransport()],
+  schema: LogFieldsSchema,
+  onValidationError: (context) => {
+    console.warn('Dropped invalid log', context.stage, context.reason, context.issues);
+  },
+});
+
+logger.info('User action', { userId: '123', action: 'login' });
+```
+
+Invalid logs are dropped before transport delivery. `schema` validates input `fields` before formatters run, and `outputSchema` can validate the final formatted event:
+
+```ts
+const OutputSchema = z.object({
+  eventName: z.string(),
+  userId: z.string(),
+});
+
+const logger = new Logger({
+  transports: [new ConsoleTransport()],
+  schema: LogFieldsSchema,
+  outputSchema: OutputSchema,
+  formatters: [
+    (event) => ({
+      eventName: event.message,
+      userId: event.fields.userId,
+    }),
+  ],
+});
+```
+
+Unknown key behavior depends on your schema configuration:
+- strict object schemas (like `z.object(...).strict()`) reject unknown keys
+- non-strict schemas may allow them
+
+`logger.raw(...)` bypasses schema validation.
+
 ## Requirements
 
 Node.js 20 or higher is required. Node.js 18 is no longer supported.
