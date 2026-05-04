@@ -104,7 +104,22 @@ export const functionMiddleware = [
 
 Request and function middleware currently await `logger.flush()` before resolving. When we want non-blocking delivery later, the clean path is to introduce an injected `waitUntil`-style primitive instead of expanding the public config surface.
 
-To customize which fields are emitted for function events while keeping default logging behavior, use report transform hooks:
+To customize which fields are emitted while keeping default logging behavior, use report transform hooks:
+
+```ts
+createAxiomRequestMiddleware(createMiddleware, startLogger, {
+  transformSuccessResult: (data, report) => ({
+    ...report,
+    tenant: data.request.headers.get('x-tenant-id'),
+    region: data.request.headers.get('x-region'),
+  }),
+  transformErrorResult: (data, report) => ({
+    ...report,
+    tenant: data.request.headers.get('x-tenant-id'),
+    region: data.request.headers.get('x-region'),
+  }),
+});
+```
 
 ```ts
 createAxiomMiddleware(createMiddleware, startLogger, {

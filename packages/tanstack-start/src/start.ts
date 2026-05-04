@@ -96,6 +96,8 @@ export interface StartRequestMiddlewareConfig {
   shouldLog?: (context: StartRequestContext) => MaybePromise<boolean>;
   logLevelByStatusCode?: (statusCode: number, data: StartRequestSuccessData | StartRequestErrorData) => LogLevelType;
   store?: ServerContextFields | ContextStoreFactory<StartRequestContext>;
+  transformSuccessResult?: ResultReportTransformer<StartRequestSuccessData>;
+  transformErrorResult?: ResultReportTransformer<StartRequestErrorData>;
   onSuccess?: (data: StartRequestSuccessData, report: LogReport) => MaybePromise<void>;
   onError?: (data: StartRequestErrorData, report: LogReport) => MaybePromise<void>;
 }
@@ -584,12 +586,21 @@ const defaultRequestOnSuccess = async (
   logger: Logger,
   data: StartRequestSuccessData,
   logLevelByStatusCode?: StartRequestMiddlewareConfig['logLevelByStatusCode'],
+  transformSuccessResult?: StartRequestMiddlewareConfig['transformSuccessResult'],
 ) => {
   const [message, report] = transformStartRequestSuccessResult(data);
+  const transformedReport = await applyResultReportTransform(
+    logger,
+    'request',
+    'success',
+    data,
+    report,
+    transformSuccessResult,
+  );
   const logLevel = logLevelByStatusCode
     ? logLevelByStatusCode(data.response.status, data)
     : getLogLevelFromStatusCode(data.response.status);
-  logger.log(logLevel, message, report);
+  logger.log(logLevel, message, transformedReport);
   await logger.flush();
 };
 
@@ -597,22 +608,32 @@ const defaultRequestOnError = async (
   logger: Logger,
   data: StartRequestErrorData,
   logLevelByStatusCode?: StartRequestMiddlewareConfig['logLevelByStatusCode'],
+  transformErrorResult?: StartRequestMiddlewareConfig['transformErrorResult'],
 ) => {
   if (data.error instanceof Error) {
     logger.error(data.error.message, data.error);
   }
 
   const [message, report] = transformStartRequestErrorResult(data);
+  const transformedReport = await applyResultReportTransform(
+    logger,
+    'request',
+    'error',
+    data,
+    report,
+    transformErrorResult,
+  );
   const statusCode = getStatusCodeFromError(data.error);
   const logLevel = logLevelByStatusCode
     ? logLevelByStatusCode(statusCode, data)
     : getLogLevelFromStatusCode(statusCode);
-  logger.log(logLevel, message, report);
+  logger.log(logLevel, message, transformedReport);
   await logger.flush();
 };
 
 const applyResultReportTransform = async <TData>(
   logger: Logger,
+  target: 'function' | 'request',
   phase: 'success' | 'error',
   data: TData,
   report: LogReport,
@@ -627,9 +648,9 @@ const applyResultReportTransform = async <TData>(
     return transformedReport ?? report;
   } catch (error) {
     if (error instanceof Error) {
-      logger.error(`Failed to transform TanStack Start function ${phase} report`, error);
+      logger.error(`Failed to transform TanStack Start ${target} ${phase} report`, error);
     } else {
-      logger.error(`Failed to transform TanStack Start function ${phase} report`, { error });
+      logger.error(`Failed to transform TanStack Start ${target} ${phase} report`, { error });
     }
 
     return report;
@@ -642,7 +663,14 @@ const defaultFunctionOnSuccess = async (
   transformSuccessResult?: StartFunctionMiddlewareConfig['transformSuccessResult'],
 ) => {
   const [message, report] = transformStartFunctionSuccessResult(data);
-  const transformedReport = await applyResultReportTransform(logger, 'success', data, report, transformSuccessResult);
+  const transformedReport = await applyResultReportTransform(
+    logger,
+    'function',
+    'success',
+    data,
+    report,
+    transformSuccessResult,
+  );
   logger.info(message, transformedReport);
   await logger.flush();
 };
@@ -657,7 +685,14 @@ const defaultFunctionOnError = async (
   }
 
   const [message, report] = transformStartFunctionErrorResult(data);
-  const transformedReport = await applyResultReportTransform(logger, 'error', data, report, transformErrorResult);
+  const transformedReport = await applyResultReportTransform(
+    logger,
+    'function',
+    'error',
+    data,
+    report,
+    transformErrorResult,
+  );
   logger.error(message, transformedReport);
   await logger.flush();
 };
@@ -667,7 +702,7 @@ export const createAxiomRequestMiddleware = (
   logger: Logger,
   config: StartRequestMiddlewareConfig = {},
 ) => {
-  const { store, onSuccess, onError, logLevelByStatusCode } = config;
+  const { store, onSuccess, onError, logLevelByStatusCode, transformSuccessResult, transformErrorResult } = config;
 
   return createMiddleware({ type: 'request' }).server(async (requestContext: StartRequestContext) => {
     const shouldLog = await shouldLogRequest(requestContext, config);
@@ -700,9 +735,17 @@ export const createAxiomRequestMiddleware = (
 
         if (onSuccess) {
           const [, report] = transformStartRequestSuccessResult(data);
-          await onSuccess(data, report);
+          const transformedReport = await applyResultReportTransform(
+            logger,
+            'request',
+            'success',
+            data,
+            report,
+            transformSuccessResult,
+          );
+          await onSuccess(data, transformedReport);
         } else {
-          await defaultRequestOnSuccess(logger, data, logLevelByStatusCode);
+          await defaultRequestOnSuccess(logger, data, logLevelByStatusCode, transformSuccessResult);
         }
 
         return nextResult;
@@ -718,9 +761,17 @@ export const createAxiomRequestMiddleware = (
 
         if (onError) {
           const [, report] = transformStartRequestErrorResult(data);
-          await onError(data, report);
+          const transformedReport = await applyResultReportTransform(
+            logger,
+            'request',
+            'error',
+            data,
+            report,
+            transformErrorResult,
+          );
+          await onError(data, transformedReport);
         } else {
-          await defaultRequestOnError(logger, data, logLevelByStatusCode);
+          await defaultRequestOnError(logger, data, logLevelByStatusCode, transformErrorResult);
         }
 
         throw error;
@@ -838,6 +889,7 @@ export const createAxiomMiddleware = (
           const [, report] = transformStartFunctionSuccessResult(data);
           const transformedReport = await applyResultReportTransform(
             logger,
+            'function',
             'success',
             data,
             report,
@@ -863,6 +915,7 @@ export const createAxiomMiddleware = (
           const [, report] = transformStartFunctionErrorResult(data);
           const transformedReport = await applyResultReportTransform(
             logger,
+            'function',
             'error',
             data,
             report,

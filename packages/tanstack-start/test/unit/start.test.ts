@@ -14,6 +14,8 @@ import {
   type StartFunctionErrorData,
   type StartFunctionSuccessData,
   type StartRequestContext,
+  type StartRequestErrorData,
+  type StartRequestSuccessData,
   type StartUncaughtErrorData,
   type TanStackCreateMiddleware,
 } from '../../src/start';
@@ -225,6 +227,103 @@ describe('start middleware', () => {
     expect(onSuccess).toHaveBeenCalledTimes(1);
     expect(mockLogger.log).not.toHaveBeenCalled();
     expect(mockLogger.flush).not.toHaveBeenCalled();
+  });
+
+  it('supports request success report transforms', async () => {
+    const createMiddleware = createMockCreateMiddleware();
+    const transformSuccessResult = vi.fn((data: StartRequestSuccessData, report: Record<string | symbol, any>) => ({
+      ...report,
+      tenantId: data.request.headers.get('x-tenant-id'),
+    }));
+
+    const middleware = createAxiomRequestMiddleware(createMiddleware, mockLogger, {
+      transformSuccessResult,
+    }) as unknown as (context: StartRequestContext) => Promise<unknown>;
+
+    const request = new Request('https://example.com/api/custom', {
+      method: 'GET',
+      headers: {
+        'x-tenant-id': 'tenant-123',
+      },
+    });
+    const response = new Response('ok', { status: 200 });
+
+    const context = {
+      request,
+      pathname: '/api/custom',
+      context: {},
+      next: vi.fn().mockResolvedValue({ request, response, pathname: '/api/custom', context: {} }),
+    } as unknown as StartRequestContext;
+
+    await middleware(context);
+
+    expect(transformSuccessResult).toHaveBeenCalledTimes(1);
+    const [, , report] = vi.mocked(mockLogger.log).mock.calls[0] as [
+      string,
+      string,
+      Record<string | symbol, any>,
+    ];
+    expect(report.tenantId).toBe('tenant-123');
+  });
+
+  it('supports request error report transforms', async () => {
+    const createMiddleware = createMockCreateMiddleware();
+    const transformErrorResult = vi.fn((data: StartRequestErrorData, report: Record<string | symbol, any>) => ({
+      ...report,
+      errorName: data.error instanceof Error ? data.error.name : 'unknown',
+    }));
+
+    const middleware = createAxiomRequestMiddleware(createMiddleware, mockLogger, {
+      transformErrorResult,
+    }) as unknown as (context: StartRequestContext) => Promise<unknown>;
+
+    const request = new Request('https://example.com/api/custom', { method: 'GET' });
+    const error = new Error('request failed');
+
+    const context = {
+      request,
+      pathname: '/api/custom',
+      context: {},
+      next: vi.fn().mockRejectedValue(error),
+    } as unknown as StartRequestContext;
+
+    await expect(middleware(context)).rejects.toThrow(error);
+
+    expect(transformErrorResult).toHaveBeenCalledTimes(1);
+    const [, , report] = vi.mocked(mockLogger.log).mock.calls[0] as [
+      string,
+      string,
+      Record<string | symbol, any>,
+    ];
+    expect(report.errorName).toBe('Error');
+  });
+
+  it('passes transformed request reports to custom callbacks', async () => {
+    const createMiddleware = createMockCreateMiddleware();
+    const onSuccess = vi.fn();
+
+    const middleware = createAxiomRequestMiddleware(createMiddleware, mockLogger, {
+      transformSuccessResult: (_data, report) => ({
+        ...report,
+        callbackField: 'available',
+      }),
+      onSuccess,
+    }) as unknown as (context: StartRequestContext) => Promise<unknown>;
+
+    const request = new Request('https://example.com/api/custom', { method: 'GET' });
+    const response = new Response('ok', { status: 200 });
+
+    const context = {
+      request,
+      pathname: '/api/custom',
+      context: {},
+      next: vi.fn().mockResolvedValue({ request, response, pathname: '/api/custom', context: {} }),
+    } as unknown as StartRequestContext;
+
+    await middleware(context);
+
+    expect(onSuccess).toHaveBeenCalledWith(expect.any(Object), expect.objectContaining({ callbackField: 'available' }));
+    expect(mockLogger.log).not.toHaveBeenCalled();
   });
 
   it('logs function middleware success and omits data by default', async () => {
