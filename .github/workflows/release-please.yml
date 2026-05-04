@@ -20,6 +20,7 @@ jobs:
       logging_released: ${{ steps.release.outputs['packages/logging--release_created'] }}
       react_released: ${{ steps.release.outputs['packages/react--release_created'] }}
       nextjs_released: ${{ steps.release.outputs['packages/nextjs--release_created'] }}
+      tanstack_start_released: ${{ steps.release.outputs['packages/tanstack-start--release_created'] }}
     steps:
       - id: release
         uses: googleapis/release-please-action@v4
@@ -75,3 +76,11 @@ jobs:
     secrets: inherit
     with:
       package_dir: packages/nextjs
+
+  publish-tanstack-start:
+    needs: release-please
+    if: ${{ needs.release-please.outputs.tanstack_start_released == 'true' }}
+    uses: ./.github/workflows/publish-package.yml
+    secrets: inherit
+    with:
+      package_dir: packages/tanstack-start
