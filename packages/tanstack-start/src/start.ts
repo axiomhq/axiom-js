@@ -742,7 +742,7 @@ const createFunctionCorrelationClientHandler = (config: StartFunctionCorrelation
   };
 };
 
-export const createAxiomFunctionCorrelationMiddleware = (
+export const createAxiomFnCorrelationMiddleware = (
   createMiddleware: TanStackCreateMiddleware,
   config: StartFunctionCorrelationMiddlewareConfig = {},
 ) => {

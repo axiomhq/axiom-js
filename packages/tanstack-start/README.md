@@ -16,7 +16,7 @@ Use the root package for framework-neutral Start observability:
 
 - `createAxiomRequestMiddleware`
 - `createAxiomFnMiddleware`
-- `createAxiomFunctionCorrelationMiddleware`
+- `createAxiomFnCorrelationMiddleware`
 - `createAxiomProxyHandler`
 - `createAxiomUncaughtErrorHandler`
 - `captureError`
@@ -109,6 +109,8 @@ export const functionMiddleware = [
 ```
 
 Request and function middleware currently await `logger.flush()` before resolving. When we want non-blocking delivery later, the clean path is to introduce an injected `waitUntil`-style primitive instead of expanding the public config surface.
+
+Use one function instrumentation path per server function. If `createAxiomFnMiddleware` is mounted globally through `createStart({ functionMiddleware })`, do not also attach it to individual server functions unless you intentionally want multiple log events for the same call.
 
 To fully customize emitted fields or side effects, provide `onSuccess` / `onError` callbacks. When a callback is provided, the middleware skips default logging for that path. The `transformStart*Result` helpers are exported for users who want to keep the default message/report shape and add their own fields.
 

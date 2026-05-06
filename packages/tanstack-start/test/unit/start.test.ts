@@ -2,7 +2,7 @@ import { EVENT, LogLevel } from '@axiomhq/logging';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   captureError,
-  createAxiomFunctionCorrelationMiddleware,
+  createAxiomFnCorrelationMiddleware,
   createAxiomFnMiddleware,
   createAxiomProxyHandler,
   createAxiomRequestMiddleware,
@@ -433,7 +433,7 @@ describe('start middleware', () => {
 
   it('adds correlation context and header in function client middleware', async () => {
     const createMiddleware = createMockCreateMiddleware();
-    const middleware = createAxiomFunctionCorrelationMiddleware(createMiddleware, {
+    const middleware = createAxiomFnCorrelationMiddleware(createMiddleware, {
       createRequestId: () => 'corr-generated',
     }) as unknown as (context: StartFunctionClientContext) => Promise<unknown>;
 
@@ -472,7 +472,7 @@ describe('start middleware', () => {
 
   it('reuses existing request_id in function client middleware', async () => {
     const createMiddleware = createMockCreateMiddleware();
-    const middleware = createAxiomFunctionCorrelationMiddleware(createMiddleware) as unknown as (
+    const middleware = createAxiomFnCorrelationMiddleware(createMiddleware) as unknown as (
       context: StartFunctionClientContext,
     ) => Promise<unknown>;
 
