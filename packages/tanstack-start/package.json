@@ -114,13 +114,13 @@
   "devDependencies": {
     "@axiomhq/logging": "workspace:*",
     "@repo/eslint-config": "workspace:*",
-    "@tanstack/config": "^0.16.0",
-    "@tanstack/router-core": "^1.162.9",
-    "@tanstack/start-client-core": "^1.162.9",
+    "@tanstack/config": "^0.22.2",
+    "@tanstack/router-core": "^1.169.2",
+    "@tanstack/start-client-core": "^1.168.2",
     "@types/react": "^19.2.2",
     "react": "^19.2.0",
     "solid-js": "^1.9.12",
-    "vite": "^7.2.6",
+    "vite": "^7.3.2",
     "vitest": "^4.0.14"
   }
 }

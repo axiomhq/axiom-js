@@ -13,19 +13,19 @@
     "@axiomhq/logging": "workspace:*",
     "@axiomhq/nextjs": "workspace:*",
     "@axiomhq/react": "workspace:*",
-    "next": "15.5.9",
+    "next": "15.5.15",
     "react": "19.1.4",
     "react-dom": "19.1.4"
   },
   "devDependencies": {
-    "@eslint/eslintrc": "^3",
-    "@types/node": "^20",
+    "@eslint/eslintrc": "^3.3.5",
+    "@types/node": "^20.19.39",
     "@types/react": "19.1.5",
     "@types/react-dom": "19.1.5",
-    "eslint": "^9",
-    "eslint-config-next": "15.5.9",
-    "postcss": "^8",
-    "tailwindcss": "^3.4.1",
+    "eslint": "^9.39.1",
+    "eslint-config-next": "15.5.15",
+    "postcss": "^8.5.14",
+    "tailwindcss": "^3.4.19",
     "typescript": "^5",
     "vite": "^7.3.2"
   }
