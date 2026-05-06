@@ -1,6 +1,6 @@
 {
   "name": "@axiomhq/tanstack-start",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "The official TanStack Start package for Axiom",
   "author": "Axiom, Inc.",
   "license": "MIT",
