@@ -93,9 +93,6 @@
   "bugs": {
     "url": "https://github.com/axiomhq/axiom-js/issues"
   },
-  "publishConfig": {
-    "tag": "alpha"
-  },
   "peerDependencies": {
     "@axiomhq/logging": "workspace:*",
     "@tanstack/router-core": ">=1",
