@@ -15,7 +15,7 @@ npm install @axiomhq/js @axiomhq/logging @axiomhq/tanstack-start
 Use the root package for framework-neutral Start observability:
 
 - `createAxiomRequestMiddleware`
-- `createAxiomMiddleware`
+- `createAxiomFnMiddleware`
 - `createAxiomFunctionCorrelationMiddleware`
 - `createAxiomProxyHandler`
 - `createAxiomUncaughtErrorHandler`
@@ -32,7 +32,7 @@ Use the root package for framework-neutral Start observability:
 ```ts
 import { createMiddleware } from '@tanstack/react-start';
 import {
-  createAxiomMiddleware,
+  createAxiomFnMiddleware,
   createAxiomRequestMiddleware,
   tanStackStartServerFormatters,
 } from '@axiomhq/tanstack-start';
@@ -90,7 +90,7 @@ The Start middleware APIs are framework-neutral because they build on TanStack S
 ```ts
 import { createMiddleware } from '@tanstack/react-start';
 import {
-  createAxiomMiddleware,
+  createAxiomFnMiddleware,
   createAxiomRequestMiddleware,
 } from '@axiomhq/tanstack-start';
 
@@ -102,7 +102,7 @@ export const requestMiddleware = [
 ];
 
 export const functionMiddleware = [
-  createAxiomMiddleware(createMiddleware, startLogger, {
+  createAxiomFnMiddleware(createMiddleware, startLogger, {
     correlation: true,
   }),
 ];
@@ -153,13 +153,13 @@ export const requestMiddleware = [
 
 ```ts
 import {
-  createAxiomMiddleware,
+  createAxiomFnMiddleware,
   transformStartFunctionErrorResult,
   transformStartFunctionSuccessResult,
 } from '@axiomhq/tanstack-start';
 
 export const functionMiddleware = [
-  createAxiomMiddleware(createMiddleware, startLogger, {
+  createAxiomFnMiddleware(createMiddleware, startLogger, {
     correlation: true,
     onSuccess: async (data) => {
       const [message, report] = transformStartFunctionSuccessResult(data);

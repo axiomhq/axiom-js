@@ -5,7 +5,7 @@ This example demonstrates how to use [`@axiomhq/tanstack-start`](../../packages/
 It covers the shared and framework-specific observability paths:
 
 1. TanStack Router SPA navigation and route timing events (`@axiomhq/tanstack-start/router`)
-2. TanStack Start request/function middleware (including client+server correlation via `createAxiomMiddleware(..., { correlation: true })`)
+2. TanStack Start request/function middleware (including client+server correlation via `createAxiomFnMiddleware(..., { correlation: true })`)
 3. Solid route-level error-boundary integration through TanStack Router `defaultErrorComponent` (`@axiomhq/tanstack-start/solid`)
 
 ## Run
