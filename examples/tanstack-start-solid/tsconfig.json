@@ -1,0 +1,15 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "baseUrl": ".",
+    "jsx": "preserve",
+    "jsxImportSource": "solid-js",
+    "rootDir": "./",
+    "resolveJsonModule": true,
+    "useDefineForClassFields": false
+  },
+  "include": ["src/**/*", "vite.config.ts"]
+}

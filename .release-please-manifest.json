@@ -4,5 +4,6 @@
   "packages/winston": "1.6.0",
   "packages/logging": "0.2.0",
   "packages/react": "0.2.0",
-  "packages/nextjs": "0.2.0"
+  "packages/nextjs": "0.2.0",
+  "packages/tanstack-start": "0.1.0"
 }
