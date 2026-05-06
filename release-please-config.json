@@ -44,10 +44,7 @@
     },
     "packages/tanstack-start": {
       "release-type": "node",
-      "versioning-strategy": "prerelease",
-      "include-v-in-tag": false,
-      "prerelease": true,
-      "prerelease-type": "alpha"
+      "include-v-in-tag": false
     }
   }
 }
