@@ -57,7 +57,7 @@
   "devDependencies": {
     "@axiomhq/js": "workspace:*",
     "@repo/eslint-config": "workspace:*",
-    "@tanstack/config": "^0.16.0",
+    "@tanstack/config": "^0.22.2",
     "msw": "^2.6.2",
     "vite": "^7.3.2"
   },

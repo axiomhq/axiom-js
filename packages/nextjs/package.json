@@ -70,8 +70,8 @@
     "@axiomhq/logging": "workspace:*",
     "@edge-runtime/vm": "^5.0.0",
     "@repo/eslint-config": "workspace:*",
-    "@tanstack/config": "^0.16.0",
-    "next": "^15.5.9",
+    "@tanstack/config": "^0.22.2",
+    "next": "^15.5.15",
     "vite": "^7.3.2",
     "vitest": "^4.0.14"
   },
