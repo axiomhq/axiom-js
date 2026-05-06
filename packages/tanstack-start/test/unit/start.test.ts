@@ -8,14 +8,11 @@ import {
   createAxiomRequestMiddleware,
   createAxiomUncaughtErrorHandler,
   getLogLevelFromStatusCode,
+  getStartErrorStatusCode,
   transformStartUncaughtErrorResult,
   type StartFunctionClientContext,
   type StartFunctionContext,
-  type StartFunctionErrorData,
-  type StartFunctionSuccessData,
   type StartRequestContext,
-  type StartRequestErrorData,
-  type StartRequestSuccessData,
   type StartUncaughtErrorData,
   type TanStackCreateMiddleware,
 } from '../../src/start';
@@ -225,56 +222,24 @@ describe('start middleware', () => {
     await middleware(context);
 
     expect(onSuccess).toHaveBeenCalledTimes(1);
+    expect(onSuccess).toHaveBeenCalledWith(
+      expect.objectContaining({
+        request,
+        response,
+        startTime: expect.any(Number),
+        endTime: expect.any(Number),
+      }),
+    );
     expect(mockLogger.log).not.toHaveBeenCalled();
     expect(mockLogger.flush).not.toHaveBeenCalled();
   });
 
-  it('supports request success report transforms', async () => {
+  it('supports custom request error callbacks', async () => {
     const createMiddleware = createMockCreateMiddleware();
-    const transformSuccessResult = vi.fn((data: StartRequestSuccessData, report: Record<string | symbol, any>) => ({
-      ...report,
-      tenantId: data.request.headers.get('x-tenant-id'),
-    }));
+    const onError = vi.fn();
 
     const middleware = createAxiomRequestMiddleware(createMiddleware, mockLogger, {
-      transformSuccessResult,
-    }) as unknown as (context: StartRequestContext) => Promise<unknown>;
-
-    const request = new Request('https://example.com/api/custom', {
-      method: 'GET',
-      headers: {
-        'x-tenant-id': 'tenant-123',
-      },
-    });
-    const response = new Response('ok', { status: 200 });
-
-    const context = {
-      request,
-      pathname: '/api/custom',
-      context: {},
-      next: vi.fn().mockResolvedValue({ request, response, pathname: '/api/custom', context: {} }),
-    } as unknown as StartRequestContext;
-
-    await middleware(context);
-
-    expect(transformSuccessResult).toHaveBeenCalledTimes(1);
-    const [, , report] = vi.mocked(mockLogger.log).mock.calls[0] as [
-      string,
-      string,
-      Record<string | symbol, any>,
-    ];
-    expect(report.tenantId).toBe('tenant-123');
-  });
-
-  it('supports request error report transforms', async () => {
-    const createMiddleware = createMockCreateMiddleware();
-    const transformErrorResult = vi.fn((data: StartRequestErrorData, report: Record<string | symbol, any>) => ({
-      ...report,
-      errorName: data.error instanceof Error ? data.error.name : 'unknown',
-    }));
-
-    const middleware = createAxiomRequestMiddleware(createMiddleware, mockLogger, {
-      transformErrorResult,
+      onError,
     }) as unknown as (context: StartRequestContext) => Promise<unknown>;
 
     const request = new Request('https://example.com/api/custom', { method: 'GET' });
@@ -289,41 +254,17 @@ describe('start middleware', () => {
 
     await expect(middleware(context)).rejects.toThrow(error);
 
-    expect(transformErrorResult).toHaveBeenCalledTimes(1);
-    const [, , report] = vi.mocked(mockLogger.log).mock.calls[0] as [
-      string,
-      string,
-      Record<string | symbol, any>,
-    ];
-    expect(report.errorName).toBe('Error');
-  });
-
-  it('passes transformed request reports to custom callbacks', async () => {
-    const createMiddleware = createMockCreateMiddleware();
-    const onSuccess = vi.fn();
-
-    const middleware = createAxiomRequestMiddleware(createMiddleware, mockLogger, {
-      transformSuccessResult: (_data, report) => ({
-        ...report,
-        callbackField: 'available',
+    expect(onError).toHaveBeenCalledTimes(1);
+    expect(onError).toHaveBeenCalledWith(
+      expect.objectContaining({
+        request,
+        error,
+        startTime: expect.any(Number),
+        endTime: expect.any(Number),
       }),
-      onSuccess,
-    }) as unknown as (context: StartRequestContext) => Promise<unknown>;
-
-    const request = new Request('https://example.com/api/custom', { method: 'GET' });
-    const response = new Response('ok', { status: 200 });
-
-    const context = {
-      request,
-      pathname: '/api/custom',
-      context: {},
-      next: vi.fn().mockResolvedValue({ request, response, pathname: '/api/custom', context: {} }),
-    } as unknown as StartRequestContext;
-
-    await middleware(context);
-
-    expect(onSuccess).toHaveBeenCalledWith(expect.any(Object), expect.objectContaining({ callbackField: 'available' }));
+    );
     expect(mockLogger.log).not.toHaveBeenCalled();
+    expect(mockLogger.flush).not.toHaveBeenCalled();
   });
 
   it('logs function middleware success and omits data by default', async () => {
@@ -370,14 +311,11 @@ describe('start middleware', () => {
     expect(report.data).toBeUndefined();
   });
 
-  it('supports function success report transforms', async () => {
+  it('supports custom function success callbacks', async () => {
     const createMiddleware = createMockCreateMiddleware();
-    const transformSuccessResult = vi.fn((data: StartFunctionSuccessData, report: Record<string | symbol, any>) => ({
-      ...report,
-      functionData: data.context.data,
-    }));
+    const onSuccess = vi.fn();
     const middleware = createAxiomMiddleware(createMiddleware, mockLogger, {
-      transformSuccessResult,
+      onSuccess,
     }) as unknown as (context: StartFunctionContext) => Promise<unknown>;
 
     const result = {
@@ -399,19 +337,24 @@ describe('start middleware', () => {
 
     await middleware(context);
 
-    expect(transformSuccessResult).toHaveBeenCalledTimes(1);
-    const [, report] = vi.mocked(mockLogger.info).mock.calls[0] as [string, Record<string | symbol, any>];
-    expect(report.functionData).toEqual({ requestId: 'abc' });
+    expect(onSuccess).toHaveBeenCalledTimes(1);
+    expect(onSuccess).toHaveBeenCalledWith(
+      expect.objectContaining({
+        context,
+        result,
+        startTime: expect.any(Number),
+        endTime: expect.any(Number),
+      }),
+    );
+    expect(mockLogger.info).not.toHaveBeenCalled();
+    expect(mockLogger.flush).not.toHaveBeenCalled();
   });
 
-  it('supports function error report transforms', async () => {
+  it('supports custom function error callbacks', async () => {
     const createMiddleware = createMockCreateMiddleware();
-    const transformErrorResult = vi.fn((data: StartFunctionErrorData, report: Record<string | symbol, any>) => ({
-      ...report,
-      contextMethod: data.context.method,
-    }));
+    const onError = vi.fn();
     const middleware = createAxiomMiddleware(createMiddleware, mockLogger, {
-      transformErrorResult,
+      onError,
     }) as unknown as (context: StartFunctionContext) => Promise<unknown>;
 
     const error = new Error('function failed');
@@ -429,45 +372,17 @@ describe('start middleware', () => {
 
     await expect(middleware(context)).rejects.toThrow(error);
 
-    expect(transformErrorResult).toHaveBeenCalledTimes(1);
-    const lastErrorCall = vi.mocked(mockLogger.error).mock.calls.at(-1) as [string, Record<string | symbol, any>];
-    expect(lastErrorCall[1].contextMethod).toBe('POST');
-  });
-
-  it('falls back to default function report when transform throws', async () => {
-    const createMiddleware = createMockCreateMiddleware();
-    const middleware = createAxiomMiddleware(createMiddleware, mockLogger, {
-      transformSuccessResult: () => {
-        throw new Error('transform failed');
-      },
-    }) as unknown as (context: StartFunctionContext) => Promise<unknown>;
-
-    const result = {
-      'use functions must return the result of next()': true,
-      context: {},
-      sendContext: {},
-    };
-
-    const context = {
-      data: { requestId: 'abc' },
-      method: 'POST',
-      signal: new AbortController().signal,
-      context: {},
-      serverFnMeta: {
-        id: 'fn-id',
-      },
-      next: vi.fn().mockResolvedValue(result),
-    } as unknown as StartFunctionContext;
-
-    await middleware(context);
-
-    expect(mockLogger.error).toHaveBeenCalledWith(
-      'Failed to transform TanStack Start function success report',
-      expect.any(Error),
+    expect(onError).toHaveBeenCalledTimes(1);
+    expect(onError).toHaveBeenCalledWith(
+      expect.objectContaining({
+        context,
+        error,
+        startTime: expect.any(Number),
+        endTime: expect.any(Number),
+      }),
     );
-    const [message, report] = vi.mocked(mockLogger.info).mock.calls[0] as [string, Record<string | symbol, any>];
-    expect(message).toMatch(/completed in \d+ms/);
-    expect(report[EVENT].source).toBe('tanstack-start-function');
+    expect(mockLogger.error).not.toHaveBeenCalled();
+    expect(mockLogger.flush).not.toHaveBeenCalled();
   });
 
   it('awaits function flush before resolving', async () => {
@@ -696,62 +611,6 @@ describe('start middleware', () => {
     expect(mockLogger.flush).not.toHaveBeenCalled();
   });
 
-  it('supports shouldLog callback for request middleware', async () => {
-    const createMiddleware = createMockCreateMiddleware();
-    const middleware = createAxiomRequestMiddleware(createMiddleware, mockLogger, {
-      shouldLog: (ctx) => ctx.request.method !== 'OPTIONS',
-    }) as unknown as (context: StartRequestContext) => Promise<unknown>;
-
-    const request = new Request('https://example.com/api/items', { method: 'OPTIONS' });
-
-    const context = {
-      request,
-      pathname: '/api/items',
-      context: {},
-      next: vi.fn().mockResolvedValue({
-        request,
-        response: new Response(null, { status: 204 }),
-        pathname: '/api/items',
-        context: {},
-      }),
-    } as unknown as StartRequestContext;
-
-    await middleware(context);
-
-    expect(mockLogger.log).not.toHaveBeenCalled();
-    expect(mockLogger.flush).not.toHaveBeenCalled();
-  });
-
-  it('supports custom request log level strategy', async () => {
-    const createMiddleware = createMockCreateMiddleware();
-    const middleware = createAxiomRequestMiddleware(createMiddleware, mockLogger, {
-      logLevelByStatusCode: () => LogLevel.debug,
-    }) as unknown as (context: StartRequestContext) => Promise<unknown>;
-
-    const request = new Request('https://example.com/api/teapot', { method: 'GET' });
-    const response = new Response('teapot', { status: 418 });
-
-    const context = {
-      request,
-      pathname: '/api/teapot',
-      context: {},
-      next: vi.fn().mockResolvedValue({
-        request,
-        response,
-        pathname: '/api/teapot',
-        context: {},
-      }),
-    } as unknown as StartRequestContext;
-
-    await middleware(context);
-
-    expect(mockLogger.log).toHaveBeenCalledWith(
-      LogLevel.debug,
-      expect.stringContaining('GET /api/teapot 418 in'),
-      expect.any(Object),
-    );
-  });
-
   it('creates a proxy handler that ingests events and returns ok', async () => {
     const handler = createAxiomProxyHandler(mockLogger);
     const request = new Request('https://example.com/api/axiom', {
@@ -789,6 +648,12 @@ describe('start middleware', () => {
     expect(getLogLevelFromStatusCode(200)).toBe(LogLevel.info);
     expect(getLogLevelFromStatusCode(404)).toBe(LogLevel.warn);
     expect(getLogLevelFromStatusCode(500)).toBe(LogLevel.error);
+  });
+
+  it('exposes default error status-code extraction', () => {
+    expect(getStartErrorStatusCode(Object.assign(new Error('teapot'), { status: 418 }))).toBe(418);
+    expect(getStartErrorStatusCode(Object.assign(new Error('unavailable'), { statusCode: 503 }))).toBe(503);
+    expect(getStartErrorStatusCode(new Error('unknown'))).toBe(500);
   });
 
   it('transforms uncaught server errors', () => {

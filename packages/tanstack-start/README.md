@@ -20,6 +20,12 @@ Use the root package for framework-neutral Start observability:
 - `createAxiomProxyHandler`
 - `createAxiomUncaughtErrorHandler`
 - `captureError`
+- `getLogLevelFromStatusCode`
+- `getStartErrorStatusCode`
+- `transformStartRequestSuccessResult`
+- `transformStartRequestErrorResult`
+- `transformStartFunctionSuccessResult`
+- `transformStartFunctionErrorResult`
 - `tanStackStartServerFormatters`
 - `tanStackStartClientFormatters`
 
@@ -104,40 +110,97 @@ export const functionMiddleware = [
 
 Request and function middleware currently await `logger.flush()` before resolving. When we want non-blocking delivery later, the clean path is to introduce an injected `waitUntil`-style primitive instead of expanding the public config surface.
 
-To customize which fields are emitted while keeping default logging behavior, use report transform hooks:
+To fully customize emitted fields or side effects, provide `onSuccess` / `onError` callbacks. When a callback is provided, the middleware skips default logging for that path. The `transformStart*Result` helpers are exported for users who want to keep the default message/report shape and add their own fields.
 
 ```ts
-createAxiomRequestMiddleware(createMiddleware, startLogger, {
-  transformSuccessResult: (data, report) => ({
-    ...report,
-    tenant: data.request.headers.get('x-tenant-id'),
-    region: data.request.headers.get('x-region'),
+import {
+  createAxiomRequestMiddleware,
+  getLogLevelFromStatusCode,
+  getStartErrorStatusCode,
+  transformStartRequestErrorResult,
+  transformStartRequestSuccessResult,
+} from '@axiomhq/tanstack-start';
+
+export const requestMiddleware = [
+  createAxiomRequestMiddleware(createMiddleware, startLogger, {
+    onSuccess: async (data) => {
+      const [message, report] = transformStartRequestSuccessResult(data);
+      const logLevel = getLogLevelFromStatusCode(data.response.status);
+
+      startLogger.log(logLevel, message, {
+        ...report,
+        tenant: data.request.headers.get('x-tenant-id'),
+        region: data.request.headers.get('x-region'),
+      });
+
+      await startLogger.flush();
+    },
+    onError: async (data) => {
+      const [message, report] = transformStartRequestErrorResult(data);
+      const logLevel = getLogLevelFromStatusCode(getStartErrorStatusCode(data.error));
+
+      startLogger.log(logLevel, message, {
+        ...report,
+        tenant: data.request.headers.get('x-tenant-id'),
+        region: data.request.headers.get('x-region'),
+      });
+
+      await startLogger.flush();
+    },
   }),
-  transformErrorResult: (data, report) => ({
-    ...report,
-    tenant: data.request.headers.get('x-tenant-id'),
-    region: data.request.headers.get('x-region'),
-  }),
-});
+];
 ```
 
 ```ts
-createAxiomMiddleware(createMiddleware, startLogger, {
-  correlation: true,
-  transformSuccessResult: (data, report) => ({
-    ...report,
-    requestHeaders: {
-      tenant: data.context.context?.request?.headers.get('x-tenant-id'),
-      region: data.context.context?.request?.headers.get('x-region'),
+import {
+  createAxiomMiddleware,
+  transformStartFunctionErrorResult,
+  transformStartFunctionSuccessResult,
+} from '@axiomhq/tanstack-start';
+
+export const functionMiddleware = [
+  createAxiomMiddleware(createMiddleware, startLogger, {
+    correlation: true,
+    onSuccess: async (data) => {
+      const [message, report] = transformStartFunctionSuccessResult(data);
+
+      startLogger.info(message, {
+        ...report,
+        requestHeaders: {
+          tenant: data.context.context?.request?.headers.get('x-tenant-id'),
+          region: data.context.context?.request?.headers.get('x-region'),
+        },
+      });
+
+      await startLogger.flush();
+    },
+    onError: async (data) => {
+      const [message, report] = transformStartFunctionErrorResult(data);
+
+      startLogger.error(message, {
+        ...report,
+        requestHeaders: {
+          tenant: data.context.context?.request?.headers.get('x-tenant-id'),
+          region: data.context.context?.request?.headers.get('x-region'),
+        },
+      });
+
+      await startLogger.flush();
     },
   }),
-  transformErrorResult: (data, report) => ({
-    ...report,
-    requestHeaders: {
-      tenant: data.context.context?.request?.headers.get('x-tenant-id'),
-      region: data.context.context?.request?.headers.get('x-region'),
-    },
-  }),
+];
+```
+
+For simple side effects, callbacks can ignore logging entirely:
+
+```ts
+createAxiomRequestMiddleware(createMiddleware, startLogger, {
+  onSuccess: async (data) => {
+    await analytics.track('request_complete', {
+      path: new URL(data.request.url).pathname,
+      statusCode: data.response.status,
+    });
+  },
 });
 ```
 
@@ -147,7 +210,6 @@ createAxiomMiddleware(createMiddleware, startLogger, {
 import { observeTanStackRouter } from '@axiomhq/tanstack-start/router';
 
 const observe = observeTanStackRouter(routerLogger, {
-  eventType: 'onResolved',
   source: 'tanstack-router-spa',
   performance: true,
 });
@@ -155,7 +217,79 @@ const observe = observeTanStackRouter(routerLogger, {
 const unsubscribe = observe(router);
 ```
 
+`observeTanStackRouter` listens to `onResolved` by default. It only subscribes in the browser, so it is safe to call from router setup that also runs during SSR. The returned `unsubscribe` function can be used by HMR or custom router lifecycles.
+
+Use the default `source` of `tanstack-router` for general Router instrumentation, or set a custom source such as `tanstack-router-spa`, `tanstack-router-react`, or `tanstack-router-solid` when you want to distinguish app/framework variants in Axiom.
+
 When `performance` is enabled, the observer pairs router lifecycle events and emits route timing logs in addition to navigation logs.
+
+## Client-Side Proxy Ingestion
+
+For browser logs, use `ProxyTransport` on the client and receive those events with `createAxiomProxyHandler` on the server. This keeps the Axiom token server-side while preserving the same logger API in client code.
+
+```ts
+// src/lib/axiom/client.ts
+import { ConsoleTransport, Logger, ProxyTransport } from '@axiomhq/logging';
+import type { Transport } from '@axiomhq/logging';
+import { tanStackStartClientFormatters } from '@axiomhq/tanstack-start';
+import { tanStackRouterFormatters } from '@axiomhq/tanstack-start/router';
+
+function createBrowserTransports(): [Transport, ...Transport[]] {
+  return [
+    new ProxyTransport({ url: '/api/axiom' }),
+    new ConsoleTransport({ prettyPrint: true }),
+  ];
+}
+
+export const routerLogger = new Logger({
+  transports: createBrowserTransports(),
+  formatters: tanStackRouterFormatters,
+});
+
+export const clientLogger = new Logger({
+  transports: createBrowserTransports(),
+  formatters: tanStackStartClientFormatters,
+});
+```
+
+```ts
+// src/lib/axiom/server.ts
+import { Axiom } from '@axiomhq/js';
+import { AxiomJSTransport, ConsoleTransport, Logger } from '@axiomhq/logging';
+import { tanStackStartServerFormatters } from '@axiomhq/tanstack-start';
+
+const axiom = new Axiom({ token: process.env.AXIOM_TOKEN! });
+
+export const startLogger = new Logger({
+  transports: [
+    new AxiomJSTransport({
+      axiom,
+      dataset: process.env.AXIOM_DATASET!,
+    }),
+    new ConsoleTransport({ prettyPrint: true }),
+  ],
+  formatters: tanStackStartServerFormatters,
+});
+```
+
+```ts
+// src/routes/api/axiom.ts
+import { createFileRoute } from '@tanstack/react-router';
+import { createAxiomProxyHandler } from '@axiomhq/tanstack-start';
+import { startLogger } from '../../lib/axiom/server';
+
+const proxyHandler = createAxiomProxyHandler(startLogger);
+
+export const Route = createFileRoute('/api/axiom')({
+  server: {
+    handlers: {
+      POST: ({ request }) => proxyHandler(request),
+    },
+  },
+});
+```
+
+For Solid apps, use the same route pattern with `createFileRoute` from `@tanstack/solid-router`.
 
 ## Client Error Boundaries
 

@@ -65,10 +65,12 @@ const createMockRouter = (initialPath: string) => {
 describe('router observers', () => {
   afterEach(() => {
     vi.restoreAllMocks();
+    vi.unstubAllGlobals();
   });
 
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.stubGlobal('window', {});
   });
 
   it('transforms navigation data into an event payload', () => {
@@ -145,6 +147,22 @@ describe('router observers', () => {
     emit('onResolved', '/third');
 
     expect(mockLogger.info).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not subscribe to the server-side router', () => {
+    vi.unstubAllGlobals();
+    const { router, emit } = createMockRouter('/first');
+    const subscribe = vi.spyOn(router, 'subscribe');
+
+    const observe = observeTanStackRouter(mockLogger);
+    const unsubscribe = observe(router);
+
+    expect(subscribe).not.toHaveBeenCalled();
+
+    unsubscribe();
+    emit('onResolved', '/second');
+
+    expect(mockLogger.info).not.toHaveBeenCalled();
   });
 
   it('supports custom event type, source, message and flush behavior', () => {

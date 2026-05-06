@@ -30,7 +30,6 @@ const REQUEST_ID_FIELD = 'request_id';
 type MaybePromise<T> = T | Promise<T>;
 
 type LogReport = Record<string | symbol, unknown>;
-type ResultReportTransformer<TData> = (data: TData, report: LogReport) => MaybePromise<LogReport | void>;
 
 type ContextStoreFactory<TContext> = (context: TContext) => MaybePromise<ServerContextFields>;
 type StartRequestMatcher = string | RegExp | ((context: StartRequestContext) => MaybePromise<boolean>);
@@ -93,22 +92,16 @@ export interface StartFunctionErrorData {
 export interface StartRequestMiddlewareConfig {
   include?: StartRequestMatcher | StartRequestMatcher[];
   exclude?: StartRequestMatcher | StartRequestMatcher[];
-  shouldLog?: (context: StartRequestContext) => MaybePromise<boolean>;
-  logLevelByStatusCode?: (statusCode: number, data: StartRequestSuccessData | StartRequestErrorData) => LogLevelType;
   store?: ServerContextFields | ContextStoreFactory<StartRequestContext>;
-  transformSuccessResult?: ResultReportTransformer<StartRequestSuccessData>;
-  transformErrorResult?: ResultReportTransformer<StartRequestErrorData>;
-  onSuccess?: (data: StartRequestSuccessData, report: LogReport) => MaybePromise<void>;
-  onError?: (data: StartRequestErrorData, report: LogReport) => MaybePromise<void>;
+  onSuccess?: (data: StartRequestSuccessData) => MaybePromise<void>;
+  onError?: (data: StartRequestErrorData) => MaybePromise<void>;
 }
 
 export interface StartFunctionMiddlewareConfig {
   correlation?: boolean | StartFunctionCorrelationMiddlewareConfig;
   store?: ServerContextFields | ContextStoreFactory<StartFunctionContext>;
-  transformSuccessResult?: ResultReportTransformer<StartFunctionSuccessData>;
-  transformErrorResult?: ResultReportTransformer<StartFunctionErrorData>;
-  onSuccess?: (data: StartFunctionSuccessData, report: LogReport) => MaybePromise<void>;
-  onError?: (data: StartFunctionErrorData, report: LogReport) => MaybePromise<void>;
+  onSuccess?: (data: StartFunctionSuccessData) => MaybePromise<void>;
+  onError?: (data: StartFunctionErrorData) => MaybePromise<void>;
 }
 
 export interface StartFunctionCorrelationMiddlewareConfig {
@@ -263,7 +256,7 @@ const resolveStore = async <TContext>(
   return mergeRequestIdIntoStore(resolvedStore, resolvedRequestId);
 };
 
-const getStatusCodeFromError = (error: unknown): number => {
+export const getStartErrorStatusCode = (error: unknown): number => {
   if (!error || typeof error !== 'object') {
     return 500;
   }
@@ -298,6 +291,21 @@ const asArray = <T>(value: T | T[] | undefined): T[] => {
   return Array.isArray(value) ? value : [value];
 };
 
+const matchesStringMatcher = (matcher: string | RegExp, values: Array<string | undefined>) => {
+  const targets = values.filter((value): value is string => Boolean(value));
+
+  if (matcher instanceof RegExp) {
+    return targets.some((value) => matcher.test(value));
+  }
+
+  if (matcher.endsWith('*')) {
+    const prefix = matcher.slice(0, -1);
+    return targets.some((value) => value.startsWith(prefix));
+  }
+
+  return targets.includes(matcher);
+};
+
 const getRequestPath = (requestContext: StartRequestContext) => {
   if (requestContext.pathname) {
     return requestContext.pathname;
@@ -315,31 +323,17 @@ const matchesRequestMatcher = async (matcher: StartRequestMatcher, requestContex
     return await matcher(requestContext);
   }
 
-  const pathname = getRequestPath(requestContext);
-
-  if (matcher instanceof RegExp) {
-    return matcher.test(pathname);
-  }
-
-  if (matcher.endsWith('*')) {
-    const prefix = matcher.slice(0, -1);
-    return pathname.startsWith(prefix);
-  }
-
-  return pathname === matcher;
+  return matchesStringMatcher(matcher, [getRequestPath(requestContext)]);
 };
 
-const shouldLogRequest = async (
-  requestContext: StartRequestContext,
-  config: Pick<StartRequestMiddlewareConfig, 'include' | 'exclude' | 'shouldLog'>,
+const matchesMiddlewareConfig = async <TMatcher>(
+  include: TMatcher | TMatcher[] | undefined,
+  exclude: TMatcher | TMatcher[] | undefined,
+  matches: (matcher: TMatcher) => MaybePromise<boolean>,
 ) => {
-  const { include, exclude, shouldLog } = config;
-
   const includeMatchers = asArray(include);
   if (includeMatchers.length > 0) {
-    const includeResults = await Promise.all(
-      includeMatchers.map((matcher) => matchesRequestMatcher(matcher, requestContext)),
-    );
+    const includeResults = await Promise.all(includeMatchers.map((matcher) => matches(matcher)));
     if (!includeResults.some(Boolean)) {
       return false;
     }
@@ -347,19 +341,17 @@ const shouldLogRequest = async (
 
   const excludeMatchers = asArray(exclude);
   if (excludeMatchers.length > 0) {
-    const excludeResults = await Promise.all(
-      excludeMatchers.map((matcher) => matchesRequestMatcher(matcher, requestContext)),
-    );
+    const excludeResults = await Promise.all(excludeMatchers.map((matcher) => matches(matcher)));
     if (excludeResults.some(Boolean)) {
       return false;
     }
   }
 
-  if (shouldLog) {
-    return await shouldLog(requestContext);
-  }
-
   return true;
+};
+
+const matchesRequestConfig = (requestContext: StartRequestContext, config: StartRequestMiddlewareConfig) => {
+  return matchesMiddlewareConfig(config.include, config.exclude, (matcher) => matchesRequestMatcher(matcher, requestContext));
 };
 
 const getRequestMetadata = (
@@ -430,7 +422,7 @@ export const transformStartRequestSuccessResult = (
 };
 
 export const transformStartRequestErrorResult = (data: StartRequestErrorData): [message: string, report: LogReport] => {
-  const statusCode = getStatusCodeFromError(data.error);
+  const statusCode = getStartErrorStatusCode(data.error);
   const request = getRequestMetadata(
     data.request,
     statusCode,
@@ -582,118 +574,38 @@ export const captureError = <TArgs extends unknown[], TResult>(
   };
 };
 
-const defaultRequestOnSuccess = async (
-  logger: Logger,
-  data: StartRequestSuccessData,
-  logLevelByStatusCode?: StartRequestMiddlewareConfig['logLevelByStatusCode'],
-  transformSuccessResult?: StartRequestMiddlewareConfig['transformSuccessResult'],
-) => {
+const defaultRequestOnSuccess = async (logger: Logger, data: StartRequestSuccessData) => {
   const [message, report] = transformStartRequestSuccessResult(data);
-  const transformedReport = await applyResultReportTransform(
-    logger,
-    'request',
-    'success',
-    data,
-    report,
-    transformSuccessResult,
-  );
-  const logLevel = logLevelByStatusCode
-    ? logLevelByStatusCode(data.response.status, data)
-    : getLogLevelFromStatusCode(data.response.status);
-  logger.log(logLevel, message, transformedReport);
+  const logLevel = getLogLevelFromStatusCode(data.response.status);
+  logger.log(logLevel, message, report);
   await logger.flush();
 };
 
-const defaultRequestOnError = async (
-  logger: Logger,
-  data: StartRequestErrorData,
-  logLevelByStatusCode?: StartRequestMiddlewareConfig['logLevelByStatusCode'],
-  transformErrorResult?: StartRequestMiddlewareConfig['transformErrorResult'],
-) => {
+const defaultRequestOnError = async (logger: Logger, data: StartRequestErrorData) => {
   if (data.error instanceof Error) {
     logger.error(data.error.message, data.error);
   }
 
   const [message, report] = transformStartRequestErrorResult(data);
-  const transformedReport = await applyResultReportTransform(
-    logger,
-    'request',
-    'error',
-    data,
-    report,
-    transformErrorResult,
-  );
-  const statusCode = getStatusCodeFromError(data.error);
-  const logLevel = logLevelByStatusCode
-    ? logLevelByStatusCode(statusCode, data)
-    : getLogLevelFromStatusCode(statusCode);
-  logger.log(logLevel, message, transformedReport);
+  const statusCode = getStartErrorStatusCode(data.error);
+  const logLevel = getLogLevelFromStatusCode(statusCode);
+  logger.log(logLevel, message, report);
   await logger.flush();
 };
 
-const applyResultReportTransform = async <TData>(
-  logger: Logger,
-  target: 'function' | 'request',
-  phase: 'success' | 'error',
-  data: TData,
-  report: LogReport,
-  transform?: ResultReportTransformer<TData>,
-): Promise<LogReport> => {
-  if (!transform) {
-    return report;
-  }
-
-  try {
-    const transformedReport = await transform(data, report);
-    return transformedReport ?? report;
-  } catch (error) {
-    if (error instanceof Error) {
-      logger.error(`Failed to transform TanStack Start ${target} ${phase} report`, error);
-    } else {
-      logger.error(`Failed to transform TanStack Start ${target} ${phase} report`, { error });
-    }
-
-    return report;
-  }
-};
-
-const defaultFunctionOnSuccess = async (
-  logger: Logger,
-  data: StartFunctionSuccessData,
-  transformSuccessResult?: StartFunctionMiddlewareConfig['transformSuccessResult'],
-) => {
+const defaultFunctionOnSuccess = async (logger: Logger, data: StartFunctionSuccessData) => {
   const [message, report] = transformStartFunctionSuccessResult(data);
-  const transformedReport = await applyResultReportTransform(
-    logger,
-    'function',
-    'success',
-    data,
-    report,
-    transformSuccessResult,
-  );
-  logger.info(message, transformedReport);
+  logger.info(message, report);
   await logger.flush();
 };
 
-const defaultFunctionOnError = async (
-  logger: Logger,
-  data: StartFunctionErrorData,
-  transformErrorResult?: StartFunctionMiddlewareConfig['transformErrorResult'],
-) => {
+const defaultFunctionOnError = async (logger: Logger, data: StartFunctionErrorData) => {
   if (data.error instanceof Error) {
     logger.error(data.error.message, data.error);
   }
 
   const [message, report] = transformStartFunctionErrorResult(data);
-  const transformedReport = await applyResultReportTransform(
-    logger,
-    'function',
-    'error',
-    data,
-    report,
-    transformErrorResult,
-  );
-  logger.error(message, transformedReport);
+  logger.error(message, report);
   await logger.flush();
 };
 
@@ -702,11 +614,11 @@ export const createAxiomRequestMiddleware = (
   logger: Logger,
   config: StartRequestMiddlewareConfig = {},
 ) => {
-  const { store, onSuccess, onError, logLevelByStatusCode, transformSuccessResult, transformErrorResult } = config;
+  const { store, onSuccess, onError } = config;
 
   return createMiddleware({ type: 'request' }).server(async (requestContext: StartRequestContext) => {
-    const shouldLog = await shouldLogRequest(requestContext, config);
-    if (!shouldLog) {
+    const requestMatchesConfig = await matchesRequestConfig(requestContext, config);
+    if (!requestMatchesConfig) {
       return requestContext.next();
     }
 
@@ -734,18 +646,9 @@ export const createAxiomRequestMiddleware = (
         } satisfies StartRequestSuccessData;
 
         if (onSuccess) {
-          const [, report] = transformStartRequestSuccessResult(data);
-          const transformedReport = await applyResultReportTransform(
-            logger,
-            'request',
-            'success',
-            data,
-            report,
-            transformSuccessResult,
-          );
-          await onSuccess(data, transformedReport);
+          await onSuccess(data);
         } else {
-          await defaultRequestOnSuccess(logger, data, logLevelByStatusCode, transformSuccessResult);
+          await defaultRequestOnSuccess(logger, data);
         }
 
         return nextResult;
@@ -760,18 +663,9 @@ export const createAxiomRequestMiddleware = (
         } satisfies StartRequestErrorData;
 
         if (onError) {
-          const [, report] = transformStartRequestErrorResult(data);
-          const transformedReport = await applyResultReportTransform(
-            logger,
-            'request',
-            'error',
-            data,
-            report,
-            transformErrorResult,
-          );
-          await onError(data, transformedReport);
+          await onError(data);
         } else {
-          await defaultRequestOnError(logger, data, logLevelByStatusCode, transformErrorResult);
+          await defaultRequestOnError(logger, data);
         }
 
         throw error;
@@ -860,7 +754,7 @@ export const createAxiomMiddleware = (
   logger: Logger,
   config: StartFunctionMiddlewareConfig = {},
 ) => {
-  const { correlation = false, store, onSuccess, onError, transformSuccessResult, transformErrorResult } = config;
+  const { correlation = false, store, onSuccess, onError } = config;
   const correlationConfig = correlation === true ? {} : correlation || undefined;
 
   const serverMiddleware = async (functionContext: StartFunctionContext) => {
@@ -886,18 +780,9 @@ export const createAxiomMiddleware = (
         } satisfies StartFunctionSuccessData;
 
         if (onSuccess) {
-          const [, report] = transformStartFunctionSuccessResult(data);
-          const transformedReport = await applyResultReportTransform(
-            logger,
-            'function',
-            'success',
-            data,
-            report,
-            transformSuccessResult,
-          );
-          await onSuccess(data, transformedReport);
+          await onSuccess(data);
         } else {
-          await defaultFunctionOnSuccess(logger, data, transformSuccessResult);
+          await defaultFunctionOnSuccess(logger, data);
         }
 
         return result;
@@ -912,18 +797,9 @@ export const createAxiomMiddleware = (
         } satisfies StartFunctionErrorData;
 
         if (onError) {
-          const [, report] = transformStartFunctionErrorResult(data);
-          const transformedReport = await applyResultReportTransform(
-            logger,
-            'function',
-            'error',
-            data,
-            report,
-            transformErrorResult,
-          );
-          await onError(data, transformedReport);
+          await onError(data);
         } else {
-          await defaultFunctionOnError(logger, data, transformErrorResult);
+          await defaultFunctionOnError(logger, data);
         }
 
         throw error;

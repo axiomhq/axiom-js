@@ -295,5 +295,11 @@ const observeRouter = (router: RouterLike, logger: Logger, options: RouterObserv
 };
 
 export const observeTanStackRouter = (logger: Logger, options: RouterObserverOptions = {}) => {
-  return (router: RouterLike) => observeRouter(router, logger, options);
+  return (router: RouterLike) => {
+    if (typeof window === 'undefined') {
+      return () => {};
+    }
+
+    return observeRouter(router, logger, options);
+  };
 };

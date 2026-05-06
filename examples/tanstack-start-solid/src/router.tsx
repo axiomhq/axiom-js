@@ -13,14 +13,15 @@ export function getRouter() {
     defaultErrorComponent: RouteErrorComponent,
   })
 
-  if (typeof window !== 'undefined') {
-    const observe = observeTanStackRouter(routerLogger, {
-      eventType: 'onResolved',
-      source: 'tanstack-router-solid',
-      performance: true,
-    })
+  const observe = observeTanStackRouter(routerLogger, {
+    source: 'tanstack-router-solid',
+    performance: true,
+  })
 
-    observe(router)
+  const unsubscribe = observe(router)
+
+  if (import.meta.hot) {
+    import.meta.hot.dispose(unsubscribe)
   }
 
   return router
