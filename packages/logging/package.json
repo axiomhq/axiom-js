@@ -62,7 +62,7 @@
     "vite": "^7.3.2"
   },
   "peerDependencies": {
-    "@axiomhq/js": "workspace:*"
+    "@axiomhq/js": "^1.0.0"
   },
   "peerDependenciesMeta": {
     "@axiomhq/js": {
