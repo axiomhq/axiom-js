@@ -6,12 +6,12 @@ import {
   type LogEvent,
   type LogLevel as LogLevelType,
 } from '@axiomhq/logging';
-import type {
-  FunctionMiddlewareClientFnOptions,
-  FunctionMiddlewareServerFnOptions,
+import {
   createMiddleware,
-  RequestServerOptions,
-} from '@tanstack/start-client-core' with { 'resolution-mode': 'import' };
+  type FunctionMiddlewareClientFnOptions,
+  type FunctionMiddlewareServerFnOptions,
+  type RequestServerOptions,
+} from '@tanstack/start-client-core';
 import { frameworkIdentifierFormatter } from './identifier';
 import {
   getServerContextStore,
@@ -610,7 +610,6 @@ const defaultFunctionOnError = async (logger: Logger, data: StartFunctionErrorDa
 };
 
 export const createAxiomRequestMiddleware = (
-  createMiddleware: TanStackCreateMiddleware,
   logger: Logger,
   config: StartRequestMiddlewareConfig = {},
 ) => {
@@ -743,14 +742,12 @@ const createFunctionCorrelationClientHandler = (config: StartFunctionCorrelation
 };
 
 export const createAxiomFnCorrelationMiddleware = (
-  createMiddleware: TanStackCreateMiddleware,
   config: StartFunctionCorrelationMiddlewareConfig = {},
 ) => {
   return createMiddleware({ type: 'function' }).client(createFunctionCorrelationClientHandler(config));
 };
 
 export const createAxiomFnMiddleware = (
-  createMiddleware: TanStackCreateMiddleware,
   logger: Logger,
   config: StartFunctionMiddlewareConfig = {},
 ) => {

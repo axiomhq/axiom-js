@@ -1,4 +1,4 @@
-import { createMiddleware, createStart } from '@tanstack/solid-start'
+import { createStart } from '@tanstack/solid-start'
 import {
   createAxiomFnMiddleware,
   createAxiomRequestMiddleware,
@@ -7,10 +7,10 @@ import { startLogger } from './lib/logger'
 
 export const startInstance = createStart(() => ({
   requestMiddleware: [
-    createAxiomRequestMiddleware(createMiddleware, startLogger),
+    createAxiomRequestMiddleware(startLogger),
   ],
   functionMiddleware: [
-    createAxiomFnMiddleware(createMiddleware, startLogger, {
+    createAxiomFnMiddleware(startLogger, {
       correlation: true,
     }),
   ],
