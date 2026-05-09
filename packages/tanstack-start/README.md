@@ -30,7 +30,6 @@ Use the root package for framework-neutral Start observability:
 - `tanStackStartClientFormatters`
 
 ```ts
-import { createMiddleware } from '@tanstack/react-start';
 import {
   createAxiomFnMiddleware,
   createAxiomRequestMiddleware,
@@ -88,21 +87,20 @@ export const startLogger = new Logger({
 The Start middleware APIs are framework-neutral because they build on TanStack Start core contracts.
 
 ```ts
-import { createMiddleware } from '@tanstack/react-start';
 import {
   createAxiomFnMiddleware,
   createAxiomRequestMiddleware,
 } from '@axiomhq/tanstack-start';
 
 export const requestMiddleware = [
-  createAxiomRequestMiddleware(createMiddleware, startLogger, {
+  createAxiomRequestMiddleware(startLogger, {
     include: ['/api/*', '/_server/*'],
     exclude: ['/api/health'],
   }),
 ];
 
 export const functionMiddleware = [
-  createAxiomFnMiddleware(createMiddleware, startLogger, {
+  createAxiomFnMiddleware(startLogger, {
     correlation: true,
   }),
 ];
@@ -124,7 +122,7 @@ import {
 } from '@axiomhq/tanstack-start';
 
 export const requestMiddleware = [
-  createAxiomRequestMiddleware(createMiddleware, startLogger, {
+  createAxiomRequestMiddleware(startLogger, {
     onSuccess: async (data) => {
       const [message, report] = transformStartRequestSuccessResult(data);
       const logLevel = getLogLevelFromStatusCode(data.response.status);
@@ -161,7 +159,7 @@ import {
 } from '@axiomhq/tanstack-start';
 
 export const functionMiddleware = [
-  createAxiomFnMiddleware(createMiddleware, startLogger, {
+  createAxiomFnMiddleware(startLogger, {
     correlation: true,
     onSuccess: async (data) => {
       const [message, report] = transformStartFunctionSuccessResult(data);
@@ -196,7 +194,7 @@ export const functionMiddleware = [
 For simple side effects, callbacks can ignore logging entirely:
 
 ```ts
-createAxiomRequestMiddleware(createMiddleware, startLogger, {
+createAxiomRequestMiddleware(startLogger, {
   onSuccess: async (data) => {
     await analytics.track('request_complete', {
       path: new URL(data.request.url).pathname,
