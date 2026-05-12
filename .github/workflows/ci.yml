@@ -17,7 +17,7 @@ env:
   NEXT_PUBLIC_AXIOM_TOKEN: ${{ secrets.TESTING_DEV_INGEST_API_TOKEN }}
   NEXT_PUBLIC_AXIOM_URL: ${{ secrets.TESTING_DEV_API_URL }}
   NEXT_PUBLIC_AXIOM_ORG_ID: ${{ secrets.TESTING_DEV_ORG_ID }}
-  AXIOM_DATASET_SUFFIX: ${{ github.run_id }}
+  AXIOM_DATASET_SUFFIX: ${{ github.run_id }}-${{ github.run_attempt }}
   NODEVERSION: 22.x
   PNPM_VERSION: 10.4.1
   TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
@@ -119,7 +119,7 @@ jobs:
       AXIOM_EDGE: ${{ vars.TESTING_DEV_EDGE }}
       AXIOM_EDGE_URL: ${{ vars.TESTING_DEV_EDGE_URL }}
       AXIOM_EDGE_DATASET_REGION: ${{ vars.TESTING_DEV_EDGE_DATASET_REGION }}
-      AXIOM_DATASET_SUFFIX: ${{ github.run_id }}-${{ matrix.node }}-development
+      AXIOM_DATASET_SUFFIX: ${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.node }}-development
     steps:
       - uses: actions/checkout@v6
       - name: Skip integration tests for external PRs
