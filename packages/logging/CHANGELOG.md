@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.2](https://github.com/axiomhq/axiom-js/compare/logging-0.2.1...logging-0.2.2) (2026-05-12)
+
+
+### Miscellaneous Chores
+
+* **logging:** Synchronize integrations versions
+
 ## [0.2.1](https://github.com/axiomhq/axiom-js/compare/logging-0.2.0...logging-0.2.1) (2026-05-06)
 
 
