@@ -21,14 +21,24 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      checks: write
       issues: write
       pull-requests: write
     if: github.repository_owner == 'axiomhq' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.fork == false)
     steps:
       - uses: z0al/dependent-issues@950226e7ca8fc43dc209a7febf67c655af3bdb43 # v1
+        if: github.event_name != 'pull_request'
         env:
           GITHUB_TOKEN: ${{ github.token }}
           GITHUB_READ_TOKEN: ${{ secrets.AXIOM_AUTOMATION_TOKEN }}
         with:
           label: dependent
           keywords: depends on, blocked by, needs
+      - uses: LouisBrunner/checks-action@937cbbcde3259005b50746dc91cde29098aac2ff # v3.1.0
+        if: github.event_name == 'pull_request'
+        with:
+          token: ${{ github.token }}
+          name: Dependent Issues
+          conclusion: success
+          output: |
+            {"summary":"Skipping dependent issue checks on pull_request events due read-only token permissions."}
