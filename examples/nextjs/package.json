@@ -13,7 +13,7 @@
     "@axiomhq/logging": "workspace:*",
     "@axiomhq/nextjs": "workspace:*",
     "@axiomhq/react": "workspace:*",
-    "next": "15.5.15",
+    "next": "15.5.18",
     "react": "19.2.5",
     "react-dom": "19.2.5"
   },
@@ -23,7 +23,7 @@
     "@types/react": "19.2.14",
     "@types/react-dom": "19.2.3",
     "eslint": "^9.39.1",
-    "eslint-config-next": "15.5.15",
+    "eslint-config-next": "15.5.18",
     "postcss": "^8.5.14",
     "tailwindcss": "^3.4.19",
     "typescript": "^5",
