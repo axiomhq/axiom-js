@@ -1,5 +1,27 @@
 import { EVENT, LogLevel } from '@axiomhq/logging';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+
+const { createDefaultMiddlewareBuilder, mockCreateMiddleware } = vi.hoisted(() => {
+  const createDefaultMiddlewareBuilder = () => ({
+    client: (handler: unknown) => handler,
+    server: (handler: unknown) => handler,
+  });
+
+  return {
+    createDefaultMiddlewareBuilder,
+    mockCreateMiddleware: vi.fn(createDefaultMiddlewareBuilder),
+  };
+});
+
+vi.mock('@tanstack/start-client-core', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@tanstack/start-client-core')>();
+
+  return {
+    ...actual,
+    createMiddleware: mockCreateMiddleware,
+  };
+});
+
 import {
   captureError,
   createAxiomFnCorrelationMiddleware,
@@ -14,7 +36,6 @@ import {
   type StartFunctionContext,
   type StartRequestContext,
   type StartUncaughtErrorData,
-  type TanStackCreateMiddleware,
 } from '../../src/start';
 import { mockLogger } from '../lib/mock';
 
@@ -22,25 +43,17 @@ const waitForTurn = async () => {
   await new Promise((resolve) => setTimeout(resolve, 0));
 };
 
-const createMockCreateMiddleware = () => {
-  const createMiddleware = vi.fn(() => ({
-    client: (handler: unknown) => handler,
-    server: (handler: unknown) => handler,
-  }));
-
-  return createMiddleware as unknown as TanStackCreateMiddleware;
-};
-
 describe('start middleware', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockCreateMiddleware.mockReset();
+    mockCreateMiddleware.mockImplementation(createDefaultMiddlewareBuilder);
     vi.mocked(mockLogger.flush).mockReset();
     vi.mocked(mockLogger.flush).mockImplementation(() => undefined as never);
   });
 
   it('logs request middleware success with status-aware level', async () => {
-    const createMiddleware = createMockCreateMiddleware();
-    const middleware = createAxiomRequestMiddleware(createMiddleware, mockLogger) as unknown as (
+    const middleware = createAxiomRequestMiddleware(mockLogger) as unknown as (
       context: StartRequestContext,
     ) => Promise<unknown>;
 
@@ -89,7 +102,6 @@ describe('start middleware', () => {
   });
 
   it('awaits request flush before resolving', async () => {
-    const createMiddleware = createMockCreateMiddleware();
     let resolveFlush: (() => void) | undefined;
     const flushPromise = new Promise<void>((resolve) => {
       resolveFlush = resolve;
@@ -97,7 +109,7 @@ describe('start middleware', () => {
 
     vi.mocked(mockLogger.flush).mockImplementation(() => flushPromise as never);
 
-    const middleware = createAxiomRequestMiddleware(createMiddleware, mockLogger) as unknown as (
+    const middleware = createAxiomRequestMiddleware(mockLogger) as unknown as (
       context: StartRequestContext,
     ) => Promise<unknown>;
 
@@ -133,8 +145,7 @@ describe('start middleware', () => {
   });
 
   it('logs request middleware error, flushes and rethrows', async () => {
-    const createMiddleware = createMockCreateMiddleware();
-    const middleware = createAxiomRequestMiddleware(createMiddleware, mockLogger) as unknown as (
+    const middleware = createAxiomRequestMiddleware(mockLogger) as unknown as (
       context: StartRequestContext,
     ) => Promise<unknown>;
 
@@ -166,8 +177,7 @@ describe('start middleware', () => {
   });
 
   it('includes correlation id for request middleware when header is present', async () => {
-    const createMiddleware = createMockCreateMiddleware();
-    const middleware = createAxiomRequestMiddleware(createMiddleware, mockLogger) as unknown as (
+    const middleware = createAxiomRequestMiddleware(mockLogger) as unknown as (
       context: StartRequestContext,
     ) => Promise<unknown>;
 
@@ -202,10 +212,9 @@ describe('start middleware', () => {
   });
 
   it('supports custom request callbacks', async () => {
-    const createMiddleware = createMockCreateMiddleware();
     const onSuccess = vi.fn();
 
-    const middleware = createAxiomRequestMiddleware(createMiddleware, mockLogger, {
+    const middleware = createAxiomRequestMiddleware(mockLogger, {
       onSuccess,
     }) as unknown as (context: StartRequestContext) => Promise<unknown>;
 
@@ -235,10 +244,9 @@ describe('start middleware', () => {
   });
 
   it('supports custom request error callbacks', async () => {
-    const createMiddleware = createMockCreateMiddleware();
     const onError = vi.fn();
 
-    const middleware = createAxiomRequestMiddleware(createMiddleware, mockLogger, {
+    const middleware = createAxiomRequestMiddleware(mockLogger, {
       onError,
     }) as unknown as (context: StartRequestContext) => Promise<unknown>;
 
@@ -268,8 +276,7 @@ describe('start middleware', () => {
   });
 
   it('logs function middleware success and omits data by default', async () => {
-    const createMiddleware = createMockCreateMiddleware();
-    const middleware = createAxiomFnMiddleware(createMiddleware, mockLogger) as unknown as (
+    const middleware = createAxiomFnMiddleware(mockLogger) as unknown as (
       context: StartFunctionContext,
     ) => Promise<unknown>;
 
@@ -312,9 +319,8 @@ describe('start middleware', () => {
   });
 
   it('supports custom function success callbacks', async () => {
-    const createMiddleware = createMockCreateMiddleware();
     const onSuccess = vi.fn();
-    const middleware = createAxiomFnMiddleware(createMiddleware, mockLogger, {
+    const middleware = createAxiomFnMiddleware(mockLogger, {
       onSuccess,
     }) as unknown as (context: StartFunctionContext) => Promise<unknown>;
 
@@ -351,9 +357,8 @@ describe('start middleware', () => {
   });
 
   it('supports custom function error callbacks', async () => {
-    const createMiddleware = createMockCreateMiddleware();
     const onError = vi.fn();
-    const middleware = createAxiomFnMiddleware(createMiddleware, mockLogger, {
+    const middleware = createAxiomFnMiddleware(mockLogger, {
       onError,
     }) as unknown as (context: StartFunctionContext) => Promise<unknown>;
 
@@ -386,7 +391,6 @@ describe('start middleware', () => {
   });
 
   it('awaits function flush before resolving', async () => {
-    const createMiddleware = createMockCreateMiddleware();
     let resolveFlush: (() => void) | undefined;
     const flushPromise = new Promise<void>((resolve) => {
       resolveFlush = resolve;
@@ -394,7 +398,7 @@ describe('start middleware', () => {
 
     vi.mocked(mockLogger.flush).mockImplementation(() => flushPromise as never);
 
-    const middleware = createAxiomFnMiddleware(createMiddleware, mockLogger) as unknown as (
+    const middleware = createAxiomFnMiddleware(mockLogger) as unknown as (
       context: StartFunctionContext,
     ) => Promise<unknown>;
 
@@ -432,8 +436,7 @@ describe('start middleware', () => {
   });
 
   it('adds correlation context and header in function client middleware', async () => {
-    const createMiddleware = createMockCreateMiddleware();
-    const middleware = createAxiomFnCorrelationMiddleware(createMiddleware, {
+    const middleware = createAxiomFnCorrelationMiddleware({
       createRequestId: () => 'corr-generated',
     }) as unknown as (context: StartFunctionClientContext) => Promise<unknown>;
 
@@ -471,8 +474,7 @@ describe('start middleware', () => {
   });
 
   it('reuses existing request_id in function client middleware', async () => {
-    const createMiddleware = createMockCreateMiddleware();
-    const middleware = createAxiomFnCorrelationMiddleware(createMiddleware) as unknown as (
+    const middleware = createAxiomFnCorrelationMiddleware() as unknown as (
       context: StartFunctionClientContext,
     ) => Promise<unknown>;
 
@@ -508,7 +510,7 @@ describe('start middleware', () => {
   });
 
   it('supports correlation through createAxiomFnMiddleware config', async () => {
-    const createMiddleware = vi.fn(() => ({
+    mockCreateMiddleware.mockImplementationOnce(() => ({
       client: (clientHandler: unknown) => ({
         server: (serverHandler: unknown) => ({
           clientHandler,
@@ -516,9 +518,9 @@ describe('start middleware', () => {
         }),
       }),
       server: (serverHandler: unknown) => serverHandler,
-    })) as unknown as TanStackCreateMiddleware;
+    }));
 
-    const middleware = createAxiomFnMiddleware(createMiddleware, mockLogger, {
+    const middleware = createAxiomFnMiddleware(mockLogger, {
       correlation: {
         createRequestId: () => 'corr-from-config',
       },
@@ -556,8 +558,7 @@ describe('start middleware', () => {
   });
 
   it('logs function middleware error, flushes and rethrows', async () => {
-    const createMiddleware = createMockCreateMiddleware();
-    const middleware = createAxiomFnMiddleware(createMiddleware, mockLogger) as unknown as (
+    const middleware = createAxiomFnMiddleware(mockLogger) as unknown as (
       context: StartFunctionContext,
     ) => Promise<unknown>;
 
@@ -585,8 +586,7 @@ describe('start middleware', () => {
   });
 
   it('supports include/exclude request matching', async () => {
-    const createMiddleware = createMockCreateMiddleware();
-    const middleware = createAxiomRequestMiddleware(createMiddleware, mockLogger, {
+    const middleware = createAxiomRequestMiddleware(mockLogger, {
       include: '/api/*',
       exclude: '/api/internal/*',
     }) as unknown as (context: StartRequestContext) => Promise<unknown>;
