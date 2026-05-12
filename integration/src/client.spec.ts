@@ -1,6 +1,7 @@
 import { gzip } from 'zlib';
 import { describe, expect, it, beforeAll, afterAll } from 'vitest';
 import { AxiomWithoutBatching, ContentType, ContentEncoding } from '@axiomhq/js';
+import { createTestDataset, cleanupDatasetIfExists } from './testHelpers';
 
 const datasetSuffix = process.env.AXIOM_DATASET_SUFFIX || 'local';
 
@@ -13,15 +14,15 @@ describe('Axiom', () => {
   });
 
   beforeAll(async () => {
-    await axiom.datasets.create({
+    await createTestDataset(axiom.datasets, {
       name: datasetName,
       description: 'This is a test dataset for datasets integration tests.',
     });
   });
 
   afterAll(async () => {
-    const resp = await axiom.datasets.delete(datasetName);
-    expect(resp.status).toEqual(204);
+    const resp = await cleanupDatasetIfExists(axiom.datasets, datasetName);
+    if (resp) expect(resp.status).toEqual(204);
   });
 
   describe('ingest', () => {
