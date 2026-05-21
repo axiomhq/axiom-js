@@ -232,13 +232,13 @@ describe('Axiom', () => {
       headers[headerAPIRateReset] = resetTimeInSeconds.toString();
 
       mockFetchResponse({}, 429, headers);
-      expect(axiom.datasets.list).rejects.toBeInstanceOf(AxiomTooManyRequestsError);
+      await expect(axiom.datasets.list()).rejects.toBeInstanceOf(AxiomTooManyRequestsError);
 
       // ingest and query should succeed
       mockFetchResponse({}, 200, headers);
       await axiom.ingest('test', [{ name: 'test' }]);
 
-      mockFetchResponse({}, 200, headers);
+      mockFetchResponse(tabularQueryResult, 200, headers);
       await axiom.query("['test']");
     });
 
@@ -526,21 +526,29 @@ describe('Axiom', () => {
       expect(response.matches).toHaveLength(2);
     });
 
-    it('APL Query', async () => {
-      mockFetchResponse(queryResult);
+    it('APL Query defaults to tabular', async () => {
+      mockFetchResponse(tabularQueryResult);
       // works without options
-      let response = await axiom.query("['test'] | where response == 304");
+      let response = await axiom.query("['sample-http-logs'] | where status_int != 200");
       expect(response).not.toEqual('undefined');
-      expect(response.matches).toHaveLength(2);
+      expect(response.tables).toHaveLength(1);
+      expect(Array.from(response.tables[0].events())).toEqual(tabularEvents);
 
-      // works with options
+      // works with options and no explicit format
       const options = {
         streamingDuration: '1m',
         noCache: true,
       };
 
+      mockFetchResponse(tabularQueryResult);
+      response = await axiom.query("['sample-http-logs'] | where status_int != 200", options);
+      expect(response).not.toEqual('undefined');
+      expect(response.tables).toHaveLength(1);
+    });
+
+    it('APL Query supports explicit legacy format', async () => {
       mockFetchResponse(queryResult);
-      response = await axiom.query("['test'] | where response == 304", options);
+      const response = await axiom.query("['test'] | where response == 304", { format: 'legacy' });
       expect(response).not.toEqual('undefined');
       expect(response.matches).toHaveLength(2);
     });
