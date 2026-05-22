@@ -2,7 +2,7 @@ import fetchRetry from "fetch-retry";
 import { parseLimitFromResponse, Limit, LimitType } from "./limit.js";
 
 export class FetchClient {
-  constructor(public config: { headers: HeadersInit; baseUrl: string; timeout: number }) {}
+  constructor(public config: { headers: HeadersInit; baseUrl: string; timeout: number; fetch?: typeof globalThis.fetch }) {}
 
   async doReq<T>(
     endpoint: string,
@@ -20,7 +20,8 @@ export class FetchClient {
 
     const headers = { ...this.config.headers, ...init.headers };
 
-    const resp = await fetchRetry(fetch)(finalUrl, {
+    const fetchFn = this.config.fetch ?? fetch;
+    const resp = await fetchRetry(fetchFn)(finalUrl, {
       retries: 1,
       retryDelay: function (attempt, error, response) {
         return Math.pow(2, attempt) * 1000; // 1000, 2000, 4000
