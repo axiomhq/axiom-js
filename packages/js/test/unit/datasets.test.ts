@@ -4,7 +4,8 @@ import { testMockedFetchCall } from '../lib/mock';
 
 const baseUrl = 'http://axiom-js.dev.local';
 const edgeUrl = 'https://us-east-1.aws.edge.axiom.co';
-const metricsWindow = { start: '2026-06-02T10:31:37-04:00', end: '2026-06-02T10:31:37-04:00' };
+const metricsWindow = { start: '2026-06-02T10:31:37-04:00', end: '2026-06-03T10:31:37-04:00' };
+const metricsQuery = new URLSearchParams(metricsWindow).toString();
 
 const mockNoContentFetchCall = (test: (url: string, init: RequestInit) => void) => {
   vi.spyOn(global, 'fetch').mockImplementationOnce((url: RequestInfo | URL, init?: RequestInit) => {
@@ -37,7 +38,7 @@ const datasetList = [
 ];
 
 describe('DatasetsService', () => {
-  const client = new datasets.Service({ url: baseUrl, token: '' });
+  const client = new datasets.Service({ url: baseUrl, token: 'test-token' });
 
   it('List', async () => {
     testMockedFetchCall((url: string, init: RequestInit) => {
@@ -241,7 +242,7 @@ describe('DatasetsService', () => {
     },
   ])('$name uses the expected metrics metadata endpoint', async ({ call, expectedPath, response }) => {
     testMockedFetchCall((url: string, init: RequestInit) => {
-      expect(url).toEqual(`${edgeUrl}${expectedPath}?start=2026-06-02T10:31:37-04:00&end=2026-06-03T10:31:37-04:00`);
+      expect(url).toEqual(`${edgeUrl}${expectedPath}?${metricsQuery}`);
       expect(init.method).toEqual('GET');
       expect(init.body).toBeUndefined();
     }, response);
@@ -251,9 +252,7 @@ describe('DatasetsService', () => {
 
   it('routes metrics metadata by edgeDeployment and sends an Accept override', async () => {
     testMockedFetchCall((url: string, init: RequestInit) => {
-      expect(url).toEqual(
-        'https://us-east-1.aws.edge.axiom.co/v1/query/metrics/info/datasets/metrics/metrics?start=2026-06-02T10:31:37-04:00&end=2026-06-03T10:31:37-04:00',
-      );
+      expect(url).toEqual(`${edgeUrl}/v1/query/metrics/info/datasets/metrics/metrics?${metricsQuery}`);
       expect(init.headers).toMatchObject({
         Accept: 'application/vnd.metrics-info.v2+json',
       });
