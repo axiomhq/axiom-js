@@ -1,4 +1,5 @@
 import { annotations } from './annotations.js';
+import { dashboards } from './dashboards.js';
 import { datasets } from './datasets.js';
 import { monitors } from './monitors.js';
 import { savedQueries } from './savedQueries.js';
@@ -9,6 +10,7 @@ import { isAxiomPersonalToken } from './token.js';
 
 class BaseClient extends HTTPClient {
   annotations: annotations.Service;
+  dashboards: dashboards.Service;
   datasets: datasets.Service;
   monitors: monitors.Service;
   savedQueries: savedQueries.Service;
@@ -25,6 +27,7 @@ class BaseClient extends HTTPClient {
 
     super(options);
     this.annotations = new annotations.Service(options);
+    this.dashboards = new dashboards.Service(options);
     this.datasets = new datasets.Service(options);
     this.monitors = new monitors.Service(options);
     this.savedQueries = new savedQueries.Service(options);
