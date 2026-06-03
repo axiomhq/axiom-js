@@ -37,3 +37,4 @@ export { datasets } from './datasets.js';
 export { annotations } from './annotations.js';
 export { users } from './users.js';
 export { monitors } from './monitors.js';
+export { savedQueries } from './savedQueries.js';
