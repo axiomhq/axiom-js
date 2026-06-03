@@ -156,6 +156,96 @@ export function resolveIngestUrl(options: Pick<ClientOptions, 'url' | 'edge' | '
   return `${AxiomURL}/v1/datasets/${dataset}/ingest`;
 }
 
+function buildQueryUrl(baseUrl: string, path: string): string {
+  try {
+    const parsed = new URL(baseUrl);
+    const currentPath = parsed.pathname;
+
+    if (currentPath === '' || currentPath === '/') {
+      parsed.pathname = path;
+      return parsed.toString();
+    }
+
+    parsed.pathname = currentPath.replace(/\/+$/, '');
+    return parsed.toString();
+  } catch {
+    const trimmed = baseUrl.replace(/\/+$/, '');
+    return `${trimmed}${path}`;
+  }
+}
+
+const edgeDeploymentUrls: Record<string, string> = {
+  'cloud.us-east-1.aws': 'https://us-east-1.aws.edge.axiom.co',
+  'cloud.eu-central-1.aws': 'https://eu-central-1.aws.edge.axiom.co',
+};
+
+function resolveEdgeUrlFromDeployment(edgeDeployment: string | null | undefined): string | undefined {
+  if (!edgeDeployment || edgeDeployment === 'null') {
+    return undefined;
+  }
+
+  return edgeDeploymentUrls[edgeDeployment.toLowerCase()];
+}
+
+/**
+ * Resolves the APL query endpoint URL.
+ *
+ * @see https://axiom.co/docs/restapi/endpoints/queryApl
+ * @see https://axiom.co/docs/restapi/endpoints/queryEdge
+ */
+export function resolveAplQueryUrl(options: Pick<ClientOptions, 'url' | 'edge' | 'edgeUrl'>): string {
+  if (options.edgeUrl) {
+    return buildQueryUrl(options.edgeUrl, '/v1/query/_apl');
+  }
+
+  if (options.edge) {
+    return `https://${options.edge}/v1/query/_apl`;
+  }
+
+  if (options.url) {
+    return buildQueryUrl(options.url, '/v1/datasets/_apl');
+  }
+
+  return `${AxiomURL}/v1/datasets/_apl`;
+}
+
+/**
+ * Resolves the MPL query endpoint URL.
+ *
+ * @see https://axiom.co/docs/restapi/endpoints/queryMetrics
+ */
+export function resolveMplQueryUrl(
+  clientOptions: Pick<ClientOptions, 'url' | 'edge' | 'edgeUrl'>,
+  options?: { edge?: string; edgeUrl?: string; edgeDeployment?: string | null },
+): string {
+  if (options?.edgeUrl) {
+    return buildQueryUrl(options.edgeUrl, '/v1/query/_mpl');
+  }
+
+  if (options?.edge) {
+    return `https://${options.edge}/v1/query/_mpl`;
+  }
+
+  const deploymentEdgeUrl = resolveEdgeUrlFromDeployment(options?.edgeDeployment);
+  if (deploymentEdgeUrl) {
+    return buildQueryUrl(deploymentEdgeUrl, '/v1/query/_mpl');
+  }
+
+  if (clientOptions.edgeUrl) {
+    return buildQueryUrl(clientOptions.edgeUrl, '/v1/query/_mpl');
+  }
+
+  if (clientOptions.edge) {
+    return `https://${clientOptions.edge}/v1/query/_mpl`;
+  }
+
+  if (clientOptions.url) {
+    return buildQueryUrl(clientOptions.url, '/v1/query/_mpl');
+  }
+
+  return `${AxiomURL}/v1/query/_mpl`;
+}
+
 export default abstract class HTTPClient {
   protected readonly client: FetchClient;
   protected readonly clientOptions: ClientOptions;

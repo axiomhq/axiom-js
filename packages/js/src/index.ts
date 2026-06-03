@@ -8,6 +8,9 @@ export {
   IngestFailure,
   QueryOptionsBase,
   QueryOptions,
+  MetricsQueryOptions,
+  MetricsResult,
+  MetricsQuery,
   QueryLegacy,
   Aggregation,
   AggregationOp,
@@ -29,7 +32,7 @@ export {
   Message,
   Query,
 } from './client.js';
-export { ClientOptions, resolveIngestUrl } from './httpClient.js';
+export { ClientOptions, resolveAplQueryUrl, resolveIngestUrl, resolveMplQueryUrl } from './httpClient.js';
 export { datasets } from './datasets.js';
 export { annotations } from './annotations.js';
 export { users } from './users.js';
