@@ -3,7 +3,7 @@ import { datasets } from './datasets.js';
 import { monitors } from './monitors.js';
 import { users } from './users.js';
 import { Batch, createBatchKey } from './batch.js';
-import HTTPClient, { ClientOptions, resolveIngestUrl } from './httpClient.js';
+import HTTPClient, { ClientOptions, resolveAplQueryUrl, resolveIngestUrl, resolveMplQueryUrl } from './httpClient.js';
 import { isAxiomPersonalToken } from './token.js';
 
 class BaseClient extends HTTPClient {
@@ -26,6 +26,8 @@ class BaseClient extends HTTPClient {
     this.datasets = new datasets.Service(options);
     this.monitors = new monitors.Service(options);
     this.users = new users.Service(options);
+    this.query = this.query.bind(this); // bind `this` so method uses client state when passed around
+    this.aplQuery = this.aplQuery.bind(this); // bind `this` so method uses client state when passed around
     if (options.onError) {
       this.onError = options.onError;
     }
@@ -184,12 +186,13 @@ class BaseClient extends HTTPClient {
     );
 
   /**
-   * Executes APL query using the provided APL and returns the result
+   * Executes an APL or MPL query and returns the result.
    *
-   * @param apl - the apl query
+   * @param query - the APL or MPL query
    * @param options - optional query options
    * @returns result of the query depending on the format in options, check: {@link QueryResult} and {@link TabularQueryResult}
    * @see https://axiom.co/docs/restapi/endpoints/queryApl
+   * @see https://axiom.co/docs/restapi/endpoints/queryMetrics
    *
    * @example
    * ```
@@ -197,13 +200,24 @@ class BaseClient extends HTTPClient {
    * ```
    *
    */
-  query = <
-    TOptions extends QueryOptions,
-    TResult = TOptions['format'] extends 'tabular' ? Promise<TabularQueryResult> : Promise<QueryResult>,
-  >(
+  query(apl: string, options: QueryOptions & { format: 'tabular' }): Promise<TabularQueryResult>;
+  query(apl: string, options?: QueryOptions): Promise<QueryResult>;
+  query(mpl: string, options: MetricsQueryOptions): Promise<MetricsResult>;
+  query(
+    query: string,
+    options?: QueryOptions | MetricsQueryOptions,
+  ): Promise<QueryResult | TabularQueryResult | MetricsResult> {
+    if (options?.type === 'mpl') {
+      return this.queryMpl(query, options);
+    }
+
+    return this.queryApl(query, options);
+  }
+
+  private queryApl = <TOptions extends QueryOptions>(
     apl: string,
     options?: TOptions,
-  ): Promise<TResult> => {
+  ): Promise<TOptions['format'] extends 'tabular' ? TabularQueryResult : QueryResult> => {
     const req: Query = { apl: apl };
     if (options?.startTime) {
       req.startTime = options?.startTime;
@@ -214,7 +228,7 @@ class BaseClient extends HTTPClient {
 
     return this.client
       .post<TOptions['format'] extends 'tabular' ? RawTabularQueryResult : QueryResult>(
-        this.localPath + '/datasets/_apl',
+        resolveAplQueryUrl(this.clientOptions),
         {
           body: JSON.stringify(req),
         },
@@ -225,6 +239,7 @@ class BaseClient extends HTTPClient {
           cursor: options?.cursor as string,
         },
         120_000,
+        true,
       )
       .then((res) => {
         if (options?.format !== 'tabular') {
@@ -259,7 +274,34 @@ class BaseClient extends HTTPClient {
             };
           }),
         };
-      }) as Promise<TResult>;
+      }) as Promise<TOptions['format'] extends 'tabular' ? TabularQueryResult : QueryResult>;
+  };
+
+  private queryMpl = async (mpl: string, options: MetricsQueryOptions): Promise<MetricsResult> => {
+    const req: MetricsQuery = {
+      mpl,
+      startTime: options.startTime,
+      endTime: options.endTime,
+    };
+
+    const init: RequestInit = {
+      body: JSON.stringify(req),
+    };
+    if (options.accept) {
+      init.headers = {
+        Accept: options.accept,
+      };
+    }
+
+    return this.client.post<MetricsResult>(
+      resolveMplQueryUrl(this.clientOptions, options),
+      init,
+      {
+        format: options.format as string,
+      },
+      120_000,
+      true,
+    );
   };
 
   /**
@@ -276,13 +318,11 @@ class BaseClient extends HTTPClient {
    * await axiom.aplQuery("['dataset'] | count");
    * ```
    */
-  aplQuery = <
-    TOptions extends QueryOptions,
-    TResult = TOptions['format'] extends 'tabular' ? Promise<TabularQueryResult> : Promise<QueryResult>,
-  >(
-    apl: string,
-    options?: TOptions,
-  ): Promise<TResult> => this.query(apl, options);
+  aplQuery(apl: string, options: QueryOptions & { format: 'tabular' }): Promise<TabularQueryResult>;
+  aplQuery(apl: string, options?: QueryOptions): Promise<QueryResult>;
+  aplQuery(apl: string, options?: QueryOptions): Promise<QueryResult | TabularQueryResult> {
+    return this.query(apl, options);
+  }
 }
 
 /**
@@ -457,10 +497,30 @@ export interface QueryOptionsBase {
 }
 
 export interface QueryOptions extends QueryOptionsBase {
+  type?: 'apl';
   startTime?: string;
   endTime?: string;
   format?: 'legacy' | 'tabular';
   cursor?: string;
+}
+
+export interface MetricsQueryOptions {
+  type: 'mpl';
+  startTime: string;
+  endTime: string;
+  format?: 'metrics-v1' | 'metrics-v2';
+  accept?: string;
+  edge?: string;
+  edgeUrl?: string;
+  edgeDeployment?: string | null;
+}
+
+export type MetricsResult = Record<string, unknown>;
+
+export interface MetricsQuery {
+  mpl: string;
+  startTime: string;
+  endTime: string;
 }
 
 export interface QueryLegacy {
