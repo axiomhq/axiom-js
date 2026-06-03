@@ -187,6 +187,16 @@ function resolveEdgeUrlFromDeployment(edgeDeployment: string | null | undefined)
   return edgeDeploymentUrls[edgeDeployment.toLowerCase()];
 }
 
+function assertNoUnsupportedEdgeDeployment(edgeDeployment: string | null | undefined) {
+  if (!edgeDeployment || edgeDeployment === 'null' || resolveEdgeUrlFromDeployment(edgeDeployment)) {
+    return;
+  }
+
+  throw new Error(
+    `Unsupported edgeDeployment "${edgeDeployment}". Pass edgeUrl or edge to route MPL queries to that deployment.`,
+  );
+}
+
 /**
  * Resolves the APL query endpoint URL.
  *
@@ -231,6 +241,8 @@ export function resolveMplQueryUrl(
     return buildQueryUrl(deploymentEdgeUrl, '/v1/query/_mpl');
   }
 
+  assertNoUnsupportedEdgeDeployment(options?.edgeDeployment);
+
   if (clientOptions.edgeUrl) {
     return buildQueryUrl(clientOptions.edgeUrl, '/v1/query/_mpl');
   }
@@ -239,11 +251,7 @@ export function resolveMplQueryUrl(
     return `https://${clientOptions.edge}/v1/query/_mpl`;
   }
 
-  if (clientOptions.url) {
-    return buildQueryUrl(clientOptions.url, '/v1/query/_mpl');
-  }
-
-  return `${AxiomURL}/v1/query/_mpl`;
+  throw new Error('MPL queries must be routed to an Axiom edge deployment. Set edge, edgeUrl, or edgeDeployment.');
 }
 
 export default abstract class HTTPClient {

@@ -277,15 +277,12 @@ class BaseClient extends HTTPClient {
       }) as Promise<TOptions['format'] extends 'tabular' ? TabularQueryResult : QueryResult>;
   };
 
-  private queryMpl = (mpl: string, options: MetricsQueryOptions): Promise<MetricsResult> => {
+  private queryMpl = async (mpl: string, options: MetricsQueryOptions): Promise<MetricsResult> => {
     const req: MetricsQuery = {
       mpl,
       startTime: options.startTime,
       endTime: options.endTime,
     };
-    if ('edgeDeployment' in options) {
-      req.queryEdgeDeployment = options.edgeDeployment;
-    }
 
     const init: RequestInit = {
       body: JSON.stringify(req),
@@ -524,7 +521,6 @@ export interface MetricsQuery {
   mpl: string;
   startTime: string;
   endTime: string;
-  queryEdgeDeployment?: string | null;
 }
 
 export interface QueryLegacy {

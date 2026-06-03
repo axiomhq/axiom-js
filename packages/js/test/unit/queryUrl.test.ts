@@ -133,25 +133,35 @@ describe('APL query URL behavior', () => {
 });
 
 describe('MPL query URL behavior', () => {
-  it('uses the default API base for metrics queries without url or edge options', async () => {
+  it('requires edge routing for metrics queries', async () => {
     const client = new AxiomWithoutBatching({ token: 'test-token' });
 
-    testMockedFetchCall((url: string) => {
-      expect(url).toEqual(`${defaultApiUrl}/v1/query/_mpl`);
-    }, metricsResult);
-
-    await client.query('metrics:http_requests_total', {
-      type: 'mpl',
-      startTime: 'now-1h',
-      endTime: 'now',
-    });
+    await expect(
+      client.query('metrics:http_requests_total', {
+        type: 'mpl',
+        startTime: 'now-1h',
+        endTime: 'now',
+      }),
+    ).rejects.toThrow('MPL queries must be routed to an Axiom edge deployment');
   });
 
-  it('posts metrics queries to _mpl with body, format, and Accept override', async () => {
+  it('does not route metrics queries through the configured API URL', async () => {
     const client = new AxiomWithoutBatching({ token: 'test-token', url: customApiUrl });
 
+    await expect(
+      client.query('metrics:http_requests_total', {
+        type: 'mpl',
+        startTime: 'now-1h',
+        endTime: 'now',
+      }),
+    ).rejects.toThrow('MPL queries must be routed to an Axiom edge deployment');
+  });
+
+  it('posts metrics queries to edge _mpl with body, format, and Accept override', async () => {
+    const client = new AxiomWithoutBatching({ token: 'test-token' });
+
     testMockedFetchCall((url: string, init: RequestInit) => {
-      expect(url).toEqual(`${customApiUrl}/v1/query/_mpl?format=metrics-v2`);
+      expect(url).toEqual(`${edgeUrl}/v1/query/_mpl?format=metrics-v2`);
       expect(init.method).toEqual('POST');
       expect(init.headers).toMatchObject({
         Accept: 'application/json+metrics.v2',
@@ -169,6 +179,7 @@ describe('MPL query URL behavior', () => {
       type: 'mpl',
       startTime: 'now-1h',
       endTime: 'now',
+      edgeUrl,
       format: 'metrics-v2',
       accept: 'application/json+metrics.v2',
     });
@@ -187,7 +198,6 @@ describe('MPL query URL behavior', () => {
           mpl: 'metrics:http_requests_total',
           startTime: 'now-1h',
           endTime: 'now',
-          queryEdgeDeployment: edgeDeployment,
         }),
       );
     }, metricsResult);
@@ -200,19 +210,17 @@ describe('MPL query URL behavior', () => {
     });
   });
 
-  it('does not synthesize hosts for undocumented edgeDeployment IDs', async () => {
+  it('rejects undocumented edgeDeployment IDs', async () => {
     const client = new AxiomWithoutBatching({ token: 'test-token', url: customApiUrl });
 
-    testMockedFetchCall((url: string) => {
-      expect(url).toEqual(`${customApiUrl}/v1/query/_mpl`);
-    }, metricsResult);
-
-    await client.query('metrics:http_requests_total', {
-      type: 'mpl',
-      startTime: 'now-1h',
-      endTime: 'now',
-      edgeDeployment: 'cloud.ap-south-1.aws',
-    });
+    await expect(
+      client.query('metrics:http_requests_total', {
+        type: 'mpl',
+        startTime: 'now-1h',
+        endTime: 'now',
+        edgeDeployment: 'cloud.ap-south-1.aws',
+      }),
+    ).rejects.toThrow('Unsupported edgeDeployment "cloud.ap-south-1.aws"');
   });
 
   it.each([
@@ -285,11 +293,11 @@ describe('MPL query URL behavior', () => {
   });
 
   it('keeps query callable when detached from the client instance', async () => {
-    const client = new AxiomWithoutBatching({ token: 'test-token', url: customApiUrl });
+    const client = new AxiomWithoutBatching({ token: 'test-token', edge: 'us-east-1.aws.edge.axiom.co' });
     const query = client.query;
 
     testMockedFetchCall((url: string) => {
-      expect(url).toEqual(`${customApiUrl}/v1/query/_mpl`);
+      expect(url).toEqual('https://us-east-1.aws.edge.axiom.co/v1/query/_mpl');
     }, metricsResult);
 
     await query('metrics:http_requests_total', {
