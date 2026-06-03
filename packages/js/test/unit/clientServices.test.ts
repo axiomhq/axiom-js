@@ -81,15 +81,42 @@ describe('AxiomWithoutBatching mounted services', () => {
     const response: users.User = {
       id: 'user-id',
       name: 'Axiom User',
-      emails: ['user@example.com'],
+      email: 'user@example.com',
+      role: { id: 'admin', name: 'Admin' },
     };
 
     testMockedFetchCall((url: string, init: RequestInit) => {
-      expect(url).toEqual(`${clientURL}/v1/user`);
+      expect(url).toEqual(`${clientURL}/v2/user`);
       expect(init.method).toEqual('GET');
     }, response);
 
     await expect(client.users.current()).resolves.toEqual(response);
+  });
+
+  it('lists and gets users through the mounted users service', async () => {
+    const client = new AxiomWithoutBatching({ url: clientURL, token: 'test-token' });
+    const response: users.User[] = [
+      {
+        id: 'user-id',
+        name: 'Axiom User',
+        email: 'user@example.com',
+        role: { id: 'admin', name: 'Admin' },
+      },
+    ];
+
+    testMockedFetchCall((url: string, init: RequestInit) => {
+      expect(url).toEqual(`${clientURL}/v2/users`);
+      expect(init.method).toEqual('GET');
+    }, response);
+
+    await expect(client.users.list()).resolves.toEqual(response);
+
+    testMockedFetchCall((url: string, init: RequestInit) => {
+      expect(url).toEqual(`${clientURL}/v2/users/user-id`);
+      expect(init.method).toEqual('GET');
+    }, response[0]);
+
+    await expect(client.users.get('user-id')).resolves.toEqual(response[0]);
   });
 
   it('lists dashboards through the mounted dashboards service', async () => {
