@@ -1,4 +1,4 @@
-import HTTPClient from "./httpClient.js";
+import HTTPClient from './httpClient.js';
 
 export namespace annotations {
   export interface Annotation {
@@ -39,18 +39,33 @@ export namespace annotations {
   }
 
   export class Service extends HTTPClient {
-    private readonly localPath = "/v2/annotations";
+    private readonly localPath = '/v2/annotations';
 
+    /**
+     * @see https://axiom.co/docs/restapi/endpoints/getAnnotations
+     */
     list = (req?: ListingQueryParams): Promise<Annotation[]> => this.client.get(this.localPath, {}, req);
 
-    get = (id: string): Promise<Annotation> => this.client.get(this.localPath + "/" + id);
+    /**
+     * @see https://axiom.co/docs/restapi/endpoints/getAnnotation
+     */
+    get = (id: string): Promise<Annotation> => this.client.get(this.localPath + '/' + id);
 
+    /**
+     * @see https://axiom.co/docs/restapi/endpoints/createAnnotation
+     */
     create = (req: CreateRequest): Promise<Annotation> =>
       this.client.post(this.localPath, { body: JSON.stringify(req) });
 
+    /**
+     * @see https://axiom.co/docs/restapi/endpoints/updateAnnotation
+     */
     update = (id: string, req: UpdateRequest): Promise<Annotation> =>
-      this.client.put(this.localPath + "/" + id, { body: JSON.stringify(req) });
+      this.client.put(this.localPath + '/' + id, { body: JSON.stringify(req) });
 
-    delete = (id: string): Promise<Response> => this.client.delete(this.localPath + "/" + id);
+    /**
+     * @see https://axiom.co/docs/restapi/endpoints/deleteAnnotation
+     */
+    delete = (id: string): Promise<Response> => this.client.delete(this.localPath + '/' + id);
   }
 }

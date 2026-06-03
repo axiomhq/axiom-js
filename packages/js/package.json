@@ -21,6 +21,7 @@
     "build:cjs": "rollup -c rollup.config.cjs.js",
     "format": "eslint './**/*.{js,ts}' --quiet --fix",
     "lint": "eslint './**/*.{js,ts}'",
+    "typecheck": "tsc -p tsconfig.json --emitDeclarationOnly false --noEmit",
     "test": "vitest run test/unit/* --coverage"
   },
   "repository": {

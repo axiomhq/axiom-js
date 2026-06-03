@@ -53,6 +53,7 @@ jobs:
             ${{ runner.os }}-turbo-
       - run: pnpm install --frozen-lockfile
       - run: pnpm build && pnpm build:cjs
+      - run: pnpm typecheck
       - run: pnpm lint
       - run: pnpm test
 

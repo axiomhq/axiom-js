@@ -31,6 +31,7 @@
     "build": "vite build",
     "format": "eslint . --fix",
     "lint": "eslint .",
+    "typecheck": "tsc -p tsconfig.json --emitDeclarationOnly false --noEmit",
     "test": "vitest",
     "test:watch": "vitest watch"
   },
@@ -74,7 +75,7 @@
     "react": "^19.2.5",
     "react-dom": "^19.2.5",
     "vite": "^7.3.2",
-    "vitest": "^4.0.14"
+    "vitest": "catalog:"
   },
   "peerDependencies": {
     "@axiomhq/logging": "workspace:*",

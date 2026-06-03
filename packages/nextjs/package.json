@@ -52,6 +52,7 @@
     "build": "vite build",
     "format": "eslint . --fix",
     "lint": "eslint .",
+    "typecheck": "tsc -p tsconfig.json --emitDeclarationOnly false --noEmit",
     "test": "vitest run ./test/unit/*"
   },
   "keywords": [
@@ -73,7 +74,7 @@
     "@tanstack/config": "^0.22.2",
     "next": "^15.5.18",
     "vite": "^7.3.2",
-    "vitest": "^4.0.14"
+    "vitest": "catalog:"
   },
   "peerDependencies": {
     "@axiomhq/logging": "workspace:*",
