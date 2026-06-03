@@ -1,4 +1,4 @@
-import { IngestOptions, IngestStatus } from "./client.js";
+import { IngestOptions, IngestStatus } from './client.js';
 
 /**
  * Transport callback used by {@link Batch} to send queued events.
@@ -36,7 +36,7 @@ export interface BatchConfig {
 /**
  * Internal batch lifecycle state.
  */
-export type BatchState = "idle" | "scheduled" | "flushing";
+export type BatchState = 'idle' | 'scheduled' | 'flushing';
 
 const DEFAULT_MAX_BATCH_SIZE = 1000;
 const DEFAULT_FLUSH_INTERVAL_MS = 1000;
@@ -48,7 +48,7 @@ const DEFAULT_FLUSH_INTERVAL_MS = 1000;
  * parsing so incompatible payloads do not share the same queue.
  */
 export function createBatchKey(id: string, options?: IngestOptions): string {
-  return `${id}:${options?.timestampField || "-"}:${options?.timestampFormat || "-"}:${options?.csvDelimiter || "-"}`;
+  return `${id}:${options?.timestampField || '-'}:${options?.timestampFormat || '-'}:${options?.csvDelimiter || '-'}`;
 }
 
 /**
@@ -63,7 +63,7 @@ export class Batch {
   options?: IngestOptions;
 
   events: Array<object> = [];
-  state: BatchState = "idle";
+  state: BatchState = 'idle';
 
   activeFlush: Promise<IngestStatus | void> = Promise.resolve();
   nextFlush?: ReturnType<typeof setTimeout>;
@@ -115,26 +115,20 @@ export class Batch {
     const previousFlush = this.activeFlush;
 
     const flushPromise = (async (): Promise<IngestStatus | undefined> => {
-      this.state = "flushing";
+      this.state = 'flushing';
       // Keep flushes serialized but don't allow previous failures to poison
       // all future flushes.
       await previousFlush.catch(() => undefined);
 
       if (events.length === 0) {
-        this.lastFlush = new Date(this.now());
-        if (this.state !== "scheduled") {
-          this.state = "idle";
-        }
+        this.finishFlush();
         return;
       }
 
       try {
         return await this.ingestFn(this.id, events, this.options);
       } finally {
-        this.lastFlush = new Date(this.now());
-        if (this.state !== "scheduled") {
-          this.state = "idle";
-        }
+        this.finishFlush();
       }
     })();
 
@@ -175,7 +169,7 @@ export class Batch {
    */
   private scheduleFlush = () => {
     this.clearScheduledFlush();
-    this.state = "scheduled";
+    this.state = 'scheduled';
 
     this.nextFlush = setTimeout(() => {
       this.startBackgroundFlush();
@@ -203,5 +197,15 @@ export class Batch {
 
     clearTimeout(this.nextFlush);
     this.nextFlush = undefined;
+  };
+
+  /**
+   * Finishes a flush without overriding a newly scheduled flush.
+   */
+  private finishFlush = () => {
+    this.lastFlush = new Date(this.now());
+    if (this.state !== 'scheduled') {
+      this.state = 'idle';
+    }
   };
 }

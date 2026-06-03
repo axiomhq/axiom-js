@@ -3,6 +3,10 @@
   "tasks": {
     "lint": {},
     "format": {},
+    "typecheck": {
+      "dependsOn": ["^build"],
+      "outputs": []
+    },
 
     "build": {
       "dependsOn": ["^build"],

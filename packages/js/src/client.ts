@@ -1,11 +1,15 @@
+import { annotations } from './annotations.js';
 import { datasets } from './datasets.js';
+import { monitors } from './monitors.js';
 import { users } from './users.js';
 import { Batch, createBatchKey } from './batch.js';
 import HTTPClient, { ClientOptions, resolveIngestUrl } from './httpClient.js';
 import { isAxiomPersonalToken } from './token.js';
 
 class BaseClient extends HTTPClient {
+  annotations: annotations.Service;
   datasets: datasets.Service;
+  monitors: monitors.Service;
   users: users.Service;
   localPath = '/v1';
   onError = console.error;
@@ -18,7 +22,9 @@ class BaseClient extends HTTPClient {
     }
 
     super(options);
+    this.annotations = new annotations.Service(options);
     this.datasets = new datasets.Service(options);
+    this.monitors = new monitors.Service(options);
     this.users = new users.Service(options);
     if (options.onError) {
       this.onError = options.onError;
@@ -107,9 +113,7 @@ class BaseClient extends HTTPClient {
     }
   };
 
-  protected resolveCompressionSource = (
-    data: string | Buffer | Uint8Array | ReadableStream,
-  ): ReadableStream | null => {
+  protected resolveCompressionSource = (data: string | Buffer | Uint8Array | ReadableStream): ReadableStream | null => {
     if (typeof ReadableStream !== 'undefined' && data instanceof ReadableStream) {
       return data;
     }
@@ -157,6 +161,15 @@ class BaseClient extends HTTPClient {
     return new TextEncoder().encode(String(chunk));
   };
 
+  /**
+   * Executes a legacy dataset query against the provided dataset.
+   *
+   * @param dataset - name of the dataset to query
+   * @param query - legacy query request
+   * @param options - optional query options
+   * @returns Promise<QueryLegacyResult>
+   * @see https://axiom.co/docs/restapi/endpoints/queryDataset
+   */
   queryLegacy = (dataset: string, query: QueryLegacy, options?: QueryOptions): Promise<QueryLegacyResult> =>
     this.client.post(
       this.localPath + '/datasets/' + dataset + '/query',
@@ -176,6 +189,7 @@ class BaseClient extends HTTPClient {
    * @param apl - the apl query
    * @param options - optional query options
    * @returns result of the query depending on the format in options, check: {@link QueryResult} and {@link TabularQueryResult}
+   * @see https://axiom.co/docs/restapi/endpoints/queryApl
    *
    * @example
    * ```
@@ -255,6 +269,7 @@ class BaseClient extends HTTPClient {
    * @param apl - the apl query
    * @param options - optional query options
    * @returns Promise<QueryResult>
+   * @see https://axiom.co/docs/restapi/endpoints/queryApl
    *
    * @example
    * ```
