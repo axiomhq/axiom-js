@@ -5,10 +5,15 @@ import { Axiom } from '@axiomhq/js';
 const axiom = new Axiom({ token: process.env.AXIOM_TOKEN || '', url: process.env.AXIOM_URL || '' });
 
 async function query() {
-  const aplQuery = "['new-lambda-test']";
+  const aplQuery = `
+    ['my-dataset']
+    | where foo == "bar"
+    | summarize cost = sum(value) by group_field
+  `;
 
   const res = await axiom.query(aplQuery, {
-    startTime: '2023-10-23T15:46:25.089482+02:00',
+    startTime: '2026-06-02T10:31:37-04:00',
+    endTime: '2026-06-03T10:31:37-04:00',
     format: 'tabular',
   });
 
@@ -22,4 +27,4 @@ async function query() {
   }
 }
 
-query();
+query().catch(console.error);

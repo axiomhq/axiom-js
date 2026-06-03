@@ -16,8 +16,8 @@ const queryResult = {
   datasetNames: ['test'],
   matches: [],
   request: {
-    startTime: 'now-1h',
-    endTime: 'now',
+    startTime: '2026-06-02T10:31:37-04:00',
+    endTime: '2026-06-03T10:31:37-04:00',
     resolution: 'auto',
   },
   status: {
@@ -109,15 +109,15 @@ describe('APL query URL behavior', () => {
       expect(init.body).toEqual(
         JSON.stringify({
           apl: 'metrics:http_requests_total',
-          startTime: 'now-1h',
-          endTime: 'now',
+          startTime: '2026-06-02T10:31:37-04:00',
+          endTime: '2026-06-03T10:31:37-04:00',
         }),
       );
     }, queryResult);
 
     await client.query('metrics:http_requests_total', {
-      startTime: 'now-1h',
-      endTime: 'now',
+      startTime: '2026-06-02T10:31:37-04:00',
+      endTime: '2026-06-03T10:31:37-04:00',
     });
   });
 
@@ -139,8 +139,8 @@ describe('MPL query URL behavior', () => {
     await expect(
       client.query('metrics:http_requests_total', {
         type: 'mpl',
-        startTime: 'now-1h',
-        endTime: 'now',
+        startTime: '2026-06-02T10:31:37-04:00',
+        endTime: '2026-06-03T10:31:37-04:00',
       }),
     ).rejects.toThrow('MPL queries must be routed to an Axiom edge deployment');
   });
@@ -151,8 +151,8 @@ describe('MPL query URL behavior', () => {
     await expect(
       client.query('metrics:http_requests_total', {
         type: 'mpl',
-        startTime: 'now-1h',
-        endTime: 'now',
+        startTime: '2026-06-02T10:31:37-04:00',
+        endTime: '2026-06-03T10:31:37-04:00',
       }),
     ).rejects.toThrow('MPL queries must be routed to an Axiom edge deployment');
   });
@@ -169,16 +169,16 @@ describe('MPL query URL behavior', () => {
       expect(init.body).toEqual(
         JSON.stringify({
           mpl: 'metrics:http_requests_total',
-          startTime: 'now-1h',
-          endTime: 'now',
+          startTime: '2026-06-02T10:31:37-04:00',
+          endTime: '2026-06-03T10:31:37-04:00',
         }),
       );
     }, metricsResult);
 
     await client.query('metrics:http_requests_total', {
       type: 'mpl',
-      startTime: 'now-1h',
-      endTime: 'now',
+      startTime: '2026-06-02T10:31:37-04:00',
+      endTime: '2026-06-03T10:31:37-04:00',
       edgeUrl,
       format: 'metrics-v2',
       accept: 'application/json+metrics.v2',
@@ -196,16 +196,16 @@ describe('MPL query URL behavior', () => {
       expect(init.body).toEqual(
         JSON.stringify({
           mpl: 'metrics:http_requests_total',
-          startTime: 'now-1h',
-          endTime: 'now',
+          startTime: '2026-06-02T10:31:37-04:00',
+          endTime: '2026-06-03T10:31:37-04:00',
         }),
       );
     }, metricsResult);
 
     await client.query('metrics:http_requests_total', {
       type: 'mpl',
-      startTime: 'now-1h',
-      endTime: 'now',
+      startTime: '2026-06-02T10:31:37-04:00',
+      endTime: '2026-06-03T10:31:37-04:00',
       edgeDeployment,
     });
   });
@@ -216,8 +216,8 @@ describe('MPL query URL behavior', () => {
     await expect(
       client.query('metrics:http_requests_total', {
         type: 'mpl',
-        startTime: 'now-1h',
-        endTime: 'now',
+        startTime: '2026-06-02T10:31:37-04:00',
+        endTime: '2026-06-03T10:31:37-04:00',
         edgeDeployment: 'cloud.ap-south-1.aws',
       }),
     ).rejects.toThrow('Unsupported edgeDeployment "cloud.ap-south-1.aws"');
@@ -244,8 +244,8 @@ describe('MPL query URL behavior', () => {
 
     await client.query('metrics:http_requests_total', {
       type: 'mpl',
-      startTime: 'now-1h',
-      endTime: 'now',
+      startTime: '2026-06-02T10:31:37-04:00',
+      endTime: '2026-06-03T10:31:37-04:00',
       ...routing,
     });
   });
@@ -272,8 +272,8 @@ describe('MPL query URL behavior', () => {
 
       await client.query('metrics:http_requests_total', {
         type: 'mpl',
-        startTime: 'now-1h',
-        endTime: 'now',
+        startTime: '2026-06-02T10:31:37-04:00',
+        endTime: '2026-06-03T10:31:37-04:00',
       });
     },
   );
@@ -287,8 +287,8 @@ describe('MPL query URL behavior', () => {
 
     await client.query('metrics:http_requests_total', {
       type: 'mpl',
-      startTime: 'now-1h',
-      endTime: 'now',
+      startTime: '2026-06-02T10:31:37-04:00',
+      endTime: '2026-06-03T10:31:37-04:00',
     });
   });
 
@@ -302,8 +302,8 @@ describe('MPL query URL behavior', () => {
 
     await query('metrics:http_requests_total', {
       type: 'mpl',
-      startTime: 'now-1h',
-      endTime: 'now',
+      startTime: '2026-06-02T10:31:37-04:00',
+      endTime: '2026-06-03T10:31:37-04:00',
     });
   });
 });
