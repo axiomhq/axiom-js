@@ -7,33 +7,30 @@ export AXIOM_TOKEN="..."
 npx ts-node <example-file.ts>
 ```
 
-
 ## Examples
 
-* [create-annotation.ts](./src/create-annotation.ts): How to create an annotation.
+<!-- examples in src/*.ts, excluding local smoke tests -->
 
-* [ingest-events.ts](./src/ingest-events.ts): How to ingest events into a dataset.
+- [create-annotation.ts](./src/create-annotation.ts): How to create an annotation.
 
-* [ingest-file.ts](./src/ingest-file.ts): How to ingest the contents of a file into
-  Axiom.
+- [ingest-events.ts](./src/ingest-events.ts): How to ingest events into a dataset.
 
-* [ingest-string.ts](./src/ingest-string.ts): How to ingest a JSON string into a
-  dataset.
+- [ingest-file.ts](./src/ingest-file.ts): How to ingest the contents of a file into Axiom.
 
-* [inspect-dataset.ts](./src/inspect-dataset.ts): How to inspect a dataset, fields,
-  and map fields.
+- [ingest-string.ts](./src/ingest-string.ts): How to ingest a JSON string into a dataset.
 
-* [inspect-metrics-dataset.ts](./src/inspect-metrics-dataset.ts): How to inspect
-  metrics metadata for a metrics dataset.
+- [inspect-dataset.ts](./src/inspect-dataset.ts): How to inspect a dataset, fields, and map fields.
 
-* [list-datasets.ts](./src/list-datasets.ts): How to retrieve a list of datasets.
+- [inspect-metrics-dataset.ts](./src/inspect-metrics-dataset.ts): How to inspect metrics metadata for a metrics dataset.
 
-* [manage-monitors.ts](./src/manage-monitors.ts): How to create, list, get, update,
-  and delete monitors.
+- [list-datasets.ts](./src/list-datasets.ts): How to retrieve a list of datasets.
 
-* [query-legacy.ts](./src/query-legacy.ts): How to query a dataset.
+- [manage-monitors.ts](./src/manage-monitors.ts): How to create, list, get, update, and delete monitors.
 
-* [query-metrics.ts](./src/query-metrics.ts): How to query metrics using MPL.
+- [query-legacy.ts](./src/query-legacy.ts): How to query a dataset.
 
-* [query.ts](./src/query.ts): How to query summarized results using the Axiom
-  Processing Language (APL).
+- [query-metrics.ts](./src/query-metrics.ts): How to query metrics using MPL.
+
+- [query.ts](./src/query.ts): How to query summarized results using the Axiom Processing Language (APL).
+
+- [saved-queries.ts](./src/saved-queries.ts): How to retrieve saved queries.

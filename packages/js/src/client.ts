@@ -1,6 +1,7 @@
 import { annotations } from './annotations.js';
 import { datasets } from './datasets.js';
 import { monitors } from './monitors.js';
+import { savedQueries } from './savedQueries.js';
 import { users } from './users.js';
 import { Batch, createBatchKey } from './batch.js';
 import HTTPClient, { ClientOptions, resolveAplQueryUrl, resolveIngestUrl, resolveMplQueryUrl } from './httpClient.js';
@@ -10,6 +11,7 @@ class BaseClient extends HTTPClient {
   annotations: annotations.Service;
   datasets: datasets.Service;
   monitors: monitors.Service;
+  savedQueries: savedQueries.Service;
   users: users.Service;
   localPath = '/v1';
   onError = console.error;
@@ -25,6 +27,7 @@ class BaseClient extends HTTPClient {
     this.annotations = new annotations.Service(options);
     this.datasets = new datasets.Service(options);
     this.monitors = new monitors.Service(options);
+    this.savedQueries = new savedQueries.Service(options);
     this.users = new users.Service(options);
     this.query = this.query.bind(this); // bind `this` so method uses client state when passed around
     this.aplQuery = this.aplQuery.bind(this); // bind `this` so method uses client state when passed around
