@@ -4,7 +4,7 @@ import { testMockedFetchCall } from '../lib/mock';
 
 const baseUrl = 'http://axiom-js.dev.local';
 const edgeUrl = 'https://us-east-1.aws.edge.axiom.co';
-const metricsWindow = { start: 'now-1h', end: 'now' };
+const metricsWindow = { start: '2026-06-02T10:31:37-04:00', end: '2026-06-02T10:31:37-04:00' };
 
 const mockNoContentFetchCall = (test: (url: string, init: RequestInit) => void) => {
   vi.spyOn(global, 'fetch').mockImplementationOnce((url: RequestInfo | URL, init?: RequestInit) => {
@@ -241,7 +241,7 @@ describe('DatasetsService', () => {
     },
   ])('$name uses the expected metrics metadata endpoint', async ({ call, expectedPath, response }) => {
     testMockedFetchCall((url: string, init: RequestInit) => {
-      expect(url).toEqual(`${edgeUrl}${expectedPath}?start=now-1h&end=now`);
+      expect(url).toEqual(`${edgeUrl}${expectedPath}?start=2026-06-02T10:31:37-04:00&end=2026-06-03T10:31:37-04:00`);
       expect(init.method).toEqual('GET');
       expect(init.body).toBeUndefined();
     }, response);
@@ -252,7 +252,7 @@ describe('DatasetsService', () => {
   it('routes metrics metadata by edgeDeployment and sends an Accept override', async () => {
     testMockedFetchCall((url: string, init: RequestInit) => {
       expect(url).toEqual(
-        'https://us-east-1.aws.edge.axiom.co/v1/query/metrics/info/datasets/metrics/metrics?start=now-1h&end=now',
+        'https://us-east-1.aws.edge.axiom.co/v1/query/metrics/info/datasets/metrics/metrics?start=2026-06-02T10:31:37-04:00&end=2026-06-03T10:31:37-04:00',
       );
       expect(init.headers).toMatchObject({
         Accept: 'application/vnd.metrics-info.v2+json',

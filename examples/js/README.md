@@ -7,27 +7,33 @@ export AXIOM_TOKEN="..."
 npx ts-node <example-file.ts>
 ```
 
-From the repo root:
-
-```shell
-pnpm --filter @axiomhq/js build
-pnpm --filter examples-js example src/symphony-compat-smoke.ts
-```
-
-Fill the constants at the top of the smoke file before running it.
 
 ## Examples
 
-<!-- example files in examples/js/src -->
+* [create-annotation.ts](./src/create-annotation.ts): How to create an annotation.
 
-- [ingest-file.ts](./src/ingest-file.ts): How to ingest the contents of a file into
+* [ingest-events.ts](./src/ingest-events.ts): How to ingest events into a dataset.
+
+* [ingest-file.ts](./src/ingest-file.ts): How to ingest the contents of a file into
   Axiom.
 
-- [list-datasets.ts](./src/list-datasets.ts): How to retrieve a list of datasets.
+* [ingest-string.ts](./src/ingest-string.ts): How to ingest a JSON string into a
+  dataset.
 
-- [query-legacy.ts](./src/query-legacy.ts): How to query a dataset.
+* [inspect-dataset.ts](./src/inspect-dataset.ts): How to inspect a dataset, fields,
+  and map fields.
 
-- [query.ts](./src/query.ts): How to query a dataset using the Axiom Processing Language (APL).
+* [inspect-metrics-dataset.ts](./src/inspect-metrics-dataset.ts): How to inspect
+  metrics metadata for a metrics dataset.
 
-- [symphony-compat-smoke.ts](./src/symphony-compat-smoke.ts): How to live-smoke the
-  Symphony compatibility dataset and metrics metadata surfaces.
+* [list-datasets.ts](./src/list-datasets.ts): How to retrieve a list of datasets.
+
+* [manage-monitors.ts](./src/manage-monitors.ts): How to create, list, get, update,
+  and delete monitors.
+
+* [query-legacy.ts](./src/query-legacy.ts): How to query a dataset.
+
+* [query-metrics.ts](./src/query-metrics.ts): How to query metrics using MPL.
+
+* [query.ts](./src/query.ts): How to query summarized results using the Axiom
+  Processing Language (APL).
