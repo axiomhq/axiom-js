@@ -4,3 +4,6 @@ packages:
   - 'integration'
   - 'e2e/*'
   - 'internal/*'
+
+catalog:
+  vitest: 4.1.0
