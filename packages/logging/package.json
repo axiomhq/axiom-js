@@ -1,7 +1,7 @@
 {
   "name": "@axiomhq/logging",
   "description": "The official logging package for Axiom",
-  "version": "0.2.0",
+  "version": "0.2.2",
   "author": "Axiom, Inc.",
   "license": "MIT",
   "contributors": [
@@ -30,6 +30,7 @@
     "build": "vite build",
     "format": "eslint . --fix",
     "lint": "eslint .",
+    "typecheck": "tsc -p tsconfig.json --emitDeclarationOnly false --noEmit",
     "test": "vitest ./test/unit/*"
   },
   "repository": {
@@ -57,12 +58,12 @@
   "devDependencies": {
     "@axiomhq/js": "workspace:*",
     "@repo/eslint-config": "workspace:*",
-    "@tanstack/config": "^0.16.0",
+    "@tanstack/config": "^0.22.2",
     "msw": "^2.6.2",
-    "vite": "^7.2.6"
+    "vite": "^7.3.2"
   },
   "peerDependencies": {
-    "@axiomhq/js": "workspace:*"
+    "@axiomhq/js": "^1.0.0"
   },
   "peerDependenciesMeta": {
     "@axiomhq/js": {

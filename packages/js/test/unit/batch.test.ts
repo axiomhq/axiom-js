@@ -117,4 +117,65 @@ describe("Batch", () => {
     // Make sure we ingested both events
     expect(sentEvents).toEqual([{ foo: "bar" }, { foo: "baz" }]);
   });
+
+  it("doesn't get stuck after a rejected flush", async () => {
+    const sendFn = vi
+      .fn()
+      .mockRejectedValueOnce(new Error("boom"))
+      .mockResolvedValueOnce({ ingested: 1, failed: 0, processedBytes: 0, blocksCreated: 0, walLength: 0 });
+
+    const batch = new Batch(sendFn, "my-dataset", { timestampField: "foo" });
+
+    batch.ingest({ foo: "first" });
+    await expect(batch.flush()).rejects.toThrow("boom");
+
+    batch.ingest({ foo: "second" });
+    await expect(batch.flush()).resolves.toEqual({
+      ingested: 1,
+      failed: 0,
+      processedBytes: 0,
+      blocksCreated: 0,
+      walLength: 0,
+    });
+
+    expect(sendFn).toHaveBeenCalledTimes(2);
+    expect(sendFn).toHaveBeenNthCalledWith(1, "my-dataset", [{ foo: "first" }], { timestampField: "foo" });
+    expect(sendFn).toHaveBeenNthCalledWith(2, "my-dataset", [{ foo: "second" }], { timestampField: "foo" });
+    expect(batch.events).toEqual([]);
+  });
+
+  it("reports background flush errors and continues flushing", async () => {
+    const onError = vi.fn();
+    const sendFn = vi
+      .fn()
+      .mockRejectedValueOnce(new Error("boom"))
+      .mockResolvedValueOnce({ ingested: 1, failed: 0, processedBytes: 0, blocksCreated: 0, walLength: 0 });
+
+    const batch = new Batch(sendFn, "my-dataset", { timestampField: "foo" }, { maxBatchSize: 1, onError });
+
+    batch.ingest({ foo: "first" });
+    await sleep(10);
+
+    expect(onError).toHaveBeenCalledTimes(1);
+
+    batch.ingest({ foo: "second" });
+    await batch.flush();
+
+    expect(sendFn).toHaveBeenCalledTimes(2);
+    expect(sendFn).toHaveBeenNthCalledWith(2, "my-dataset", [{ foo: "second" }], { timestampField: "foo" });
+  });
+
+  it("supports configurable flush thresholds", async () => {
+    const sendFn = vi.fn() as IngestFunction;
+    const batch = new Batch(sendFn, "my-dataset", { timestampField: "foo" }, { maxBatchSize: 2, flushIntervalMs: 20 });
+
+    batch.ingest({ foo: "bar" });
+    await sleep(5);
+    expect(sendFn).toHaveBeenCalledTimes(0);
+
+    batch.ingest({ foo: "baz" });
+    await sleep(20);
+    expect(sendFn).toHaveBeenCalledTimes(1);
+    expect(sendFn).toHaveBeenCalledWith("my-dataset", [{ foo: "bar" }, { foo: "baz" }], { timestampField: "foo" });
+  });
 });

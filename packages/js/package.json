@@ -1,7 +1,7 @@
 {
   "name": "@axiomhq/js",
   "description": "The official javascript bindings for the Axiom API",
-  "version": "1.4.0",
+  "version": "1.6.1",
   "author": "Axiom, Inc.",
   "license": "MIT",
   "contributors": [
@@ -21,6 +21,7 @@
     "build:cjs": "rollup -c rollup.config.cjs.js",
     "format": "eslint './**/*.{js,ts}' --quiet --fix",
     "lint": "eslint './**/*.{js,ts}'",
+    "typecheck": "tsc -p tsconfig.json --emitDeclarationOnly false --noEmit",
     "test": "vitest run test/unit/* --coverage"
   },
   "repository": {

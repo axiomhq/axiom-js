@@ -1,6 +1,6 @@
 {
   "name": "@axiomhq/react",
-  "version": "0.2.0",
+  "version": "0.2.2",
   "description": "The official React package for Axiom",
   "author": "Axiom, Inc.",
   "license": "MIT",
@@ -31,6 +31,7 @@
     "build": "vite build",
     "format": "eslint . --fix",
     "lint": "eslint .",
+    "typecheck": "tsc -p tsconfig.json --emitDeclarationOnly false --noEmit",
     "test": "vitest",
     "test:watch": "vitest watch"
   },
@@ -63,18 +64,18 @@
   "devDependencies": {
     "@axiomhq/logging": "workspace:*",
     "@repo/eslint-config": "workspace:*",
-    "@tanstack/config": "^0.16.0",
+    "@tanstack/config": "^0.22.2",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.2.0",
     "@testing-library/react-hooks": "^8.0.1",
-    "@types/react": "^19.1.5",
-    "@types/react-dom": "^19.1.5",
-    "@vitejs/plugin-react": "^4.3.4",
-    "happy-dom": "^20.0.10",
-    "react": "^19.1.4",
-    "react-dom": "^19.1.4",
-    "vite": "^7.2.6",
-    "vitest": "^4.0.14"
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^5.2.0",
+    "happy-dom": "^20.9.0",
+    "react": "^19.2.5",
+    "react-dom": "^19.2.5",
+    "vite": "^7.3.2",
+    "vitest": "catalog:"
   },
   "peerDependencies": {
     "@axiomhq/logging": "workspace:*",

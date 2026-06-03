@@ -1,6 +1,6 @@
 {
   "name": "@axiomhq/nextjs",
-  "version": "0.2.0",
+  "version": "0.2.2",
   "author": "Axiom, Inc.",
   "license": "MIT",
   "description": "The official Next.js package for Axiom",
@@ -52,6 +52,7 @@
     "build": "vite build",
     "format": "eslint . --fix",
     "lint": "eslint .",
+    "typecheck": "tsc -p tsconfig.json --emitDeclarationOnly false --noEmit",
     "test": "vitest run ./test/unit/*"
   },
   "keywords": [
@@ -70,10 +71,10 @@
     "@axiomhq/logging": "workspace:*",
     "@edge-runtime/vm": "^5.0.0",
     "@repo/eslint-config": "workspace:*",
-    "@tanstack/config": "^0.16.0",
-    "next": "^15.5.9",
-    "vite": "^7.2.6",
-    "vitest": "^4.0.14"
+    "@tanstack/config": "^0.22.2",
+    "next": "^15.5.18",
+    "vite": "^7.3.2",
+    "vitest": "catalog:"
   },
   "peerDependencies": {
     "@axiomhq/logging": "workspace:*",

@@ -10,6 +10,9 @@ on:
     branches:
       - main
 
+permissions:
+  contents: read
+
 env:
   AXIOM_TOKEN: ${{ secrets.TESTING_DEV_API_TOKEN }}
   AXIOM_URL: ${{ secrets.TESTING_DEV_API_URL }}
@@ -17,7 +20,7 @@ env:
   NEXT_PUBLIC_AXIOM_TOKEN: ${{ secrets.TESTING_DEV_INGEST_API_TOKEN }}
   NEXT_PUBLIC_AXIOM_URL: ${{ secrets.TESTING_DEV_API_URL }}
   NEXT_PUBLIC_AXIOM_ORG_ID: ${{ secrets.TESTING_DEV_ORG_ID }}
-  AXIOM_DATASET_SUFFIX: ${{ github.run_id }}
+  AXIOM_DATASET_SUFFIX: ${{ github.run_id }}-${{ github.run_attempt }}
   NODEVERSION: 22.x
   PNPM_VERSION: 10.4.1
   TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
@@ -33,16 +36,16 @@ jobs:
           - 20.x
           - 22.x
     steps:
-      - uses: actions/checkout@v6
-      - uses: pnpm/action-setup@v4
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+      - uses: pnpm/action-setup@0e279bb959325dab635dd2c09392533439d90093 # v6
         with:
           version: ${{ env.PNPM_VERSION }}
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
         with:
           node-version: ${{ matrix.node }}
           cache: 'pnpm'
       - name: Cache turbo build setup
-        uses: actions/cache@v4
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
         with:
           path: ./node_modules/.cache/turbo
           key: ${{ runner.os }}-turbo-${{ github.sha }}
@@ -50,6 +53,7 @@ jobs:
             ${{ runner.os }}-turbo-
       - run: pnpm install --frozen-lockfile
       - run: pnpm build && pnpm build:cjs
+      - run: pnpm typecheck
       - run: pnpm lint
       - run: pnpm test
 
@@ -58,16 +62,16 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
-      - uses: pnpm/action-setup@v4
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+      - uses: pnpm/action-setup@0e279bb959325dab635dd2c09392533439d90093 # v6
         with:
           version: ${{ env.PNPM_VERSION }}
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
         with:
           node-version: 20.x
           cache: 'pnpm'
       - name: Cache turbo build setup
-        uses: actions/cache@v4
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
         with:
           path: ./node_modules/.cache/turbo
           key: ${{ runner.os }}-turbo-${{ github.sha }}
@@ -86,11 +90,11 @@ jobs:
           - 20.x
           - 22.x
     steps:
-      - uses: actions/checkout@v6
-      - uses: pnpm/action-setup@v4
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+      - uses: pnpm/action-setup@0e279bb959325dab635dd2c09392533439d90093 # v6
         with:
           version: ${{ env.PNPM_VERSION }}
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
         with:
           node-version: ${{ matrix.node }}
           cache: 'pnpm'
@@ -102,49 +106,52 @@ jobs:
     name: Test (Integration)
     runs-on: ubuntu-latest
     needs: build
-    if: github.event.pull_request.head.repo.full_name == github.repository
     concurrency:
-      group: ${{ matrix.environment }}
+      group: integration-development
       cancel-in-progress: false
-    continue-on-error: ${{ matrix.environment == 'development' }}
+    continue-on-error: true
     strategy:
       fail-fast: true
       matrix:
         node:
           - 20.x
           - 22.x
-        environment:
-          - development
-        include:
-          - environment: development
-            slug: DEV
     env:
-      AXIOM_TOKEN: ${{ secrets[format('TESTING_{0}_API_TOKEN', matrix.slug)] }}
-      AXIOM_URL: ${{ secrets[format('TESTING_{0}_API_URL', matrix.slug)] }}
-      AXIOM_ORG_ID: ${{ secrets[format('TESTING_{0}_ORG_ID', matrix.slug)] }}
-      AXIOM_EDGE: ${{ vars[format('TESTING_{0}_EDGE', matrix.slug)] }}
-      AXIOM_EDGE_URL: ${{ vars[format('TESTING_{0}_EDGE_URL', matrix.slug)] }}
-      AXIOM_EDGE_DATASET_REGION: ${{ vars[format('TESTING_{0}_EDGE_DATASET_REGION', matrix.slug)] }}
-      AXIOM_DATASET_SUFFIX: ${{ github.run_id }}-${{ matrix.node }}-${{ matrix.environment }}
+      AXIOM_TOKEN: ${{ secrets.TESTING_DEV_API_TOKEN }}
+      AXIOM_URL: ${{ secrets.TESTING_DEV_API_URL }}
+      AXIOM_ORG_ID: ${{ secrets.TESTING_DEV_ORG_ID }}
+      AXIOM_EDGE: ${{ vars.TESTING_DEV_EDGE }}
+      AXIOM_EDGE_URL: ${{ vars.TESTING_DEV_EDGE_URL }}
+      AXIOM_EDGE_DATASET_REGION: ${{ vars.TESTING_DEV_EDGE_DATASET_REGION }}
+      AXIOM_DATASET_SUFFIX: ${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.node }}-development
     steps:
-      - uses: actions/checkout@v6
-      - uses: pnpm/action-setup@v4
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+      - name: Skip integration tests for external PRs
+        if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.repository
+        run: echo "Skipping integration tests because this run does not have access to repository secrets."
+      - uses: pnpm/action-setup@0e279bb959325dab635dd2c09392533439d90093 # v6
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
         with:
           version: ${{ env.PNPM_VERSION }}
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
         with:
           node-version: ${{ matrix.node }}
           cache: 'pnpm'
       - name: Cache turbo build setup
-        uses: actions/cache@v4
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
         with:
           path: ./node_modules/.cache/turbo
           key: ${{ runner.os }}-turbo-${{ github.sha }}
           restore-keys: |
             ${{ runner.os }}-turbo-
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm build && pnpm build:cjs
-      - run: pnpm integration
+      - if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+        run: pnpm install --frozen-lockfile
+      - if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+        run: pnpm build && pnpm build:cjs
+      - if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+        run: pnpm integration
 
   deploy-e2e-apps:
     name: Deploy E2E apps
@@ -152,8 +159,8 @@ jobs:
     needs: build
     if: github.event.pull_request.head.repo.full_name == github.repository
     steps:
-      - uses: actions/checkout@v6
-      - uses: amondnet/vercel-action@v25 #deploy
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+      - uses: amondnet/vercel-action@de09aeac2ace6599ec9b11ef87558759a496bac4 # v42
         id: vercel-deploy
         with:
           vercel-token: ${{ secrets.VERCEL_TOKEN }} # Required
@@ -179,16 +186,16 @@ jobs:
       max-parallel: 1
       fail-fast: true
     steps:
-      - uses: actions/checkout@v6
-      - uses: pnpm/action-setup@v4
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+      - uses: pnpm/action-setup@0e279bb959325dab635dd2c09392533439d90093 # v6
         with:
           version: ${{ env.PNPM_VERSION }}
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
         with:
           node-version: ${{ matrix.node }}
           cache: 'pnpm'
       - name: Cache turbo build setup
-        uses: actions/cache@v4
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
         with:
           path: ./node_modules/.cache/turbo
           key: ${{ runner.os }}-turbo-${{ github.sha }}

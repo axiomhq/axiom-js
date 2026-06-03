@@ -3,6 +3,10 @@
   "tasks": {
     "lint": {},
     "format": {},
+    "typecheck": {
+      "dependsOn": ["^build"],
+      "outputs": []
+    },
 
     "build": {
       "dependsOn": ["^build"],
@@ -53,7 +57,8 @@
         "AXIOM_ORG_ID",
         "NEXT_PUBLIC_AXIOM_TOKEN",
         "NEXT_PUBLIC_AXIOM_URL",
-        "NEXT_PUBLIC_AXIOM_ORG_ID"
+        "NEXT_PUBLIC_AXIOM_ORG_ID",
+        "AXIOM_DATASET_SUFFIX"
       ]
     }
   }

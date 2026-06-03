@@ -1,7 +1,7 @@
-import { FetchClient } from "./fetchClient.js";
+import { FetchClient } from './fetchClient.js';
 
-const Version = "AXIOM_VERSION";
-const AxiomURL = "https://api.axiom.co";
+const Version = 'AXIOM_VERSION';
+const AxiomURL = 'https://api.axiom.co';
 
 /**
  * ClientOptions is used to configure the HTTPClient and provide the necessary
@@ -156,13 +156,120 @@ export function resolveIngestUrl(options: Pick<ClientOptions, 'url' | 'edge' | '
   return `${AxiomURL}/v1/datasets/${dataset}/ingest`;
 }
 
+function buildQueryUrl(baseUrl: string, path: string): string {
+  try {
+    const parsed = new URL(baseUrl);
+    const currentPath = parsed.pathname;
+
+    if (currentPath === '' || currentPath === '/') {
+      parsed.pathname = path;
+      return parsed.toString();
+    }
+
+    parsed.pathname = currentPath.replace(/\/+$/, '');
+    return parsed.toString();
+  } catch {
+    const trimmed = baseUrl.replace(/\/+$/, '');
+    return `${trimmed}${path}`;
+  }
+}
+
+const edgeDeploymentUrls: Record<string, string> = {
+  'cloud.us-east-1.aws': 'https://us-east-1.aws.edge.axiom.co',
+  'cloud.eu-central-1.aws': 'https://eu-central-1.aws.edge.axiom.co',
+};
+
+function resolveEdgeUrlFromDeployment(edgeDeployment: string | null | undefined): string | undefined {
+  if (!edgeDeployment || edgeDeployment === 'null') {
+    return undefined;
+  }
+
+  return edgeDeploymentUrls[edgeDeployment.toLowerCase()];
+}
+
+function assertNoUnsupportedEdgeDeployment(edgeDeployment: string | null | undefined, operation: string) {
+  if (!edgeDeployment || edgeDeployment === 'null' || resolveEdgeUrlFromDeployment(edgeDeployment)) {
+    return;
+  }
+
+  throw new Error(
+    `Unsupported edgeDeployment "${edgeDeployment}". Pass edgeUrl or edge to route ${operation} to that deployment.`,
+  );
+}
+
+export function resolveEdgeQueryUrl(
+  clientOptions: Pick<ClientOptions, 'url' | 'edge' | 'edgeUrl'>,
+  options: { edge?: string; edgeUrl?: string; edgeDeployment?: string | null } | undefined,
+  path: string,
+  operation: string,
+): string {
+  if (options?.edgeUrl) {
+    return buildQueryUrl(options.edgeUrl, path);
+  }
+
+  if (options?.edge) {
+    return `https://${options.edge}${path}`;
+  }
+
+  const deploymentEdgeUrl = resolveEdgeUrlFromDeployment(options?.edgeDeployment);
+  if (deploymentEdgeUrl) {
+    return buildQueryUrl(deploymentEdgeUrl, path);
+  }
+
+  assertNoUnsupportedEdgeDeployment(options?.edgeDeployment, operation);
+
+  if (clientOptions.edgeUrl) {
+    return buildQueryUrl(clientOptions.edgeUrl, path);
+  }
+
+  if (clientOptions.edge) {
+    return `https://${clientOptions.edge}${path}`;
+  }
+
+  throw new Error(`${operation} must be routed to an Axiom edge deployment. Set edge, edgeUrl, or edgeDeployment.`);
+}
+
+/**
+ * Resolves the APL query endpoint URL.
+ *
+ * @see https://axiom.co/docs/restapi/endpoints/queryApl
+ * @see https://axiom.co/docs/restapi/endpoints/queryEdge
+ */
+export function resolveAplQueryUrl(options: Pick<ClientOptions, 'url' | 'edge' | 'edgeUrl'>): string {
+  if (options.edgeUrl) {
+    return buildQueryUrl(options.edgeUrl, '/v1/query/_apl');
+  }
+
+  if (options.edge) {
+    return `https://${options.edge}/v1/query/_apl`;
+  }
+
+  if (options.url) {
+    return buildQueryUrl(options.url, '/v1/datasets/_apl');
+  }
+
+  return `${AxiomURL}/v1/datasets/_apl`;
+}
+
+/**
+ * Resolves the MPL query endpoint URL.
+ *
+ * @see https://axiom.co/docs/restapi/endpoints/queryMetrics
+ */
+export function resolveMplQueryUrl(
+  clientOptions: Pick<ClientOptions, 'url' | 'edge' | 'edgeUrl'>,
+  options?: { edge?: string; edgeUrl?: string; edgeDeployment?: string | null },
+): string {
+  return resolveEdgeQueryUrl(clientOptions, options, '/v1/query/_mpl', 'MPL queries');
+}
+
 export default abstract class HTTPClient {
   protected readonly client: FetchClient;
   protected readonly clientOptions: ClientOptions;
 
-  constructor({ orgId = "", token, url, edge, edgeUrl, onError }: ClientOptions) {
+  constructor({ orgId = '', token, url, edge, edgeUrl, onError }: ClientOptions) {
     if (!token) {
-      console.warn("Missing Axiom token");
+      console.warn('Missing Axiom token');
     }
 
     // Store options for use in ingest URL resolution
@@ -173,15 +280,15 @@ export default abstract class HTTPClient {
     const baseUrl = url ? url.replace(/\/+$/, '') : AxiomURL;
 
     const headers: HeadersInit = {
-      Accept: "application/json",
-      "Content-Type": "application/json",
-      Authorization: "Bearer " + token,
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+      Authorization: 'Bearer ' + token,
     };
-    if (typeof window === "undefined") {
-      headers["User-Agent"] = "axiom-js/" + Version;
+    if (typeof window === 'undefined') {
+      headers['User-Agent'] = 'axiom-js/' + Version;
     }
     if (orgId) {
-      headers["X-Axiom-Org-Id"] = orgId;
+      headers['X-Axiom-Org-Id'] = orgId;
     }
 
     this.client = new FetchClient({

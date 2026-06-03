@@ -1,5 +1,6 @@
 import { describe, expect, it, beforeAll, afterAll } from 'vitest';
 import { AxiomWithoutBatching, Axiom } from '@axiomhq/js';
+import { createTestDataset, cleanupDatasetIfExists } from './testHelpers';
 
 const datasetSuffix = process.env.AXIOM_DATASET_SUFFIX || 'local';
 
@@ -36,21 +37,21 @@ describe.skipIf(!hasEdgeConfig)('Edge Ingestion', () => {
 
   beforeAll(async () => {
     // Create dataset (API call goes to main URL, not edge)
-    const createRequest: { name: string; description: string; region?: string } = {
+    const createRequest: { name: string; description: string; edgeDeployment?: string } = {
       name: datasetName,
       description: 'Test dataset for edge ingestion integration tests.',
     };
-    // Only set region if explicitly configured and non-empty
+    // Only set edgeDeployment if explicitly configured and non-empty
     if (edgeDatasetRegion && edgeDatasetRegion.trim() !== '') {
-      createRequest.region = edgeDatasetRegion;
+      createRequest.edgeDeployment = edgeDatasetRegion;
     }
-    await axiom.datasets.create(createRequest);
+    await createTestDataset(axiom.datasets, createRequest);
   });
 
   afterAll(async () => {
     // Delete dataset (API call goes to main URL, not edge)
-    const resp = await axiom.datasets.delete(datasetName);
-    expect(resp.status).toEqual(204);
+    const resp = await cleanupDatasetIfExists(axiom.datasets, datasetName);
+    if (resp) expect(resp.status).toEqual(204);
   });
 
   describe('ingest via edge', () => {

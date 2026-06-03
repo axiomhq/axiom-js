@@ -1,5 +1,5 @@
-import fetchRetry from "fetch-retry";
-import { parseLimitFromResponse, Limit, LimitType } from "./limit.js";
+import fetchRetry from 'fetch-retry';
+import { parseLimitFromResponse, Limit, LimitType } from './limit.js';
 
 export class FetchClient {
   constructor(public config: { headers: HeadersInit; baseUrl: string; timeout: number }) {}
@@ -30,7 +30,7 @@ export class FetchClient {
       method,
       body: init.body ? init.body : undefined,
       signal: AbortSignal.timeout(timeout),
-      cache: "no-store",
+      cache: 'no-store',
     });
 
     if (resp.status === 204) {
@@ -40,7 +40,7 @@ export class FetchClient {
 
       return Promise.reject(new AxiomTooManyRequestsError(limit));
     } else if (resp.status === 401) {
-      return Promise.reject(new Error("forbidden"));
+      return Promise.reject(new Error('forbidden'));
     } else if (resp.status >= 400) {
       const payload = (await resp.json()) as { message: string };
       return Promise.reject(new Error(payload.message));
@@ -49,20 +49,44 @@ export class FetchClient {
     return (await resp.json()) as T;
   }
 
-  post<T>(url: string, init: RequestInit = {}, searchParams: any = {}, timeout = this.config.timeout, useAbsoluteUrl = false): Promise<T> {
-    return this.doReq<T>(url, "POST", init, searchParams, timeout, useAbsoluteUrl);
+  post<T>(
+    url: string,
+    init: RequestInit = {},
+    searchParams: any = {},
+    timeout = this.config.timeout,
+    useAbsoluteUrl = false,
+  ): Promise<T> {
+    return this.doReq<T>(url, 'POST', init, searchParams, timeout, useAbsoluteUrl);
   }
 
-  get<T>(url: string, init: RequestInit = {}, searchParams: any = {}, timeout = this.config.timeout): Promise<T> {
-    return this.doReq<T>(url, "GET", init, searchParams, timeout);
+  get<T>(
+    url: string,
+    init: RequestInit = {},
+    searchParams: any = {},
+    timeout = this.config.timeout,
+    useAbsoluteUrl = false,
+  ): Promise<T> {
+    return this.doReq<T>(url, 'GET', init, searchParams, timeout, useAbsoluteUrl);
   }
 
-  put<T>(url: string, init: RequestInit = {}, searchParams: any = {}, timeout = this.config.timeout): Promise<T> {
-    return this.doReq<T>(url, "PUT", init, searchParams, timeout);
+  put<T>(
+    url: string,
+    init: RequestInit = {},
+    searchParams: any = {},
+    timeout = this.config.timeout,
+    useAbsoluteUrl = false,
+  ): Promise<T> {
+    return this.doReq<T>(url, 'PUT', init, searchParams, timeout, useAbsoluteUrl);
   }
 
-  delete<T>(url: string, init: RequestInit = {}, searchParams: any = {}, timeout = this.config.timeout): Promise<T> {
-    return this.doReq<T>(url, "DELETE", init, searchParams, timeout);
+  delete<T>(
+    url: string,
+    init: RequestInit = {},
+    searchParams: any = {},
+    timeout = this.config.timeout,
+    useAbsoluteUrl = false,
+  ): Promise<T> {
+    return this.doReq<T>(url, 'DELETE', init, searchParams, timeout, useAbsoluteUrl);
   }
 
   _prepareSearchParams = (searchParams: { [key: string]: string }) => {
@@ -81,7 +105,7 @@ export class FetchClient {
 }
 
 export class AxiomTooManyRequestsError extends Error {
-  public message: string = "";
+  public message: string = '';
 
   constructor(
     public limit: Limit,

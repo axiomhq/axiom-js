@@ -1,11 +1,19 @@
+import { annotations } from './annotations.js';
+import { dashboards } from './dashboards.js';
 import { datasets } from './datasets.js';
+import { monitors } from './monitors.js';
+import { savedQueries } from './savedQueries.js';
 import { users } from './users.js';
 import { Batch, createBatchKey } from './batch.js';
-import HTTPClient, { ClientOptions, resolveIngestUrl } from './httpClient.js';
+import HTTPClient, { ClientOptions, resolveAplQueryUrl, resolveIngestUrl, resolveMplQueryUrl } from './httpClient.js';
 import { isAxiomPersonalToken } from './token.js';
 
 class BaseClient extends HTTPClient {
+  annotations: annotations.Service;
+  dashboards: dashboards.Service;
   datasets: datasets.Service;
+  monitors: monitors.Service;
+  savedQueries: savedQueries.Service;
   users: users.Service;
   localPath = '/v1';
   onError = console.error;
@@ -18,8 +26,14 @@ class BaseClient extends HTTPClient {
     }
 
     super(options);
+    this.annotations = new annotations.Service(options);
+    this.dashboards = new dashboards.Service(options);
     this.datasets = new datasets.Service(options);
+    this.monitors = new monitors.Service(options);
+    this.savedQueries = new savedQueries.Service(options);
     this.users = new users.Service(options);
+    this.query = this.query.bind(this); // bind `this` so method uses client state when passed around
+    this.aplQuery = this.aplQuery.bind(this); // bind `this` so method uses client state when passed around
     if (options.onError) {
       this.onError = options.onError;
     }
@@ -31,7 +45,7 @@ class BaseClient extends HTTPClient {
    * @param dataset - name of the dataset to ingest events into
    * @param data - data to be ingested
    * @param contentType - optional content type, defaults to JSON
-   * @param contentEncoding - optional content encoding, defaults to Identity
+   * @param contentEncoding - optional content encoding, defaults to Auto
    * @param options - optional ingest options
    * @returns result a promise of ingest and its status, check: {@link IngestStatus}
    * @example
@@ -44,21 +58,22 @@ class BaseClient extends HTTPClient {
    */
   ingestRaw = async (
     dataset: string,
-    data: string | Buffer | ReadableStream,
+    data: string | Buffer | Uint8Array | ReadableStream,
     contentType: ContentType = ContentType.JSON,
-    contentEncoding: ContentEncoding = ContentEncoding.Identity,
+    contentEncoding: ContentEncoding = ContentEncoding.Auto,
     options?: IngestOptions,
   ): Promise<IngestStatus> => {
     try {
+      const encoded = await this.encodeIngestPayload(data, contentEncoding);
       const ingestUrl = resolveIngestUrl(this.clientOptions, dataset);
       return await this.client.post<IngestStatus>(
         ingestUrl,
         {
           headers: {
             'Content-Type': contentType,
-            'Content-Encoding': contentEncoding,
+            'Content-Encoding': encoded.contentEncoding,
           },
-          body: data,
+          body: encoded.data,
         },
         {
           'timestamp-field': options?.timestampField as string,
@@ -80,6 +95,89 @@ class BaseClient extends HTTPClient {
     }
   };
 
+  protected encodeIngestPayload = async (
+    data: string | Buffer | Uint8Array | ReadableStream,
+    contentEncoding: ContentEncoding,
+  ): Promise<{ data: string | Buffer | Uint8Array | ReadableStream; contentEncoding: ContentEncoding }> => {
+    if (contentEncoding !== ContentEncoding.Auto) {
+      return { data, contentEncoding };
+    }
+
+    if (typeof CompressionStream === 'undefined') {
+      return { data, contentEncoding: ContentEncoding.Identity };
+    }
+
+    try {
+      const source = this.resolveCompressionSource(data);
+      if (!source) {
+        return { data, contentEncoding: ContentEncoding.Identity };
+      }
+      const stream = source.pipeThrough(new CompressionStream('gzip'));
+      const compressed = new Uint8Array(await new Response(stream).arrayBuffer());
+      return { data: compressed, contentEncoding: ContentEncoding.GZIP };
+    } catch (err) {
+      this.onError(err as Error);
+      return { data, contentEncoding: ContentEncoding.Identity };
+    }
+  };
+
+  protected resolveCompressionSource = (data: string | Buffer | Uint8Array | ReadableStream): ReadableStream | null => {
+    if (typeof ReadableStream !== 'undefined' && data instanceof ReadableStream) {
+      return data;
+    }
+
+    if (this.isAsyncIterable(data)) {
+      return new ReadableStream({
+        start: async (controller) => {
+          for await (const chunk of data) {
+            controller.enqueue(this.normalizeChunk(chunk));
+          }
+          controller.close();
+        },
+      });
+    }
+
+    if (typeof data === 'string' || data instanceof Uint8Array) {
+      return new Blob([data]).stream();
+    }
+
+    return null;
+  };
+
+  protected isAsyncIterable = (value: unknown): value is AsyncIterable<unknown> => {
+    return (
+      value !== null &&
+      typeof value === 'object' &&
+      Symbol.asyncIterator in value &&
+      typeof (value as AsyncIterable<unknown>)[Symbol.asyncIterator] === 'function'
+    );
+  };
+
+  protected normalizeChunk = (chunk: unknown): Uint8Array => {
+    if (chunk instanceof Uint8Array) {
+      return chunk;
+    }
+
+    if (chunk instanceof ArrayBuffer) {
+      return new Uint8Array(chunk);
+    }
+
+    if (typeof chunk === 'string') {
+      return new TextEncoder().encode(chunk);
+    }
+
+    return new TextEncoder().encode(String(chunk));
+  };
+
+  /**
+   * Executes a legacy dataset query against the provided dataset.
+   *
+   * @param dataset - name of the dataset to query
+   * @param query - legacy query request
+   * @param options - optional query options
+   * @returns Promise<QueryLegacyResult>
+   * @see https://axiom.co/docs/restapi/endpoints/queryDataset
+   */
   queryLegacy = (dataset: string, query: QueryLegacy, options?: QueryOptions): Promise<QueryLegacyResult> =>
     this.client.post(
       this.localPath + '/datasets/' + dataset + '/query',
@@ -94,11 +192,13 @@ class BaseClient extends HTTPClient {
     );
 
   /**
-   * Executes APL query using the provided APL and returns the result
+   * Executes an APL or MPL query and returns the result.
    *
-   * @param apl - the apl query
+   * @param query - the APL or MPL query
    * @param options - optional query options
    * @returns result of the query depending on the format in options, check: {@link QueryResult} and {@link TabularQueryResult}
+   * @see https://axiom.co/docs/restapi/endpoints/queryApl
+   * @see https://axiom.co/docs/restapi/endpoints/queryMetrics
    *
    * @example
    * ```
@@ -106,13 +206,24 @@ class BaseClient extends HTTPClient {
    * ```
    *
    */
-  query = <
-    TOptions extends QueryOptions,
-    TResult = TOptions['format'] extends 'tabular' ? Promise<TabularQueryResult> : Promise<QueryResult>,
-  >(
+  query(apl: string, options: QueryOptions & { format: 'tabular' }): Promise<TabularQueryResult>;
+  query(apl: string, options?: QueryOptions): Promise<QueryResult>;
+  query(mpl: string, options: MetricsQueryOptions): Promise<MetricsResult>;
+  query(
+    query: string,
+    options?: QueryOptions | MetricsQueryOptions,
+  ): Promise<QueryResult | TabularQueryResult | MetricsResult> {
+    if (options?.type === 'mpl') {
+      return this.queryMpl(query, options);
+    }
+
+    return this.queryApl(query, options);
+  }
+
+  private queryApl = <TOptions extends QueryOptions>(
     apl: string,
     options?: TOptions,
-  ): Promise<TResult> => {
+  ): Promise<TOptions['format'] extends 'tabular' ? TabularQueryResult : QueryResult> => {
     const req: Query = { apl: apl };
     if (options?.startTime) {
       req.startTime = options?.startTime;
@@ -123,7 +234,7 @@ class BaseClient extends HTTPClient {
 
     return this.client
       .post<TOptions['format'] extends 'tabular' ? RawTabularQueryResult : QueryResult>(
-        this.localPath + '/datasets/_apl',
+        resolveAplQueryUrl(this.clientOptions),
         {
           body: JSON.stringify(req),
         },
@@ -134,6 +245,7 @@ class BaseClient extends HTTPClient {
           cursor: options?.cursor as string,
         },
         120_000,
+        true,
       )
       .then((res) => {
         if (options?.format !== 'tabular') {
@@ -168,7 +280,34 @@ class BaseClient extends HTTPClient {
             };
           }),
         };
-      }) as Promise<TResult>;
+      }) as Promise<TOptions['format'] extends 'tabular' ? TabularQueryResult : QueryResult>;
+  };
+
+  private queryMpl = async (mpl: string, options: MetricsQueryOptions): Promise<MetricsResult> => {
+    const req: MetricsQuery = {
+      mpl,
+      startTime: options.startTime,
+      endTime: options.endTime,
+    };
+
+    const init: RequestInit = {
+      body: JSON.stringify(req),
+    };
+    if (options.accept) {
+      init.headers = {
+        Accept: options.accept,
+      };
+    }
+
+    return this.client.post<MetricsResult>(
+      resolveMplQueryUrl(this.clientOptions, options),
+      init,
+      {
+        format: options.format as string,
+      },
+      120_000,
+      true,
+    );
   };
 
   /**
@@ -178,19 +317,18 @@ class BaseClient extends HTTPClient {
    * @param apl - the apl query
    * @param options - optional query options
    * @returns Promise<QueryResult>
+   * @see https://axiom.co/docs/restapi/endpoints/queryApl
    *
    * @example
    * ```
    * await axiom.aplQuery("['dataset'] | count");
    * ```
    */
-  aplQuery = <
-    TOptions extends QueryOptions,
-    TResult = TOptions['format'] extends 'tabular' ? Promise<TabularQueryResult> : Promise<QueryResult>,
-  >(
-    apl: string,
-    options?: TOptions,
-  ): Promise<TResult> => this.query(apl, options);
+  aplQuery(apl: string, options: QueryOptions & { format: 'tabular' }): Promise<TabularQueryResult>;
+  aplQuery(apl: string, options?: QueryOptions): Promise<QueryResult>;
+  aplQuery(apl: string, options?: QueryOptions): Promise<QueryResult | TabularQueryResult> {
+    return this.query(apl, options);
+  }
 }
 
 /**
@@ -222,8 +360,7 @@ export class AxiomWithoutBatching extends BaseClient {
   async ingest(dataset: string, events: Array<object> | object, options?: IngestOptions): Promise<IngestStatus> {
     const array = Array.isArray(events) ? events : [events];
     const json = array.map((v) => JSON.stringify(v)).join('\n');
-
-    return this.ingestRaw(dataset, json, ContentType.NDJSON, ContentEncoding.Identity, options);
+    return this.ingestRaw(dataset, json, ContentType.NDJSON, ContentEncoding.Auto, options);
   }
 }
 
@@ -257,10 +394,11 @@ export class Axiom extends BaseClient {
         (dataset, events, options) => {
           const array = Array.isArray(events) ? events : [events];
           const json = array.map((v) => JSON.stringify(v)).join('\n');
-          return this.ingestRaw(dataset, json, ContentType.NDJSON, ContentEncoding.Identity, options);
+          return this.ingestRaw(dataset, json, ContentType.NDJSON, ContentEncoding.Auto, options);
         },
         dataset,
         options,
+        { onError: this.onError },
       );
     }
     return this.batch[key].ingest(events);
@@ -299,6 +437,7 @@ export enum ContentType {
 }
 
 export enum ContentEncoding {
+  Auto = 'auto',
   Identity = '',
   GZIP = 'gzip',
 }
@@ -364,10 +503,30 @@ export interface QueryOptionsBase {
 }
 
 export interface QueryOptions extends QueryOptionsBase {
+  type?: 'apl';
   startTime?: string;
   endTime?: string;
   format?: 'legacy' | 'tabular';
   cursor?: string;
+}
+
+export interface MetricsQueryOptions {
+  type: 'mpl';
+  startTime: string;
+  endTime: string;
+  format?: 'metrics-v1' | 'metrics-v2';
+  accept?: string;
+  edge?: string;
+  edgeUrl?: string;
+  edgeDeployment?: string | null;
+}
+
+export type MetricsResult = Record<string, unknown>;
+
+export interface MetricsQuery {
+  mpl: string;
+  startTime: string;
+  endTime: string;
 }
 
 export interface QueryLegacy {

@@ -1,6 +1,6 @@
 {
   "name": "@axiomhq/pino",
-  "version": "1.4.0",
+  "version": "1.6.1",
   "description": "The official Axiom transport for Pino",
   "type": "module",
   "types": "dist/esm/types/index.d.ts",
@@ -14,6 +14,7 @@
     "build:cjs": "rollup -c rollup.config.cjs.js",
     "format": "eslint 'src/**/*.{js,ts}' --quiet --fix",
     "lint": "eslint 'src/**/*.{js,ts}'",
+    "typecheck": "tsc -p tsconfig.json --emitDeclarationOnly false --noEmit",
     "test": "vitest run test/unit/*  --coverage"
   },
   "repository": {
