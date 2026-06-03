@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { AxiomWithoutBatching } from '../../src/client';
 import { annotations } from '../../src/annotations';
+import { dashboards } from '../../src/dashboards';
 import { monitors } from '../../src/monitors';
 import { savedQueries } from '../../src/savedQueries';
 import { users } from '../../src/users';
@@ -89,6 +90,24 @@ describe('AxiomWithoutBatching mounted services', () => {
     }, response);
 
     await expect(client.users.current()).resolves.toEqual(response);
+  });
+
+  it('lists dashboards through the mounted dashboards service', async () => {
+    const client = new AxiomWithoutBatching({ url: clientURL, token: 'test-token' });
+    const response: dashboards.DashboardResource[] = [
+      {
+        id: 'dashboard-id',
+        uid: 'dashboard-uid',
+        dashboard: { name: 'Runtime overview' },
+      },
+    ];
+
+    testMockedFetchCall((url: string, init: RequestInit) => {
+      expect(url).toEqual(`${clientURL}/v2/dashboards?limit=100&offset=20`);
+      expect(init.method).toEqual('GET');
+    }, response);
+
+    await expect(client.dashboards.list({ limit: 100, offset: 20 })).resolves.toEqual(response);
   });
 
   it('lists saved queries through the mounted savedQueries service', async () => {

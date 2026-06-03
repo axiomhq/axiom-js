@@ -19,6 +19,8 @@ npx ts-node <example-file.ts>
 
 - [ingest-string.ts](./src/ingest-string.ts): How to ingest a JSON string into a dataset.
 
+- [inspect-dashboards.ts](./src/inspect-dashboards.ts): How to list dashboards and retrieve one by UID.
+
 - [inspect-dataset.ts](./src/inspect-dataset.ts): How to inspect a dataset, fields, and map fields.
 
 - [inspect-metrics-dataset.ts](./src/inspect-metrics-dataset.ts): How to inspect metrics metadata for a metrics dataset.
