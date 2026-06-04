@@ -36,3 +36,5 @@ npx ts-node <example-file.ts>
 - [query.ts](./src/query.ts): How to query summarized results using the Axiom Processing Language (APL).
 
 - [saved-queries.ts](./src/saved-queries.ts): How to retrieve saved queries.
+
+- [users.ts](./src/users.ts): How to retrieve the current user, list users, and retrieve a user by ID.
