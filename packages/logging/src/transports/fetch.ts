@@ -1,5 +1,6 @@
 import { Transport } from './transport';
 import { LogEvent, LogLevelValue, LogLevel } from '../logger';
+import { safeStringify } from '../internal/safe-stringify';
 
 interface FetchConfig {
   input: Parameters<typeof fetch>[0];
@@ -46,21 +47,34 @@ export class SimpleFetchTransport implements Transport {
       return;
     }
 
-    await fetch(this.fetchConfig.input, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      ...this.fetchConfig.init,
-      body: JSON.stringify(this.events),
-    })
-      .then(async (res) => {
-        if (!res.ok) {
-          console.error(await res.text());
-          throw new Error('Failed to flush logs');
-        }
-        this.events = [];
-      })
-      .catch(console.error);
+    const batch = this.events;
+    this.events = [];
+
+    let body: string;
+    try {
+      body = safeStringify(batch);
+    } catch (err) {
+      console.error('Failed to serialize log batch, dropping events:', err);
+      return;
+    }
+
+    try {
+      const res = await fetch(this.fetchConfig.input, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        ...this.fetchConfig.init,
+        body,
+      });
+      if (!res.ok) {
+        console.error(await res.text());
+        this.events.unshift(...batch);
+      }
+    } catch (err) {
+      console.error(err);
+      this.events.unshift(...batch);
+    }
   }
+
 }

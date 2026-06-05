@@ -231,6 +231,104 @@ describe('SimpleFetchTransport', () => {
     });
   });
 
+  describe('poisoned payloads', () => {
+    it('does not drop the whole batch when one event contains a circular reference', async () => {
+      let receivedLogs: any[] = [];
+      server.use(
+        http.post(API_URL, async ({ request }) => {
+          receivedLogs = (await request.json()) as any[];
+          return HttpResponse.json({ success: true });
+        }),
+      );
+
+      transport = new SimpleFetchTransport({ input: API_URL });
+
+      const poisoned: any = createLogEvent(LogLevel.info, 'poisoned');
+      poisoned.fields = { self: null as any };
+      poisoned.fields.self = poisoned.fields;
+
+      transport.log([createLogEvent(LogLevel.info, 'clean-1'), poisoned, createLogEvent(LogLevel.info, 'clean-2')]);
+      await transport.flush();
+
+      expect(receivedLogs).toHaveLength(3);
+      expect(receivedLogs.map((l) => l.message)).toEqual(['clean-1', 'poisoned', 'clean-2']);
+      expect(receivedLogs[1].fields.self).toBe('[Circular]');
+    });
+
+    it('does not reject when flush body serialization hits a DOM-like node', async () => {
+      let receivedLogs: any[] = [];
+      server.use(
+        http.post(API_URL, async ({ request }) => {
+          receivedLogs = (await request.json()) as any[];
+          return HttpResponse.json({ success: true });
+        }),
+      );
+
+      const prevWindow = (globalThis as any).window;
+      const prevElement = (globalThis as any).Element;
+      class FakeElement {
+        tagName = 'IMG';
+      }
+      (globalThis as any).window = {};
+      (globalThis as any).Element = FakeElement;
+
+      try {
+        transport = new SimpleFetchTransport({ input: API_URL });
+        const ev: any = createLogEvent(LogLevel.info, 'with-dom');
+        ev.fields = { webVital: { element: new FakeElement() } };
+        transport.log([ev]);
+        await transport.flush();
+        expect(receivedLogs).toHaveLength(1);
+        expect(receivedLogs[0].fields.webVital.element).toBe('[Element IMG]');
+      } finally {
+        (globalThis as any).window = prevWindow;
+        (globalThis as any).Element = prevElement;
+      }
+    });
+
+    it('requeues the batch when the server rejects the request', async () => {
+      let attempts = 0;
+      const bodies: any[] = [];
+      server.use(
+        http.post(API_URL, async ({ request }) => {
+          attempts++;
+          bodies.push(await request.json());
+          if (attempts === 1) return HttpResponse.error();
+          return HttpResponse.json({ success: true });
+        }),
+      );
+      const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+      transport = new SimpleFetchTransport({ input: API_URL });
+      transport.log([createLogEvent(LogLevel.info, 'retry-me')]);
+      await transport.flush();
+      await transport.flush();
+
+      expect(attempts).toBe(2);
+      expect(bodies[1][0].message).toBe('retry-me');
+      consoleErrorSpy.mockRestore();
+    });
+
+    it('auto-flush timer does not reject when payload is circular', async () => {
+      const unhandled = vi.fn();
+      process.on('unhandledRejection', unhandled);
+
+      server.use(http.post(API_URL, () => HttpResponse.json({ success: true })));
+
+      transport = new SimpleFetchTransport({ input: API_URL, autoFlush: { durationMs: 500 } });
+      const poisoned: any = createLogEvent(LogLevel.info, 'poisoned');
+      poisoned.fields = { self: null as any };
+      poisoned.fields.self = poisoned.fields;
+      transport.log([poisoned]);
+
+      await vi.advanceTimersByTimeAsync(500);
+      await vi.runAllTimersAsync();
+
+      expect(unhandled).not.toHaveBeenCalled();
+      process.off('unhandledRejection', unhandled);
+    });
+  });
+
   describe('log level filtering', () => {
     it('should filter logs based on logLevel', async () => {
       let receivedLogs: any[] = [];
