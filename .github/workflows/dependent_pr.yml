@@ -38,7 +38,7 @@ jobs:
         if: github.event_name == 'pull_request'
         with:
           token: ${{ github.token }}
-          sha: ${{ github.sha }}
+          sha: ${{ github.event.pull_request.head.sha }}
           name: Dependent Issues
           conclusion: success
           output: |
