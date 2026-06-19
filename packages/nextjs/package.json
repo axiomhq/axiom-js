@@ -73,7 +73,7 @@
     "@repo/eslint-config": "workspace:*",
     "@tanstack/config": "^0.22.2",
     "next": "^15.5.18",
-    "vite": "^7.3.2",
+    "vite": "^7.3.5",
     "vitest": "catalog:"
   },
   "peerDependencies": {

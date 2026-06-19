@@ -74,7 +74,7 @@
     "happy-dom": "^20.9.0",
     "react": "^19.2.5",
     "react-dom": "^19.2.5",
-    "vite": "^7.3.2",
+    "vite": "^7.3.5",
     "vitest": "catalog:"
   },
   "peerDependencies": {
