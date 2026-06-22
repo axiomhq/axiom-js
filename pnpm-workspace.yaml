@@ -6,4 +6,4 @@ packages:
   - 'internal/*'
 
 catalog:
-  vitest: 4.1.0
+  vitest: 4.1.9
