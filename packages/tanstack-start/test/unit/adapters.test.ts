@@ -2,6 +2,7 @@ import { EVENT } from '@axiomhq/logging';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { createAxiomReactErrorHandler } from '../../src/react';
 import { createAxiomSolidErrorHandler } from '../../src/solid';
+import { axiomClient } from '../../src/identifier';
 import { mockLogger } from '../lib/mock';
 
 describe('framework adapters', () => {
@@ -11,6 +12,8 @@ describe('framework adapters', () => {
 
   it('logs React error-boundary errors through the React adapter', () => {
     const handleError = createAxiomReactErrorHandler(mockLogger);
+
+    expect(mockLogger.appendAxiomClient).toHaveBeenCalledWith(axiomClient);
 
     handleError(new Error('react boom'), {
       componentStack: '\n    in Widget',
@@ -53,6 +56,8 @@ describe('framework adapters', () => {
 
   it('logs Solid error-boundary errors through the Solid adapter', () => {
     const handleError = createAxiomSolidErrorHandler(mockLogger);
+
+    expect(mockLogger.appendAxiomClient).toHaveBeenCalledWith(axiomClient);
 
     handleError(new Error('solid boom'));
 

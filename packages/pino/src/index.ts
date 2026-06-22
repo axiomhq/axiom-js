@@ -1,5 +1,9 @@
 import build from 'pino-abstract-transport';
-import { Axiom, ClientOptions } from '@axiomhq/js';
+import { Axiom } from '@axiomhq/js';
+import type { ClientOptions } from '@axiomhq/js';
+
+const Version = 'AXIOM_VERSION';
+const AxiomClient = `axiom-pino/${Version}`;
 
 export enum AxiomEventLevel {
   Trace = 'trace',
@@ -13,10 +17,15 @@ export enum AxiomEventLevel {
 
 export interface Options extends ClientOptions {
   dataset: string;
+  axiomClient?: string;
 }
 
 export default async function axiomTransport(options: Options) {
-  const axiom = new Axiom(options);
+  const clientOptions: ClientOptions & { axiomClient?: string } = {
+    ...options,
+    axiomClient: appendAxiomClient(AxiomClient, options.axiomClient),
+  };
+  const axiom = new Axiom(clientOptions);
 
   const dataset = options.dataset;
 
@@ -65,3 +74,12 @@ export const mapLogLevel = (level: string | number) => {
 
   return AxiomEventLevel.Silent;
 };
+
+function appendAxiomClient(baseAxiomClient: string, axiomClient?: string): string {
+  const trimmedAxiomClient = axiomClient?.trim();
+  if (!trimmedAxiomClient) {
+    return baseAxiomClient;
+  }
+
+  return `${baseAxiomClient} ${trimmedAxiomClient}`;
+}

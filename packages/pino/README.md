@@ -12,10 +12,13 @@ const logger = pino(
     options: {
       dataset: process.env.AXIOM_DATASET,
       token: process.env.AXIOM_TOKEN,
+      axiomClient: 'my-app/1.0',
     },
   }),
 );
 ```
+
+The transport sends an `Axiom-Client` header like `axiom-js/<version> axiom-pino/<version> my-app/1.0`.
 
 ## Requirements
 

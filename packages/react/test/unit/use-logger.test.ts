@@ -1,7 +1,8 @@
 import { renderHook, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { createUseLogger } from '../../src/use-logger';
-import { Logger } from '@axiomhq/logging';
+import { Logger, type Formatter, type Transport } from '@axiomhq/logging';
+import { axiomClient, frameworkIdentifier, frameworkIdentifierFormatter } from '../../src/identifier';
 
 describe('Logger hook', () => {
   let mockLogger: Logger;
@@ -44,6 +45,66 @@ describe('Logger hook', () => {
       } as unknown as Logger;
 
       expect(() => createUseLogger(mockLogger)).not.toThrow();
+    });
+
+    it('should append react Axiom-Client product through the logger', () => {
+      const appendAxiomClient = vi.fn();
+      const mockLogger = {
+        flush: () => Promise.resolve(),
+        appendAxiomClient,
+      } as unknown as Logger;
+
+      createUseLogger(mockLogger);
+
+      expect(appendAxiomClient).toHaveBeenCalledWith(axiomClient);
+    });
+
+    it('should add the react framework identifier formatter to the logger', () => {
+      const logger = new Logger({
+        transports: [{ log: vi.fn(), flush: vi.fn() } as unknown as Transport],
+      });
+
+      createUseLogger(logger);
+      createUseLogger(logger);
+
+      expect(logger.config.formatters?.filter((formatter) => formatter === frameworkIdentifierFormatter)).toHaveLength(1);
+    });
+
+    it('should add the react framework identifier to log events', () => {
+      const logs: any[] = [];
+      const logger = new Logger({
+        transports: [
+          {
+            log: (events: any[]) => logs.push(...events),
+            flush: vi.fn(),
+          } as unknown as Transport,
+        ],
+      });
+
+      createUseLogger(logger);
+      logger.info('hello');
+
+      expect(logs[0]['@app'][frameworkIdentifier.name]).toBe(frameworkIdentifier.version);
+    });
+
+    it('should preserve existing logger formatters', () => {
+      const formatter: Formatter = (logEvent) => ({ ...logEvent, existing: true });
+      const logs: any[] = [];
+      const logger = new Logger({
+        transports: [
+          {
+            log: (events: any[]) => logs.push(...events),
+            flush: vi.fn(),
+          } as unknown as Transport,
+        ],
+        formatters: [formatter],
+      });
+
+      createUseLogger(logger);
+      logger.info('hello');
+
+      expect(logs[0].existing).toBe(true);
+      expect(logs[0]['@app'][frameworkIdentifier.name]).toBe(frameworkIdentifier.version);
     });
   });
 

@@ -2,6 +2,7 @@ import { FetchClient } from './fetchClient.js';
 
 const Version = 'AXIOM_VERSION';
 const AxiomURL = 'https://api.axiom.co';
+const AxiomClientHeader = 'Axiom-Client';
 
 /**
  * ClientOptions is used to configure the HTTPClient and provide the necessary
@@ -73,6 +74,13 @@ export interface ClientOptions {
    * @example "http://localhost:3400/ingest"
    */
   edgeUrl?: string;
+  /**
+   * Additional client product tokens to append to the Axiom-Client header.
+   * Multiple products should be separated by spaces.
+   *
+   * @example "my-app/1.2.3"
+   */
+  axiomClient?: string;
   onError?: (error: Error) => void;
 }
 
@@ -267,13 +275,13 @@ export default abstract class HTTPClient {
   protected readonly client: FetchClient;
   protected readonly clientOptions: ClientOptions;
 
-  constructor({ orgId = '', token, url, edge, edgeUrl, onError }: ClientOptions) {
+  constructor({ orgId = '', token, url, edge, edgeUrl, axiomClient, onError }: ClientOptions) {
     if (!token) {
       console.warn('Missing Axiom token');
     }
 
     // Store options for use in ingest URL resolution
-    this.clientOptions = { orgId, token, url, edge, edgeUrl, onError };
+    this.clientOptions = { orgId, token, url, edge, edgeUrl, axiomClient, onError };
 
     // For the main API client, always use url or default (never edge options)
     // edge/edgeUrl only affects ingest endpoints, not other API calls
@@ -283,10 +291,8 @@ export default abstract class HTTPClient {
       Accept: 'application/json',
       'Content-Type': 'application/json',
       Authorization: 'Bearer ' + token,
+      [AxiomClientHeader]: appendAxiomClient('axiom-js/' + Version, axiomClient),
     };
-    if (typeof window === 'undefined') {
-      headers['User-Agent'] = 'axiom-js/' + Version;
-    }
     if (orgId) {
       headers['X-Axiom-Org-Id'] = orgId;
     }
@@ -297,4 +303,32 @@ export default abstract class HTTPClient {
       timeout: 20_000,
     });
   }
+
+  appendAxiomClient(axiomClient: string) {
+    const headers = this.client.config.headers as Record<string, string>;
+    if (!headers[AxiomClientHeader]) {
+      return;
+    }
+
+    headers[AxiomClientHeader] = appendAxiomClient(headers[AxiomClientHeader], axiomClient);
+  }
+}
+
+export function appendAxiomClient(baseAxiomClient: string, axiomClient?: string): string {
+  const additionalProducts = axiomClient?.trim().split(/\s+/).filter(Boolean) ?? [];
+  if (additionalProducts.length === 0) {
+    return baseAxiomClient;
+  }
+
+  const products = baseAxiomClient.trim().split(/\s+/).filter(Boolean);
+  const productSet = new Set(products);
+
+  for (const product of additionalProducts) {
+    if (!productSet.has(product)) {
+      products.push(product);
+      productSet.add(product);
+    }
+  }
+
+  return products.join(' ');
 }

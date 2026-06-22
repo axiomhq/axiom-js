@@ -12,7 +12,7 @@ import {
   type FunctionMiddlewareServerFnOptions,
   type RequestServerOptions,
 } from '@tanstack/start-client-core';
-import { frameworkIdentifierFormatter } from './identifier';
+import { appendTanStackStartAxiomClient, frameworkIdentifierFormatter } from './identifier';
 import {
   getServerContextStore,
   runWithServerContext,
@@ -525,6 +525,7 @@ const defaultUncaughtOnError = async (logger: Logger, data: StartUncaughtErrorDa
 };
 
 export const createAxiomUncaughtErrorHandler = (logger: Logger, config: StartUncaughtErrorCaptureConfig = {}) => {
+  appendTanStackStartAxiomClient(logger);
   const { onError, source = START_UNCAUGHT_SOURCE } = config;
 
   return async (data: StartUncaughtErrorData) => {
@@ -613,6 +614,7 @@ export const createAxiomRequestMiddleware = (
   logger: Logger,
   config: StartRequestMiddlewareConfig = {},
 ) => {
+  appendTanStackStartAxiomClient(logger);
   const { store, onSuccess, onError } = config;
 
   return createMiddleware({ type: 'request' }).server(async (requestContext: StartRequestContext) => {
@@ -678,6 +680,7 @@ const isLogEventArray = (value: unknown): value is LogEvent[] => {
 };
 
 export const createAxiomProxyHandler = (logger: Logger, config: StartProxyHandlerConfig = {}) => {
+  appendTanStackStartAxiomClient(logger);
   const { onSuccess, onError } = config;
 
   return async (request: Request) => {
@@ -751,6 +754,7 @@ export const createAxiomFnMiddleware = (
   logger: Logger,
   config: StartFunctionMiddlewareConfig = {},
 ) => {
+  appendTanStackStartAxiomClient(logger);
   const { correlation = false, store, onSuccess, onError } = config;
   const correlationConfig = correlation === true ? {} : correlation || undefined;
 

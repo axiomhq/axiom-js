@@ -10,11 +10,14 @@ import {
 import { mockLogger } from '../lib/mock';
 import { EVENT, LogLevel } from '@axiomhq/logging';
 import { forbidden, notFound, permanentRedirect, redirect, unauthorized } from 'next/navigation';
+import { axiomClient } from '../../src/identifier';
 
 describe('routeHandler', () => {
   describe('createAxiomRouteHandler', () => {
     it('should handle successful requests', async () => {
       const withAxiom = createAxiomRouteHandler(mockLogger);
+      expect(mockLogger.appendAxiomClient).toHaveBeenCalledWith(axiomClient);
+
       const mockResponse = new NextResponse(null, { status: 200 });
       const handler = vi.fn().mockResolvedValue(mockResponse);
       const wrappedHandler = withAxiom(handler);

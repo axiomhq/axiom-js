@@ -1,28 +1,14 @@
 import Transport, { TransportStreamOptions } from 'winston-transport';
 
 import { AxiomWithoutBatching } from '@axiomhq/js';
+import type { ClientOptions } from '@axiomhq/js';
 
-export interface WinstonOptions extends TransportStreamOptions {
+const Version = 'AXIOM_VERSION';
+const AxiomClient = `axiom-winston/${Version}`;
+
+export interface WinstonOptions extends TransportStreamOptions, ClientOptions {
   dataset?: string;
-  token: string;
-  orgId?: string;
-  url?: string;
-  /**
-   * The Axiom edge domain for ingestion.
-   * Specify just the domain without scheme (https:// is added automatically).
-   *
-   * @example "eu-central-1.aws.edge.axiom.co"
-   */
-  edge?: string;
-  /**
-   * The Axiom edge URL for ingestion.
-   * Specify the full URL with scheme.
-   * Takes precedence over `edge` if both are set.
-   *
-   * @example "https://eu-central-1.aws.edge.axiom.co"
-   */
-  edgeUrl?: string;
-  onError?: (err: Error) => void;
+  axiomClient?: string;
 }
 
 export class WinstonTransport extends Transport {
@@ -34,14 +20,16 @@ export class WinstonTransport extends Transport {
 
   constructor(opts: WinstonOptions) {
     super(opts);
-    this.client = new AxiomWithoutBatching({
+    const clientOptions: ClientOptions & { axiomClient?: string } = {
       token: opts.token,
       orgId: opts.orgId,
       url: opts.url,
       edge: opts.edge,
       edgeUrl: opts.edgeUrl,
+      axiomClient: appendAxiomClient(AxiomClient, opts.axiomClient),
       onError: opts.onError,
-    });
+    };
+    this.client = new AxiomWithoutBatching(clientOptions);
     this.dataset = opts?.dataset || process.env.AXIOM_DATASET || '';
   }
 
@@ -89,4 +77,13 @@ export class WinstonTransport extends Transport {
       .then((_res: any) => callback(null))
       .catch(callback);
   }
+}
+
+function appendAxiomClient(baseAxiomClient: string, axiomClient?: string): string {
+  const trimmedAxiomClient = axiomClient?.trim();
+  if (!trimmedAxiomClient) {
+    return baseAxiomClient;
+  }
+
+  return `${baseAxiomClient} ${trimmedAxiomClient}`;
 }

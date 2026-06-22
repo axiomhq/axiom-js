@@ -35,6 +35,7 @@ jobs:
         node:
           - 20.x
           - 22.x
+          - 24.x
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
       - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6
@@ -89,6 +90,7 @@ jobs:
         node:
           - 20.x
           - 22.x
+          - 24.x
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
       - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6
@@ -116,6 +118,7 @@ jobs:
         node:
           - 20.x
           - 22.x
+          - 24.x
     env:
       AXIOM_TOKEN: ${{ secrets.TESTING_DEV_API_TOKEN }}
       AXIOM_URL: ${{ secrets.TESTING_DEV_API_URL }}

@@ -1,6 +1,6 @@
 import { EVENT, Logger, type Formatter } from '@axiomhq/logging';
 import type { AnyRouter, RouterEvent, RouterEvents } from '@tanstack/router-core';
-import { frameworkIdentifierFormatter } from './identifier';
+import { appendTanStackStartAxiomClient, frameworkIdentifierFormatter } from './identifier';
 
 const ROUTER_SOURCE = 'tanstack-router';
 const DEFAULT_EVENT: keyof RouterEvents = 'onResolved';
@@ -295,6 +295,8 @@ const observeRouter = (router: RouterLike, logger: Logger, options: RouterObserv
 };
 
 export const observeTanStackRouter = (logger: Logger, options: RouterObserverOptions = {}) => {
+  appendTanStackStartAxiomClient(logger);
+
   return (router: RouterLike) => {
     if (typeof window === 'undefined') {
       return () => {};

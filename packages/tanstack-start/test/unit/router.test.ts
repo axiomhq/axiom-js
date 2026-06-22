@@ -8,6 +8,7 @@ import {
   transformRouterPerformanceResult,
   type RouterLike,
 } from '../../src/router';
+import { axiomClient } from '../../src/identifier';
 import { mockLogger } from '../lib/mock';
 
 type RouterEventType = keyof RouterEvents;
@@ -127,6 +128,8 @@ describe('router observers', () => {
     const { router, emit } = createMockRouter('/first');
 
     const observe = observeTanStackRouter(mockLogger);
+    expect(mockLogger.appendAxiomClient).toHaveBeenCalledWith(axiomClient);
+
     const unsubscribe = observe(router);
 
     emit('onResolved', '/second');

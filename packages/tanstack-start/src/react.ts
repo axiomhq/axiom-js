@@ -1,6 +1,7 @@
 import type { Logger } from '@axiomhq/logging';
 import type { ErrorInfo } from 'react';
 import { reportClientError, type ClientErrorCaptureConfig } from './client';
+import { appendTanStackStartAxiomClient } from './identifier';
 
 const REACT_ERROR_SOURCE = 'tanstack-start-react-error-boundary';
 
@@ -16,6 +17,7 @@ export const createAxiomReactErrorHandler = (
   logger: Logger,
   config: ReactErrorCaptureConfig = {},
 ) => {
+  appendTanStackStartAxiomClient(logger);
   const { source = REACT_ERROR_SOURCE, ...rest } = config;
 
   return (error: unknown, errorInfo?: Pick<ErrorInfo, 'componentStack'> | ReactErrorContext) => {

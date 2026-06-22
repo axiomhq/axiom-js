@@ -160,6 +160,28 @@ describe('Logger', () => {
     });
   });
 
+  describe('appendAxiomClient', () => {
+    it('should forward Axiom-Client products to transports that support it', () => {
+      const appendAxiomClient = vi.fn();
+      const transport = {
+        log: vi.fn(),
+        flush: vi.fn(),
+        appendAxiomClient,
+      };
+      logger = new Logger({
+        transports: [transport],
+      });
+
+      logger.appendAxiomClient('axiom-react/1.0');
+
+      expect(appendAxiomClient).toHaveBeenCalledWith('axiom-react/1.0');
+    });
+
+    it('should ignore transports that do not support Axiom-Client products', () => {
+      expect(() => logger.appendAxiomClient('axiom-react/1.0')).not.toThrow();
+    });
+  });
+
   describe('Root fields injection using EVENT symbol', () => {
     it('should inject root fields into log events', () => {
       logger.info('user action', { [EVENT]: { userId: '123' } });
