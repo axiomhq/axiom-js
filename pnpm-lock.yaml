@@ -27,7 +27,7 @@ overrides:
   picomatch@>=4.0.0 <4.0.4: 4.0.4
   postcss@<8.5.10: 8.5.14
   srvx@<0.11.13: 0.11.15
-  undici@>=7.0.0 <7.24.0: 7.25.0
+  undici@>7.28.0: 7.28.0
   yaml@>=2.0.0 <2.8.3: 2.8.4
 
 importers:
@@ -5824,8 +5824,8 @@ packages:
   undici-types@7.14.0:
     resolution: {integrity: sha512-QQiYxHuyZ9gQUIrmPo3IA+hUl4KYk8uSA7cHrcKd/l3p1OTpZcM0Tbp9x7FAtXdAYhlasd60ncPpgu6ihG6TOA==}
 
-  undici@7.25.0:
-    resolution: {integrity: sha512-xXnp4kTyor2Zq+J1FfPI6Eq3ew5h6Vl0F/8d9XU5zZQf1tX9s2Su1/3PiMmUANFULpmksxkClamIZcaUqryHsQ==}
+  undici@7.28.0:
+    resolution: {integrity: sha512-cRZYrTDwWznlnRiPjggAGxZXanty6M8RV1ff8Wm4LWXBp7/IG8v5DnOm74DtUBp9OONpK75YlPnIjQqX0dBDtA==}
     engines: {node: '>=20.18.1'}
 
   universalify@0.1.2:
@@ -9199,7 +9199,7 @@ snapshots:
       parse5: 7.3.0
       parse5-htmlparser2-tree-adapter: 7.1.0
       parse5-parser-stream: 7.1.2
-      undici: 7.25.0
+      undici: 7.28.0
       whatwg-mimetype: 4.0.0
 
   chokidar@3.6.0:
@@ -10652,7 +10652,7 @@ snapshots:
       saxes: 6.0.0
       symbol-tree: 3.2.4
       tough-cookie: 6.0.1
-      undici: 7.25.0
+      undici: 7.28.0
       w3c-xmlserializer: 5.0.0
       webidl-conversions: 8.0.1
       whatwg-mimetype: 5.0.0
@@ -12178,7 +12178,7 @@ snapshots:
 
   undici-types@7.14.0: {}
 
-  undici@7.25.0: {}
+  undici@7.28.0: {}
 
   universalify@0.1.2: {}
 
