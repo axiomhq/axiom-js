@@ -75,10 +75,10 @@ export interface ClientOptions {
    */
   edgeUrl?: string;
   /**
-   * Additional client product tokens to append to the Axiom-Client header.
-   * Multiple products should be separated by spaces.
+   * Additional product tokens to append to the Axiom-Client header.
+   * Use product/version tokens separated by spaces.
    *
-   * @example "my-app/1.2.3"
+   * @example "axiom-react/1.2.3 my-app/4.5.6"
    */
   axiomClient?: string;
   onError?: (error: Error) => void;
