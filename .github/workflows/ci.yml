@@ -37,7 +37,7 @@ jobs:
           - 22.x
           - 24.x
     steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v6
       - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6
         with:
           version: ${{ env.PNPM_VERSION }}
@@ -63,7 +63,7 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v6
       - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6
         with:
           version: ${{ env.PNPM_VERSION }}
@@ -92,7 +92,7 @@ jobs:
           - 22.x
           - 24.x
     steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v6
       - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6
         with:
           version: ${{ env.PNPM_VERSION }}
@@ -128,7 +128,7 @@ jobs:
       AXIOM_EDGE_DATASET_REGION: ${{ vars.TESTING_DEV_EDGE_DATASET_REGION }}
       AXIOM_DATASET_SUFFIX: ${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.node }}-development
     steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v6
       - name: Skip integration tests for external PRs
         if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.repository
         run: echo "Skipping integration tests because this run does not have access to repository secrets."
@@ -162,7 +162,7 @@ jobs:
     needs: build
     if: github.event.pull_request.head.repo.full_name == github.repository
     steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v6
       - uses: amondnet/vercel-action@de09aeac2ace6599ec9b11ef87558759a496bac4 # v42
         id: vercel-deploy
         with:
@@ -189,7 +189,7 @@ jobs:
       max-parallel: 1
       fail-fast: true
     steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v6
       - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6
         with:
           version: ${{ env.PNPM_VERSION }}
