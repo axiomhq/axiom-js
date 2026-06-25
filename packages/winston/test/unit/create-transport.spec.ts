@@ -24,7 +24,7 @@ describe('winston transport tests', () => {
     expect(t).toBeDefined();
   });
 
-  it('appends winston and custom Axiom-Client products', () => {
+  it('appends winston and custom X-Axiom-Client products', () => {
     new WinstonTransport({ token: process.env.AXIOM_TOKEN || '', axiomClient: 'my-app/1.0' });
 
     expect(axiomMock.options[0].axiomClient).toEqual('axiom-winston/AXIOM_VERSION my-app/1.0');

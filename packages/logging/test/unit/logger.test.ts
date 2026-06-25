@@ -161,7 +161,7 @@ describe('Logger', () => {
   });
 
   describe('appendAxiomClient', () => {
-    it('should forward Axiom-Client products to transports that support it', () => {
+    it('should forward X-Axiom-Client products to transports that support it', () => {
       const appendAxiomClient = vi.fn();
       const transport = {
         log: vi.fn(),
@@ -177,7 +177,7 @@ describe('Logger', () => {
       expect(appendAxiomClient).toHaveBeenCalledWith('axiom-react/1.0');
     });
 
-    it('should ignore transports that do not support Axiom-Client products', () => {
+    it('should ignore transports that do not support X-Axiom-Client products', () => {
       expect(() => logger.appendAxiomClient('axiom-react/1.0')).not.toThrow();
     });
   });

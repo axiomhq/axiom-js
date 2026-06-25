@@ -47,7 +47,7 @@ describe('Logger hook', () => {
       expect(() => createUseLogger(mockLogger)).not.toThrow();
     });
 
-    it('should append react Axiom-Client product through the logger', () => {
+    it('should append react X-Axiom-Client product through the logger', () => {
       const appendAxiomClient = vi.fn();
       const mockLogger = {
         flush: () => Promise.resolve(),

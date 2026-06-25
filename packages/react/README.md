@@ -23,7 +23,7 @@ const WebVitals = createWebVitalsComponent(logger);
 export { useLogger, WebVitals };
 ```
 
-`createUseLogger` adds React package usage metadata to log events under `@app.react-axiom-version` and appends `axiom-react/<version>` to supported logging transports' `Axiom-Client` header.
+`createUseLogger` adds React package usage metadata to log events under `@app.react-axiom-version` and appends `axiom-react/<version>` to supported logging transports' `X-Axiom-Client` header.
 
 ## Requirements
 

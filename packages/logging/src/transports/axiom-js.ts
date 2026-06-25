@@ -8,7 +8,7 @@ interface AxiomJSTransportConfig {
   dataset: string;
   logLevel?: LogLevel;
   /**
-   * Additional product tokens to append to the Axiom-Client header.
+   * Additional product tokens to append to the X-Axiom-Client header.
    * Use product/version tokens separated by spaces.
    *
    * @example "axiom-react/1.2.3 my-app/4.5.6"

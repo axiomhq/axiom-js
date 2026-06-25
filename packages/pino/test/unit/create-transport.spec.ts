@@ -27,7 +27,7 @@ describe('pino transport tests', () => {
     expect(t).toBeDefined();
   });
 
-  it('appends pino and custom Axiom-Client products', async () => {
+  it('appends pino and custom X-Axiom-Client products', async () => {
     await axiomTransport({
       token: process.env.AXIOM_TOKEN || '',
       dataset: process.env.AXIOM_DATASET || '',

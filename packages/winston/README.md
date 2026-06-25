@@ -25,7 +25,7 @@ logger.log({
 });
 ```
 
-The transport sends an `Axiom-Client` header like `axiom-js/<version> axiom-winston/<version> my-app/1.0`.
+The transport sends an `X-Axiom-Client` header like `axiom-js/<version> axiom-winston/<version> my-app/1.0`.
 
 ## Requirements
 

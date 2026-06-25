@@ -47,11 +47,11 @@ describe('AxiomJSTransport', () => {
     });
 
     describe('appendAxiomClient', () => {
-      it('should append logging Axiom-Client product when created', () => {
+      it('should append logging X-Axiom-Client product when created', () => {
         expect((mockAxiom as any).appendAxiomClient).toHaveBeenCalledWith(axiomClient);
       });
 
-      it('should append custom Axiom-Client products after logging product', () => {
+      it('should append custom X-Axiom-Client products after logging product', () => {
         transport = new AxiomJSTransport({
           axiom: mockAxiom,
           dataset: DATASET,
@@ -61,7 +61,7 @@ describe('AxiomJSTransport', () => {
         expect((mockAxiom as any).appendAxiomClient).toHaveBeenLastCalledWith(`${axiomClient} axiom-react/0.0.0`);
       });
 
-      it('should append Axiom-Client products through the transport method', () => {
+      it('should append X-Axiom-Client products through the transport method', () => {
         transport.appendAxiomClient?.('my-app/1.0');
 
         expect((mockAxiom as any).appendAxiomClient).toHaveBeenCalledWith('my-app/1.0');

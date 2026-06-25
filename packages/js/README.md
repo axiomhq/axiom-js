@@ -14,7 +14,7 @@ axiom.ingest('DATASET_NAME', [{ foo: 'bar' }]);
 await axiom.flush();
 ```
 
-Custom products are appended to the `Axiom-Client` header, for example `axiom-js/<version> my-app/1.0`.
+Custom products are appended to the `X-Axiom-Client` header, for example `axiom-js/<version> my-app/1.0`.
 You can also append products after creating the client with `axiom.appendAxiomClient('my-integration/1.0')`.
 
 ## Requirements

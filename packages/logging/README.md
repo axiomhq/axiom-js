@@ -21,7 +21,7 @@ export const logger = new Logger({
 logger.info('Hello World!');
 ```
 
-`AxiomJSTransport` appends logging package usage to the Axiom client's `Axiom-Client` header. With the example above, requests use an `Axiom-Client` header like `axiom-js/<version> axiom-logging/<version> my-app/1.0`.
+`AxiomJSTransport` appends logging package usage to the Axiom client's `X-Axiom-Client` header. With the example above, requests use an `X-Axiom-Client` header like `axiom-js/<version> axiom-logging/<version> my-app/1.0`.
 
 ## Requirements
 

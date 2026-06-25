@@ -9,11 +9,11 @@ describe('identifier', () => {
     expect(frameworkIdentifier.version.length).toBeGreaterThan(0);
   });
 
-  it('exposes the nextjs Axiom-Client product', () => {
+  it('exposes the nextjs X-Axiom-Client product', () => {
     expect(axiomClient).toBe(`axiom-nextjs/${frameworkIdentifier.version}`);
   });
 
-  it('appends the nextjs Axiom-Client product to supported loggers', () => {
+  it('appends the nextjs X-Axiom-Client product to supported loggers', () => {
     const logger = {
       appendAxiomClient: vi.fn(),
     } as unknown as Logger;

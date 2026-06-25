@@ -82,7 +82,7 @@ export const startLogger = new Logger({
 });
 ```
 
-TanStack Start helpers that receive a logger append `axiom-tanstack-start/<version>` to supported logging transports' `Axiom-Client` header.
+TanStack Start helpers that receive a logger append `axiom-tanstack-start/<version>` to supported logging transports' `X-Axiom-Client` header.
 
 ## Shared Start Middleware
 

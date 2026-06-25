@@ -19,7 +19,7 @@ export const logger = new Logger({
 export const withAxiom = createAxiomRouteHandler(logger);
 ```
 
-Next.js helpers that receive a logger append `axiom-nextjs/<version>` to supported logging transports' `Axiom-Client` header.
+Next.js helpers that receive a logger append `axiom-nextjs/<version>` to supported logging transports' `X-Axiom-Client` header.
 
 ```ts
 // api/route.ts

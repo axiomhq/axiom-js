@@ -14,11 +14,11 @@ describe('identifier', () => {
     expect(frameworkIdentifier.version.length).toBeGreaterThan(0);
   });
 
-  it('exposes the tanstack Axiom-Client product', () => {
+  it('exposes the tanstack X-Axiom-Client product', () => {
     expect(axiomClient).toBe(`axiom-tanstack-start/${frameworkIdentifier.version}`);
   });
 
-  it('appends the tanstack Axiom-Client product to supported loggers', () => {
+  it('appends the tanstack X-Axiom-Client product to supported loggers', () => {
     const logger = {
       appendAxiomClient: vi.fn(),
     } as unknown as Logger;

@@ -2,7 +2,7 @@ import { FetchClient } from './fetchClient.js';
 
 const Version = 'AXIOM_VERSION';
 const AxiomURL = 'https://api.axiom.co';
-const AxiomClientHeader = 'Axiom-Client';
+const AxiomClientHeader = 'X-Axiom-Client';
 
 /**
  * ClientOptions is used to configure the HTTPClient and provide the necessary
@@ -75,7 +75,7 @@ export interface ClientOptions {
    */
   edgeUrl?: string;
   /**
-   * Additional product tokens to append to the Axiom-Client header.
+   * Additional product tokens to append to the X-Axiom-Client header.
    * Use product/version tokens separated by spaces.
    *
    * @example "axiom-react/1.2.3 my-app/4.5.6"
