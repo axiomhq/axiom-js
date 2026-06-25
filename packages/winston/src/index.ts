@@ -1,6 +1,10 @@
 import Transport, { TransportStreamOptions } from 'winston-transport';
 
 import { AxiomWithoutBatching } from '@axiomhq/js';
+import type { ClientOptions } from '@axiomhq/js';
+
+const Version = 'AXIOM_VERSION';
+const AxiomClient = `axiom-winston/${Version}`;
 
 export interface WinstonOptions extends TransportStreamOptions {
   dataset?: string;
@@ -22,6 +26,13 @@ export interface WinstonOptions extends TransportStreamOptions {
    * @example "https://eu-central-1.aws.edge.axiom.co"
    */
   edgeUrl?: string;
+  /**
+   * Additional product tokens to append to the X-Axiom-Client header.
+   * Use product/version tokens separated by spaces.
+   *
+   * @example "axiom-react/1.2.3 my-app/4.5.6"
+   */
+  axiomClient?: string;
   onError?: (err: Error) => void;
 }
 
@@ -34,14 +45,16 @@ export class WinstonTransport extends Transport {
 
   constructor(opts: WinstonOptions) {
     super(opts);
-    this.client = new AxiomWithoutBatching({
+    const clientOptions: ClientOptions = {
       token: opts.token,
       orgId: opts.orgId,
       url: opts.url,
       edge: opts.edge,
       edgeUrl: opts.edgeUrl,
+      axiomClient: appendAxiomClient(AxiomClient, opts.axiomClient),
       onError: opts.onError,
-    });
+    };
+    this.client = new AxiomWithoutBatching(clientOptions);
     this.dataset = opts?.dataset || process.env.AXIOM_DATASET || '';
   }
 
@@ -89,4 +102,13 @@ export class WinstonTransport extends Transport {
       .then((_res: any) => callback(null))
       .catch(callback);
   }
+}
+
+function appendAxiomClient(baseAxiomClient: string, axiomClient?: string): string {
+  const trimmedAxiomClient = axiomClient?.trim();
+  if (!trimmedAxiomClient) {
+    return baseAxiomClient;
+  }
+
+  return `${baseAxiomClient} ${trimmedAxiomClient}`;
 }

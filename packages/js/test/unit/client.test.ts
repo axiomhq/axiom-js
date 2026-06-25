@@ -198,6 +198,43 @@ describe('Axiom', () => {
     expect(axiom.users).toBeTruthy();
   });
 
+  it('appends custom products to the X-Axiom-Client header', async () => {
+    const client = new AxiomWithoutBatching({ url: clientURL, token: '', axiomClient: 'my-app/1.0' });
+
+    testMockedFetchCall((_: string, init: RequestInit) => {
+      const headers = new Headers(init.headers);
+      expect(headers.get('X-Axiom-Client')).toEqual('axiom-js/AXIOM_VERSION my-app/1.0');
+      expect(headers.get('User-Agent')).toBeNull();
+    }, []);
+
+    await client.datasets.list();
+  });
+
+  it('does not append an empty custom X-Axiom-Client product', async () => {
+    const client = new AxiomWithoutBatching({ url: clientURL, token: '', axiomClient: '   ' });
+
+    testMockedFetchCall((_: string, init: RequestInit) => {
+      const headers = new Headers(init.headers);
+      expect(headers.get('X-Axiom-Client')).toEqual('axiom-js/AXIOM_VERSION');
+    }, []);
+
+    await client.datasets.list();
+  });
+
+  it('appends X-Axiom-Client products after client construction', async () => {
+    const client = new AxiomWithoutBatching({ url: clientURL, token: '' });
+
+    client.appendAxiomClient('axiom-logging/1.0 axiom-react/1.0');
+    client.appendAxiomClient('axiom-react/1.0');
+
+    testMockedFetchCall((_: string, init: RequestInit) => {
+      const headers = new Headers(init.headers);
+      expect(headers.get('X-Axiom-Client')).toEqual('axiom-js/AXIOM_VERSION axiom-logging/1.0 axiom-react/1.0');
+    }, []);
+
+    await client.datasets.list();
+  });
+
   it('Retries failed 5xx requests', async () => {
     // TODO: this doesn't actually check that retries happened, fix
     mockFetchResponse({ message: 'Internal Server Error' }, 500);

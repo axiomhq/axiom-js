@@ -1,5 +1,6 @@
 import type { Logger } from '@axiomhq/logging';
 import { reportClientError, type ClientErrorCaptureConfig } from './client';
+import { appendTanStackStartAxiomClient } from './identifier';
 
 const SOLID_ERROR_SOURCE = 'tanstack-start-solid-error-boundary';
 
@@ -11,6 +12,7 @@ export const createAxiomSolidErrorHandler = (
   logger: Logger,
   config: SolidErrorCaptureConfig = {},
 ) => {
+  appendTanStackStartAxiomClient(logger);
   const { source = SOLID_ERROR_SOURCE, ...rest } = config;
 
   return (error: unknown, _reset?: () => void) => {

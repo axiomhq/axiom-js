@@ -1,5 +1,5 @@
 import { describe, beforeEach, it, expect, vi } from 'vitest';
-import { AxiomJSTransport } from '../../../src/transports/axiom-js';
+import { AxiomJSTransport, axiomClient } from '../../../src/transports/axiom-js';
 import { createLogEvent } from '../../lib/mock';
 import { Axiom, AxiomWithoutBatching } from '@axiomhq/js';
 import { LogLevel } from 'src/logger';
@@ -13,10 +13,12 @@ describe('AxiomJSTransport', () => {
   beforeEach(() => {
     mockAxiomWithoutBatching = Object.create(AxiomWithoutBatching.prototype, {
       ingest: { value: vi.fn() },
+      appendAxiomClient: { value: vi.fn() },
     });
     mockAxiom = Object.create(Axiom.prototype, {
       ingest: { value: vi.fn() },
       flush: { value: vi.fn().mockResolvedValue(undefined) },
+      appendAxiomClient: { value: vi.fn() },
     });
   });
 
@@ -41,6 +43,28 @@ describe('AxiomJSTransport', () => {
         await transport.flush();
 
         expect(mockAxiom.flush).toHaveBeenCalledTimes(1);
+      });
+    });
+
+    describe('appendAxiomClient', () => {
+      it('should append logging X-Axiom-Client product when created', () => {
+        expect((mockAxiom as any).appendAxiomClient).toHaveBeenCalledWith(axiomClient);
+      });
+
+      it('should append custom X-Axiom-Client products after logging product', () => {
+        transport = new AxiomJSTransport({
+          axiom: mockAxiom,
+          dataset: DATASET,
+          axiomClient: 'axiom-react/0.0.0',
+        });
+
+        expect((mockAxiom as any).appendAxiomClient).toHaveBeenLastCalledWith(`${axiomClient} axiom-react/0.0.0`);
+      });
+
+      it('should append X-Axiom-Client products through the transport method', () => {
+        transport.appendAxiomClient?.('my-app/1.0');
+
+        expect((mockAxiom as any).appendAxiomClient).toHaveBeenCalledWith('my-app/1.0');
       });
     });
   });

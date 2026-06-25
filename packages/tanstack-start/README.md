@@ -82,6 +82,8 @@ export const startLogger = new Logger({
 });
 ```
 
+TanStack Start helpers that receive a logger append `axiom-tanstack-start/<version>` to supported logging transports' `X-Axiom-Client` header.
+
 ## Shared Start Middleware
 
 The Start middleware APIs are framework-neutral because they build on TanStack Start core contracts.

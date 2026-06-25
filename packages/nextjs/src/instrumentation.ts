@@ -1,5 +1,6 @@
 import { EVENT, Logger } from '@axiomhq/logging';
 import { Instrumentation } from 'next';
+import { appendNextJsAxiomClient } from './identifier';
 
 export const transformOnRequestError = (
   ...args: Parameters<Instrumentation.onRequestError>
@@ -36,8 +37,11 @@ export const transformOnRequestError = (
 };
 
 export const createOnRequestError =
-  (logger: Logger): Instrumentation.onRequestError =>
-  async (...args) => {
-    logger.error(...transformOnRequestError(...args));
-    await logger.flush();
+  (logger: Logger): Instrumentation.onRequestError => {
+    appendNextJsAxiomClient(logger);
+
+    return async (...args) => {
+      logger.error(...transformOnRequestError(...args));
+      await logger.flush();
+    };
   };

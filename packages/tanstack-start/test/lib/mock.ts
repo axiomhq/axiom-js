@@ -9,5 +9,6 @@ export const mockLogger = {
   info: vi.fn(),
   warn: vi.fn(),
   with: vi.fn(),
+  appendAxiomClient: vi.fn(),
   flush: vi.fn(),
 } as unknown as Logger;

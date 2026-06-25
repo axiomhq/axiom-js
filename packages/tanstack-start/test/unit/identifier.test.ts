@@ -1,11 +1,31 @@
-import { describe, expect, it } from 'vitest';
-import { frameworkIdentifier, frameworkIdentifierFormatter } from '../../src/identifier';
+import { describe, expect, it, vi } from 'vitest';
+import {
+  appendTanStackStartAxiomClient,
+  axiomClient,
+  frameworkIdentifier,
+  frameworkIdentifierFormatter,
+} from '../../src/identifier';
+import type { Logger } from '@axiomhq/logging';
 
 describe('identifier', () => {
   it('exposes the tanstack framework identifier', () => {
     expect(frameworkIdentifier.name).toBe('tanstack-start-axiom-version');
     expect(typeof frameworkIdentifier.version).toBe('string');
     expect(frameworkIdentifier.version.length).toBeGreaterThan(0);
+  });
+
+  it('exposes the tanstack X-Axiom-Client product', () => {
+    expect(axiomClient).toBe(`axiom-tanstack-start/${frameworkIdentifier.version}`);
+  });
+
+  it('appends the tanstack X-Axiom-Client product to supported loggers', () => {
+    const logger = {
+      appendAxiomClient: vi.fn(),
+    } as unknown as Logger;
+
+    appendTanStackStartAxiomClient(logger);
+
+    expect((logger as any).appendAxiomClient).toHaveBeenCalledWith(axiomClient);
   });
 
   it('adds framework identifier without dropping existing app metadata', () => {

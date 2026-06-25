@@ -1,4 +1,5 @@
 import typescript from '@rollup/plugin-typescript';
+import replace from '@rollup/plugin-replace';
 
 export default [
   {
@@ -10,6 +11,12 @@ export default [
       sourcemap: true,
       preserveModules: true,
     },
-    plugins: [typescript({ outDir: 'dist/esm', declarationDir: 'dist/esm/types' })],
+    plugins: [
+      typescript({ outDir: 'dist/esm', declarationDir: 'dist/esm/types' }),
+      replace({
+        preventAssignment: true,
+        AXIOM_VERSION: process.env.npm_package_version,
+      }),
+    ],
   },
 ];

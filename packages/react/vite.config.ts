@@ -2,7 +2,9 @@ import { defineConfig, mergeConfig } from 'vite';
 import { tanstackViteConfig } from '@tanstack/config/vite';
 
 const config = defineConfig({
-  // Framework plugins, vitest config, etc.
+  define: {
+    __PACKAGE_VERSION__: JSON.stringify(process.env.npm_package_version),
+  },
 });
 
 export default mergeConfig(

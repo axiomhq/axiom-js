@@ -5,6 +5,7 @@ import { getAccessFallbackHTTPStatus, isHTTPAccessFallbackError } from 'src/lib/
 import { getRedirectStatus, isRedirectError } from 'src/lib/next-redirect-errors';
 import { NextRequest, NextResponse } from 'next/server';
 import { isEdgeRuntime } from 'src/lib/runtime';
+import { appendNextJsAxiomClient } from './identifier';
 
 /**
  * If we don't use a constant + access via bracket notation, webpack will throw an error when after is not exported
@@ -173,6 +174,7 @@ export const createAxiomRouteHandler = <TRequestCreateRouteHandler = NextRequest
     onError?: (data: ErrorData) => void;
   },
 ) => {
+  appendNextJsAxiomClient(logger);
   const { store: argStore, onSuccess, onError } = config ?? {};
   const withAxiom = <TRequestRouteHandler = TRequestCreateRouteHandler>(handler: NextHandler<TRequestRouteHandler>) => {
     return async <C extends any = any>(

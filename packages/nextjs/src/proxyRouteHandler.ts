@@ -1,6 +1,9 @@
 import { LogEvent, Logger } from '@axiomhq/logging';
+import { appendNextJsAxiomClient } from './identifier';
 
 export const createProxyRouteHandler = (logger: Logger) => {
+  appendNextJsAxiomClient(logger);
+
   return async <T extends Request>(req: T) => {
     try {
       const events = (await req.json()) as LogEvent[];

@@ -1,5 +1,9 @@
 import build from 'pino-abstract-transport';
-import { Axiom, ClientOptions } from '@axiomhq/js';
+import { Axiom } from '@axiomhq/js';
+import type { ClientOptions } from '@axiomhq/js';
+
+const Version = 'AXIOM_VERSION';
+const AxiomClient = `axiom-pino/${Version}`;
 
 export enum AxiomEventLevel {
   Trace = 'trace',
@@ -13,10 +17,21 @@ export enum AxiomEventLevel {
 
 export interface Options extends ClientOptions {
   dataset: string;
+  /**
+   * Additional product tokens to append to the X-Axiom-Client header.
+   * Use product/version tokens separated by spaces.
+   *
+   * @example "axiom-react/1.2.3 my-app/4.5.6"
+   */
+  axiomClient?: string;
 }
 
 export default async function axiomTransport(options: Options) {
-  const axiom = new Axiom(options);
+  const clientOptions: ClientOptions = {
+    ...options,
+    axiomClient: appendAxiomClient(AxiomClient, options.axiomClient),
+  };
+  const axiom = new Axiom(clientOptions);
 
   const dataset = options.dataset;
 
@@ -65,3 +80,12 @@ export const mapLogLevel = (level: string | number) => {
 
   return AxiomEventLevel.Silent;
 };
+
+function appendAxiomClient(baseAxiomClient: string, axiomClient?: string): string {
+  const trimmedAxiomClient = axiomClient?.trim();
+  if (!trimmedAxiomClient) {
+    return baseAxiomClient;
+  }
+
+  return `${baseAxiomClient} ${trimmedAxiomClient}`;
+}

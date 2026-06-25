@@ -39,6 +39,18 @@ class BaseClient extends HTTPClient {
     }
   }
 
+  // Services create their own HTTPClient instances, so appending after construction
+  // must update the base client and each mounted service client.
+  appendAxiomClient = (axiomClient: string) => {
+    super.appendAxiomClient(axiomClient);
+    this.annotations.appendAxiomClient(axiomClient);
+    this.dashboards.appendAxiomClient(axiomClient);
+    this.datasets.appendAxiomClient(axiomClient);
+    this.monitors.appendAxiomClient(axiomClient);
+    this.savedQueries.appendAxiomClient(axiomClient);
+    this.users.appendAxiomClient(axiomClient);
+  };
+
   /**
    * Ingest events into the provided dataset using raw data types, e.g: string, buffer or a stream.
    *
