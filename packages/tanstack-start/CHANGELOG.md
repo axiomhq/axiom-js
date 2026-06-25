@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.0](https://github.com/axiomhq/axiom-js/compare/tanstack-start-0.1.0...tanstack-start-0.2.0) (2026-06-25)
+
+
+### Features
+
+* added X-Axiom-Client attribution header ([#469](https://github.com/axiomhq/axiom-js/issues/469)) ([5626690](https://github.com/axiomhq/axiom-js/commit/562669077dfc28ca1ee292a5dcdcfcbf21123917))
+
 ## [0.1.0](https://github.com/axiomhq/axiom-js/compare/tanstack-start-0.0.1...tanstack-start-0.1.0) (2026-05-12)
 
 
