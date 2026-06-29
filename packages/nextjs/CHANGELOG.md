@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.0](https://github.com/axiomhq/axiom-js/compare/nextjs-0.2.2...nextjs-0.3.0) (2026-06-25)
+
+
+### Features
+
+* added X-Axiom-Client attribution header ([#469](https://github.com/axiomhq/axiom-js/issues/469)) ([5626690](https://github.com/axiomhq/axiom-js/commit/562669077dfc28ca1ee292a5dcdcfcbf21123917))
+
 ## [0.2.2](https://github.com/axiomhq/axiom-js/compare/nextjs-0.2.1...nextjs-0.2.2) (2026-05-12)
 
 

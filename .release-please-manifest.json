@@ -1,9 +1,9 @@
 {
-  "packages/js": "1.7.0",
-  "packages/pino": "1.7.0",
-  "packages/winston": "1.7.0",
-  "packages/logging": "0.2.2",
-  "packages/react": "0.2.2",
-  "packages/nextjs": "0.2.2",
-  "packages/tanstack-start": "0.1.0"
+  "packages/js": "1.8.0",
+  "packages/pino": "1.8.0",
+  "packages/winston": "1.8.0",
+  "packages/logging": "0.3.0",
+  "packages/react": "0.3.0",
+  "packages/nextjs": "0.3.0",
+  "packages/tanstack-start": "0.2.0"
 }
