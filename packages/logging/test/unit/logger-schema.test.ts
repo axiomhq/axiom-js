@@ -311,6 +311,37 @@ describe('Logger schema validation', () => {
       typedLogger.info('user action', { userId: 123 });
     });
 
+    it('should follow Zod unknown-key policies for child context', () => {
+      const strictLogger = new Logger({
+        transports: [mockTransport],
+        schema: z.object({ userId: z.string() }).strict(),
+      });
+      const passthroughLogger = new Logger({
+        transports: [mockTransport],
+        schema: z.object({ userId: z.string() }).passthrough(),
+      });
+      const catchallLogger = new Logger({
+        transports: [mockTransport],
+        schema: z.object({ userId: z.string() }).catchall(z.string()),
+      });
+
+      // @ts-expect-error strict schemas reject undeclared context fields
+      strictLogger.with({ requestId: 'req-1' });
+
+      const passthroughChild = passthroughLogger.with({ requestId: 'req-1' });
+      passthroughChild.info('user action', { userId: 'user-1' });
+
+      const catchallChild = catchallLogger.with({ requestId: 'req-1' });
+      catchallChild.info('user action', { userId: 'user-1' });
+
+      expect(mockTransport.logs).toHaveLength(2);
+      expect(mockTransport.logs[0].fields).toEqual({ requestId: 'req-1', userId: 'user-1' });
+      expect(mockTransport.logs[1].fields).toEqual({ requestId: 'req-1', userId: 'user-1' });
+
+      // @ts-expect-error catchall context must match the catchall schema
+      catchallLogger.with({ requestId: 123 });
+    });
+
     it('should track fields added through logger context', () => {
       const schema = createSchema<{ requestId: string; userId: string; attempt?: number }>((value) => ({
         value: value as { requestId: string; userId: string; attempt?: number },
