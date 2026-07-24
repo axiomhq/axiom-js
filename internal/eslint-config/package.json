@@ -13,7 +13,7 @@
     "@next/eslint-plugin-next": "^15.5.18",
     "eslint": "^9.39.1",
     "eslint-config-prettier": "^9.1.0",
-    "eslint-plugin-react": "^7.37.2",
+    "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^5.0.0",
     "eslint-plugin-tsdoc": "^0.4.0",
     "eslint-plugin-turbo": "^2.10.6",
