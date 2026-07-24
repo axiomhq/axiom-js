@@ -1,5 +1,7 @@
 import { Axiom } from '@axiomhq/js';
 
+export const dynamic = 'force-dynamic';
+
 export default async function Home() {
   const axiom = new Axiom({
     token: process.env.NEXT_PUBLIC_AXIOM_TOKEN,
@@ -7,7 +9,7 @@ export default async function Home() {
     orgId: process.env.NEXT_PUBLIC_AXIOM_ORG_ID,
   });
 
-  axiom.ingest('axiom-js-e2e-test', [
+  axiom.ingest(`axiom-js-e2e-test-${process.env.AXIOM_DATASET_SUFFIX || 'local'}`, [
     {
       name: 'test',
       request: {

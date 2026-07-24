@@ -1,25 +1,40 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { WinstonTransport } from '../../src';
 
+const axiomMock = vi.hoisted(() => ({
+  options: [] as any[],
+}));
+
+vi.mock('@axiomhq/js', () => ({
+  AxiomWithoutBatching: class {
+    constructor(options: any) {
+      axiomMock.options.push(options);
+    }
+  },
+}));
+
 describe('winston transport tests', () => {
+  beforeEach(() => {
+    axiomMock.options = [];
+  });
+
   it('creates a truthy instance', () => {
     const t = new WinstonTransport({ token: process.env.AXIOM_TOKEN || '' });
     expect(t).toBeTruthy();
     expect(t).toBeDefined();
   });
 
-  it('uses a custom fetch implementation', async () => {
-    const customFetch = vi.fn<typeof fetch>(async () => {
-      return new Response(JSON.stringify({ ingested: 1, failed: 0 }));
-    });
-    const transport = new WinstonTransport({
-      token: 'test-token',
-      dataset: 'test-dataset',
-      fetch: customFetch,
-    });
+  it('appends winston and custom X-Axiom-Client products', () => {
+    new WinstonTransport({ token: process.env.AXIOM_TOKEN || '', axiomClient: 'my-app/1.0' });
 
-    await transport.client.ingest('test-dataset', { message: 'test' });
+    expect(axiomMock.options[0].axiomClient).toEqual('axiom-winston/AXIOM_VERSION my-app/1.0');
+  });
 
-    expect(customFetch).toHaveBeenCalledOnce();
+  it('forwards a custom fetch implementation', () => {
+    const customFetch = vi.fn<typeof fetch>();
+
+    new WinstonTransport({ token: 'test-token', fetch: customFetch });
+
+    expect(axiomMock.options[0].fetch).toBe(customFetch);
   });
 });

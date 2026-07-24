@@ -1,5 +1,6 @@
 import { describe, expect, it, beforeAll, afterAll } from 'vitest';
 import { datasets } from '@axiomhq/js';
+import { createTestDataset, cleanupDatasetIfExists } from './testHelpers';
 
 const datasetSuffix = process.env.AXIOM_DATASET_SUFFIX || 'local';
 
@@ -12,15 +13,15 @@ describe('DatasetsService', () => {
   });
 
   beforeAll(async () => {
-    await client.create({
+    await createTestDataset(client, {
       name: datasetName,
       description: 'This is a test dataset for datasets integration tests.',
     });
   });
 
   afterAll(async () => {
-    const resp = await client.delete(datasetName);
-    expect(resp.status).toEqual(204);
+    const resp = await cleanupDatasetIfExists(client, datasetName);
+    if (resp) expect(resp.status).toEqual(204);
   });
 
   describe('update', () => {

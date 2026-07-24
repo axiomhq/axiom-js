@@ -1,4 +1,5 @@
 import typescript from '@rollup/plugin-typescript';
+import replace from '@rollup/plugin-replace';
 
 export default [
   {
@@ -11,6 +12,12 @@ export default [
       preserveModules: true,
       entryFileNames: '[name].cjs',
     },
-    plugins: [typescript({ outDir: 'dist/cjs', declarationDir: 'dist/cjs/types' })],
+    plugins: [
+      typescript({ outDir: 'dist/cjs', declarationDir: 'dist/cjs/types' }),
+      replace({
+        preventAssignment: true,
+        AXIOM_VERSION: process.env.npm_package_version,
+      }),
+    ],
   },
 ];

@@ -5,6 +5,38 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.8.0](https://github.com/axiomhq/axiom-js/compare/js-1.7.0...js-1.8.0) (2026-06-25)
+
+
+### Features
+
+* added X-Axiom-Client attribution header ([#469](https://github.com/axiomhq/axiom-js/issues/469)) ([5626690](https://github.com/axiomhq/axiom-js/commit/562669077dfc28ca1ee292a5dcdcfcbf21123917))
+
+## [1.7.0](https://github.com/axiomhq/axiom-js/compare/js-1.6.1...js-1.7.0) (2026-06-09)
+
+
+### Features
+
+* **dashboards:** read only operations ([#457](https://github.com/axiomhq/axiom-js/issues/457)) ([83ec382](https://github.com/axiomhq/axiom-js/commit/83ec3820f493383f3c26b143c77d4408ba961b89))
+* **datasets:** migrate to datasets v2 + add metrics support ([#455](https://github.com/axiomhq/axiom-js/issues/455)) ([0688f37](https://github.com/axiomhq/axiom-js/commit/0688f375a49f380dad05640572d0c61e294d5e4b))
+* **query:** add mpl support ([#453](https://github.com/axiomhq/axiom-js/issues/453)) ([c3938af](https://github.com/axiomhq/axiom-js/commit/c3938afc9df072f6d985fb9205ce3bdbb06138b4))
+* **saved queries:** read only operations ([#456](https://github.com/axiomhq/axiom-js/issues/456)) ([3adf678](https://github.com/axiomhq/axiom-js/commit/3adf6783b342c58d2c1b8bf77cc1ab98cc980071))
+* **users:** read only operations ([#458](https://github.com/axiomhq/axiom-js/issues/458)) ([64f7d62](https://github.com/axiomhq/axiom-js/commit/64f7d62c900287c1d4dbf292ad2a50f8756786ea))
+
+## [1.6.1](https://github.com/axiomhq/axiom-js/compare/js-1.6.0...js-1.6.1) (2026-05-06)
+
+
+### Bug Fixes
+
+* **js:** overall batching logic ([#419](https://github.com/axiomhq/axiom-js/issues/419)) ([a2b3f17](https://github.com/axiomhq/axiom-js/commit/a2b3f172f12494706f4ecfff476e23db0b6be069))
+
+## [1.6.0](https://github.com/axiomhq/axiom-js/compare/js-1.5.0...js-1.6.0) (2026-03-30)
+
+
+### Features
+
+* **js:** gzip-compress default ingest payloads ([#413](https://github.com/axiomhq/axiom-js/issues/413)) ([3e76027](https://github.com/axiomhq/axiom-js/commit/3e7602781742b2fd8374701e90180e8d585068f2))
+
 ## [1.5.0](https://github.com/axiomhq/axiom-js/compare/js-1.4.0...js-1.5.0) (2026-03-20)
 
 

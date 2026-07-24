@@ -1,18 +1,38 @@
 import { Axiom, AxiomWithoutBatching } from '@axiomhq/js';
 import { LogLevel, LogLevelValue } from '../logger';
+import { Version } from '../runtime';
 import { Transport } from './transport';
 
 interface AxiomJSTransportConfig {
   axiom: Axiom | AxiomWithoutBatching;
   dataset: string;
   logLevel?: LogLevel;
+  /**
+   * Additional product tokens to append to the X-Axiom-Client header.
+   * Use product/version tokens separated by spaces.
+   *
+   * @example "axiom-react/1.2.3 my-app/4.5.6"
+   */
+  axiomClient?: string;
 }
+
+type AxiomClientClient = {
+  appendAxiomClient?: (axiomClient: string) => void;
+};
+
+export const axiomClient = `axiom-logging/${Version ?? 'unknown'}`;
+
 export class AxiomJSTransport implements Transport {
   private config: AxiomJSTransportConfig;
   private promises: Promise<any>[] = [];
 
   constructor(config: AxiomJSTransportConfig) {
     this.config = config;
+    this.appendAxiomClient(config.axiomClient ? `${axiomClient} ${config.axiomClient}` : axiomClient);
+  }
+
+  appendAxiomClient(axiomClient: string) {
+    (this.config.axiom as AxiomClientClient).appendAxiomClient?.(axiomClient);
   }
 
   log(logs: any[]) {

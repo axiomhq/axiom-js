@@ -1,29 +1,51 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import axiomTransport from '../../src';
 
+const axiomMock = vi.hoisted(() => ({
+  options: [] as any[],
+}));
+
+vi.mock('@axiomhq/js', () => ({
+  Axiom: class {
+    constructor(options: any) {
+      axiomMock.options.push(options);
+    }
+
+    ingest = vi.fn();
+    flush = vi.fn();
+  },
+}));
+
 describe('pino transport tests', () => {
-  it('creates a truthy instance', () => {
-    const t = axiomTransport({ token: process.env.AXIOM_TOKEN || '', dataset: process.env.AXIOM_DATASET || '' });
+  beforeEach(() => {
+    axiomMock.options = [];
+  });
+
+  it('creates a truthy instance', async () => {
+    const t = await axiomTransport({ token: process.env.AXIOM_TOKEN || '', dataset: process.env.AXIOM_DATASET || '' });
     expect(t).toBeTruthy();
     expect(t).toBeDefined();
   });
 
-  it('uses a custom fetch implementation', async () => {
-    const customFetch = vi.fn<typeof fetch>(async () => {
-      return new Response(JSON.stringify({ ingested: 1, failed: 0 }));
+  it('appends pino and custom X-Axiom-Client products', async () => {
+    await axiomTransport({
+      token: process.env.AXIOM_TOKEN || '',
+      dataset: process.env.AXIOM_DATASET || '',
+      axiomClient: 'my-app/1.0',
     });
-    const transport = await axiomTransport({
+
+    expect(axiomMock.options[0].axiomClient).toEqual('axiom-pino/AXIOM_VERSION my-app/1.0');
+  });
+
+  it('forwards a custom fetch implementation', async () => {
+    const customFetch = vi.fn<typeof fetch>();
+
+    await axiomTransport({
       token: 'test-token',
       dataset: 'test-dataset',
       fetch: customFetch,
     });
 
-    transport.end(`${JSON.stringify({ time: Date.now(), level: 30, message: 'test' })}\n`);
-    await new Promise<void>((resolve, reject) => {
-      transport.on('close', resolve);
-      transport.on('error', reject);
-    });
-
-    expect(customFetch).toHaveBeenCalledOnce();
+    expect(axiomMock.options[0].fetch).toBe(customFetch);
   });
 });

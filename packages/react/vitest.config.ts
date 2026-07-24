@@ -3,6 +3,9 @@ import react from '@vitejs/plugin-react';
 
 export default defineConfig({
   plugins: [react()],
+  define: {
+    __PACKAGE_VERSION__: JSON.stringify(process.env.npm_package_version),
+  },
   test: {
     globals: true,
     environment: 'happy-dom',

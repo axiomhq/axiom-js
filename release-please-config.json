@@ -41,6 +41,11 @@
       "release-type": "node",
       "versioning-strategy": "always-bump-patch",
       "include-v-in-tag": false
+    },
+    "packages/tanstack-start": {
+      "release-type": "node",
+      "include-v-in-tag": false,
+      "initial-version": "0.0.1"
     }
   }
 }

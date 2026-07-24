@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { InstrumentationOnRequestError } from 'next/dist/server/instrumentation/types';
 import { mockLogger } from '../lib/mock';
 import { EVENT } from '@axiomhq/logging';
+import { axiomClient } from '../../src/identifier';
 
 describe('instrumentation', () => {
   const mockRequest: Parameters<InstrumentationOnRequestError>[1] = {
@@ -61,6 +62,8 @@ describe('instrumentation', () => {
   describe('createOnRequestError', () => {
     it('should create handler that logs errors and flushes', async () => {
       const handler = createOnRequestError(mockLogger);
+      expect(mockLogger.appendAxiomClient).toHaveBeenCalledWith(axiomClient);
+
       const testError = new Error('Test error');
 
       await handler(testError, mockRequest, mockContext);

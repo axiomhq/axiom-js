@@ -14,6 +14,7 @@ const logger = winston.createLogger({
         new AxiomTransport({
             dataset: 'my-dataset',
             token: 'my-token',
+            axiomClient: 'my-app/1.0',
         }),
     ],
 });
@@ -23,6 +24,8 @@ logger.log({
     message: 'Logger successfully setup',
 });
 ```
+
+The transport sends an `X-Axiom-Client` header like `axiom-js/<version> axiom-winston/<version> my-app/1.0`.
 
 ## Requirements
 

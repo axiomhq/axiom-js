@@ -1,13 +1,23 @@
 import { Axiom } from '@axiomhq/js';
 import { describe, it, expect, beforeAll, afterAll, vi } from 'vitest';
 
+function isNotFoundError(error: unknown) {
+  return error instanceof Error && /not found/i.test(error.message);
+}
+
 describe('Ingestion & query on different runtime', () => {
   vi.useRealTimers()
 
   const axiom = new Axiom({ token: process.env.AXIOM_TOKEN || '', url: process.env.AXIOM_URL, orgId: process.env.AXIOM_ORG_ID });
-  const datasetName = 'axiom-js-e2e-test';
+  const datasetName = `axiom-js-e2e-test-${process.env.AXIOM_DATASET_SUFFIX || 'local'}`;
 
   beforeAll(async () => {
+    try {
+      await axiom.datasets.delete(datasetName);
+    } catch (error) {
+      if (!isNotFoundError(error)) throw error;
+    }
+
     const ds = await axiom.datasets.create({
       name: datasetName,
       description: 'This is a test dataset for datasets integration tests.',
@@ -16,15 +26,19 @@ describe('Ingestion & query on different runtime', () => {
   });
 
   afterAll(async () => {
-    const resp = await axiom.datasets.delete(datasetName);
-    expect(resp.status).toEqual(204);
-    console.log(`deleted testing dataset: ${datasetName}`);
+    try {
+      const resp = await axiom.datasets.delete(datasetName);
+      expect(resp.status).toEqual(204);
+      console.log(`deleted testing dataset: ${datasetName}`);
+    } catch (error) {
+      if (!isNotFoundError(error)) throw error;
+    }
   });
 
   it('ingest on a lambda function should succeed', async () => {
     const startTime = new Date(Date.now()).toISOString();
     // call route that ingests logs
-    const resp = await fetch(process.env.TESTING_TARGET_URL + '/api/lambda');
+    const resp = await fetch(`${process.env.TESTING_TARGET_URL}/api/lambda?dataset=${encodeURIComponent(datasetName)}`);
     expect(resp.status).toEqual(200);
     const payload = await resp.json();
     expect(payload.ingested).toEqual(2);
@@ -52,7 +66,7 @@ describe('Ingestion & query on different runtime', () => {
   it('ingest on a edge function should succeed', async () => {
     const startTime = new Date(Date.now()).toISOString();
     // call route that ingests logs
-    const resp = await fetch(process.env.TESTING_TARGET_URL + '/api/edge');
+    const resp = await fetch(`${process.env.TESTING_TARGET_URL}/api/edge?dataset=${encodeURIComponent(datasetName)}`);
     expect(resp.status).toEqual(200);
     const payload = await resp.json();
     expect(payload.ingested).toEqual(2);

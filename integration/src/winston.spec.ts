@@ -3,6 +3,7 @@ import winston from 'winston';
 
 import { Axiom } from '@axiomhq/js';
 import { WinstonTransport as AxiomTransport } from '@axiomhq/winston';
+import { createTestDataset, cleanupDatasetIfExists } from './testHelpers';
 
 const datasetSuffix = process.env.AXIOM_DATASET_SUFFIX || 'local';
 
@@ -28,15 +29,15 @@ describe('WinstonTransport', () => {
   });
 
   beforeAll(async () => {
-    await axiom.datasets.create({
+    await createTestDataset(axiom.datasets, {
       name: datasetName,
       description: 'This is a test dataset for datasets integration tests.',
     });
   });
 
   afterAll(async () => {
-    const resp = await axiom.datasets.delete(datasetName);
-    expect(resp.status).toEqual(204);
+    const resp = await cleanupDatasetIfExists(axiom.datasets, datasetName);
+    if (resp) expect(resp.status).toEqual(204);
   });
 
   it('sends logs to Axiom', async () => {

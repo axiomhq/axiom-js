@@ -9,13 +9,19 @@ import { Logger, ConsoleTransport, AxiomJSTransport } from '@axiomhq/logging';
 
 export const logger = new Logger({
   transports: [
-    new AxiomJSTransport({ axiom: axiomClient, dataset: process.env.AXIOM_DATASET! }),
+    new AxiomJSTransport({
+      axiom: axiomClient,
+      dataset: process.env.AXIOM_DATASET!,
+      axiomClient: 'my-app/1.0',
+    }),
     new ConsoleTransport({ prettyPrint: true }),
   ],
 });
 
 logger.info('Hello World!');
 ```
+
+`AxiomJSTransport` appends logging package usage to the Axiom client's `X-Axiom-Client` header. With the example above, requests use an `X-Axiom-Client` header like `axiom-js/<version> axiom-logging/<version> my-app/1.0`.
 
 ## Requirements
 

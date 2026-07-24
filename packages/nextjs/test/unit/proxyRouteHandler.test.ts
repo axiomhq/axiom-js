@@ -2,6 +2,7 @@ import { describe, it, expect, vi, afterAll } from 'vitest';
 import { createProxyRouteHandler } from '../../src/proxyRouteHandler';
 import { mockLogger } from '../lib/mock';
 import { NextRequest } from 'next/server';
+import { axiomClient } from '../../src/identifier';
 
 describe('createProxyRouteHandler', () => {
   afterAll(() => {
@@ -10,6 +11,8 @@ describe('createProxyRouteHandler', () => {
 
   it('should process log events successfully', async () => {
     const handler = createProxyRouteHandler(mockLogger);
+    expect(mockLogger.appendAxiomClient).toHaveBeenCalledWith(axiomClient);
+
     const mockEvents = [
       { level: 'info', message: 'test1' },
       { level: 'error', message: 'test2' },

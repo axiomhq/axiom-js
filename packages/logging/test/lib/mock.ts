@@ -13,6 +13,7 @@ export const createLogEvent = (
   '@app': {
     'axiom-logging-version': 'test',
   },
+  source: 'test',
 });
 
 export class MockTransport implements Transport {

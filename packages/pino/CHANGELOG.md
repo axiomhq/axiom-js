@@ -5,6 +5,34 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.8.0](https://github.com/axiomhq/axiom-js/compare/pino-1.7.0...pino-1.8.0) (2026-06-25)
+
+
+### Features
+
+* added X-Axiom-Client attribution header ([#469](https://github.com/axiomhq/axiom-js/issues/469)) ([5626690](https://github.com/axiomhq/axiom-js/commit/562669077dfc28ca1ee292a5dcdcfcbf21123917))
+
+## [1.7.0](https://github.com/axiomhq/axiom-js/compare/pino-1.6.1...pino-1.7.0) (2026-06-09)
+
+
+### Miscellaneous Chores
+
+* **pino:** Synchronize core versions
+
+## [1.6.1](https://github.com/axiomhq/axiom-js/compare/pino-1.6.0...pino-1.6.1) (2026-05-06)
+
+
+### Miscellaneous Chores
+
+* **pino:** Synchronize core versions
+
+## [1.6.0](https://github.com/axiomhq/axiom-js/compare/pino-1.5.0...pino-1.6.0) (2026-03-30)
+
+
+### Miscellaneous Chores
+
+* **pino:** Synchronize core versions
+
 ## [1.5.0](https://github.com/axiomhq/axiom-js/compare/pino-1.4.0...pino-1.5.0) (2026-03-20)
 
 

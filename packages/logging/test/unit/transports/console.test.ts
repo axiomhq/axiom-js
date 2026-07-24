@@ -1,11 +1,11 @@
-import { describe, beforeEach, afterEach, it, expect, vi, SpyInstance } from 'vitest';
+import { describe, beforeEach, afterEach, it, expect, vi } from 'vitest';
 import { ConsoleTransport } from '../../../src/transports/console';
 import * as shared from '../../../src/runtime';
 import { createLogEvent } from '../../lib/mock';
 import { LogLevel } from 'src/logger';
 
 describe('ConsoleTransport', () => {
-  let consoleSpy: SpyInstance;
+  let consoleSpy: ReturnType<typeof vi.spyOn>;
   let transport: ConsoleTransport;
 
   beforeEach(() => {

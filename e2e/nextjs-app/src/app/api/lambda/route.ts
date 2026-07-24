@@ -3,7 +3,8 @@ import { NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic'; // disable prerendering
 
-export async function GET() {
+export async function GET(request: Request) {
+  const dataset = new URL(request.url).searchParams.get('dataset') || 'axiom-js-e2e-test';
   const axiom = new AxiomWithoutBatching({
     token: process.env.AXIOM_TOKEN || '',
     orgId: process.env.AXIOM_ORG_ID,
@@ -11,7 +12,7 @@ export async function GET() {
   });
 
   try {
-    const resp = await axiom.ingest('axiom-js-e2e-test', [
+    const resp = await axiom.ingest(dataset, [
       { foo: 'bar', test: 'ingest_on_lambda', request: { path: '/api/lambda' } },
       { bar: 'baz', test: 'ingest_on_lambda', request: { path: '/api/lambda' } },
     ]);

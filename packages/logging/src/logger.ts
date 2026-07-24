@@ -91,6 +91,10 @@ export class Logger {
     this.config.transports.forEach((transport) => transport.log([log]));
   }
 
+  appendAxiomClient = (axiomClient: string) => {
+    this.config.transports.forEach((transport) => transport.appendAxiomClient?.(axiomClient));
+  };
+
   /**
    * Log a debug message
    * @param message The log message
