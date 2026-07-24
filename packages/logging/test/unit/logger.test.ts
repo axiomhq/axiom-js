@@ -429,6 +429,8 @@ describe('Logger', () => {
       typedLogger.info('user action', { userId: '123' });
       typedLogger.info('user action', { userId: '123', attempt: 1, [EVENT]: { traceId: 'abc' } });
 
+      // @ts-expect-error userId is required by the schema
+      typedLogger.info('user action');
       // @ts-expect-error userId must be a string
       typedLogger.info('user action', { userId: 123 });
       // @ts-expect-error unknown is not part of the schema input
@@ -437,7 +439,50 @@ describe('Logger', () => {
       const childLogger = typedLogger.with({ userId: '123' });
       childLogger.info('user action');
 
+      const consumeLogger = (_logger: Logger) => {};
+      consumeLogger(typedLogger);
+
       expectTypeOf(typedLogger.config.schema).toEqualTypeOf<typeof schema | undefined>();
+    });
+
+    it('should track fields added through logger context', () => {
+      const schema = createSchema<{ requestId: string; userId: string; attempt?: number }>((value) => ({
+        value: value as { requestId: string; userId: string; attempt?: number },
+      }));
+
+      const typedLogger = new Logger({
+        transports: [mockTransport],
+        schema,
+      });
+
+      const requestLogger = typedLogger.with({ requestId: 'req-1' });
+      requestLogger.info('user action', { userId: 'user-1' });
+
+      // @ts-expect-error userId is still required
+      requestLogger.info('user action');
+      // @ts-expect-error unknown is not part of the schema input
+      typedLogger.with({ unknown: true });
+
+      const userLogger = requestLogger.with({ userId: 'user-1' });
+      userLogger.info('user action');
+      userLogger.info('user action', { attempt: 1 });
+
+      const configuredLogger = new Logger({
+        transports: [mockTransport],
+        schema,
+        args: { requestId: 'req-1' },
+      });
+      configuredLogger.info('user action', { userId: 'user-1' });
+
+      // @ts-expect-error userId is not provided by the configured context
+      configuredLogger.info('user action');
+    });
+
+    it('should keep schema-less loggers permissive', () => {
+      const untypedLogger = new Logger({ transports: [mockTransport] });
+
+      untypedLogger.info('user action');
+      untypedLogger.info('user action', { arbitrary: true });
     });
   });
 
