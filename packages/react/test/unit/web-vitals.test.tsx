@@ -67,18 +67,150 @@ describe('Web Vitals', () => {
       const mockMetric = {
         name: 'CLS',
         value: 0.1,
+        rating: 'good',
+        delta: 0.1,
         id: 'test',
-      };
+        navigationType: 'navigate',
+        entries: [],
+      } satisfies Metric;
       const now = 1234567890;
       vi.spyOn(Date.prototype, 'getTime').mockReturnValue(now);
 
-      const result = transformWebVitalsMetric(mockMetric as Metric);
+      const result = transformWebVitalsMetric(mockMetric);
 
       expect(result).toEqual({
-        webVital: mockMetric,
+        webVital: {
+          ...mockMetric,
+          entries: [],
+        },
         _time: now,
         source: 'web-vital',
         path: '/test-path',
+      });
+    });
+
+    it('should normalize LCP entries without retaining DOM elements', () => {
+      const element: Record<string, unknown> = {
+        nodeName: 'IMG',
+        tagName: 'IMG',
+        id: 'hero',
+        className: 'hero-image',
+      };
+      element.reactFiber = { stateNode: element };
+      const metric = {
+        name: 'LCP',
+        value: 2400,
+        entries: [
+          {
+            name: '',
+            entryType: 'largest-contentful-paint',
+            startTime: 2400,
+            duration: 0,
+            renderTime: 2400,
+            loadTime: 2100,
+            size: 120000,
+            url: 'https://example.com/hero.jpg',
+            element,
+          },
+        ],
+      } as unknown as Metric;
+
+      const result = transformWebVitalsMetric(metric);
+
+      expect(result.webVital.entries).toEqual([
+        {
+          name: '',
+          entryType: 'largest-contentful-paint',
+          startTime: 2400,
+          duration: 0,
+          renderTime: 2400,
+          loadTime: 2100,
+          size: 120000,
+          url: 'https://example.com/hero.jpg',
+          element: {
+            nodeName: 'IMG',
+            tagName: 'IMG',
+            id: 'hero',
+            className: 'hero-image',
+          },
+        },
+      ]);
+      expect(() => JSON.stringify(result)).not.toThrow();
+    });
+
+    it('should normalize layout shift sources', () => {
+      const metric = {
+        name: 'CLS',
+        value: 0.1,
+        entries: [
+          {
+            name: '',
+            entryType: 'layout-shift',
+            startTime: 100,
+            duration: 0,
+            value: 0.1,
+            hadRecentInput: false,
+            sources: [
+              {
+                node: { nodeName: 'DIV', tagName: 'DIV', id: 'content' },
+                previousRect: { x: 0, y: 0, width: 100, height: 20 },
+                currentRect: { x: 0, y: 20, width: 100, height: 20 },
+              },
+            ],
+          },
+        ],
+      } as unknown as Metric;
+
+      const result = transformWebVitalsMetric(metric);
+
+      expect(result.webVital.entries[0]).toMatchObject({
+        entryType: 'layout-shift',
+        value: 0.1,
+        hadRecentInput: false,
+        sources: [
+          {
+            node: { nodeName: 'DIV', tagName: 'DIV', id: 'content' },
+            previousRect: { x: 0, y: 0, width: 100, height: 20 },
+            currentRect: { x: 0, y: 20, width: 100, height: 20 },
+          },
+        ],
+      });
+    });
+
+    it('should preserve navigation timing diagnostics', () => {
+      const metric = {
+        name: 'TTFB',
+        value: 350,
+        entries: [
+          {
+            name: 'https://example.com/',
+            entryType: 'navigation',
+            startTime: 0,
+            duration: 800,
+            fetchStart: 5,
+            domainLookupStart: 10,
+            domainLookupEnd: 20,
+            connectStart: 20,
+            secureConnectionStart: 25,
+            connectEnd: 40,
+            requestStart: 45,
+            responseStart: 350,
+            responseEnd: 500,
+            transferSize: 2048,
+            nextHopProtocol: 'h2',
+          },
+        ],
+      } as unknown as Metric;
+
+      const result = transformWebVitalsMetric(metric);
+
+      expect(result.webVital.entries[0]).toMatchObject({
+        entryType: 'navigation',
+        requestStart: 45,
+        responseStart: 350,
+        responseEnd: 500,
+        transferSize: 2048,
+        nextHopProtocol: 'h2',
       });
     });
   });
@@ -116,13 +248,17 @@ describe('Web Vitals', () => {
         name: 'CLS',
         value: 0.1,
         id: 'test',
+        entries: [],
       };
 
       const onCLSCallback = vi.mocked(webVitals.onCLS).mock.calls[0][0] as Function;
       onCLSCallback(mockMetric);
 
       expect(mockLogger.raw).toHaveBeenCalledWith({
-        webVital: mockMetric,
+        webVital: {
+          ...mockMetric,
+          entries: [],
+        },
         _time: now,
         source: 'web-vital',
         path: '/test-path',

@@ -1,6 +1,30 @@
 import fetchRetry from 'fetch-retry';
 import { parseLimitFromResponse, Limit, LimitType } from './limit.js';
 
+async function parseErrorMessage(resp: Response): Promise<string> {
+  const body = await resp.text().catch(() => '');
+  if (body.length === 0) {
+    return `Unknown ${resp.status} error`;
+  }
+
+  try {
+    const payload: unknown = JSON.parse(body);
+    if (
+      typeof payload === 'object' &&
+      payload !== null &&
+      'message' in payload &&
+      typeof payload.message === 'string' &&
+      payload.message.length > 0
+    ) {
+      return payload.message;
+    }
+  } catch {
+    // Non-JSON error responses are returned as plain text.
+  }
+
+  return body;
+}
+
 export class FetchClient {
   constructor(public config: { headers: HeadersInit; baseUrl: string; timeout: number; fetch?: typeof globalThis.fetch }) {}
 
@@ -43,8 +67,7 @@ export class FetchClient {
     } else if (resp.status === 401) {
       return Promise.reject(new Error('forbidden'));
     } else if (resp.status >= 400) {
-      const payload = (await resp.json()) as { message: string };
-      return Promise.reject(new Error(payload.message));
+      return Promise.reject(new Error(await parseErrorMessage(resp)));
     }
 
     return (await resp.json()) as T;

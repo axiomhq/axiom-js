@@ -1,5 +1,6 @@
 import { Transport } from './transport';
 import { LogEvent, LogLevelValue, LogLevel } from '../logger';
+import { safeStringify } from '../internal/safe-stringify';
 
 interface FetchConfig {
   input: Parameters<typeof fetch>[0];
@@ -52,7 +53,7 @@ export class SimpleFetchTransport implements Transport {
         'Content-Type': 'application/json',
       },
       ...this.fetchConfig.init,
-      body: JSON.stringify(this.events),
+      body: safeStringify(this.events),
     })
       .then(async (res) => {
         if (!res.ok) {

@@ -231,6 +231,51 @@ describe('SimpleFetchTransport', () => {
     });
   });
 
+  describe('non-JSON-native payloads', () => {
+    it('flushes the full batch when a log contains a circular reference', async () => {
+      let receivedLogs: any[] = [];
+      server.use(
+        http.post(API_URL, async ({ request }) => {
+          receivedLogs = (await request.json()) as any[];
+          return HttpResponse.json({ success: true });
+        }),
+      );
+
+      transport = new SimpleFetchTransport({ input: API_URL });
+      const circularFields: Record<string, unknown> = {};
+      circularFields.self = circularFields;
+
+      transport.log([
+        createLogEvent(LogLevel.info, 'before'),
+        createLogEvent(LogLevel.info, 'circular', circularFields),
+        createLogEvent(LogLevel.info, 'after'),
+      ]);
+      await transport.flush();
+
+      expect(receivedLogs.map((log) => log.message)).toEqual(['before', 'circular', 'after']);
+      expect(receivedLogs[1].fields.self).toBe('[Circular]');
+    });
+
+    it('does not cause an unhandled rejection during auto-flush', async () => {
+      const unhandledRejection = vi.fn();
+      process.on('unhandledRejection', unhandledRejection);
+      server.use(http.post(API_URL, () => HttpResponse.json({ success: true })));
+
+      try {
+        transport = new SimpleFetchTransport({ input: API_URL, autoFlush: { durationMs: 500 } });
+        const circularFields: Record<string, unknown> = {};
+        circularFields.self = circularFields;
+        transport.log([createLogEvent(LogLevel.info, 'circular', circularFields)]);
+
+        await vi.advanceTimersByTimeAsync(500);
+
+        expect(unhandledRejection).not.toHaveBeenCalled();
+      } finally {
+        process.off('unhandledRejection', unhandledRejection);
+      }
+    });
+  });
+
   describe('log level filtering', () => {
     it('should filter logs based on logLevel', async () => {
       let receivedLogs: any[] = [];
