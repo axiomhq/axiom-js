@@ -35,6 +35,15 @@ describe('ConsoleTransport', () => {
       expect(consoleSpy).toHaveBeenCalledWith('info - test message {"userId":"123"}');
     });
 
+    it('should safely include circular fields in log output', () => {
+      const fields: Record<string, unknown> = {};
+      fields.self = fields;
+
+      transport.log([createLogEvent(LogLevel.info, 'test message', fields)]);
+
+      expect(consoleSpy).toHaveBeenCalledWith('info - test message {"self":"[Circular]"}');
+    });
+
     it('should handle multiple log events', () => {
       const events = [createLogEvent(LogLevel.info, 'first message'), createLogEvent(LogLevel.error, 'second message')];
       transport.log(events);
