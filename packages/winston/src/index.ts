@@ -6,34 +6,8 @@ import type { ClientOptions } from '@axiomhq/js';
 const Version = 'AXIOM_VERSION';
 const AxiomClient = `axiom-winston/${Version}`;
 
-export interface WinstonOptions extends TransportStreamOptions {
+export interface WinstonOptions extends TransportStreamOptions, ClientOptions {
   dataset?: string;
-  token: string;
-  orgId?: string;
-  url?: string;
-  /**
-   * The Axiom edge domain for ingestion.
-   * Specify just the domain without scheme (https:// is added automatically).
-   *
-   * @example "eu-central-1.aws.edge.axiom.co"
-   */
-  edge?: string;
-  /**
-   * The Axiom edge URL for ingestion.
-   * Specify the full URL with scheme.
-   * Takes precedence over `edge` if both are set.
-   *
-   * @example "https://eu-central-1.aws.edge.axiom.co"
-   */
-  edgeUrl?: string;
-  /**
-   * Additional product tokens to append to the X-Axiom-Client header.
-   * Use product/version tokens separated by spaces.
-   *
-   * @example "axiom-react/1.2.3 my-app/4.5.6"
-   */
-  axiomClient?: string;
-  onError?: (err: Error) => void;
 }
 
 export class WinstonTransport extends Transport {
@@ -53,6 +27,7 @@ export class WinstonTransport extends Transport {
       edgeUrl: opts.edgeUrl,
       axiomClient: appendAxiomClient(AxiomClient, opts.axiomClient),
       onError: opts.onError,
+      fetch: opts.fetch,
     };
     this.client = new AxiomWithoutBatching(clientOptions);
     this.dataset = opts?.dataset || process.env.AXIOM_DATASET || '';

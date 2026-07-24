@@ -36,4 +36,16 @@ describe('pino transport tests', () => {
 
     expect(axiomMock.options[0].axiomClient).toEqual('axiom-pino/AXIOM_VERSION my-app/1.0');
   });
+
+  it('forwards a custom fetch implementation', async () => {
+    const customFetch = vi.fn<typeof fetch>();
+
+    await axiomTransport({
+      token: 'test-token',
+      dataset: 'test-dataset',
+      fetch: customFetch,
+    });
+
+    expect(axiomMock.options[0].fetch).toBe(customFetch);
+  });
 });

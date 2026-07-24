@@ -29,4 +29,12 @@ describe('winston transport tests', () => {
 
     expect(axiomMock.options[0].axiomClient).toEqual('axiom-winston/AXIOM_VERSION my-app/1.0');
   });
+
+  it('forwards a custom fetch implementation', () => {
+    const customFetch = vi.fn<typeof fetch>();
+
+    new WinstonTransport({ token: 'test-token', fetch: customFetch });
+
+    expect(axiomMock.options[0].fetch).toBe(customFetch);
+  });
 });

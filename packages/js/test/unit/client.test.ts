@@ -198,6 +198,17 @@ describe('Axiom', () => {
     expect(axiom.users).toBeTruthy();
   });
 
+  it('uses a custom fetch implementation', async () => {
+    const customFetch = vi.fn<typeof fetch>(async () => {
+      return new Response(JSON.stringify([]));
+    });
+    const client = new AxiomWithoutBatching({ url: clientURL, token: '', fetch: customFetch });
+
+    await client.datasets.list();
+
+    expect(customFetch).toHaveBeenCalledOnce();
+  });
+
   it('appends custom products to the X-Axiom-Client header', async () => {
     const client = new AxiomWithoutBatching({ url: clientURL, token: '', axiomClient: 'my-app/1.0' });
 

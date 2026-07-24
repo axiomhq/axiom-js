@@ -82,6 +82,23 @@ export interface ClientOptions {
    */
   axiomClient?: string;
   onError?: (error: Error) => void;
+  /**
+   * Custom fetch implementation. When provided, all HTTP requests use this
+   * function instead of the global `fetch`. Useful for routing through a
+   * proxy with a custom dispatcher (e.g., `undici.ProxyAgent`).
+   *
+   * @example
+   * ```
+   * import { ProxyAgent } from 'undici';
+   *
+   * const dispatcher = new ProxyAgent('http://proxy:8080');
+   * const axiom = new Axiom({
+   *     token: "my-token",
+   *     fetch: (input, init) => fetch(input, { ...init, dispatcher }),
+   * })
+   * ```
+   */
+  fetch?: typeof globalThis.fetch;
 }
 
 /**
@@ -275,13 +292,13 @@ export default abstract class HTTPClient {
   protected readonly client: FetchClient;
   protected readonly clientOptions: ClientOptions;
 
-  constructor({ orgId = '', token, url, edge, edgeUrl, axiomClient, onError }: ClientOptions) {
+  constructor({ orgId = '', token, url, edge, edgeUrl, axiomClient, onError, fetch: fetchFn }: ClientOptions) {
     if (!token) {
       console.warn('Missing Axiom token');
     }
 
     // Store options for use in ingest URL resolution
-    this.clientOptions = { orgId, token, url, edge, edgeUrl, axiomClient, onError };
+    this.clientOptions = { orgId, token, url, edge, edgeUrl, axiomClient, onError, fetch: fetchFn };
 
     // For the main API client, always use url or default (never edge options)
     // edge/edgeUrl only affects ingest endpoints, not other API calls
@@ -301,6 +318,7 @@ export default abstract class HTTPClient {
       baseUrl,
       headers,
       timeout: 20_000,
+      ...(fetchFn && { fetch: fetchFn }),
     });
   }
 
