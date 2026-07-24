@@ -1,28 +1,9 @@
 import Transport, { TransportStreamOptions } from 'winston-transport';
 
-import { AxiomWithoutBatching } from '@axiomhq/js';
+import { AxiomWithoutBatching, type ClientOptions } from '@axiomhq/js';
 
-export interface WinstonOptions extends TransportStreamOptions {
+export interface WinstonOptions extends TransportStreamOptions, ClientOptions {
   dataset?: string;
-  token: string;
-  orgId?: string;
-  url?: string;
-  /**
-   * The Axiom edge domain for ingestion.
-   * Specify just the domain without scheme (https:// is added automatically).
-   *
-   * @example "eu-central-1.aws.edge.axiom.co"
-   */
-  edge?: string;
-  /**
-   * The Axiom edge URL for ingestion.
-   * Specify the full URL with scheme.
-   * Takes precedence over `edge` if both are set.
-   *
-   * @example "https://eu-central-1.aws.edge.axiom.co"
-   */
-  edgeUrl?: string;
-  onError?: (err: Error) => void;
 }
 
 export class WinstonTransport extends Transport {
@@ -41,6 +22,7 @@ export class WinstonTransport extends Transport {
       edge: opts.edge,
       edgeUrl: opts.edgeUrl,
       onError: opts.onError,
+      fetch: opts.fetch,
     });
     this.dataset = opts?.dataset || process.env.AXIOM_DATASET || '';
   }
