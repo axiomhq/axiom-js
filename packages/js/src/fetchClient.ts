@@ -25,8 +25,31 @@ async function parseErrorMessage(resp: Response): Promise<string> {
   return body;
 }
 
+function requestEndpoint(url: string): string {
+  try {
+    return new URL(url).pathname;
+  } catch {
+    return url.split('?')[0];
+  }
+}
+
+export class AxiomRequestError extends Error {
+  constructor(
+    public status: number,
+    public method: string,
+    public endpoint: string,
+    message: string,
+  ) {
+    super(`${method} ${endpoint} failed with ${status}: ${message}`);
+    this.name = 'AxiomRequestError';
+    Object.setPrototypeOf(this, AxiomRequestError.prototype);
+  }
+}
+
 export class FetchClient {
-  constructor(public config: { headers: HeadersInit; baseUrl: string; timeout: number; fetch?: typeof globalThis.fetch }) {}
+  constructor(
+    public config: { headers: HeadersInit; baseUrl: string; timeout: number; fetch?: typeof globalThis.fetch },
+  ) {}
 
   async doReq<T>(
     endpoint: string,
@@ -67,7 +90,9 @@ export class FetchClient {
     } else if (resp.status === 401) {
       return Promise.reject(new Error('forbidden'));
     } else if (resp.status >= 400) {
-      return Promise.reject(new Error(await parseErrorMessage(resp)));
+      return Promise.reject(
+        new AxiomRequestError(resp.status, method, requestEndpoint(finalUrl), await parseErrorMessage(resp)),
+      );
     }
 
     return (await resp.json()) as T;

@@ -4,7 +4,7 @@ import { MockTransport } from '../lib/mock';
 
 describe('Logger', () => {
   let mockTransport: MockTransport;
-  let logger: Logger;
+  let logger: Logger<any, any>;
 
   beforeEach(() => {
     mockTransport = new MockTransport();

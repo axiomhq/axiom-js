@@ -9,7 +9,7 @@
     "build": "tsc -b",
     "format": "eslint 'src/**/*.{js,ts}' --quiet --fix",
     "lint": "eslint 'src/**/*.{js,ts}'",
-    "integration": "vitest run src/*"
+    "integration": "vitest run src/* --no-file-parallelism"
   },
   "dependencies": {
     "@axiomhq/js": "workspace:*",

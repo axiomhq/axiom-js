@@ -1,6 +1,7 @@
 import { defaultFormatters } from 'src/default-formatters';
 import { Transport } from '.';
 import { Version, isBrowser } from './runtime';
+import type { StandardSchemaV1 } from './standard-schema';
 
 const LOG_LEVEL = 'info';
 
@@ -59,20 +60,110 @@ export type FrameworkIdentifier = {
   version: string;
 };
 
-export type LoggerConfig = {
-  args?: Record<string | symbol, any>;
-  transports: [Transport, ...Transport[]];
-  logLevel?: LogLevel;
-  formatters?: Array<Formatter>;
-  overrideDefaultFormatters?: boolean;
+export type LoggerSchema = StandardSchemaV1<Record<string, any>, Record<string, any>>;
+export type OutputLoggerSchema = StandardSchemaV1<any, any>;
+
+type IsAny<T> = 0 extends 1 & T ? true : false;
+
+type FieldsInput<TSchema extends LoggerSchema | undefined> = IsAny<TSchema> extends true
+  ? Record<string, any>
+  : TSchema extends LoggerSchema
+    ? StandardSchemaV1.InferInput<TSchema>
+    : Record<string, any>;
+
+type FieldsOutput<TSchema extends LoggerSchema | undefined> = IsAny<TSchema> extends true
+  ? Record<string, any>
+  : TSchema extends LoggerSchema
+    ? StandardSchemaV1.InferOutput<TSchema>
+    : Record<string, any>;
+
+type OutputValue<TOutputSchema extends OutputLoggerSchema | undefined> = IsAny<TOutputSchema> extends true
+  ? any
+  : TOutputSchema extends OutputLoggerSchema
+    ? StandardSchemaV1.InferOutput<TOutputSchema>
+    : LogEvent;
+
+type DefaultLoggerContext<TSchema extends LoggerSchema | undefined> = IsAny<TSchema> extends true ? any : {};
+
+type RequiredKeys<T> = {
+  [TKey in keyof T]-?: {} extends Pick<T, TKey> ? never : TKey;
+}[keyof T];
+
+type MissingRequiredKeys<
+  TSchema extends LoggerSchema | undefined,
+  TContext extends Partial<FieldsInput<TSchema>>,
+> = IsAny<TSchema> extends true
+  ? never
+  : TSchema extends LoggerSchema
+    ? Exclude<RequiredKeys<FieldsInput<TSchema>>, keyof TContext>
+    : never;
+
+export type LoggerArgs<
+  TSchema extends LoggerSchema | undefined = any,
+  TContext extends Partial<FieldsInput<TSchema>> = DefaultLoggerContext<TSchema>,
+> = Omit<FieldsInput<TSchema>, keyof TContext> &
+  Partial<Pick<FieldsInput<TSchema>, Extract<keyof TContext, keyof FieldsInput<TSchema>>>> &
+  Record<symbol, any>;
+
+type LoggerMethodArgs<
+  TSchema extends LoggerSchema | undefined,
+  TContext extends Partial<FieldsInput<TSchema>>,
+> = [MissingRequiredKeys<TSchema, TContext>] extends [never]
+  ? [args?: LoggerArgs<TSchema, TContext>]
+  : [args: LoggerArgs<TSchema, TContext>];
+
+type ErrorLoggerMethodArgs<
+  TSchema extends LoggerSchema | undefined,
+  TContext extends Partial<FieldsInput<TSchema>>,
+> = [MissingRequiredKeys<TSchema, TContext>] extends [never]
+  ? [args?: LoggerArgs<TSchema, TContext> | Error]
+  : [args: LoggerArgs<TSchema, TContext> | Error];
+
+type NoExtraFields<TFields, TAllowedFields> = TFields &
+  Record<Exclude<keyof TFields, keyof TAllowedFields | symbol>, never>;
+
+export type ValidationErrorReason = 'validation-failed' | 'async-unsupported' | 'validation-threw';
+export type ValidationStage = 'input' | 'output';
+
+export type ValidationErrorContext<
+  TSchema extends LoggerSchema | undefined = any,
+  TOutputSchema extends OutputLoggerSchema | undefined = any,
+> = {
+  stage: ValidationStage;
+  reason: ValidationErrorReason;
+  level: LogLevel;
+  message: string;
+  value: unknown;
+  issues?: ReadonlyArray<StandardSchemaV1.Issue>;
+  error?: unknown;
+  schema: TSchema | TOutputSchema;
 };
 
-export class Logger {
-  children: Logger[] = [];
-  public logLevel: LogLevelValue = LogLevelValue.debug;
-  public config: LoggerConfig;
+export type LoggerConfig<
+  TSchema extends LoggerSchema | undefined = any,
+  TOutputSchema extends OutputLoggerSchema | undefined = any,
+  TContext extends Partial<FieldsInput<TSchema>> = Partial<FieldsInput<TSchema>>,
+> = {
+  args?: TContext & Record<symbol, any>;
+  transports: [Transport, ...Transport[]];
+  logLevel?: LogLevel;
+  formatters?: Array<Formatter<any, any>>;
+  overrideDefaultFormatters?: boolean;
+  schema?: TSchema;
+  outputSchema?: TOutputSchema;
+  onValidationError?: (context: ValidationErrorContext<TSchema, TOutputSchema>) => void;
+};
 
-  constructor(public initConfig: LoggerConfig) {
+export class Logger<
+  TSchema extends LoggerSchema | undefined = any,
+  TOutputSchema extends OutputLoggerSchema | undefined = any,
+  TContext extends Partial<FieldsInput<TSchema>> = DefaultLoggerContext<TSchema>,
+> {
+  children: Logger<TSchema, TOutputSchema, any>[] = [];
+  public logLevel: LogLevelValue = LogLevelValue.debug;
+  public config: LoggerConfig<TSchema, TOutputSchema, TContext>;
+
+  constructor(public initConfig: LoggerConfig<TSchema, TOutputSchema, TContext>) {
     // check if user passed a log level, if not the default init value will be used as is.
     if (this.initConfig.logLevel != undefined) {
       this.logLevel = LogLevelValue[this.initConfig.logLevel];
@@ -104,8 +195,8 @@ export class Logger {
    * // Add fields to the log event
    * logger.debug("User action", { userId: 123 });
    */
-  debug = (message: string, args: Record<string | symbol, any> = {}) => {
-    this.log(LogLevel.debug, message, args);
+  debug = (message: string, ...[args]: LoggerMethodArgs<TSchema, TContext>) => {
+    this._log(LogLevel.debug, message, args);
   };
 
   /**
@@ -117,8 +208,8 @@ export class Logger {
    * // Add fields to the log event
    * logger.info("User logged in", { userId: 123 });
    */
-  info = (message: string, args: Record<string | symbol, any> = {}) => {
-    this.log(LogLevel.info, message, args);
+  info = (message: string, ...[args]: LoggerMethodArgs<TSchema, TContext>) => {
+    this._log(LogLevel.info, message, args);
   };
 
   /**
@@ -130,8 +221,8 @@ export class Logger {
    * // Add fields to the log event
    * logger.warn("Rate limit approaching", { requestCount: 950 });
    */
-  warn = (message: string, args: Record<string | symbol, any> = {}) => {
-    this.log(LogLevel.warn, message, args);
+  warn = (message: string, ...[args]: LoggerMethodArgs<TSchema, TContext>) => {
+    this._log(LogLevel.warn, message, args);
   };
 
   /**
@@ -147,8 +238,8 @@ export class Logger {
    *   logger.error("Operation failed", err);
    * }
    */
-  error = (message: string, args: Record<string | symbol, any> = {}) => {
-    this.log(LogLevel.error, message, args);
+  error = (message: string, ...[args]: ErrorLoggerMethodArgs<TSchema, TContext>) => {
+    this._log(LogLevel.error, message, args);
   };
 
   /**
@@ -159,28 +250,95 @@ export class Logger {
    * // Create a child logger with additional fields
    * const childLogger = logger.with({ userId: 123 });
    */
-  with = (fields: Record<string | symbol, any>) => {
-    const { [EVENT]: argsEventFields, ...argsRest } = this.config.args ?? {};
-    const { [EVENT]: _eventFields, ...rest } = fields;
+  with = <TFields extends Partial<FieldsInput<TSchema>> & Record<symbol, any>>(
+    fields: NoExtraFields<TFields, FieldsInput<TSchema>>,
+  ) => {
+    const { eventFields: argsEventFields, fields: argsRest } = extractEventFields(
+      this.config.args as Record<string | symbol, any> | undefined,
+    );
+    const { eventFields: inputEventFields, fields: rest } = extractEventFields(fields as Record<string | symbol, any>);
 
-    const eventFields = { ...(argsEventFields ?? {}), ...(_eventFields ?? {}) };
+    const eventFields = {
+      ...((argsEventFields && typeof argsEventFields === 'object' ? argsEventFields : {}) as Record<string, any>),
+      ...((inputEventFields && typeof inputEventFields === 'object'
+        ? inputEventFields
+        : {}) as Record<string, any>),
+    };
 
-    const childConfig = { ...this.config, args: { ...argsRest, ...rest, [EVENT]: eventFields } };
+    type ChildContext = TContext & Pick<TFields, Extract<keyof TFields, keyof FieldsInput<TSchema>>>;
+    const childArgs = { ...argsRest, ...rest, [EVENT]: eventFields } as unknown as ChildContext & Record<symbol, any>;
+    const childConfig: LoggerConfig<TSchema, TOutputSchema, ChildContext> = { ...this.config, args: childArgs };
 
-    const child = new Logger(childConfig);
+    const child = new Logger<TSchema, TOutputSchema, ChildContext>(childConfig);
     this.children.push(child);
     return child;
   };
 
-  private _transformEvent = (level: LogLevel, message: string, args: Record<string | symbol, any> = {}) => {
-    let rootFields = {};
-    let fields = this.config.args ?? {};
-    if (this.config.args && EVENT in this.config.args) {
-      const { [EVENT]: argsEventFields, ...argsRest } = this.config.args ?? {};
-      rootFields = { ...(argsEventFields ?? {}) };
-      fields = argsRest;
+  private _notifyValidationError = (
+    stage: ValidationStage,
+    reason: ValidationErrorReason,
+    level: LogLevel,
+    message: string,
+    schema: TSchema | TOutputSchema,
+    value: unknown,
+    details: Pick<ValidationErrorContext<TSchema, TOutputSchema>, 'issues' | 'error'> = {},
+  ) => {
+    this.config.onValidationError?.({
+      stage,
+      reason,
+      level,
+      message,
+      schema,
+      value,
+      ...details,
+    });
+  };
+
+  private _validate = <TOutput>(
+    stage: ValidationStage,
+    schema: StandardSchemaV1<unknown, TOutput> | undefined,
+    level: LogLevel,
+    message: string,
+    value: unknown,
+  ): { success: true; value: TOutput } | { success: false } => {
+    if (!schema) {
+      return { success: true, value: value as TOutput };
     }
 
+    try {
+      const result = schema['~standard'].validate(value);
+
+      if (isPromiseLike(result)) {
+        this._notifyValidationError(stage, 'async-unsupported', level, message, schema as TSchema | TOutputSchema, value);
+        return { success: false };
+      }
+
+      if (result.issues) {
+        this._notifyValidationError(stage, 'validation-failed', level, message, schema as TSchema | TOutputSchema, value, {
+          issues: result.issues,
+        });
+        return { success: false };
+      }
+
+      return { success: true, value: result.value };
+    } catch (error) {
+      this._notifyValidationError(stage, 'validation-threw', level, message, schema as TSchema | TOutputSchema, value, {
+        error,
+      });
+      return { success: false };
+    }
+  };
+
+  private _transformEvent = (
+    level: LogLevel,
+    message: string,
+    args: LoggerArgs<TSchema, TContext> | Error = {} as LoggerArgs<TSchema, TContext>,
+  ) => {
+    const { eventFields: argsEventFields, fields } = extractEventFields(
+      this.config.args as Record<string | symbol, any> | undefined,
+    );
+    const rootFields =
+      argsEventFields && typeof argsEventFields === 'object' ? (argsEventFields as Record<string, any>) : {};
     const logEvent: LogEvent = {
       level: LogLevel[level].toString(),
       message,
@@ -209,7 +367,7 @@ export class Logger {
 
     if (typeof args === 'object' && args !== null) {
       // Extract root properties before JSON serialization (since symbols are lost in JSON.stringify)
-      const { [EVENT]: rootArgs, ...fieldArgs } = args as Record<string | symbol, any>;
+      const { eventFields: rootArgs, fields: fieldArgs } = extractEventFields(args as Record<string | symbol, any>);
 
       // Process regular fields
       const parsedArgs = JSON.parse(JSON.stringify(fieldArgs, jsonFriendlyErrorReplacer));
@@ -228,12 +386,37 @@ export class Logger {
       logEvent.fields = { ...logEvent.fields, args: args };
     }
 
-    if (this.config.formatters && this.config.formatters.length > 0) {
-      // Apply formatters to the entire logEvent
-      return this.config.formatters.reduce((acc, formatter) => formatter(acc), logEvent);
+    const inputValidation = this._validate<FieldsOutput<TSchema>>(
+      'input',
+      this.config.schema as StandardSchemaV1<unknown, FieldsOutput<TSchema>> | undefined,
+      level,
+      message,
+      logEvent.fields,
+    );
+    if (!inputValidation.success) {
+      return null;
     }
 
-    return logEvent;
+    logEvent.fields = inputValidation.value;
+
+    let formattedEvent: Record<string, any> = logEvent;
+    if (this.config.formatters && this.config.formatters.length > 0) {
+      // Apply formatters to the entire logEvent
+      formattedEvent = this.config.formatters.reduce((acc, formatter) => formatter(acc), logEvent);
+    }
+
+    const outputValidation = this._validate<OutputValue<TOutputSchema>>(
+      'output',
+      this.config.outputSchema as StandardSchemaV1<unknown, OutputValue<TOutputSchema>> | undefined,
+      level,
+      message,
+      formattedEvent,
+    );
+    if (!outputValidation.success) {
+      return null;
+    }
+
+    return outputValidation.value;
   };
 
   /**
@@ -242,8 +425,22 @@ export class Logger {
    * @param message The log message
    * @param options Log options or Error object
    */
-  log = (level: LogLevel, message: string, args: Record<string | symbol, any> = {}) => {
-    this.config.transports.forEach((transport) => transport.log([this._transformEvent(level, message, args)]));
+  log = (level: LogLevel, message: string, ...[args]: ErrorLoggerMethodArgs<TSchema, TContext>) => {
+    this._log(level, message, args);
+  };
+
+  private _log = (
+    level: LogLevel,
+    message: string,
+    args: LoggerArgs<TSchema, TContext> | Error = {} as LoggerArgs<TSchema, TContext>,
+  ) => {
+    const event = this._transformEvent(level, message, args);
+
+    if (!event) {
+      return;
+    }
+
+    this.config.transports.forEach((transport) => transport.log([event]));
   };
 
   flush = async () => {
@@ -269,4 +466,21 @@ function jsonFriendlyErrorReplacer(_key: string, value: any) {
   }
 
   return value;
+}
+
+function extractEventFields(args: Record<string | symbol, any> | undefined) {
+  const fields = { ...(args ?? {}) };
+  const eventFields = fields[EVENT];
+  delete fields[EVENT];
+
+  return { eventFields, fields };
+}
+
+function isPromiseLike(value: unknown): value is PromiseLike<unknown> {
+  return (
+    (typeof value === 'object' || typeof value === 'function') &&
+    value !== null &&
+    'then' in value &&
+    typeof value.then === 'function'
+  );
 }
