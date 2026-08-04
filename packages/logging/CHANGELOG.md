@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.4.0](https://github.com/axiomhq/axiom-js/compare/logging-0.3.0...logging-0.4.0) (2026-08-04)
+
+
+### Features
+
+* **logging:** add standard schema validation ([#433](https://github.com/axiomhq/axiom-js/issues/433)) ([6551afd](https://github.com/axiomhq/axiom-js/commit/6551afd12bb7a44d746bd20b6c4c0c78233bfaad))
+
+
+### Bug Fixes
+
+* handle non-JSON responses and unserializable logs ([#478](https://github.com/axiomhq/axiom-js/issues/478)) ([dc65fd6](https://github.com/axiomhq/axiom-js/commit/dc65fd6be5e2a7589b67845f997c6c9b25032214))
+
 ## [0.3.0](https://github.com/axiomhq/axiom-js/compare/logging-0.2.2...logging-0.3.0) (2026-06-25)
 
 

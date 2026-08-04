@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.0](https://github.com/axiomhq/axiom-js/compare/js-1.8.0...js-2.0.0) (2026-08-04)
+
+
+### ⚠ BREAKING CHANGES
+
+* **js:** APL queries without an explicit format now return tabular results.
+
+### Features
+
+* **js:** add custom fetch option to ClientOptions ([#412](https://github.com/axiomhq/axiom-js/issues/412)) ([19fa66f](https://github.com/axiomhq/axiom-js/commit/19fa66fe36078b41bd79d568f6971283b4d618ca))
+* **js:** default APL query format to tabular ([8c3e4fa](https://github.com/axiomhq/axiom-js/commit/8c3e4fa40c540d9d74be1632d8bdf8640e0d88a6))
+* **logging:** add standard schema validation ([#433](https://github.com/axiomhq/axiom-js/issues/433)) ([6551afd](https://github.com/axiomhq/axiom-js/commit/6551afd12bb7a44d746bd20b6c4c0c78233bfaad))
+
+
+### Bug Fixes
+
+* handle non-JSON responses and unserializable logs ([#478](https://github.com/axiomhq/axiom-js/issues/478)) ([dc65fd6](https://github.com/axiomhq/axiom-js/commit/dc65fd6be5e2a7589b67845f997c6c9b25032214))
+
 ## [1.8.0](https://github.com/axiomhq/axiom-js/compare/js-1.7.0...js-1.8.0) (2026-06-25)
 
 

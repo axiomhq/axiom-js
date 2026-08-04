@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.0](https://github.com/axiomhq/axiom-js/compare/react-0.3.0...react-0.4.0) (2026-08-04)
+
+
+### Bug Fixes
+
+* handle non-JSON responses and unserializable logs ([#478](https://github.com/axiomhq/axiom-js/issues/478)) ([dc65fd6](https://github.com/axiomhq/axiom-js/commit/dc65fd6be5e2a7589b67845f997c6c9b25032214))
+
 ## [0.3.0](https://github.com/axiomhq/axiom-js/compare/react-0.2.2...react-0.3.0) (2026-06-25)
 
 

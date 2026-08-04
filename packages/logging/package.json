@@ -1,7 +1,7 @@
 {
   "name": "@axiomhq/logging",
   "description": "The official logging package for Axiom",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "author": "Axiom, Inc.",
   "license": "MIT",
   "contributors": [
