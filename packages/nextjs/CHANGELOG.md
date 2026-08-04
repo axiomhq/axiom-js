@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.0](https://github.com/axiomhq/axiom-js/compare/nextjs-0.3.0...nextjs-0.4.0) (2026-08-04)
+
+
+### Miscellaneous Chores
+
+* **nextjs:** Synchronize integrations versions
+
 ## [0.3.0](https://github.com/axiomhq/axiom-js/compare/nextjs-0.2.2...nextjs-0.3.0) (2026-06-25)
 
 
