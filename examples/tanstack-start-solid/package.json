@@ -20,7 +20,7 @@
     "@axiomhq/tanstack-start": "workspace:*",
     "@tanstack/solid-router": "^1.169.2",
     "@tanstack/solid-start": "^1.167.61",
-    "solid-js": "^1.9.12"
+    "solid-js": "^1.9.14"
   },
   "devDependencies": {
     "@tanstack/eslint-config": "^0.3.0",
