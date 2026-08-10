@@ -38,7 +38,7 @@ jobs:
           - 24.x
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v6
-      - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6
+      - uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6
         with:
           version: ${{ env.PNPM_VERSION }}
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v6
@@ -64,7 +64,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v6
-      - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6
+      - uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6
         with:
           version: ${{ env.PNPM_VERSION }}
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v6
@@ -93,7 +93,7 @@ jobs:
           - 24.x
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v6
-      - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6
+      - uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6
         with:
           version: ${{ env.PNPM_VERSION }}
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v6
@@ -132,7 +132,7 @@ jobs:
       - name: Skip integration tests for external PRs
         if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.repository
         run: echo "Skipping integration tests because this run does not have access to repository secrets."
-      - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6
+      - uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6
         if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
         with:
           version: ${{ env.PNPM_VERSION }}
@@ -190,7 +190,7 @@ jobs:
       fail-fast: true
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v6
-      - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6
+      - uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6
         with:
           version: ${{ env.PNPM_VERSION }}
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v6
