@@ -118,7 +118,7 @@
     "@types/react": "^19.2.2",
     "react": "^19.2.0",
     "solid-js": "^1.9.14",
-    "vite": "^7.3.5",
+    "vite": "^7.3.6",
     "vitest": "catalog:"
   }
 }
