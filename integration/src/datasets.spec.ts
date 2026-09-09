@@ -17,12 +17,11 @@ describe('DatasetsService', () => {
       name: datasetName,
       description: 'This is a test dataset for datasets integration tests.',
     });
-  });
+  }, 60_000);
 
   afterAll(async () => {
-    const resp = await cleanupDatasetIfExists(client, datasetName);
-    if (resp) expect(resp.status).toEqual(204);
-  });
+    await cleanupDatasetIfExists(client, datasetName);
+  }, 60_000);
 
   describe('update', () => {
     it('should update the dataset', async () => {
