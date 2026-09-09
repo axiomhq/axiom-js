@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.1](https://github.com/axiomhq/axiom-js/compare/react-0.4.0...react-0.4.1) (2026-09-09)
+
+
+### Miscellaneous Chores
+
+* **react:** Synchronize integrations versions
+
 ## [0.4.0](https://github.com/axiomhq/axiom-js/compare/react-0.3.0...react-0.4.0) (2026-08-04)
 
 

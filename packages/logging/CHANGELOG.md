@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.1](https://github.com/axiomhq/axiom-js/compare/logging-0.4.0...logging-0.4.1) (2026-09-09)
+
+
+### Bug Fixes
+
+* **logging:** bound fetch transport buffering and retries ([#507](https://github.com/axiomhq/axiom-js/issues/507)) ([062c9c8](https://github.com/axiomhq/axiom-js/commit/062c9c824b743eba04f9c3ee6b54608a192f8d06))
+
 ## [0.4.0](https://github.com/axiomhq/axiom-js/compare/logging-0.3.0...logging-0.4.0) (2026-08-04)
 
 
