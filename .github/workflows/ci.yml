@@ -186,19 +186,23 @@ jobs:
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID}} #Required
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID}} #Required
           scope: ${{ secrets.VERCEL_SCOPE }}
-          env: |
-            AXIOM_TOKEN=${{ secrets.TESTING_API_TOKEN }}
-            AXIOM_URL=${{ vars.TESTING_API_URL }}
-            AXIOM_ORG_ID=${{ vars.TESTING_ORG_ID }}
-            NEXT_PUBLIC_AXIOM_TOKEN=${{ secrets.TESTING_INGEST_API_TOKEN }}
-            NEXT_PUBLIC_AXIOM_URL=${{ vars.TESTING_API_URL }}
-            NEXT_PUBLIC_AXIOM_ORG_ID=${{ vars.TESTING_ORG_ID }}
-            AXIOM_DATASET_SUFFIX=${{ env.AXIOM_DATASET_SUFFIX }}
-          build-env: |
-            NEXT_PUBLIC_AXIOM_TOKEN=${{ secrets.TESTING_INGEST_API_TOKEN }}
-            NEXT_PUBLIC_AXIOM_URL=${{ vars.TESTING_API_URL }}
-            NEXT_PUBLIC_AXIOM_ORG_ID=${{ vars.TESTING_ORG_ID }}
-            AXIOM_DATASET_SUFFIX=${{ env.AXIOM_DATASET_SUFFIX }}
+          # The action only forwards env/build-env inputs in experimental API mode.
+          # CLI flags also override stale project credentials during the Next.js build.
+          vercel-args: >-
+            --env AXIOM_TOKEN="${{ secrets.TESTING_API_TOKEN }}"
+            --env AXIOM_URL="${{ vars.TESTING_API_URL }}"
+            --env AXIOM_ORG_ID="${{ vars.TESTING_ORG_ID }}"
+            --env NEXT_PUBLIC_AXIOM_TOKEN="${{ secrets.TESTING_INGEST_API_TOKEN }}"
+            --env NEXT_PUBLIC_AXIOM_URL="${{ vars.TESTING_API_URL }}"
+            --env NEXT_PUBLIC_AXIOM_ORG_ID="${{ vars.TESTING_ORG_ID }}"
+            --env AXIOM_DATASET_SUFFIX="${{ env.AXIOM_DATASET_SUFFIX }}"
+            --build-env AXIOM_TOKEN="${{ secrets.TESTING_API_TOKEN }}"
+            --build-env AXIOM_URL="${{ vars.TESTING_API_URL }}"
+            --build-env AXIOM_ORG_ID="${{ vars.TESTING_ORG_ID }}"
+            --build-env NEXT_PUBLIC_AXIOM_TOKEN="${{ secrets.TESTING_INGEST_API_TOKEN }}"
+            --build-env NEXT_PUBLIC_AXIOM_URL="${{ vars.TESTING_API_URL }}"
+            --build-env NEXT_PUBLIC_AXIOM_ORG_ID="${{ vars.TESTING_ORG_ID }}"
+            --build-env AXIOM_DATASET_SUFFIX="${{ env.AXIOM_DATASET_SUFFIX }}"
     outputs:
       preview-url: ${{ steps.vercel-deploy.outputs.preview-url }}
     environment:
