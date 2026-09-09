@@ -60,7 +60,7 @@
     "@repo/eslint-config": "workspace:*",
     "@tanstack/config": "^0.22.2",
     "msw": "^2.6.2",
-    "vite": "^7.3.5",
+    "vite": "^7.3.6",
     "zod": "^4.4.3"
   },
   "peerDependencies": {
