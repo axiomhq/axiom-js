@@ -88,19 +88,44 @@ describe('SimpleFetchTransport', () => {
       expect(requestSpy).not.toHaveBeenCalled();
     });
 
-    it('should handle request errors gracefully', async () => {
-      const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    it('drops permanent request failures and continues with later logs', async () => {
+      const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      const receivedMessages: string[][] = [];
       server.use(
-        http.post(API_URL, () => {
-          return HttpResponse.error();
+        http.post(API_URL, async ({ request }) => {
+          const logs = (await request.json()) as Array<{ message: string }>;
+          receivedMessages.push(logs.map((log) => log.message));
+          return receivedMessages.length === 1
+            ? HttpResponse.json({ error: true }, { status: 400 })
+            : HttpResponse.json({ success: true });
         }),
       );
 
-      transport.log([createLogEvent()]);
+      transport.log([createLogEvent(LogLevel.error, 'failed')]);
+      await transport.flush();
+      transport.log([createLogEvent(LogLevel.info, 'next')]);
       await transport.flush();
 
-      expect(consoleErrorSpy).toHaveBeenCalled();
-      consoleErrorSpy.mockRestore();
+      expect(consoleWarnSpy).toHaveBeenCalled();
+      expect(receivedMessages).toEqual([['failed'], ['next']]);
+      consoleWarnSpy.mockRestore();
+    });
+
+    it('allows subclasses to override flush', async () => {
+      class CustomFetchTransport extends SimpleFetchTransport {
+        flushCalls = 0;
+
+        override async flush(): Promise<void> {
+          this.flushCalls += 1;
+          await super.flush();
+        }
+      }
+
+      const customTransport = new CustomFetchTransport({ input: API_URL, autoFlush: false });
+      customTransport.log([createLogEvent()]);
+      await customTransport.flush();
+
+      expect(customTransport.flushCalls).toBe(1);
     });
   });
 
@@ -150,7 +175,7 @@ describe('SimpleFetchTransport', () => {
       expect(requestSpy).toHaveBeenCalledTimes(1);
     });
 
-    it('should reset auto-flush timer when new logs are added', async () => {
+    it('should not postpone auto-flush when new logs are added', async () => {
       let receivedBody: any;
       server.use(
         http.post(API_URL, async ({ request }) => {
@@ -170,12 +195,99 @@ describe('SimpleFetchTransport', () => {
       transport.log([createLogEvent(LogLevel.info, 'second')]);
 
       await vi.advanceTimersByTimeAsync(500);
-      expect(receivedBody).toBeUndefined();
-
-      await vi.advanceTimersByTimeAsync(500);
       expect(receivedBody).toBeDefined();
       expect(receivedBody[0].message).toBe('first');
       expect(receivedBody[1].message).toBe('second');
+    });
+
+    it('makes concurrent flush callers wait for their own snapshots', async () => {
+      const receivedMessages: string[][] = [];
+      let resolveFirstRequest: (() => void) | undefined;
+      let resolveSecondRequest: (() => void) | undefined;
+      let markFirstRequestStarted: (() => void) | undefined;
+      let markSecondRequestStarted: (() => void) | undefined;
+      const firstRequestStarted = new Promise<void>((resolve) => {
+        markFirstRequestStarted = resolve;
+      });
+      const secondRequestStarted = new Promise<void>((resolve) => {
+        markSecondRequestStarted = resolve;
+      });
+      const releaseFirstRequest = new Promise<void>((resolve) => {
+        resolveFirstRequest = resolve;
+      });
+      const releaseSecondRequest = new Promise<void>((resolve) => {
+        resolveSecondRequest = resolve;
+      });
+
+      server.use(
+        http.post(API_URL, async ({ request }) => {
+          const logs = (await request.json()) as Array<{ message: string }>;
+          receivedMessages.push(logs.map((log) => log.message));
+
+          if (receivedMessages.length === 1) {
+            markFirstRequestStarted?.();
+            await releaseFirstRequest;
+          } else if (receivedMessages.length === 2) {
+            markSecondRequestStarted?.();
+            await releaseSecondRequest;
+          }
+
+          return HttpResponse.json({ success: true });
+        }),
+      );
+
+      transport = new SimpleFetchTransport({ input: API_URL, autoFlush: false });
+      transport.log([createLogEvent(LogLevel.info, 'first')]);
+      const firstFlush = transport.flush();
+      await firstRequestStarted;
+
+      transport.log([createLogEvent(LogLevel.info, 'second')]);
+      const secondFlush = transport.flush();
+      const thirdFlush = transport.flush();
+      const firstFlushResolved = vi.fn();
+      const secondFlushResolved = vi.fn();
+      const thirdFlushResolved = vi.fn();
+      void firstFlush.then(firstFlushResolved);
+      void secondFlush.then(secondFlushResolved);
+      void thirdFlush.then(thirdFlushResolved);
+
+      expect(receivedMessages).toEqual([['first']]);
+
+      resolveFirstRequest?.();
+      await secondRequestStarted;
+      await Promise.resolve();
+
+      expect(firstFlushResolved).toHaveBeenCalledOnce();
+      expect(secondFlushResolved).not.toHaveBeenCalled();
+      expect(thirdFlushResolved).not.toHaveBeenCalled();
+
+      resolveSecondRequest?.();
+      await Promise.all([firstFlush, secondFlush, thirdFlush]);
+
+      expect(receivedMessages).toEqual([['first'], ['second']]);
+      expect(firstFlushResolved).toHaveBeenCalledOnce();
+      expect(secondFlushResolved).toHaveBeenCalledOnce();
+      expect(thirdFlushResolved).toHaveBeenCalledOnce();
+    });
+
+    it('bounds the queue and request body', async () => {
+      let receivedMessages: string[] = [];
+      server.use(
+        http.post(API_URL, async ({ request }) => {
+          const logs = (await request.json()) as Array<{ message: string }>;
+          receivedMessages = logs.map((log) => log.message);
+          return HttpResponse.json({ success: true });
+        }),
+      );
+
+      transport = new SimpleFetchTransport({ input: API_URL, autoFlush: false });
+      transport.log(Array.from({ length: 1_001 }, (_, index) => createLogEvent(LogLevel.info, `event-${index}`)));
+
+      await transport.flush();
+
+      expect(receivedMessages).toHaveLength(1_000);
+      expect(receivedMessages[0]).toBe('event-1');
+      expect(receivedMessages.at(-1)).toBe('event-1000');
     });
 
     it('should auto-flush with custom duration from config object', async () => {
