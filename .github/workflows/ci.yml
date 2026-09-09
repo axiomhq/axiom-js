@@ -34,9 +34,8 @@ jobs:
     strategy:
       matrix:
         node:
-          - 20.x
-          - 22.x
           - 24.x
+          - 26.x
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v6
       - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6
@@ -89,9 +88,8 @@ jobs:
     strategy:
       matrix:
         node:
-          - 20.x
-          - 22.x
           - 24.x
+          - 26.x
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v6
       - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6
@@ -117,9 +115,8 @@ jobs:
       fail-fast: true
       matrix:
         node:
-          - 20.x
-          - 22.x
           - 24.x
+          - 26.x
     env:
       AXIOM_TOKEN: ${{ secrets.TESTING_API_TOKEN }}
       AXIOM_URL: ${{ vars.TESTING_API_URL }}
@@ -218,7 +215,8 @@ jobs:
     strategy:
       matrix:
         node:
-          - 20.x
+          - 24.x
+          - 26.x
       max-parallel: 1
       fail-fast: true
     steps:
