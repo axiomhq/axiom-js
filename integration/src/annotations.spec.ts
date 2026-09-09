@@ -23,12 +23,11 @@ describe('AnnotationsService', () => {
       name: datasetName,
       description: 'This is a test dataset to be used for annotations testing',
     });
-  });
+  }, 60_000);
 
   afterAll(async () => {
-    const resp = await cleanupDatasetIfExists(datasetsClient, datasetName);
-    if (resp) expect(resp.status).toEqual(204);
-  });
+    await cleanupDatasetIfExists(datasetsClient, datasetName);
+  }, 60_000);
 
   describe('create', () => {
     it('creates annotations successfully', async () => {

@@ -14,12 +14,13 @@ permissions:
   contents: read
 
 env:
-  AXIOM_TOKEN: ${{ secrets.TESTING_DEV_API_TOKEN }}
-  AXIOM_URL: ${{ secrets.TESTING_DEV_API_URL }}
-  AXIOM_ORG_ID: ${{ secrets.TESTING_DEV_ORG_ID }}
-  NEXT_PUBLIC_AXIOM_TOKEN: ${{ secrets.TESTING_DEV_INGEST_API_TOKEN }}
-  NEXT_PUBLIC_AXIOM_URL: ${{ secrets.TESTING_DEV_API_URL }}
-  NEXT_PUBLIC_AXIOM_ORG_ID: ${{ secrets.TESTING_DEV_ORG_ID }}
+  AXIOM_TOKEN: ${{ secrets.TESTING_API_TOKEN }}
+  AXIOM_URL: ${{ vars.TESTING_API_URL }}
+  AXIOM_ORG_ID: ${{ vars.TESTING_ORG_ID }}
+  NEXT_PUBLIC_AXIOM_TOKEN: ${{ secrets.TESTING_INGEST_API_TOKEN }}
+  NEXT_PUBLIC_AXIOM_URL: ${{ vars.TESTING_API_URL }}
+  NEXT_PUBLIC_AXIOM_ORG_ID: ${{ vars.TESTING_ORG_ID }}
+  TESTING_ENVIRONMENT: ${{ vars.TESTING_ENVIRONMENT }}
   AXIOM_DATASET_SUFFIX: ${{ github.run_id }}-${{ github.run_attempt }}
   NODEVERSION: 22.x
   PNPM_VERSION: 10.4.1
@@ -109,7 +110,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     concurrency:
-      group: integration-development
+      group: integration-${{ vars.TESTING_ENVIRONMENT || 'testing' }}
       cancel-in-progress: false
     continue-on-error: true
     strategy:
@@ -120,18 +121,33 @@ jobs:
           - 22.x
           - 24.x
     env:
-      AXIOM_TOKEN: ${{ secrets.TESTING_DEV_API_TOKEN }}
-      AXIOM_URL: ${{ secrets.TESTING_DEV_API_URL }}
-      AXIOM_ORG_ID: ${{ secrets.TESTING_DEV_ORG_ID }}
-      AXIOM_EDGE: ${{ vars.TESTING_DEV_EDGE }}
-      AXIOM_EDGE_URL: ${{ vars.TESTING_DEV_EDGE_URL }}
-      AXIOM_EDGE_DATASET_REGION: ${{ vars.TESTING_DEV_EDGE_DATASET_REGION }}
-      AXIOM_DATASET_SUFFIX: ${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.node }}-development
+      AXIOM_TOKEN: ${{ secrets.TESTING_API_TOKEN }}
+      AXIOM_URL: ${{ vars.TESTING_API_URL }}
+      AXIOM_ORG_ID: ${{ vars.TESTING_ORG_ID }}
+      AXIOM_EDGE: ${{ vars.TESTING_EDGE }}
+      AXIOM_EDGE_URL: ${{ vars.TESTING_EDGE_URL }}
+      AXIOM_EDGE_DATASET_REGION: ${{ vars.TESTING_EDGE_DATASET_REGION }}
+      AXIOM_DATASET_SUFFIX: ${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.node }}-${{ vars.TESTING_ENVIRONMENT }}
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v6
       - name: Skip integration tests for external PRs
         if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.repository
         run: echo "Skipping integration tests because this run does not have access to repository secrets."
+      - name: Validate testing configuration
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+        shell: bash
+        run: |
+          missing=()
+          for name in AXIOM_TOKEN AXIOM_URL AXIOM_ORG_ID TESTING_ENVIRONMENT; do
+            if [[ -z "${!name:-}" ]]; then
+              missing+=("$name")
+            fi
+          done
+          if (( ${#missing[@]} > 0 )); then
+            echo "Missing required testing configuration: ${missing[*]}"
+            exit 1
+          fi
+          echo "Testing configuration: org=${AXIOM_ORG_ID} url=${AXIOM_URL} environment=${TESTING_ENVIRONMENT}"
       - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6
         if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
         with:
@@ -170,6 +186,19 @@ jobs:
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID}} #Required
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID}} #Required
           scope: ${{ secrets.VERCEL_SCOPE }}
+          env: |
+            AXIOM_TOKEN=${{ secrets.TESTING_API_TOKEN }}
+            AXIOM_URL=${{ vars.TESTING_API_URL }}
+            AXIOM_ORG_ID=${{ vars.TESTING_ORG_ID }}
+            NEXT_PUBLIC_AXIOM_TOKEN=${{ secrets.TESTING_INGEST_API_TOKEN }}
+            NEXT_PUBLIC_AXIOM_URL=${{ vars.TESTING_API_URL }}
+            NEXT_PUBLIC_AXIOM_ORG_ID=${{ vars.TESTING_ORG_ID }}
+            AXIOM_DATASET_SUFFIX=${{ env.AXIOM_DATASET_SUFFIX }}
+          build-env: |
+            NEXT_PUBLIC_AXIOM_TOKEN=${{ secrets.TESTING_INGEST_API_TOKEN }}
+            NEXT_PUBLIC_AXIOM_URL=${{ vars.TESTING_API_URL }}
+            NEXT_PUBLIC_AXIOM_ORG_ID=${{ vars.TESTING_ORG_ID }}
+            AXIOM_DATASET_SUFFIX=${{ env.AXIOM_DATASET_SUFFIX }}
     outputs:
       preview-url: ${{ steps.vercel-deploy.outputs.preview-url }}
     environment:
@@ -206,6 +235,20 @@ jobs:
             ${{ runner.os }}-turbo-
       - run: pnpm install --frozen-lockfile
       - run: pnpm build && pnpm build:cjs # cjs build needed to run tests
+      - name: Validate testing configuration
+        shell: bash
+        run: |
+          missing=()
+          for name in AXIOM_TOKEN NEXT_PUBLIC_AXIOM_TOKEN AXIOM_URL AXIOM_ORG_ID TESTING_ENVIRONMENT; do
+            if [[ -z "${!name:-}" ]]; then
+              missing+=("$name")
+            fi
+          done
+          if (( ${#missing[@]} > 0 )); then
+            echo "Missing required testing configuration: ${missing[*]}"
+            exit 1
+          fi
+          echo "Testing configuration: org=${AXIOM_ORG_ID} url=${AXIOM_URL} environment=${TESTING_ENVIRONMENT}"
       - env:
           TESTING_TARGET_URL: ${{ needs.deploy-e2e-apps.outputs.preview-url }}
         run: pnpm run e2e

@@ -1,8 +1,42 @@
-import { Axiom } from '@axiomhq/js';
+import { Axiom, datasets } from '@axiomhq/js';
 import { describe, it, expect, beforeAll, afterAll, vi } from 'vitest';
+
+const datasetDeletionTimeoutMs = 30_000;
+const datasetDeletionPollIntervalMs = 250;
 
 function isNotFoundError(error: unknown) {
   return error instanceof Error && /not found/i.test(error.message);
+}
+
+async function cleanupDatasetIfExists(client: datasets.Service, datasetName: string) {
+  try {
+    await client.delete(datasetName);
+  } catch (error) {
+    if (isNotFoundError(error)) {
+      return;
+    }
+
+    throw error;
+  }
+
+  const deadline = Date.now() + datasetDeletionTimeoutMs;
+  while (true) {
+    try {
+      await client.get(datasetName);
+    } catch (error) {
+      if (isNotFoundError(error)) {
+        return;
+      }
+
+      throw error;
+    }
+
+    if (Date.now() >= deadline) {
+      throw new Error(`Timed out waiting for dataset ${datasetName} to be deleted`);
+    }
+
+    await new Promise(resolve => setTimeout(resolve, datasetDeletionPollIntervalMs));
+  }
 }
 
 describe('Ingestion & query on different runtime', () => {
@@ -12,28 +46,19 @@ describe('Ingestion & query on different runtime', () => {
   const datasetName = `axiom-js-e2e-test-${process.env.AXIOM_DATASET_SUFFIX || 'local'}`;
 
   beforeAll(async () => {
-    try {
-      await axiom.datasets.delete(datasetName);
-    } catch (error) {
-      if (!isNotFoundError(error)) throw error;
-    }
+    await cleanupDatasetIfExists(axiom.datasets, datasetName);
 
     const ds = await axiom.datasets.create({
       name: datasetName,
       description: 'This is a test dataset for datasets integration tests.',
     });
     console.log(`creating datasets for testing: ${ds.name} (${ds.id})`);
-  });
+  }, 60_000);
 
   afterAll(async () => {
-    try {
-      const resp = await axiom.datasets.delete(datasetName);
-      expect(resp.status).toEqual(204);
-      console.log(`deleted testing dataset: ${datasetName}`);
-    } catch (error) {
-      if (!isNotFoundError(error)) throw error;
-    }
-  });
+    await cleanupDatasetIfExists(axiom.datasets, datasetName);
+    console.log(`deleted testing dataset: ${datasetName}`);
+  }, 60_000);
 
   it('ingest on a lambda function should succeed', async () => {
     const startTime = new Date(Date.now()).toISOString();
