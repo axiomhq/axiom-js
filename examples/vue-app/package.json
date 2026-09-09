@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@axiomhq/js": "workspace:*",
-    "vue": "^3.5.20"
+    "vue": "^3.5.41"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^6.0.6",
