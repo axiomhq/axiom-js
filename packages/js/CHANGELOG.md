@@ -75,6 +75,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - V2 management services now expose the OpenAPI-generated request and response types directly. Legacy permissive fields
   such as `monitors.notifierIDs`, nullable dataset deployment fields, and optional user properties are no longer part of
   the public types. Delete and dataset trim operations now resolve to `void`.
+- See the [v2 to v3 migration guide](./MIGRATION.md) for upgrade instructions and examples.
 
 ## [1.3.0] - 2024-09-20
 

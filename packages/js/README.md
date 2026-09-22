@@ -41,6 +41,8 @@ npm install @axiomhq/js
 
 For more information about how to set up and use the Axiom JavaScript SDK, read documentation on [axiom.co/docs/guides/javascript](https://axiom.co/docs/guides/javascript).
 
+Upgrading from v2? Follow the [v2 to v3 migration guide](./MIGRATION.md).
+
 ## License
 
 [MIT](../../LICENSE)
