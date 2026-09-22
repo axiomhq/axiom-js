@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 
 import { annotations } from '../../src/annotations';
-import { AxiomWithoutBatching } from '../../src/client';
+import { AxiomClientWithoutBatching } from '../../src/client';
 import { dashboards } from '../../src/dashboards';
 import { datasets } from '../../src/datasets';
 import { groups } from '../../src/groups';
@@ -17,9 +17,9 @@ import { virtualFields } from '../../src/virtualFields';
 
 const clientURL = 'http://axiom-js-services.dev.local';
 
-describe('AxiomWithoutBatching mounted services', () => {
+describe('AxiomClientWithoutBatching mounted services', () => {
   it('mounts every management service', () => {
-    const client = new AxiomWithoutBatching({ url: clientURL, token: 'test-token' });
+    const client = new AxiomClientWithoutBatching({ url: clientURL, token: 'test-token' });
 
     expect(client.annotations).toBeInstanceOf(annotations.Service);
     expect(client.dashboards).toBeInstanceOf(dashboards.Service);
@@ -37,7 +37,7 @@ describe('AxiomWithoutBatching mounted services', () => {
   });
 
   it('propagates client configuration to mounted services', async () => {
-    const client = new AxiomWithoutBatching({
+    const client = new AxiomClientWithoutBatching({
       url: clientURL,
       token: 'test-token',
       orgId: 'org-id',

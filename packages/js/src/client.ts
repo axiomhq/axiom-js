@@ -90,9 +90,9 @@ class BaseClient extends HTTPClient {
    * @returns result a promise of ingest and its status, check: {@link IngestStatus}
    * @example
    * ```
-   * import { AxiomWithoutBatching } from '@axiomhq/js';
+   * import { AxiomClientWithoutBatching } from '@axiomhq/js';
    *
-   * const axiom = new AxiomWithoutBatching();
+   * const axiom = new AxiomClientWithoutBatching();
    * ```
    *
    */
@@ -382,13 +382,13 @@ class BaseClient extends HTTPClient {
 
 /**
  * Axiom's client without batching events in the background.
- * In most cases you'll want to use the {@link Axiom} client instead.
+ * In most cases you'll want to use the {@link AxiomClient} client instead.
  *
  *
  * @param options - The {@link ClientOptions} to configure authentication
  *
  */
-export class AxiomWithoutBatching extends BaseClient {
+export class AxiomClientWithoutBatching extends BaseClient {
   /**
    * Ingest event(s) asynchronously
    *
@@ -399,9 +399,9 @@ export class AxiomWithoutBatching extends BaseClient {
    *
    * @example
    * ```
-   * import { AxiomWithoutBatching } from '@axiomhq/js';
+   * import { AxiomClientWithoutBatching } from '@axiomhq/js';
    *
-   * const axiom = new AxiomWithoutBatching();
+   * const axiom = new AxiomClientWithoutBatching();
    * await axiom.ingest('dataset-name', [{ foo: 'bar' }])
    * ```
    *
@@ -420,7 +420,7 @@ export class AxiomWithoutBatching extends BaseClient {
  * @param options - The options passed to the client
  *
  */
-export class Axiom extends BaseClient {
+export class AxiomClient extends BaseClient {
   batch: { [id: string]: Batch } = {};
 
   /**

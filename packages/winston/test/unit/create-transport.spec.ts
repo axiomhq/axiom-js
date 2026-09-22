@@ -6,7 +6,7 @@ const axiomMock = vi.hoisted(() => ({
 }));
 
 vi.mock('@axiomhq/js', () => ({
-  AxiomWithoutBatching: class {
+  AxiomClientWithoutBatching: class {
     constructor(options: any) {
       axiomMock.options.push(options);
     }

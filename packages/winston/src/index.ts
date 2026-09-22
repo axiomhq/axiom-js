@@ -1,17 +1,17 @@
 import Transport, { TransportStreamOptions } from 'winston-transport';
 
-import { AxiomWithoutBatching } from '@axiomhq/js';
+import { AxiomClientWithoutBatching } from '@axiomhq/js';
 import type { ClientOptions } from '@axiomhq/js';
 
 const Version = 'AXIOM_VERSION';
-const AxiomClient = `axiom-winston/${Version}`;
+const AxiomClientProduct = `axiom-winston/${Version}`;
 
 export interface WinstonOptions extends TransportStreamOptions, ClientOptions {
   dataset?: string;
 }
 
 export class WinstonTransport extends Transport {
-  client: AxiomWithoutBatching;
+  client: AxiomClientWithoutBatching;
   dataset: string;
   batch: object[] = [];
   batchCallback: (err: Error | null) => void = () => {};
@@ -25,11 +25,11 @@ export class WinstonTransport extends Transport {
       url: opts.url,
       edge: opts.edge,
       edgeUrl: opts.edgeUrl,
-      axiomClient: appendAxiomClient(AxiomClient, opts.axiomClient),
+      axiomClient: appendAxiomClient(AxiomClientProduct, opts.axiomClient),
       onError: opts.onError,
       fetch: opts.fetch,
     };
-    this.client = new AxiomWithoutBatching(clientOptions);
+    this.client = new AxiomClientWithoutBatching(clientOptions);
     this.dataset = opts?.dataset || process.env.AXIOM_DATASET || '';
   }
 

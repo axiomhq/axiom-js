@@ -71,6 +71,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### ⚠ BREAKING CHANGES
 
+- `Axiom` is now `AxiomClient`, and `AxiomWithoutBatching` is now `AxiomClientWithoutBatching`.
 - V2 management services now expose the OpenAPI-generated request and response types directly. Legacy permissive fields
   such as `monitors.notifierIDs`, nullable dataset deployment fields, and optional user properties are no longer part of
   the public types. Delete and dataset trim operations now resolve to `void`.

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { AxiomWithoutBatching } from '../../src/client';
+import { AxiomClientWithoutBatching } from '../../src/client';
 import { testMockedFetchCall } from '../lib/mock';
 
 const defaultApiUrl = 'https://api.axiom.co';
@@ -34,7 +34,7 @@ const metricsResult = {
 
 describe('APL query URL behavior', () => {
   it('uses the default API base for APL queries without url or edge options', async () => {
-    const client = new AxiomWithoutBatching({ token: 'test-token' });
+    const client = new AxiomClientWithoutBatching({ token: 'test-token' });
 
     testMockedFetchCall((url: string) => {
       expect(url).toEqual(`${defaultApiUrl}/v1/datasets/_apl?format=tabular`);
@@ -44,7 +44,7 @@ describe('APL query URL behavior', () => {
   });
 
   it('keeps APL query options in the configured API URL when edge routing is absent', async () => {
-    const client = new AxiomWithoutBatching({ token: 'test-token', url: `${customApiUrl}/` });
+    const client = new AxiomClientWithoutBatching({ token: 'test-token', url: `${customApiUrl}/` });
 
     testMockedFetchCall((url: string) => {
       expect(url).toEqual(
@@ -60,7 +60,7 @@ describe('APL query URL behavior', () => {
   });
 
   it('routes APL queries through the configured edge domain', async () => {
-    const client = new AxiomWithoutBatching({ token: 'test-token', edge: edgeDomain });
+    const client = new AxiomClientWithoutBatching({ token: 'test-token', edge: edgeDomain });
 
     testMockedFetchCall((url: string) => {
       expect(url).toEqual(`https://${edgeDomain}/v1/query/_apl?format=tabular`);
@@ -70,7 +70,7 @@ describe('APL query URL behavior', () => {
   });
 
   it('prefers edgeUrl over edge and url for APL query routing', async () => {
-    const client = new AxiomWithoutBatching({
+    const client = new AxiomClientWithoutBatching({
       token: 'test-token',
       url: customApiUrl,
       edge: edgeDomain,
@@ -85,7 +85,7 @@ describe('APL query URL behavior', () => {
   });
 
   it('applies APL query routing through aplQuery', async () => {
-    const client = new AxiomWithoutBatching({ token: 'test-token', edge: edgeDomain });
+    const client = new AxiomClientWithoutBatching({ token: 'test-token', edge: edgeDomain });
 
     testMockedFetchCall((url: string) => {
       expect(url).toEqual(`https://${edgeDomain}/v1/query/_apl?format=tabular`);
@@ -95,7 +95,7 @@ describe('APL query URL behavior', () => {
   });
 
   it('defaults to APL when a metrics-looking query has no MPL type', async () => {
-    const client = new AxiomWithoutBatching({ token: 'test-token', url: customApiUrl });
+    const client = new AxiomClientWithoutBatching({ token: 'test-token', url: customApiUrl });
 
     testMockedFetchCall((url: string, init: RequestInit) => {
       expect(url).toEqual(`${customApiUrl}/v1/datasets/_apl?format=tabular`);
@@ -115,7 +115,7 @@ describe('APL query URL behavior', () => {
   });
 
   it('keeps custom edgeUrl paths as-is for APL queries', async () => {
-    const client = new AxiomWithoutBatching({ token: 'test-token', edgeUrl: `${customQueryPath}/` });
+    const client = new AxiomClientWithoutBatching({ token: 'test-token', edgeUrl: `${customQueryPath}/` });
 
     testMockedFetchCall((url: string) => {
       expect(url).toEqual(`${customQueryPath}?format=tabular`);
@@ -127,7 +127,7 @@ describe('APL query URL behavior', () => {
 
 describe('MPL query URL behavior', () => {
   it('requires edge routing for metrics queries', async () => {
-    const client = new AxiomWithoutBatching({ token: 'test-token' });
+    const client = new AxiomClientWithoutBatching({ token: 'test-token' });
 
     await expect(
       client.query('metrics:http_requests_total', {
@@ -139,7 +139,7 @@ describe('MPL query URL behavior', () => {
   });
 
   it('does not route metrics queries through the configured API URL', async () => {
-    const client = new AxiomWithoutBatching({ token: 'test-token', url: customApiUrl });
+    const client = new AxiomClientWithoutBatching({ token: 'test-token', url: customApiUrl });
 
     await expect(
       client.query('metrics:http_requests_total', {
@@ -151,7 +151,7 @@ describe('MPL query URL behavior', () => {
   });
 
   it('posts metrics queries to edge _mpl with body, format, and Accept override', async () => {
-    const client = new AxiomWithoutBatching({ token: 'test-token' });
+    const client = new AxiomClientWithoutBatching({ token: 'test-token' });
 
     testMockedFetchCall((url: string, init: RequestInit) => {
       expect(url).toEqual(`${edgeUrl}/v1/query/_mpl?format=metrics-v2`);
@@ -182,7 +182,7 @@ describe('MPL query URL behavior', () => {
     ['cloud.us-east-1.aws', 'https://us-east-1.aws.edge.axiom.co/v1/query/_mpl'],
     ['cloud.eu-central-1.aws', 'https://eu-central-1.aws.edge.axiom.co/v1/query/_mpl'],
   ])('routes documented edgeDeployment ID %s to its edge query domain', async (edgeDeployment, expectedUrl) => {
-    const client = new AxiomWithoutBatching({ token: 'test-token', url: customApiUrl });
+    const client = new AxiomClientWithoutBatching({ token: 'test-token', url: customApiUrl });
 
     testMockedFetchCall((url: string, init: RequestInit) => {
       expect(url).toEqual(expectedUrl);
@@ -204,7 +204,7 @@ describe('MPL query URL behavior', () => {
   });
 
   it('rejects undocumented edgeDeployment IDs', async () => {
-    const client = new AxiomWithoutBatching({ token: 'test-token', url: customApiUrl });
+    const client = new AxiomClientWithoutBatching({ token: 'test-token', url: customApiUrl });
 
     await expect(
       client.query('metrics:http_requests_total', {
@@ -224,7 +224,7 @@ describe('MPL query URL behavior', () => {
     ],
     ['edge', { edge: 'us-east-1.aws.edge.axiom.co' }, 'https://us-east-1.aws.edge.axiom.co/v1/query/_mpl'],
   ])('uses per-call %s before constructor MPL routing', async (_name, routing, expectedUrl) => {
-    const client = new AxiomWithoutBatching({
+    const client = new AxiomClientWithoutBatching({
       token: 'test-token',
       url: customApiUrl,
       edge: edgeDomain,
@@ -253,7 +253,7 @@ describe('MPL query URL behavior', () => {
   ])(
     'uses constructor %s for MPL routing when per-call routing is absent',
     async (_name, clientRouting, expectedUrl) => {
-      const client = new AxiomWithoutBatching({
+      const client = new AxiomClientWithoutBatching({
         token: 'test-token',
         url: customApiUrl,
         ...clientRouting,
@@ -272,7 +272,7 @@ describe('MPL query URL behavior', () => {
   );
 
   it('keeps custom edgeUrl paths as-is for MPL queries', async () => {
-    const client = new AxiomWithoutBatching({ token: 'test-token', edgeUrl: `${customQueryPath}/` });
+    const client = new AxiomClientWithoutBatching({ token: 'test-token', edgeUrl: `${customQueryPath}/` });
 
     testMockedFetchCall((url: string) => {
       expect(url).toEqual(customQueryPath);
@@ -286,7 +286,7 @@ describe('MPL query URL behavior', () => {
   });
 
   it('keeps query callable when detached from the client instance', async () => {
-    const client = new AxiomWithoutBatching({ token: 'test-token', edge: 'us-east-1.aws.edge.axiom.co' });
+    const client = new AxiomClientWithoutBatching({ token: 'test-token', edge: 'us-east-1.aws.edge.axiom.co' });
     const query = client.query;
 
     testMockedFetchCall((url: string) => {

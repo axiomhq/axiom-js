@@ -1,9 +1,9 @@
 import build from 'pino-abstract-transport';
-import { Axiom } from '@axiomhq/js';
+import { AxiomClient } from '@axiomhq/js';
 import type { ClientOptions } from '@axiomhq/js';
 
 const Version = 'AXIOM_VERSION';
-const AxiomClient = `axiom-pino/${Version}`;
+const AxiomClientProduct = `axiom-pino/${Version}`;
 
 export enum AxiomEventLevel {
   Trace = 'trace',
@@ -29,9 +29,9 @@ export interface Options extends ClientOptions {
 export default async function axiomTransport(options: Options) {
   const clientOptions: ClientOptions = {
     ...options,
-    axiomClient: appendAxiomClient(AxiomClient, options.axiomClient),
+    axiomClient: appendAxiomClient(AxiomClientProduct, options.axiomClient),
   };
-  const axiom = new Axiom(clientOptions);
+  const axiom = new AxiomClient(clientOptions);
 
   const dataset = options.dataset;
 

@@ -4,7 +4,7 @@ import { http, HttpResponse } from 'msw';
 import { Readable } from 'node:stream';
 import { gunzipSync, gzipSync } from 'zlib';
 
-import { ContentType, ContentEncoding, Axiom, AxiomWithoutBatching } from '../../src/client';
+import { ContentType, ContentEncoding, AxiomClient, AxiomClientWithoutBatching } from '../../src/client';
 import { AxiomTooManyRequestsError } from '../../src/fetchClient';
 import { headerAPILimit, headerAPIRateRemaining, headerAPIRateReset, headerRateScope } from '../../src/limit';
 import { mockFetchResponse, mockFetchResponseErr, testMockedFetchCall } from '../lib/mock';
@@ -182,13 +182,13 @@ const decodeGzipBody = (body: BodyInit | null | undefined): string => {
   return gunzipSync(Buffer.from(body)).toString('utf-8');
 };
 
-describe('Axiom', () => {
-  let axiom = new AxiomWithoutBatching({ url: clientURL, token: '' });
+describe('AxiomClient', () => {
+  let axiom = new AxiomClientWithoutBatching({ url: clientURL, token: '' });
   expect(axiom).toBeDefined();
 
   beforeEach(() => {
     // reset client to clear rate limits
-    axiom = new AxiomWithoutBatching({ url: clientURL, token: '' });
+    axiom = new AxiomClientWithoutBatching({ url: clientURL, token: '' });
     // restore all mocks to prevent test interference
     vi.restoreAllMocks();
   });
@@ -202,7 +202,7 @@ describe('Axiom', () => {
     const customFetch = vi.fn<typeof fetch>(async () => {
       return new Response(JSON.stringify([]));
     });
-    const client = new AxiomWithoutBatching({ url: clientURL, token: '', fetch: customFetch });
+    const client = new AxiomClientWithoutBatching({ url: clientURL, token: '', fetch: customFetch });
 
     await client.datasets.list();
 
@@ -210,7 +210,7 @@ describe('Axiom', () => {
   });
 
   it('appends custom products to the X-Axiom-Client header', async () => {
-    const client = new AxiomWithoutBatching({ url: clientURL, token: '', axiomClient: 'my-app/1.0' });
+    const client = new AxiomClientWithoutBatching({ url: clientURL, token: '', axiomClient: 'my-app/1.0' });
 
     testMockedFetchCall((_: string, init: RequestInit) => {
       const headers = new Headers(init.headers);
@@ -222,7 +222,7 @@ describe('Axiom', () => {
   });
 
   it('does not append an empty custom X-Axiom-Client product', async () => {
-    const client = new AxiomWithoutBatching({ url: clientURL, token: '', axiomClient: '   ' });
+    const client = new AxiomClientWithoutBatching({ url: clientURL, token: '', axiomClient: '   ' });
 
     testMockedFetchCall((_: string, init: RequestInit) => {
       const headers = new Headers(init.headers);
@@ -233,7 +233,7 @@ describe('Axiom', () => {
   });
 
   it('appends X-Axiom-Client products after client construction', async () => {
-    const client = new AxiomWithoutBatching({ url: clientURL, token: '' });
+    const client = new AxiomClientWithoutBatching({ url: clientURL, token: '' });
 
     client.appendAxiomClient('axiom-logging/1.0 axiom-react/1.0');
     client.appendAxiomClient('axiom-react/1.0');
@@ -453,7 +453,7 @@ describe('Axiom', () => {
         walLength: 2,
       };
 
-      const client = new Axiom({ url: clientURL, token: '' });
+      const client = new AxiomClient({ url: clientURL, token: '' });
       testMockedFetchCall((_: string, init: RequestInit) => {
         const headers = new Headers(init.headers);
         expect(headers.get('Content-Type')).toEqual(ContentType.NDJSON);
@@ -466,14 +466,14 @@ describe('Axiom', () => {
     });
 
     it('does not throw exception on ingest (50x failure)', async () => {
-      let client = new AxiomWithoutBatching({ url: clientURL, token: 'test' });
+      let client = new AxiomClientWithoutBatching({ url: clientURL, token: 'test' });
       mockFetchResponseErr();
 
       await expect(client.ingest('test', [{ name: 'test' }])).resolves.toBeTruthy();
     }, 50000);
 
     it('does not throw exception on ingest (40x failure)', async () => {
-      let client = new AxiomWithoutBatching({ url: clientURL, token: 'test' });
+      let client = new AxiomClientWithoutBatching({ url: clientURL, token: 'test' });
       mockFetchResponseErr(401);
 
       await expect(client.ingest('test', [{ name: 'test' }])).resolves.toBeTruthy();
@@ -481,7 +481,7 @@ describe('Axiom', () => {
 
     it('catch ingest errors', async () => {
       let errorCaptured = false;
-      let client = new Axiom({
+      let client = new AxiomClient({
         url: clientURL,
         token: 'test',
         onError: (err) => {
@@ -498,7 +498,7 @@ describe('Axiom', () => {
 
     it('catch ingest errors on WithoutBatching client', async () => {
       let errorCaptured = false;
-      let client = new AxiomWithoutBatching({
+      let client = new AxiomClientWithoutBatching({
         url: clientURL,
         token: 'test',
         onError: (err) => {
@@ -526,7 +526,7 @@ describe('Axiom', () => {
 
       let error: string | null = null;
 
-      let client = new AxiomWithoutBatching({
+      let client = new AxiomClientWithoutBatching({
         url: clientURL,
         token: 'test',
         onError: (err) => {
@@ -633,7 +633,7 @@ describe('Axiom', () => {
 
       server.listen();
 
-      let client = new AxiomWithoutBatching({
+      let client = new AxiomClientWithoutBatching({
         url: clientURL,
         token: 'test',
       });
@@ -645,18 +645,18 @@ describe('Axiom', () => {
   });
 
   describe('Tokens', () => {
-    it('Should warn when creating Axiom with a personal token', async () => {
+    it('Should warn when creating AxiomClient with a personal token', async () => {
       const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
-      const _client = new Axiom({ token: 'xapt-test' });
+      const _client = new AxiomClient({ token: 'xapt-test' });
 
       expect(consoleWarnSpy).toHaveBeenCalledWith(
         'Using a personal token (`xapt-...`) is deprecated for security reasons. Please use an API token (`xaat-...`) instead. Support for personal tokens will be removed in a future release.',
       );
     });
 
-    it('Should not warn when creating AxiomWithoutBatching with a personal token', async () => {
+    it('Should not warn when creating AxiomClientWithoutBatching with a personal token', async () => {
       const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
-      const _client = new AxiomWithoutBatching({ token: 'xapt-test' });
+      const _client = new AxiomClientWithoutBatching({ token: 'xapt-test' });
 
       expect(consoleWarnSpy).toHaveBeenCalledWith(
         'Using a personal token (`xapt-...`) is deprecated for security reasons. Please use an API token (`xaat-...`) instead. Support for personal tokens will be removed in a future release.',

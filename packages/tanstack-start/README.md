@@ -256,11 +256,11 @@ export const clientLogger = new Logger({
 
 ```ts
 // src/lib/axiom/server.ts
-import { Axiom } from '@axiomhq/js';
+import { AxiomClient } from '@axiomhq/js';
 import { AxiomJSTransport, ConsoleTransport, Logger } from '@axiomhq/logging';
 import { tanStackStartServerFormatters } from '@axiomhq/tanstack-start';
 
-const axiom = new Axiom({ token: process.env.AXIOM_TOKEN! });
+const axiom = new AxiomClient({ token: process.env.AXIOM_TOKEN! });
 
 export const startLogger = new Logger({
   transports: [

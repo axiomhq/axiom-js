@@ -1,10 +1,10 @@
 import { describe, expect, it, vi } from 'vitest';
 
-import { AxiomWithoutBatching } from '../../src/client';
+import { AxiomClientWithoutBatching } from '../../src/client';
 import { dashboards } from '../../src/dashboards';
 
 const baseUrl = 'http://axiom-js-generated.dev.local';
-const client = new AxiomWithoutBatching({ url: baseUrl, token: 'test-token' });
+const client = new AxiomClientWithoutBatching({ url: baseUrl, token: 'test-token' });
 
 interface ServiceCase {
   name: string;

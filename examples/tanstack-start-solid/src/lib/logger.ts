@@ -1,4 +1,4 @@
-import { Axiom } from '@axiomhq/js'
+import { AxiomClient } from '@axiomhq/js'
 import { AxiomJSTransport, ConsoleTransport, Logger } from '@axiomhq/logging'
 import type { Transport } from '@axiomhq/logging'
 import { tanStackStartServerFormatters } from '@axiomhq/tanstack-start'
@@ -13,7 +13,7 @@ function createTransports(): [Transport, ...Transport[]] {
   ]
 
   if (token && dataset) {
-    const axiom = new Axiom({ token })
+    const axiom = new AxiomClient({ token })
     transports.unshift(new AxiomJSTransport({ axiom, dataset }))
   }
 

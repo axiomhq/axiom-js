@@ -3,9 +3,9 @@
 The Axiom JavaScript SDK allows you to send data from a JavaScript app to Axiom.
 
 ```ts
-import { Axiom } from '@axiomhq/js';
+import { AxiomClient } from '@axiomhq/js';
 
-const axiom = new Axiom({
+const axiom = new AxiomClient({
   token: process.env.AXIOM_TOKEN,
   axiomClient: 'my-app/1.0',
 });

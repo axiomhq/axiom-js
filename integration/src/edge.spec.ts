@@ -1,5 +1,5 @@
 import { describe, expect, it, beforeAll, afterAll } from 'vitest';
-import { AxiomWithoutBatching, Axiom } from '@axiomhq/js';
+import { AxiomClientWithoutBatching, AxiomClient } from '@axiomhq/js';
 import { createTestDataset, cleanupDatasetIfExists } from './testHelpers';
 
 const datasetSuffix = process.env.AXIOM_DATASET_SUFFIX || 'local';
@@ -18,7 +18,7 @@ describe.skipIf(!hasEdgeConfig)('Edge Ingestion', () => {
   // Single client with edge configuration
   // - API operations (datasets.create, datasets.list, users.current) use main URL
   // - Ingest/query operations use edge URL
-  const axiom = new AxiomWithoutBatching({
+  const axiom = new AxiomClientWithoutBatching({
     token: process.env.AXIOM_TOKEN || '',
     url: process.env.AXIOM_URL,
     orgId: process.env.AXIOM_ORG_ID,
@@ -27,7 +27,7 @@ describe.skipIf(!hasEdgeConfig)('Edge Ingestion', () => {
   });
 
   // Batch client with edge options
-  const axiomBatch = new Axiom({
+  const axiomBatch = new AxiomClient({
     token: process.env.AXIOM_TOKEN || '',
     url: process.env.AXIOM_URL,
     orgId: process.env.AXIOM_ORG_ID,

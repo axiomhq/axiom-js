@@ -1,6 +1,6 @@
 export {
-  AxiomWithoutBatching,
-  Axiom,
+  AxiomClientWithoutBatching,
+  AxiomClient,
   ContentType,
   ContentEncoding,
   IngestOptions,

@@ -1,4 +1,4 @@
-import { AxiomWithoutBatching } from '@axiomhq/js';
+import { AxiomClientWithoutBatching } from '@axiomhq/js';
 import { NextResponse } from 'next/server';
 
 export const runtime = 'edge';
@@ -6,7 +6,7 @@ export const dynamic = 'force-dynamic'; // disable prerendering
 
 export async function GET(request: Request) {
   const dataset = new URL(request.url).searchParams.get('dataset') || 'axiom-js-e2e-test';
-  const axiom = new AxiomWithoutBatching({
+  const axiom = new AxiomClientWithoutBatching({
     token: process.env.AXIOM_TOKEN || '',
     orgId: process.env.AXIOM_ORG_ID,
     url: process.env.AXIOM_URL,

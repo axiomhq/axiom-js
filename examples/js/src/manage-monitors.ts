@@ -14,7 +14,7 @@ async function createMonitor() {
     threshold: 90,
     alertOnNoData: true,
     notifyByGroup: false,
-    notifierIDs: [],
+    notifierIds: [],
     intervalMinutes: 5,
     rangeMinutes: 10,
   });
@@ -49,7 +49,7 @@ async function updateMonitor(id: string) {
     threshold: 90,
     alertOnNoData: true,
     notifyByGroup: false,
-    notifierIDs: [],
+    notifierIds: [],
     intervalMinutes: 5,
     rangeMinutes: 10,
   });
