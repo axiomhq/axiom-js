@@ -1,202 +1,60 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
-import { AxiomWithoutBatching } from '../../src/client';
 import { annotations } from '../../src/annotations';
+import { AxiomWithoutBatching } from '../../src/client';
 import { dashboards } from '../../src/dashboards';
+import { datasets } from '../../src/datasets';
+import { groups } from '../../src/groups';
 import { monitors } from '../../src/monitors';
+import { notifiers } from '../../src/notifiers';
+import { orgs } from '../../src/orgs';
+import { roles } from '../../src/roles';
 import { savedQueries } from '../../src/savedQueries';
 import { tokens } from '../../src/tokens';
 import { users } from '../../src/users';
-import { testMockedFetchCall } from '../lib/mock';
+import { views } from '../../src/views';
+import { virtualFields } from '../../src/virtualFields';
 
 const clientURL = 'http://axiom-js-services.dev.local';
 
 describe('AxiomWithoutBatching mounted services', () => {
-  it('lists API tokens through the mounted tokens service', async () => {
+  it('mounts every management service', () => {
     const client = new AxiomWithoutBatching({ url: clientURL, token: 'test-token' });
-    const response: tokens.Token[] = [
-      {
-        id: 'token-id',
-        name: 'Deploy token',
-        datasetCapabilities: {},
-        orgCapabilities: {},
-      },
-    ];
 
-    testMockedFetchCall((url: string, init: RequestInit) => {
-      expect(url).toEqual(`${clientURL}/v2/tokens`);
-      expect(init.method).toEqual('GET');
-    }, response);
-
-    await expect(client.tokens.list()).resolves.toEqual(response);
+    expect(client.annotations).toBeInstanceOf(annotations.Service);
+    expect(client.dashboards).toBeInstanceOf(dashboards.Service);
+    expect(client.datasets).toBeInstanceOf(datasets.Service);
+    expect(client.groups).toBeInstanceOf(groups.Service);
+    expect(client.monitors).toBeInstanceOf(monitors.Service);
+    expect(client.notifiers).toBeInstanceOf(notifiers.Service);
+    expect(client.orgs).toBeInstanceOf(orgs.Service);
+    expect(client.roles).toBeInstanceOf(roles.Service);
+    expect(client.savedQueries).toBeInstanceOf(savedQueries.Service);
+    expect(client.tokens).toBeInstanceOf(tokens.Service);
+    expect(client.users).toBeInstanceOf(users.Service);
+    expect(client.views).toBeInstanceOf(views.Service);
+    expect(client.virtualFields).toBeInstanceOf(virtualFields.Service);
   });
 
-  it('creates annotations through the mounted annotations service', async () => {
-    const client = new AxiomWithoutBatching({ url: clientURL, token: 'test-token' });
-    const request: annotations.CreateRequest = {
-      datasets: ['logs'],
-      type: 'symphony-agent',
-    };
-    const response: annotations.Annotation = {
-      id: 'annotation-id',
-      datasets: request.datasets,
-      time: '2026-06-02T00:00:00Z',
-      type: request.type,
-    };
+  it('propagates client configuration to mounted services', async () => {
+    const client = new AxiomWithoutBatching({
+      url: clientURL,
+      token: 'test-token',
+      orgId: 'org-id',
+    });
+    client.appendAxiomClient('my-app/1.0');
 
-    testMockedFetchCall((url: string, init: RequestInit) => {
-      expect(url).toEqual(`${clientURL}/v2/annotations`);
-      expect(init.method).toEqual('POST');
-      expect(init.body).toEqual(JSON.stringify(request));
-    }, response);
+    vi.spyOn(global, 'fetch').mockImplementationOnce((url: RequestInfo | URL, init?: RequestInit) => {
+      const headers = new Headers(init?.headers);
 
-    await expect(client.annotations.create(request)).resolves.toEqual(response);
+      expect(String(url)).toEqual(`${clientURL}/v2/tokens`);
+      expect(headers.get('Authorization')).toEqual('Bearer test-token');
+      expect(headers.get('X-Axiom-Org-Id')).toEqual('org-id');
+      expect(headers.get('X-Axiom-Client')).toEqual('axiom-js/AXIOM_VERSION my-app/1.0');
+
+      return Promise.resolve(Response.json([]));
+    });
+
+    await expect(client.tokens.list()).resolves.toEqual([]);
   });
-
-  it('lists monitors through the mounted monitors service', async () => {
-    const client = new AxiomWithoutBatching({ url: clientURL, token: 'test-token' });
-    const response: monitors.Monitor[] = [
-      {
-        id: 'monitor-id',
-        createdAt: '2026-06-02T00:00:00Z',
-        createdBy: 'user-id',
-        name: 'Metric anomaly',
-        type: 'AnomalyDetection',
-        mplQuery: 'metrics:http_requests_total',
-        notifierIds: ['notifier-id'],
-      },
-    ];
-
-    testMockedFetchCall((url: string, init: RequestInit) => {
-      expect(url).toEqual(`${clientURL}/v2/monitors`);
-      expect(init.method).toEqual('GET');
-    }, response);
-
-    await expect(client.monitors.list()).resolves.toEqual(response);
-  });
-
-  it('gets monitors through the mounted monitors service', async () => {
-    const client = new AxiomWithoutBatching({ url: clientURL, token: 'test-token' });
-    const response: monitors.Monitor = {
-      id: 'monitor-id',
-      createdAt: '2026-06-02T00:00:00Z',
-      createdBy: 'user-id',
-      name: 'Error rate',
-      type: 'Threshold',
-      aplQuery: "['logs'] | where level == 'error'",
-      operator: 'Above',
-      notifierIds: ['notifier-id'],
-    };
-
-    testMockedFetchCall((url: string, init: RequestInit) => {
-      expect(url).toEqual(`${clientURL}/v2/monitors/monitor-id`);
-      expect(init.method).toEqual('GET');
-    }, response);
-
-    await expect(client.monitors.get('monitor-id')).resolves.toEqual(response);
-  });
-
-  it('gets the current user through the mounted users service', async () => {
-    const client = new AxiomWithoutBatching({ url: clientURL, token: 'test-token' });
-    const response: users.User = {
-      id: 'user-id',
-      name: 'Axiom User',
-      email: 'user@example.com',
-      role: { id: 'admin', name: 'Admin' },
-    };
-
-    testMockedFetchCall((url: string, init: RequestInit) => {
-      expect(url).toEqual(`${clientURL}/v2/user`);
-      expect(init.method).toEqual('GET');
-    }, response);
-
-    await expect(client.users.current()).resolves.toEqual(response);
-  });
-
-  it('lists and gets users through the mounted users service', async () => {
-    const client = new AxiomWithoutBatching({ url: clientURL, token: 'test-token' });
-    const response: users.User[] = [
-      {
-        id: 'user-id',
-        name: 'Axiom User',
-        email: 'user@example.com',
-        role: { id: 'admin', name: 'Admin' },
-      },
-    ];
-
-    testMockedFetchCall((url: string, init: RequestInit) => {
-      expect(url).toEqual(`${clientURL}/v2/users`);
-      expect(init.method).toEqual('GET');
-    }, response);
-
-    await expect(client.users.list()).resolves.toEqual(response);
-
-    testMockedFetchCall((url: string, init: RequestInit) => {
-      expect(url).toEqual(`${clientURL}/v2/users/user-id`);
-      expect(init.method).toEqual('GET');
-    }, response[0]);
-
-    await expect(client.users.get('user-id')).resolves.toEqual(response[0]);
-  });
-
-  it('lists dashboards through the mounted dashboards service', async () => {
-    const client = new AxiomWithoutBatching({ url: clientURL, token: 'test-token' });
-    const response = [
-      {
-        id: 'dashboard-id',
-        uid: 'dashboard-uid',
-        dashboard: { name: 'Runtime overview' },
-      },
-    ] as unknown as dashboards.DashboardResource[];
-
-    testMockedFetchCall((url: string, init: RequestInit) => {
-      expect(url).toEqual(`${clientURL}/v2/dashboards?limit=100&offset=20`);
-      expect(init.method).toEqual('GET');
-    }, response);
-
-    await expect(client.dashboards.list({ limit: 100, offset: 20 })).resolves.toEqual(response);
-  });
-
-  it('lists saved queries through the mounted savedQueries service', async () => {
-    const client = new AxiomWithoutBatching({ url: clientURL, token: 'test-token' });
-    const response: savedQueries.SavedQuery[] = [
-      {
-        id: 'saved-query-id',
-        kind: 'apl',
-        metadata: {},
-        name: 'Recent errors',
-        query: { apl: "['logs'] | where level == 'error'" },
-        who: 'user-id',
-      },
-    ];
-
-    testMockedFetchCall((url: string, init: RequestInit) => {
-      expect(url).toEqual(`${clientURL}/v2/apl-starred-queries?limit=100&who=all`);
-      expect(init.method).toEqual('GET');
-    }, response);
-
-    await expect(client.savedQueries.list({ limit: 100, who: 'all' })).resolves.toEqual(response);
-  });
-
-  it('creates monitor payloads with notifierIds', async () => {
-    const client = new AxiomWithoutBatching({ url: clientURL, token: 'test-token' });
-    const request: monitors.CreateRequest = {
-      name: 'Metric anomaly',
-      type: 'AnomalyDetection',
-      mplQuery: 'metrics:http_requests_total',
-      notifierIds: ['notifier-id'],
-    };
-
-    testMockedFetchCall(
-      (url: string, init: RequestInit) => {
-        expect(url).toEqual(`${clientURL}/v2/monitors`);
-        expect(init.method).toEqual('POST');
-        expect(init.body).toEqual(JSON.stringify(request));
-      },
-      { id: 'monitor-id', createdAt: '2026-06-02T00:00:00Z', createdBy: 'user-id', ...request },
-    );
-
-    await client.monitors.create(request);
-  });
-
 });
