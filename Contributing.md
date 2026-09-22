@@ -12,7 +12,7 @@ When reporting a bug, please try and provide as much context as possible such as
 
 ## Requirements
 
-Node.js 20 or higher is required. Node.js 18 is no longer supported.
+Node.js 22 or higher is required. Earlier Node.js versions are no longer supported.
 
 ## Setup
 

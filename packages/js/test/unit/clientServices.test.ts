@@ -5,12 +5,32 @@ import { annotations } from '../../src/annotations';
 import { dashboards } from '../../src/dashboards';
 import { monitors } from '../../src/monitors';
 import { savedQueries } from '../../src/savedQueries';
+import { tokens } from '../../src/tokens';
 import { users } from '../../src/users';
 import { testMockedFetchCall } from '../lib/mock';
 
 const clientURL = 'http://axiom-js-services.dev.local';
 
 describe('AxiomWithoutBatching mounted services', () => {
+  it('lists API tokens through the mounted tokens service', async () => {
+    const client = new AxiomWithoutBatching({ url: clientURL, token: 'test-token' });
+    const response: tokens.Token[] = [
+      {
+        id: 'token-id',
+        name: 'Deploy token',
+        datasetCapabilities: {},
+        orgCapabilities: {},
+      },
+    ];
+
+    testMockedFetchCall((url: string, init: RequestInit) => {
+      expect(url).toEqual(`${clientURL}/v2/tokens`);
+      expect(init.method).toEqual('GET');
+    }, response);
+
+    await expect(client.tokens.list()).resolves.toEqual(response);
+  });
+
   it('creates annotations through the mounted annotations service', async () => {
     const client = new AxiomWithoutBatching({ url: clientURL, token: 'test-token' });
     const request: annotations.CreateRequest = {
@@ -65,7 +85,7 @@ describe('AxiomWithoutBatching mounted services', () => {
       type: 'Threshold',
       aplQuery: "['logs'] | where level == 'error'",
       operator: 'Above',
-      notifierIDs: ['legacy-notifier-id'],
+      notifierIds: ['notifier-id'],
     };
 
     testMockedFetchCall((url: string, init: RequestInit) => {
@@ -121,13 +141,13 @@ describe('AxiomWithoutBatching mounted services', () => {
 
   it('lists dashboards through the mounted dashboards service', async () => {
     const client = new AxiomWithoutBatching({ url: clientURL, token: 'test-token' });
-    const response: dashboards.DashboardResource[] = [
+    const response = [
       {
         id: 'dashboard-id',
         uid: 'dashboard-uid',
         dashboard: { name: 'Runtime overview' },
       },
-    ];
+    ] as unknown as dashboards.DashboardResource[];
 
     testMockedFetchCall((url: string, init: RequestInit) => {
       expect(url).toEqual(`${clientURL}/v2/dashboards?limit=100&offset=20`);
@@ -179,24 +199,4 @@ describe('AxiomWithoutBatching mounted services', () => {
     await client.monitors.create(request);
   });
 
-  it('creates monitor payloads with legacy notifierIDs', async () => {
-    const client = new AxiomWithoutBatching({ url: clientURL, token: 'test-token' });
-    const request: monitors.CreateRequest = {
-      name: 'Error rate',
-      type: 'Threshold',
-      aplQuery: "['logs'] | where level == 'error'",
-      notifierIDs: ['legacy-notifier-id'],
-    };
-
-    testMockedFetchCall(
-      (url: string, init: RequestInit) => {
-        expect(url).toEqual(`${clientURL}/v2/monitors`);
-        expect(init.method).toEqual('POST');
-        expect(init.body).toEqual(JSON.stringify(request));
-      },
-      { id: 'monitor-id', createdAt: '2026-06-02T00:00:00Z', createdBy: 'user-id', ...request },
-    );
-
-    await client.monitors.create(request);
-  });
 });

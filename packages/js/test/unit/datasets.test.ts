@@ -147,9 +147,7 @@ describe('DatasetsService', () => {
       expect(init.method).toEqual('DELETE');
     });
 
-    const response = await client.delete('test/1');
-    expect(response).toBeDefined();
-    expect(response.status).toEqual(204);
+    await expect(client.delete('test/1')).resolves.toBeUndefined();
   });
 
   it('Trim', async () => {
@@ -159,9 +157,7 @@ describe('DatasetsService', () => {
       expect(init.body).toEqual(JSON.stringify({ maxDuration: '30m' }));
     });
 
-    const response = await client.trim('test/1', '30m');
-    expect(response).not.toEqual('undefined');
-    expect(response.status).toEqual(204);
+    await expect(client.trim('test/1', '30m')).resolves.toBeUndefined();
   });
 
   it.each([

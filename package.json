@@ -11,7 +11,7 @@
     "Arne Bahlo <arne@axiom.co>"
   ],
   "engines": {
-    "node": ">=20"
+    "node": ">=22"
   },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -37,13 +37,14 @@
     "build:cjs": "turbo run build:cjs",
     "test": "turbo run test",
     "integration": "turbo run integration",
-    "e2e": "turbo run e2e"
+    "e2e": "turbo run e2e",
+    "generate:openapi": "pnpm --filter @axiomhq/js generate:openapi"
   },
   "type": "module",
   "devDependencies": {
     "@rollup/plugin-replace": "^6.0.3",
     "@rollup/plugin-typescript": "^12.1.4",
-    "@types/node": "^20.19.39",
+    "@types/node": "^22.19.11",
     "@typescript-eslint/eslint-plugin": "^8.59.2",
     "@typescript-eslint/parser": "^8.59.2",
     "@vitest/coverage-v8": "^4.1.9",

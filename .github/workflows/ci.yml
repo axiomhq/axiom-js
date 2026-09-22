@@ -34,8 +34,8 @@ jobs:
     strategy:
       matrix:
         node:
+          - 22.x
           - 24.x
-          - 26.x
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v6
       - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6
@@ -69,7 +69,7 @@ jobs:
           version: ${{ env.PNPM_VERSION }}
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v6
         with:
-          node-version: 20.x
+          node-version: 22.x
           cache: 'pnpm'
       - name: Cache turbo build setup
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
@@ -88,8 +88,8 @@ jobs:
     strategy:
       matrix:
         node:
+          - 22.x
           - 24.x
-          - 26.x
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v6
       - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6
@@ -115,8 +115,8 @@ jobs:
       fail-fast: true
       matrix:
         node:
+          - 22.x
           - 24.x
-          - 26.x
     env:
       AXIOM_TOKEN: ${{ secrets.TESTING_API_TOKEN }}
       AXIOM_URL: ${{ vars.TESTING_API_URL }}
@@ -215,8 +215,8 @@ jobs:
     strategy:
       matrix:
         node:
+          - 22.x
           - 24.x
-          - 26.x
       max-parallel: 1
       fail-fast: true
     steps:

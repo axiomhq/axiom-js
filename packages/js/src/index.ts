@@ -36,6 +36,13 @@ export { ClientOptions, resolveAplQueryUrl, resolveIngestUrl, resolveMplQueryUrl
 export { datasets } from './datasets.js';
 export { annotations } from './annotations.js';
 export { dashboards } from './dashboards.js';
+export { groups } from './groups.js';
 export { users } from './users.js';
 export { monitors } from './monitors.js';
+export { notifiers } from './notifiers.js';
+export { orgs } from './orgs.js';
+export { roles } from './roles.js';
 export { savedQueries } from './savedQueries.js';
+export { tokens } from './tokens.js';
+export { virtualFields } from './virtualFields.js';
+export { views } from './views.js';

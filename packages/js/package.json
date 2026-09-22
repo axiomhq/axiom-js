@@ -10,7 +10,7 @@
     "Arne Bahlo <arne@axiom.co>"
   ],
   "engines": {
-    "node": ">=20"
+    "node": ">=22"
   },
   "type": "module",
   "types": "dist/esm/types/index.d.ts",
@@ -19,6 +19,7 @@
   "scripts": {
     "build": "rollup -c rollup.config.js",
     "build:cjs": "rollup -c rollup.config.cjs.js",
+    "generate:openapi": "node ./scripts/prepare-openapi.mjs && pnpm dlx orval@8.35.0 --config ./orval.config.ts",
     "format": "eslint './**/*.{js,ts}' --quiet --fix",
     "lint": "eslint './**/*.{js,ts}'",
     "typecheck": "tsc -p tsconfig.json --emitDeclarationOnly false --noEmit",

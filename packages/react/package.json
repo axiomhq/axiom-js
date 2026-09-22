@@ -55,7 +55,7 @@
   },
   "homepage": "https://github.com/axiomhq/axiom-js/blob/main/packages/react/README.md",
   "engines": {
-    "node": ">=20"
+    "node": ">=22"
   },
   "dependencies": {
     "use-deep-compare": "^1.3.0",
