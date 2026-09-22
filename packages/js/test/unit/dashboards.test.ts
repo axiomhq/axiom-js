@@ -9,14 +9,14 @@ describe('DashboardsService', () => {
   const client = new dashboards.Service({ url: baseUrl, token: 'test-token' });
 
   it('lists dashboards with limit and offset query params', async () => {
-    const response: dashboards.DashboardResource[] = [
+    const response = [
       {
         id: 'dashboard-id',
         uid: 'dashboard-uid',
         dashboard: { name: 'Runtime overview' },
         version: 1,
       },
-    ];
+    ] as unknown as dashboards.DashboardResource[];
 
     testMockedFetchCall((url: string, init: RequestInit) => {
       expect(url).toEqual(`${baseUrl}/v2/dashboards?limit=100&offset=20`);
@@ -27,7 +27,7 @@ describe('DashboardsService', () => {
   });
 
   it('gets a dashboard by encoded uid', async () => {
-    const response: dashboards.DashboardResource = {
+    const response = {
       id: 'dashboard-id',
       uid: 'folder/dashboard #1',
       dashboard: {
@@ -39,7 +39,7 @@ describe('DashboardsService', () => {
       updatedAt: '2026-06-03T00:00:00Z',
       updatedBy: 'user-id',
       version: 2,
-    };
+    } as unknown as dashboards.DashboardResource;
 
     testMockedFetchCall((url: string, init: RequestInit) => {
       expect(url).toEqual(`${baseUrl}/v2/dashboards/uid/folder%2Fdashboard%20%231`);

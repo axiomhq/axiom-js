@@ -21,7 +21,7 @@
   },
   "homepage": "https://github.com/axiomhq/axiom-js/blob/main/packages/nextjs/README.md",
   "engines": {
-    "node": ">=20"
+    "node": ">=22"
   },
   "module": "dist/esm/index.js",
   "types": "dist/esm/index.d.ts",

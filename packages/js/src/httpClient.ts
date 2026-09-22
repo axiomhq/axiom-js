@@ -10,7 +10,7 @@ const AxiomClientHeader = 'X-Axiom-Client';
  *
  * @example
  * ```
- * const axiom = new Axiom({
+ * const axiom = new AxiomClient({
  *     token: "my-token",
  *     orgId: "my-org-id",
  * })
@@ -19,7 +19,7 @@ const AxiomClientHeader = 'X-Axiom-Client';
  * @example
  * ```
  * // Using an edge domain for lower latency ingestion
- * const axiom = new Axiom({
+ * const axiom = new AxiomClient({
  *     token: "my-token",
  *     edge: "eu-central-1.aws.edge.axiom.co",
  * })
@@ -28,7 +28,7 @@ const AxiomClientHeader = 'X-Axiom-Client';
  * @example
  * ```
  * // Using both url (for API operations) and edge (for ingest/query)
- * const axiom = new Axiom({
+ * const axiom = new AxiomClient({
  *     token: "my-token",
  *     url: "https://api.eu.axiom.co",
  *     edge: "eu-central-1.aws.edge.axiom.co",
@@ -92,7 +92,7 @@ export interface ClientOptions {
    * import { ProxyAgent } from 'undici';
    *
    * const dispatcher = new ProxyAgent('http://proxy:8080');
-   * const axiom = new Axiom({
+   * const axiom = new AxiomClient({
    *     token: "my-token",
    *     fetch: (input, init) => fetch(input, { ...init, dispatcher }),
    * })

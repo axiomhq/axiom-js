@@ -84,8 +84,6 @@ describe("AnnotationsService", () => {
   it("Delete", async () => {
     mockNoContentResponse();
 
-    const response = await client.delete("test1");
-    expect(response).toBeDefined();
-    expect(response.status).toEqual(204);
+    await expect(client.delete("test1")).resolves.toBeUndefined();
   });
 });

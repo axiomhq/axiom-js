@@ -1,7 +1,7 @@
-const { Axiom } = require('@axiomhq/js');
+const { AxiomClient } = require('@axiomhq/js');
 
 const main = async () => {
-  const axiom = new Axiom({});
+  const axiom = new AxiomClient({});
 
   await axiom.ingest(process.env.AXIOM_DATASET, [{ foo: 'bar' }]);
 };

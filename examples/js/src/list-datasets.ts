@@ -1,6 +1,6 @@
-import { Axiom } from '@axiomhq/js';
+import { AxiomClient } from '@axiomhq/js';
 
-const axiom = new Axiom({ token: process.env.AXIOM_TOKEN || '' });
+const axiom = new AxiomClient({ token: process.env.AXIOM_TOKEN || '' });
 
 async function listDatasets() {
   const res = await axiom.datasets.list();

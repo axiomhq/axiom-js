@@ -1,7 +1,7 @@
 import { describe, expect, it, beforeAll, afterAll } from 'vitest';
 import winston from 'winston';
 
-import { Axiom } from '@axiomhq/js';
+import { AxiomClient } from '@axiomhq/js';
 import { WinstonTransport as AxiomTransport } from '@axiomhq/winston';
 import { createTestDataset, cleanupDatasetIfExists } from './testHelpers';
 
@@ -9,7 +9,7 @@ const datasetSuffix = process.env.AXIOM_DATASET_SUFFIX || 'local';
 
 describe('WinstonTransport', () => {
   const datasetName = `test-axiom-js-winston-${datasetSuffix}`;
-  const axiom = new Axiom({
+  const axiom = new AxiomClient({
     token: process.env.AXIOM_TOKEN || '',
     url: process.env.AXIOM_URL,
     orgId: process.env.AXIOM_ORG_ID,

@@ -1,6 +1,6 @@
-import { Axiom } from '@axiomhq/js';
+import { AxiomClient } from '@axiomhq/js';
 
-const axiom = new Axiom({
+const axiom = new AxiomClient({
   token: process.env.AXIOM_TOKEN || '',
   orgId: process.env.AXIOM_ORG_ID || '',
   url: process.env.AXIOM_URL || '',
@@ -11,7 +11,7 @@ async function inspectUsers() {
 
   console.log(`current user: ${currentUser.name}`);
   console.log(`id: ${currentUser.id}`);
-  console.log(`email: ${currentUser.email ?? currentUser.emails?.[0] ?? 'unknown'}`);
+  console.log(`email: ${currentUser.email}`);
   console.log(`role: ${currentUser.role?.name ?? currentUser.role?.id ?? 'none'}`);
 
   const users = await axiom.users.list();
@@ -24,7 +24,7 @@ async function inspectUsers() {
   const user = await axiom.users.get(userId);
   console.log(`\nselected user: ${user.name}`);
   console.log(`id: ${user.id}`);
-  console.log(`email: ${user.email ?? user.emails?.[0] ?? 'unknown'}`);
+  console.log(`email: ${user.email}`);
 }
 
 inspectUsers().catch(console.error);

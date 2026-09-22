@@ -1,6 +1,6 @@
-import { Axiom } from '@axiomhq/js';
+import { AxiomClient } from '@axiomhq/js';
 
-const axiomClient = new Axiom({
+const axiomClient = new AxiomClient({
   token: process.env.NEXT_PUBLIC_AXIOM_TOKEN!,
 });
 

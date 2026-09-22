@@ -1,4 +1,4 @@
-import { Axiom, datasets } from '@axiomhq/js';
+import { AxiomClient, datasets } from '@axiomhq/js';
 import { describe, it, expect, beforeAll, afterAll, vi } from 'vitest';
 
 const datasetDeletionTimeoutMs = 30_000;
@@ -42,7 +42,7 @@ async function cleanupDatasetIfExists(client: datasets.Service, datasetName: str
 describe('Ingestion & query on different runtime', () => {
   vi.useRealTimers()
 
-  const axiom = new Axiom({ token: process.env.AXIOM_TOKEN || '', url: process.env.AXIOM_URL, orgId: process.env.AXIOM_ORG_ID });
+  const axiom = new AxiomClient({ token: process.env.AXIOM_TOKEN || '', url: process.env.AXIOM_URL, orgId: process.env.AXIOM_ORG_ID });
   const datasetName = `axiom-js-e2e-test-${process.env.AXIOM_DATASET_SUFFIX || 'local'}`;
 
   beforeAll(async () => {

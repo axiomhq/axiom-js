@@ -1,8 +1,8 @@
-// The purpose of this example is to show how to query a dataset using the Axiom
+// The purpose of this example is to show how to query a dataset using the Axiom SDK.
 // Processing Language (APL).
-import { Axiom } from '@axiomhq/js';
+import { AxiomClient } from '@axiomhq/js';
 
-const axiom = new Axiom({ token: process.env.AXIOM_TOKEN || '', url: process.env.AXIOM_URL || '' });
+const axiom = new AxiomClient({ token: process.env.AXIOM_TOKEN || '', url: process.env.AXIOM_URL || '' });
 
 async function query() {
   const aplQuery = `

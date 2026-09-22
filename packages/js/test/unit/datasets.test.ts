@@ -7,13 +7,6 @@ const edgeUrl = 'https://us-east-1.aws.edge.axiom.co';
 const metricsWindow = { start: '2026-06-02T10:31:37-04:00', end: '2026-06-03T10:31:37-04:00' };
 const metricsQuery = new URLSearchParams(metricsWindow).toString();
 
-const mockNoContentFetchCall = (test: (url: string, init: RequestInit) => void) => {
-  vi.spyOn(global, 'fetch').mockImplementationOnce((url: RequestInfo | URL, init?: RequestInit) => {
-    test(String(url), init ?? {});
-    return Promise.resolve(new Response(null, { status: 204, statusText: 'No Content' }));
-  });
-};
-
 const datasetList = [
   {
     id: 'test',
@@ -142,26 +135,22 @@ describe('DatasetsService', () => {
   });
 
   it('Delete', async () => {
-    mockNoContentFetchCall((url: string, init: RequestInit) => {
+    testMockedFetchCall((url: string, init: RequestInit) => {
       expect(url).toEqual(`${baseUrl}/v2/datasets/test%2F1`);
       expect(init.method).toEqual('DELETE');
-    });
+    }, { jobID: 'delete-job' });
 
-    const response = await client.delete('test/1');
-    expect(response).toBeDefined();
-    expect(response.status).toEqual(204);
+    await expect(client.delete('test/1')).resolves.toEqual({ jobID: 'delete-job' });
   });
 
   it('Trim', async () => {
-    mockNoContentFetchCall((url: string, init: RequestInit) => {
+    testMockedFetchCall((url: string, init: RequestInit) => {
       expect(url).toEqual(`${baseUrl}/v2/datasets/test%2F1/trim`);
       expect(init.method).toEqual('POST');
       expect(init.body).toEqual(JSON.stringify({ maxDuration: '30m' }));
-    });
+    }, { jobID: 'trim-job' });
 
-    const response = await client.trim('test/1', '30m');
-    expect(response).not.toEqual('undefined');
-    expect(response.status).toEqual(204);
+    await expect(client.trim('test/1', '30m')).resolves.toEqual({ jobID: 'trim-job' });
   });
 
   it.each([

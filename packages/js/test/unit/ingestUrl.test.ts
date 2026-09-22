@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { resolveIngestUrl } from '../../src/httpClient';
-import { AxiomWithoutBatching } from '../../src/client';
+import { AxiomClientWithoutBatching } from '../../src/client';
 
 describe('resolveIngestUrl', () => {
   describe('default behavior (no url, no edge options)', () => {
@@ -173,10 +173,10 @@ describe('resolveIngestUrl', () => {
   });
 });
 
-describe('AxiomWithoutBatching client endpoint options', () => {
+describe('AxiomClientWithoutBatching client endpoint options', () => {
   it('accepts url, edge, and edgeUrl together', () => {
     expect(() =>
-      new AxiomWithoutBatching({
+      new AxiomClientWithoutBatching({
         token: 'test-token',
         url: 'https://api.axiom.co',
         edge: 'eu-central-1.aws.edge.axiom.co',
@@ -187,7 +187,7 @@ describe('AxiomWithoutBatching client endpoint options', () => {
 
   it('accepts edge without url', () => {
     expect(() =>
-      new AxiomWithoutBatching({
+      new AxiomClientWithoutBatching({
         token: 'test-token',
         edge: 'eu-central-1.aws.edge.axiom.co',
       })
@@ -196,7 +196,7 @@ describe('AxiomWithoutBatching client endpoint options', () => {
 
   it('accepts edgeUrl without url', () => {
     expect(() =>
-      new AxiomWithoutBatching({
+      new AxiomClientWithoutBatching({
         token: 'test-token',
         edgeUrl: 'https://eu-central-1.aws.edge.axiom.co',
       })
@@ -205,7 +205,7 @@ describe('AxiomWithoutBatching client endpoint options', () => {
 
   it('accepts url without edge options', () => {
     expect(() =>
-      new AxiomWithoutBatching({
+      new AxiomClientWithoutBatching({
         token: 'test-token',
         url: 'https://api.eu.axiom.co',
       })

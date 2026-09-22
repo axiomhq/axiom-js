@@ -1,71 +1,51 @@
+import {
+  createAnnotation,
+  deleteAnnotation,
+  getAnnotation,
+  getAnnotations,
+  updateAnnotation,
+} from './generated/v2/annotations/annotations.js';
+import type {
+  Annotation as GeneratedAnnotation,
+  GetAnnotationsParams,
+  NewAnnotation,
+  UpdatedAnnotation,
+} from './generated/v2/client.schemas.js';
 import HTTPClient from './httpClient.js';
 
 export namespace annotations {
-  export interface Annotation {
-    id: string;
-    type: string;
-    datasets: string[];
-    title?: string;
-    description?: string;
-    url?: string;
-    time: string;
-    endTime?: string;
-  }
-
-  export interface ListingQueryParams {
-    datasets?: string[];
-    start?: string;
-    end?: string;
-  }
-
-  export interface CreateRequest {
-    type: string;
-    datasets: string[];
-    title?: string;
-    description?: string;
-    url?: string;
-    time?: string;
-    endTime?: string;
-  }
-
-  export interface UpdateRequest {
-    type?: string;
-    datasets?: string[];
-    title?: string;
-    description?: string;
-    url?: string;
-    time?: string;
-    endTime?: string;
-  }
+  export type Annotation = GeneratedAnnotation;
+  export type ListingQueryParams = GetAnnotationsParams;
+  export type CreateRequest = NewAnnotation;
+  export type UpdateRequest = UpdatedAnnotation;
 
   export class Service extends HTTPClient {
-    private readonly localPath = '/v2/annotations';
+    private readonly requestOptions = () => ({ axiomClient: this.client });
 
     /**
      * @see https://axiom.co/docs/restapi/endpoints/getAnnotations
      */
-    list = (req?: ListingQueryParams): Promise<Annotation[]> => this.client.get(this.localPath, {}, req);
+    list = (req?: ListingQueryParams): Promise<Annotation[]> => getAnnotations(req, this.requestOptions());
 
     /**
      * @see https://axiom.co/docs/restapi/endpoints/getAnnotation
      */
-    get = (id: string): Promise<Annotation> => this.client.get(this.localPath + '/' + id);
+    get = (id: string): Promise<Annotation> => getAnnotation(encodeURIComponent(id), this.requestOptions());
 
     /**
      * @see https://axiom.co/docs/restapi/endpoints/createAnnotation
      */
-    create = (req: CreateRequest): Promise<Annotation> =>
-      this.client.post(this.localPath, { body: JSON.stringify(req) });
+    create = (req: CreateRequest): Promise<Annotation> => createAnnotation(req, this.requestOptions());
 
     /**
      * @see https://axiom.co/docs/restapi/endpoints/updateAnnotation
      */
     update = (id: string, req: UpdateRequest): Promise<Annotation> =>
-      this.client.put(this.localPath + '/' + id, { body: JSON.stringify(req) });
+      updateAnnotation(encodeURIComponent(id), req, this.requestOptions());
 
     /**
      * @see https://axiom.co/docs/restapi/endpoints/deleteAnnotation
      */
-    delete = (id: string): Promise<Response> => this.client.delete(this.localPath + '/' + id);
+    delete = (id: string): Promise<void> => deleteAnnotation(encodeURIComponent(id), this.requestOptions());
   }
 }

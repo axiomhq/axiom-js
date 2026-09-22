@@ -15,7 +15,7 @@ const monitorsList: monitors.Monitor[] = [
     threshold: 10,
     alertOnNoData: true,
     notifyByGroup: false,
-    notifierIDs: ['notifier1'],
+    notifierIds: ['notifier1'],
     intervalMinutes: 5,
     rangeMinutes: 10,
     disabled: false,
@@ -33,7 +33,7 @@ const monitorsList: monitors.Monitor[] = [
     alertOnNoData: false,
     notifyByGroup: true,
     resolvable: true,
-    notifierIDs: ['notifier1', 'notifier2'],
+    notifierIds: ['notifier1', 'notifier2'],
     intervalMinutes: 15,
     rangeMinutes: 30,
     disabled: false,
@@ -69,7 +69,7 @@ describe('MonitorsService', () => {
       threshold: 80,
       alertOnNoData: true,
       notifyByGroup: false,
-      notifierIDs: ['notifier1'],
+      notifierIds: ['notifier1'],
       intervalMinutes: 5,
       rangeMinutes: 10,
     };
@@ -93,6 +93,7 @@ describe('MonitorsService', () => {
   it('Update', async () => {
     const req: monitors.UpdateRequest = {
       name: 'Updated CPU Monitor',
+      type: 'Threshold',
       description: 'Updated description',
       threshold: 95,
     };
@@ -116,8 +117,6 @@ describe('MonitorsService', () => {
   it('Delete', async () => {
     mockNoContentResponse();
 
-    const response = await client.delete('test1');
-    expect(response).toBeDefined();
-    expect(response.status).toEqual(204);
+    await expect(client.delete('test1')).resolves.toBeUndefined();
   });
 });

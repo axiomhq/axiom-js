@@ -1,9 +1,16 @@
 import { annotations } from './annotations.js';
 import { dashboards } from './dashboards.js';
 import { datasets } from './datasets.js';
+import { groups } from './groups.js';
 import { monitors } from './monitors.js';
+import { notifiers } from './notifiers.js';
+import { orgs } from './orgs.js';
+import { roles } from './roles.js';
 import { savedQueries } from './savedQueries.js';
+import { tokens } from './tokens.js';
 import { users } from './users.js';
+import { virtualFields } from './virtualFields.js';
+import { views } from './views.js';
 import { Batch, createBatchKey } from './batch.js';
 import HTTPClient, { ClientOptions, resolveAplQueryUrl, resolveIngestUrl, resolveMplQueryUrl } from './httpClient.js';
 import { isAxiomPersonalToken } from './token.js';
@@ -12,9 +19,16 @@ class BaseClient extends HTTPClient {
   annotations: annotations.Service;
   dashboards: dashboards.Service;
   datasets: datasets.Service;
+  groups: groups.Service;
   monitors: monitors.Service;
+  notifiers: notifiers.Service;
+  orgs: orgs.Service;
+  roles: roles.Service;
   savedQueries: savedQueries.Service;
+  tokens: tokens.Service;
   users: users.Service;
+  virtualFields: virtualFields.Service;
+  views: views.Service;
   localPath = '/v1';
   onError = console.error;
 
@@ -29,9 +43,16 @@ class BaseClient extends HTTPClient {
     this.annotations = new annotations.Service(options);
     this.dashboards = new dashboards.Service(options);
     this.datasets = new datasets.Service(options);
+    this.groups = new groups.Service(options);
     this.monitors = new monitors.Service(options);
+    this.notifiers = new notifiers.Service(options);
+    this.orgs = new orgs.Service(options);
+    this.roles = new roles.Service(options);
     this.savedQueries = new savedQueries.Service(options);
+    this.tokens = new tokens.Service(options);
     this.users = new users.Service(options);
+    this.virtualFields = new virtualFields.Service(options);
+    this.views = new views.Service(options);
     this.query = this.query.bind(this); // bind `this` so method uses client state when passed around
     this.aplQuery = this.aplQuery.bind(this); // bind `this` so method uses client state when passed around
     if (options.onError) {
@@ -46,9 +67,16 @@ class BaseClient extends HTTPClient {
     this.annotations.appendAxiomClient(axiomClient);
     this.dashboards.appendAxiomClient(axiomClient);
     this.datasets.appendAxiomClient(axiomClient);
+    this.groups.appendAxiomClient(axiomClient);
     this.monitors.appendAxiomClient(axiomClient);
+    this.notifiers.appendAxiomClient(axiomClient);
+    this.orgs.appendAxiomClient(axiomClient);
+    this.roles.appendAxiomClient(axiomClient);
     this.savedQueries.appendAxiomClient(axiomClient);
+    this.tokens.appendAxiomClient(axiomClient);
     this.users.appendAxiomClient(axiomClient);
+    this.virtualFields.appendAxiomClient(axiomClient);
+    this.views.appendAxiomClient(axiomClient);
   };
 
   /**
@@ -62,9 +90,9 @@ class BaseClient extends HTTPClient {
    * @returns result a promise of ingest and its status, check: {@link IngestStatus}
    * @example
    * ```
-   * import { AxiomWithoutBatching } from '@axiomhq/js';
+   * import { AxiomClientWithoutBatching } from '@axiomhq/js';
    *
-   * const axiom = new AxiomWithoutBatching();
+   * const axiom = new AxiomClientWithoutBatching();
    * ```
    *
    */
@@ -85,7 +113,7 @@ class BaseClient extends HTTPClient {
             'Content-Type': contentType,
             'Content-Encoding': encoded.contentEncoding,
           },
-          body: encoded.data,
+          body: encoded.data as BodyInit,
         },
         {
           'timestamp-field': options?.timestampField as string,
@@ -149,8 +177,12 @@ class BaseClient extends HTTPClient {
       });
     }
 
-    if (typeof data === 'string' || data instanceof Uint8Array) {
+    if (typeof data === 'string') {
       return new Blob([data]).stream();
+    }
+
+    if (data instanceof Uint8Array) {
+      return new Blob([Uint8Array.from(data)]).stream();
     }
 
     return null;
@@ -350,13 +382,13 @@ class BaseClient extends HTTPClient {
 
 /**
  * Axiom's client without batching events in the background.
- * In most cases you'll want to use the {@link Axiom} client instead.
+ * In most cases you'll want to use the {@link AxiomClient} client instead.
  *
  *
  * @param options - The {@link ClientOptions} to configure authentication
  *
  */
-export class AxiomWithoutBatching extends BaseClient {
+export class AxiomClientWithoutBatching extends BaseClient {
   /**
    * Ingest event(s) asynchronously
    *
@@ -367,9 +399,9 @@ export class AxiomWithoutBatching extends BaseClient {
    *
    * @example
    * ```
-   * import { AxiomWithoutBatching } from '@axiomhq/js';
+   * import { AxiomClientWithoutBatching } from '@axiomhq/js';
    *
-   * const axiom = new AxiomWithoutBatching();
+   * const axiom = new AxiomClientWithoutBatching();
    * await axiom.ingest('dataset-name', [{ foo: 'bar' }])
    * ```
    *
@@ -388,7 +420,7 @@ export class AxiomWithoutBatching extends BaseClient {
  * @param options - The options passed to the client
  *
  */
-export class Axiom extends BaseClient {
+export class AxiomClient extends BaseClient {
   batch: { [id: string]: Batch } = {};
 
   /**

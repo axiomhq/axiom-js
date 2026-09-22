@@ -1,10 +1,10 @@
-import { Axiom, AxiomWithoutBatching } from '@axiomhq/js';
+import { AxiomClient, AxiomClientWithoutBatching } from '@axiomhq/js';
 import { LogLevel, LogLevelValue } from '../logger';
 import { Version } from '../runtime';
 import { Transport } from './transport';
 
 interface AxiomJSTransportConfig {
-  axiom: Axiom | AxiomWithoutBatching;
+  axiom: AxiomClient | AxiomClientWithoutBatching;
   dataset: string;
   logLevel?: LogLevel;
   /**
@@ -16,7 +16,7 @@ interface AxiomJSTransportConfig {
   axiomClient?: string;
 }
 
-type AxiomClientClient = {
+type AxiomClientLike = {
   appendAxiomClient?: (axiomClient: string) => void;
 };
 
@@ -32,7 +32,7 @@ export class AxiomJSTransport implements Transport {
   }
 
   appendAxiomClient(axiomClient: string) {
-    (this.config.axiom as AxiomClientClient).appendAxiomClient?.(axiomClient);
+    (this.config.axiom as AxiomClientLike).appendAxiomClient?.(axiomClient);
   }
 
   log(logs: any[]) {
@@ -45,15 +45,15 @@ export class AxiomJSTransport implements Transport {
       return;
     }
 
-    if (this.config.axiom instanceof Axiom) {
+    if (this.config.axiom instanceof AxiomClient) {
       this.config.axiom.ingest(this.config.dataset, filteredLogs);
-    } else if (this.config.axiom instanceof AxiomWithoutBatching) {
+    } else if (this.config.axiom instanceof AxiomClientWithoutBatching) {
       this.promises.push(this.config.axiom.ingest(this.config.dataset, filteredLogs));
     }
   }
 
   async flush() {
-    if (this.config.axiom instanceof Axiom) {
+    if (this.config.axiom instanceof AxiomClient) {
       await this.config.axiom.flush();
     } else {
       await Promise.allSettled(this.promises);

@@ -1,13 +1,13 @@
 import { gzip } from 'zlib';
 import { describe, expect, it, beforeAll, afterAll } from 'vitest';
-import { AxiomWithoutBatching, ContentType, ContentEncoding } from '@axiomhq/js';
+import { AxiomClientWithoutBatching, ContentType, ContentEncoding } from '@axiomhq/js';
 import { createTestDataset, cleanupDatasetIfExists } from './testHelpers';
 
 const datasetSuffix = process.env.AXIOM_DATASET_SUFFIX || 'local';
 
 describe('Axiom', () => {
   const datasetName = `test-axiom-js-client-${datasetSuffix}`;
-  const axiom = new AxiomWithoutBatching({
+  const axiom = new AxiomClientWithoutBatching({
     token: process.env.AXIOM_TOKEN || '',
     url: process.env.AXIOM_URL,
     orgId: process.env.AXIOM_ORG_ID,

@@ -1,6 +1,6 @@
-import { Axiom } from '@axiomhq/js';
+import { AxiomClient } from '@axiomhq/js';
 
-const axiom = new Axiom({ token: process.env.AXIOM_TOKEN || '', url: process.env.AXIOM_URL || '' });
+const axiom = new AxiomClient({ token: process.env.AXIOM_TOKEN || '', url: process.env.AXIOM_URL || '' });
 
 async function queryMetrics() {
   const mplQuery = process.env.AXIOM_MPL_QUERY || 'metrics:http_requests_total';

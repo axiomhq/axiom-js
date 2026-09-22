@@ -1,66 +1,67 @@
+import {
+  createMonitor,
+  deleteMonitor,
+  getMonitor,
+  getMonitorHistory,
+  getMonitors,
+  updateMonitor,
+} from './generated/v2/monitors/monitors.js';
+import type {
+  AlertHistory,
+  GetMonitorParams,
+  GetMonitorHistoryParams,
+  GetMonitorsParams,
+  MonitorBody,
+  MonitorWithId,
+  MonitorOperator as GeneratedMonitorOperator,
+  MonitorType as GeneratedMonitorType,
+} from './generated/v2/client.schemas.js';
 import HTTPClient from './httpClient.js';
 
 export namespace monitors {
-  export type MonitorType = 'Threshold' | 'MatchEvent' | 'AnomalyDetection';
-  export type MonitorOperator = 'Below' | 'BelowOrEqual' | 'Above' | 'AboveOrEqual' | 'AboveOrBelow';
+  export type MonitorType = GeneratedMonitorType;
+  export type MonitorOperator = GeneratedMonitorOperator;
 
-  export interface Monitor {
-    id: string;
-    createdAt: string;
-    createdBy: string;
-    name: string;
-    type: MonitorType;
-    description?: string;
-    aplQuery?: string;
-    mplQuery?: string;
-    operator?: MonitorOperator;
-    threshold?: number;
-    alertOnNoData?: boolean;
-    notifyByGroup?: boolean;
-    resolvable?: boolean;
-    notifierIds?: string[];
-    /**
-     * @deprecated Use `notifierIds` instead.
-     */
-    notifierIDs?: string[];
-    intervalMinutes?: number;
-    rangeMinutes?: number;
-    disabled?: boolean;
-    disabledUntil?: string;
-    [key: string]: unknown;
-  }
+  export type Monitor = MonitorWithId;
+  export type CreateRequest = MonitorBody;
+  export type UpdateRequest = MonitorBody;
 
-  export interface CreateRequest extends Omit<Monitor, 'id' | 'createdAt' | 'createdBy'> {}
-
-  export interface UpdateRequest extends Omit<Monitor, 'id' | 'createdAt' | 'createdBy'> {}
+  export type HistoryEntry = AlertHistory;
+  export type HistoryOptions = GetMonitorHistoryParams;
+  export type ListOptions = GetMonitorsParams;
+  export type GetOptions = GetMonitorParams;
 
   export class Service extends HTTPClient {
-    private readonly localPath = '/v2/monitors';
+    private readonly requestOptions = () => ({ axiomClient: this.client });
 
     /**
      * @see https://axiom.co/docs/restapi/endpoints/getMonitors
      */
-    list = (): Promise<Monitor[]> => this.client.get(this.localPath);
+    list = (options?: ListOptions): Promise<Monitor[]> => getMonitors(options, this.requestOptions());
 
     /**
      * @see https://axiom.co/docs/restapi/endpoints/getMonitor
      */
-    get = (id: string): Promise<Monitor> => this.client.get(this.localPath + '/' + id);
+    get = (id: string, options?: GetOptions): Promise<Monitor> =>
+      getMonitor(encodeURIComponent(id), options, this.requestOptions());
 
     /**
      * @see https://axiom.co/docs/restapi/endpoints/createMonitor
      */
-    create = (req: CreateRequest): Promise<Monitor> => this.client.post(this.localPath, { body: JSON.stringify(req) });
+    create = (req: CreateRequest): Promise<Monitor> => createMonitor(req, this.requestOptions());
 
     /**
      * @see https://axiom.co/docs/restapi/endpoints/updateMonitor
      */
     update = (id: string, req: UpdateRequest): Promise<Monitor> =>
-      this.client.put(this.localPath + '/' + id, { body: JSON.stringify(req) });
+      updateMonitor(encodeURIComponent(id), req, this.requestOptions());
 
     /**
      * @see https://axiom.co/docs/restapi/endpoints/deleteMonitor
      */
-    delete = (id: string): Promise<Response> => this.client.delete(this.localPath + '/' + id);
+    delete = (id: string): Promise<void> => deleteMonitor(encodeURIComponent(id), this.requestOptions());
+
+    history = (id: string, options: HistoryOptions): Promise<HistoryEntry[]> =>
+      getMonitorHistory(encodeURIComponent(id), options, this.requestOptions());
   }
 }

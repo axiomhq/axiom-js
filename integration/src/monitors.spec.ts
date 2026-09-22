@@ -41,7 +41,7 @@ describe('MonitorsService', () => {
       threshold: 100,
       alertOnNoData: false,
       notifyByGroup: false,
-      notifierIDs: [],
+      notifierIds: [],
       intervalMinutes: 5,
       rangeMinutes: 10,
     };
@@ -80,7 +80,7 @@ describe('MonitorsService', () => {
       threshold: 150,
       alertOnNoData: false,
       notifyByGroup: false,
-      notifierIDs: [],
+      notifierIds: [],
       intervalMinutes: 5,
       rangeMinutes: 10,
     };
@@ -94,9 +94,7 @@ describe('MonitorsService', () => {
   });
 
   it('Delete', async () => {
-    const response = await client.delete(monitorId);
-    expect(response).toBeDefined();
-    expect(response.status).toEqual(204);
+    await expect(client.delete(monitorId)).resolves.toBeUndefined();
 
     // Verify the monitor is actually deleted
     try {

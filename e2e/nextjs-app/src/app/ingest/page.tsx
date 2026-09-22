@@ -1,5 +1,5 @@
 'use client';
-import { AxiomWithoutBatching } from '@axiomhq/js';
+import { AxiomClientWithoutBatching } from '@axiomhq/js';
 import { useEffect } from 'react';
 
 export const dynamic = 'force-dynamic';
@@ -8,7 +8,7 @@ export const fetchCache = 'force-no-store';
 export default function IngestPage() {
   useEffect(() => {
     const dataset = new URLSearchParams(window.location.search).get('dataset') || 'axiom-js-e2e-test';
-    const axiom = new AxiomWithoutBatching({
+    const axiom = new AxiomClientWithoutBatching({
       token: process.env.NEXT_PUBLIC_AXIOM_TOKEN,
       orgId: process.env.NEXT_PUBLIC_AXIOM_ORG_ID,
       url: process.env.NEXT_PUBLIC_AXIOM_URL,

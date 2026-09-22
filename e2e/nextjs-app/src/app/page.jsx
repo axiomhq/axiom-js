@@ -1,9 +1,9 @@
-import { Axiom } from '@axiomhq/js';
+import { AxiomClient } from '@axiomhq/js';
 
 export const dynamic = 'force-dynamic';
 
 export default async function Home() {
-  const axiom = new Axiom({
+  const axiom = new AxiomClient({
     token: process.env.NEXT_PUBLIC_AXIOM_TOKEN,
     url: process.env.NEXT_PUBLIC_AXIOM_URL,
     orgId: process.env.NEXT_PUBLIC_AXIOM_ORG_ID,
