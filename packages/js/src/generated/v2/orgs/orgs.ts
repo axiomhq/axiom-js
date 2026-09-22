@@ -8,8 +8,6 @@
 import type {
   Org,
   PostOrg,
-  ProvisionOrg,
-  ProvisionOrgResponse,
   UpdateOrg
 } from '../client.schemas';
 
@@ -65,44 +63,6 @@ return openapiRequest<Org>(getCreateOrgUrl(),
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
     body: JSON.stringify(postOrg)
-  }
-);}
-
-
-export const getProvisionOrgUrl = () => {
-
-
-
-
-  return `/orgs/provision`
-}
-
-/**
- * Publicly provisions a temporary organization intended for automated agents. The organization is marked temporary with a TTL and is deleted automatically if it is not claimed before it expires. The response includes a claim URL that lets a human take ownership of the org. This endpoint is unauthenticated and strict rate limits apply.
- * @summary Provision a temporary organization for an agent
- */
-export const provisionOrg = async (provisionOrgBody: ProvisionOrg, options?: Parameters<typeof openapiRequest>[1]): Promise<ProvisionOrgResponse> => {
-
-    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
-    if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
-    if (Symbol.iterator in h) {
-      return Object.fromEntries(
-        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
-      );
-    }
-    const headers: Record<string, string | readonly string[]> = {};
-    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
-      if (value !== undefined) headers[name] = value;
-    }
-    return headers;
-  };
-return openapiRequest<ProvisionOrgResponse>(getProvisionOrgUrl(),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(provisionOrgBody)
   }
 );}
 

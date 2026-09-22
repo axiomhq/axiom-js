@@ -12,6 +12,7 @@ import type {
   DashboardResource as GeneratedDashboardResource,
   DashboardUpsertRequest,
   DashboardWriteResponse,
+  GetDashboardParams,
   ListDashboardsParams,
 } from './generated/v2/client.schemas.js';
 import HTTPClient from './httpClient.js';
@@ -21,6 +22,7 @@ export namespace dashboards {
   export type DashboardResource = GeneratedDashboardResource;
 
   export type ListOptions = ListDashboardsParams;
+  export type GetOptions = GetDashboardParams;
 
   export type UpsertRequest = DashboardUpsertRequest;
   export type WriteResponse = DashboardWriteResponse;
@@ -39,7 +41,8 @@ export namespace dashboards {
     /**
      * @see https://axiom.co/docs/restapi/endpoints/getDashboard
      */
-    get = (uid: string): Promise<DashboardResource> => getDashboard(encodePath(uid), this.requestOptions());
+    get = (uid: string, options?: GetOptions): Promise<DashboardResource> =>
+      getDashboard(encodePath(uid), options, this.requestOptions());
 
     create = (request: UpsertRequest): Promise<WriteResponse> => createDashboard(request, this.requestOptions());
 

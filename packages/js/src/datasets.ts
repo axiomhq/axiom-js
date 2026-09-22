@@ -2,6 +2,8 @@ import {
   createDataset,
   createMapField,
   deleteDataset,
+  deleteDatasetFields,
+  deleteFieldForDataset,
   deleteMapField,
   getDataset,
   getDatasets,
@@ -20,6 +22,11 @@ import type {
   Dataset as GeneratedDataset,
   DatasetField,
   DatasetKind as GeneratedDatasetKind,
+  DeleteDatasetFieldsRequest,
+  DeleteDatasetFieldsResult,
+  GetDatasetParams,
+  GetDatasetsParams,
+  JobCreateResponse,
   MapField as GeneratedMapField,
   MapFields as GeneratedMapFields,
   TrimOptions,
@@ -39,7 +46,12 @@ export namespace datasets {
 
   export type CreateRequest = GeneratedCreateDataset;
   export type CreateOptions = CreateDatasetParams;
+  export type ListOptions = GetDatasetsParams;
+  export type GetOptions = GetDatasetParams;
   export type UpdateRequest = UpdateDataset;
+  export type DeleteFieldsRequest = DeleteDatasetFieldsRequest;
+  export type DeleteFieldsResult = DeleteDatasetFieldsResult;
+  export type Job = JobCreateResponse;
 
   export interface MetricsInfoOptions {
     start: string;
@@ -67,12 +79,13 @@ export namespace datasets {
     /**
      * @see https://axiom.co/docs/restapi/endpoints/getDatasets
      */
-    list = (): Promise<Dataset[]> => getDatasets(this.requestOptions());
+    list = (options?: ListOptions): Promise<Dataset[]> => getDatasets(options, this.requestOptions());
 
     /**
      * @see https://axiom.co/docs/restapi/endpoints/getDataset
      */
-    get = (id: string): Promise<Dataset> => getDataset(encodePath(id), this.requestOptions());
+    get = (id: string, options?: GetOptions): Promise<Dataset> =>
+      getDataset(encodePath(id), options, this.requestOptions());
 
     /**
      * @see https://axiom.co/docs/restapi/endpoints/createDataset
@@ -89,17 +102,20 @@ export namespace datasets {
     /**
      * @see https://axiom.co/docs/restapi/endpoints/deleteDataset
      */
-    delete = (id: string): Promise<void> => deleteDataset(encodePath(id), this.requestOptions());
+    delete = (id: string): Promise<Job> => deleteDataset(encodePath(id), this.requestOptions());
 
     /**
      * @see https://axiom.co/docs/restapi/endpoints/trimDataset
      */
-    trim = (id: string, maxDurationStr: string): Promise<void> => {
+    trim = (id: string, maxDurationStr: string): Promise<Job> => {
       const req: TrimOptions = { maxDuration: maxDurationStr };
       return trimDataset(encodePath(id), req, this.requestOptions());
     };
 
     vacuum = (id: string): Promise<void> => vacuumDataset(encodePath(id), this.requestOptions());
+
+    deleteFields = (dataset: string, request: DeleteFieldsRequest): Promise<DeleteFieldsResult> =>
+      deleteDatasetFields(encodePath(dataset), request, this.requestOptions());
 
     /**
      * @see https://axiom.co/docs/restapi/endpoints/getFieldsForDataset
@@ -111,6 +127,9 @@ export namespace datasets {
 
     updateField = (dataset: string, field: string, request: Field): Promise<Field> =>
       updateFieldForDataset(encodePath(dataset), encodePath(field), request, this.requestOptions());
+
+    deleteField = (dataset: string, field: string): Promise<DeleteFieldsResult> =>
+      deleteFieldForDataset(encodePath(dataset), encodePath(field), this.requestOptions());
 
     /**
      * @see https://axiom.co/docs/restapi/endpoints/getMapFields

@@ -65,6 +65,19 @@ const cases: ServiceCase[] = [
     status: 204,
   },
   {
+    name: 'deletes multiple dataset fields',
+    call: () => client.datasets.deleteFields('dataset/name', { fields: ['field/one', 'field/two'] }),
+    method: 'POST',
+    path: '/v2/datasets/dataset%2Fname/delete-fields',
+    body: { fields: ['field/one', 'field/two'] },
+  },
+  {
+    name: 'deletes dataset fields',
+    call: () => client.datasets.deleteField('dataset/name', 'field/name'),
+    method: 'DELETE',
+    path: '/v2/datasets/dataset%2Fname/fields/field%2Fname',
+  },
+  {
     name: 'gets dataset fields',
     call: () => client.datasets.field('dataset/name', 'field/name'),
     method: 'GET',
@@ -182,13 +195,6 @@ const cases: ServiceCase[] = [
     method: 'PUT',
     path: '/v2/orgs/org%2Fid',
     body: { name: 'Updated Org' },
-  },
-  {
-    name: 'provisions organizations',
-    call: () => client.orgs.provision({ name: 'Agent Org' }),
-    method: 'POST',
-    path: '/v2/orgs/provision',
-    body: { name: 'Agent Org' },
   },
   {
     name: 'lists roles',

@@ -119,6 +119,8 @@ The compiler will identify all affected call sites. The most common changes are:
 - `users.User.email` and `users.User.role` are required. The legacy `emails` array and nullable role are removed.
 - `savedQueries.SavedQuery.metadata` is now `Record<string, string>` instead of `Record<string, unknown>`.
 - Dashboard documents are now fully typed instead of `Record<string, unknown>`.
+- Dataset, dashboard, and monitor responses now include required `labelIds` and optional resolved `labels`. Their list
+  and get methods accept the generated label filtering options where supported.
 - Open-ended index signatures were removed from management models. Undocumented extra properties are therefore rejected
   by TypeScript.
 
@@ -159,10 +161,10 @@ const email = user.email ?? user.emails?.[0];
 const email = user.email;
 ```
 
-## 5. Stop reading raw responses from delete and trim operations
+## 5. Handle the new delete and trim return values
 
-Management delete operations and `datasets.trim` now resolve to `void` on success. Request failures still reject with an
-error, so checking the HTTP status is no longer necessary.
+Dataset delete and trim operations are asynchronous and now return the generated job response instead of a raw
+`Response`. Request failures still reject with an error, so checking the HTTP status is no longer necessary.
 
 ```ts
 // Before
@@ -174,14 +176,21 @@ if (!response.ok) {
 
 ```ts
 // After
-await axiom.datasets.delete('old-dataset');
+const { jobID } = await axiom.datasets.delete('old-dataset');
 ```
 
-The exported `datasets.TrimResult` type is also removed. Use `Promise<void>` when wrapping `datasets.trim`:
+Other management delete methods, such as `annotations.delete` and `monitors.delete`, now resolve to `void` rather than a
+raw `Response`:
 
 ```ts
-async function trimDataset(name: string): Promise<void> {
-  await axiom.datasets.trim(name, '720h');
+await axiom.monitors.delete('monitor-id');
+```
+
+The exported `datasets.TrimResult` type is also removed. Use `datasets.Job` when wrapping either operation:
+
+```ts
+async function trimDataset(name: string): Promise<datasets.Job> {
+  return axiom.datasets.trim(name, '720h');
 }
 ```
 
@@ -197,7 +206,7 @@ All management services are mounted on both client classes.
 | `groups` | `list`, `get`, `create`, `update`, `delete` |
 | `monitors` | `list`, `get`, `create`, `update`, `delete`, `history` |
 | `notifiers` | `list`, `get`, `create`, `update`, `delete` |
-| `orgs` | `list`, `get`, `create`, `update`, `provision` |
+| `orgs` | `list`, `get`, `create`, `update` |
 | `roles` | `list`, `get`, `create`, `update`, `delete` |
 | `savedQueries` | `list`, `get`, `create`, `update`, `delete` |
 | `tokens` | `list`, `get`, `create`, `delete`, `regenerate` |
@@ -219,5 +228,6 @@ const views = await axiom.views.list();
 - Rename `Axiom` and `AxiomWithoutBatching` imports and constructor calls.
 - Run `tsc --noEmit` and update management request and response handling.
 - Replace `notifierIDs` with `notifierIds`.
-- Remove checks of `Response` values returned by management delete or dataset trim calls.
+- Replace checks of raw `Response` values from dataset delete or trim calls with the returned job ID. Other management
+  delete calls no longer return a response value.
 - Run the application's tests, especially code that renders dataset, user, dashboard, monitor, or saved-query data.

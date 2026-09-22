@@ -5,12 +5,58 @@
  * A public and stable API for interacting with axiom services
  * OpenAPI spec version: 2.0.0
  */
-export type DatasetCapabilitiesDataItem = typeof DatasetCapabilitiesDataItem[keyof typeof DatasetCapabilitiesDataItem];
+export type APIErrorDetailCompileErrorCode = typeof APIErrorDetailCompileErrorCode[keyof typeof APIErrorDetailCompileErrorCode];
 
 
-export const DatasetCapabilitiesDataItem = {
-  delete: 'delete',
+export const APIErrorDetailCompileErrorCode = {
+  NUMBER_0: 0,
+  NUMBER_1: 1,
+  NUMBER_2: 2,
+  NUMBER_3: 3,
+  NUMBER_16: 16,
+  NUMBER_17: 17,
+  NUMBER_32: 32,
+  NUMBER_33: 33,
+  NUMBER_34: 34,
 } as const;
+
+export type APIErrorDetailErrorType = typeof APIErrorDetailErrorType[keyof typeof APIErrorDetailErrorType];
+
+
+export const APIErrorDetailErrorType = {
+  NUMBER_0: 0,
+  NUMBER_1: 1,
+  NUMBER_2: 2,
+  NUMBER_3: 3,
+  NUMBER_4: 4,
+} as const;
+
+export interface APIErrorDetail {
+  column?: number;
+  compileErrorCode?: APIErrorDetailCompileErrorCode;
+  errorType?: APIErrorDetailErrorType;
+  line?: number;
+  message?: string;
+}
+
+export interface APIValidationIssue {
+  code?: string;
+  expected?: unknown;
+  message: string;
+  path: unknown[];
+  received?: unknown;
+}
+
+export interface APIError {
+  /** HTTP status code when the response writer includes one in the payload. */
+  code?: number;
+  detail?: APIErrorDetail;
+  /** Identifier for an internally logged panic. */
+  errorID?: string;
+  errors?: APIValidationIssue[];
+  /** Human-readable error message. */
+  message: string;
+}
 
 export type DatasetCapabilitiesIngestItem = typeof DatasetCapabilitiesIngestItem[keyof typeof DatasetCapabilitiesIngestItem];
 
@@ -70,8 +116,6 @@ export const DatasetCapabilitiesVirtualFieldsItem = {
 } as const;
 
 export interface DatasetCapabilities {[key: string]: {
-  /** Data Management capability */
-  data?: DatasetCapabilitiesDataItem[];
   /** Ingest capability */
   ingest?: DatasetCapabilitiesIngestItem[];
   /** Query capability */
@@ -80,7 +124,7 @@ export interface DatasetCapabilities {[key: string]: {
   share?: DatasetCapabilitiesShareItem[];
   /** Starred queries capability */
   starredQueries?: DatasetCapabilitiesStarredQueriesItem[];
-  /** Data Trimming capability */
+  /** Data Trimming and Deletion capability */
   trim?: DatasetCapabilitiesTrimItem[];
   /** Field Vacuuming capability */
   vacuum?: DatasetCapabilitiesVacuumItem[];
@@ -153,20 +197,20 @@ export const OrgCapabilitiesEndpointsItem = {
   delete: 'delete',
 } as const;
 
-export type OrgCapabilitiesFlowsItem = typeof OrgCapabilitiesFlowsItem[keyof typeof OrgCapabilitiesFlowsItem];
+export type OrgCapabilitiesIntegrationsItem = typeof OrgCapabilitiesIntegrationsItem[keyof typeof OrgCapabilitiesIntegrationsItem];
 
 
-export const OrgCapabilitiesFlowsItem = {
+export const OrgCapabilitiesIntegrationsItem = {
   create: 'create',
   read: 'read',
   update: 'update',
   delete: 'delete',
 } as const;
 
-export type OrgCapabilitiesIntegrationsItem = typeof OrgCapabilitiesIntegrationsItem[keyof typeof OrgCapabilitiesIntegrationsItem];
+export type OrgCapabilitiesLabelsItem = typeof OrgCapabilitiesLabelsItem[keyof typeof OrgCapabilitiesLabelsItem];
 
 
-export const OrgCapabilitiesIntegrationsItem = {
+export const OrgCapabilitiesLabelsItem = {
   create: 'create',
   read: 'read',
   update: 'update',
@@ -246,10 +290,10 @@ export interface OrgCapabilities {
   datasets?: OrgCapabilitiesDatasetsItem[];
   /** Endpoints capability */
   endpoints?: OrgCapabilitiesEndpointsItem[];
-  /** Flows capability */
-  flows?: OrgCapabilitiesFlowsItem[];
   /** Integrations capability */
   integrations?: OrgCapabilitiesIntegrationsItem[];
+  /** Labels capability */
+  labels?: OrgCapabilitiesLabelsItem[];
   /** Monitors capability */
   monitors?: OrgCapabilitiesMonitorsItem[];
   /** Notifiers capability */
@@ -739,41 +783,14 @@ export interface AplResult {
   tables: Table[];
 }
 
-export interface Block {
-  /** URL to locate the block in storage */
-  locatorURL?: string;
-  /** Estimated memory usage in bytes */
-  memoryEstimate?: number;
-  /** Number of records in the block */
-  recordCount?: number;
-}
+/**
+ * Map of collection name to the RFC3339 time of its last change.
+ */
+export type ChangesCollections = {[key: string]: string};
 
-export interface BlockFailure {
-  block?: Block;
-  /** Error message describing the failure */
-  error?: string;
-  /** Error code for categorizing the failure */
-  errorCode?: string;
-}
-
-export interface BlockSuccess {
-  block?: Block;
-  /** Number of events processed */
-  events?: number;
-}
-
-export interface BlocksRequest {
-  /** The APL query to execute for finding matching blocks */
-  apl: string;
-  /** The end time for the query time range */
-  endTime: string;
-  /** The start time for the query time range */
-  startTime: string;
-}
-
-export interface BlocksResponse {
-  /** List of blocks matching the query */
-  blocks?: Block[];
+export interface Changes {
+  /** Map of collection name to the RFC3339 time of its last change. */
+  collections: ChangesCollections;
 }
 
 export interface CreateAPIToken {
@@ -821,19 +838,6 @@ export interface CreateDataset {
   retentionDays?: number;
   /** Whether to use the retention period */
   useRetentionPeriod?: boolean;
-}
-
-export interface CreateFlowExport {
-  /** The APL query to execute for the export */
-  apl: string;
-  /** The destination to export to */
-  destinationId: string;
-  /** The RFC3339-formatted time of the end of the export range */
-  end: string;
-  /** The name of the export */
-  name: string;
-  /** The RFC3339-formatted time of the start of the export range */
-  start: string;
 }
 
 /**
@@ -894,6 +898,11 @@ export type Owner = string;
  * @maxLength 200
  */
 export type ChartId = string;
+
+/**
+ * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+ */
+export type SectionId = string;
 
 export type TimeSeriesChartType = typeof TimeSeriesChartType[keyof typeof TimeSeriesChartType];
 
@@ -974,6 +983,7 @@ export type TimeSeriesChartQuery = TimeSeriesNonMetricsAplQuery | TimeSeriesNati
 
 export interface TimeSeriesChart {
   id: ChartId;
+  sectionId?: SectionId;
   type: TimeSeriesChartType;
   /**
      * @minLength 1
@@ -1016,8 +1026,25 @@ export interface HeatmapNativeMplQuery {
 
 export type HeatmapChartQuery = HeatmapNonMetricsAplQuery | HeatmapNativeMplQuery;
 
+export type HeatmapChartColorScheme = typeof HeatmapChartColorScheme[keyof typeof HeatmapChartColorScheme];
+
+
+export const HeatmapChartColorScheme = {
+  Blue: 'Blue',
+  Orange: 'Orange',
+  Red: 'Red',
+  Purple: 'Purple',
+  Teal: 'Teal',
+  Yellow: 'Yellow',
+  Green: 'Green',
+  Pink: 'Pink',
+  Grey: 'Grey',
+  Brown: 'Brown',
+} as const;
+
 export interface HeatmapChart {
   id: ChartId;
+  sectionId?: SectionId;
   type: HeatmapChartType;
   /**
      * @minLength 1
@@ -1025,6 +1052,7 @@ export interface HeatmapChart {
      */
   name?: string;
   query: HeatmapChartQuery;
+  colorScheme?: HeatmapChartColorScheme;
 }
 
 export type LogStreamChartType = typeof LogStreamChartType[keyof typeof LogStreamChartType];
@@ -1079,6 +1107,7 @@ export interface TableSettings {
 
 export interface LogStreamChart {
   id: ChartId;
+  sectionId?: SectionId;
   type: LogStreamChartType;
   /**
      * @minLength 1
@@ -1098,6 +1127,7 @@ export const PieChartType = {
 
 export interface PieChart {
   id: ChartId;
+  sectionId?: SectionId;
   type: PieChartType;
   /**
      * @minLength 1
@@ -1116,6 +1146,7 @@ export const ScatterChartType = {
 
 export interface ScatterChart {
   id: ChartId;
+  sectionId?: SectionId;
   type: ScatterChartType;
   /**
      * @minLength 1
@@ -1134,6 +1165,7 @@ export const TableChartType = {
 
 export interface TableChart {
   id: ChartId;
+  sectionId?: SectionId;
   type: TableChartType;
   /**
      * @minLength 1
@@ -1153,6 +1185,7 @@ export const TopKChartType = {
 
 export interface TopKChart {
   id: ChartId;
+  sectionId?: SectionId;
   type: TopKChartType;
   /**
      * @minLength 1
@@ -1221,6 +1254,7 @@ export interface StatisticChartColorProps {
 
 export interface StatisticChart {
   id: ChartId;
+  sectionId?: SectionId;
   type: StatisticChartType;
   /**
      * @minLength 1
@@ -1250,6 +1284,61 @@ export interface StatisticChart {
   errorColorProps?: StatisticChartColorProps;
 }
 
+export type GaugeChartType = typeof GaugeChartType[keyof typeof GaugeChartType];
+
+
+export const GaugeChartType = {
+  Gauge: 'Gauge',
+} as const;
+
+export interface GaugeChartSegment {
+  from: number;
+  to: number;
+}
+
+export type GaugeChartColorScale = typeof GaugeChartColorScale[keyof typeof GaugeChartColorScale];
+
+
+export const GaugeChartColorScale = {
+  'green-to-red': 'green-to-red',
+  'red-to-green': 'red-to-green',
+} as const;
+
+export type GaugeChartLabelMode = typeof GaugeChartLabelMode[keyof typeof GaugeChartLabelMode];
+
+
+export const GaugeChartLabelMode = {
+  none: 'none',
+  boundaries: 'boundaries',
+  intervals: 'intervals',
+} as const;
+
+export interface GaugeChart {
+  id: ChartId;
+  sectionId?: SectionId;
+  type: GaugeChartType;
+  /**
+     * @minLength 1
+     * @maxLength 500
+     */
+  name?: string;
+  query: SimpleChartQuery;
+  /**
+     * @minItems 1
+     * @maxItems 100
+     */
+  segments: GaugeChartSegment[];
+  colorScale?: GaugeChartColorScale;
+  showRing?: boolean;
+  labelMode?: GaugeChartLabelMode;
+  showSparkline?: boolean;
+  scaleToTimeRange?: boolean;
+  /** @exclusiveMinimum 0 */
+  scaleBaseDurationMs?: number;
+  /** @maxLength 200 */
+  customUnits?: string;
+}
+
 export type NoteChartType = typeof NoteChartType[keyof typeof NoteChartType];
 
 
@@ -1266,6 +1355,7 @@ export const NoteChartVariant = {
 
 export interface NoteChart {
   id: ChartId;
+  sectionId?: SectionId;
   type: NoteChartType;
   /**
      * @minLength 1
@@ -1292,6 +1382,7 @@ export interface MonitorListColumns {
 
 export interface MonitorListChart {
   id: ChartId;
+  sectionId?: SectionId;
   type: MonitorListChartType;
   /**
      * @minLength 1
@@ -1441,6 +1532,7 @@ export type LogoUrl = string;
 
 export interface SmartFilterChart {
   id: ChartId;
+  sectionId?: SectionId;
   type: SmartFilterChartType;
   /**
      * @minLength 1
@@ -1463,17 +1555,357 @@ export const SpacerChartType = {
   Spacer: 'Spacer',
 } as const;
 
+export type SpacerChartVariant = typeof SpacerChartVariant[keyof typeof SpacerChartVariant];
+
+
+export const SpacerChartVariant = {
+  transparent: 'transparent',
+  dashed: 'dashed',
+  solid: 'solid',
+} as const;
+
 export interface SpacerChart {
   id: ChartId;
+  sectionId?: SectionId;
   type: SpacerChartType;
   /**
      * @minLength 1
      * @maxLength 500
      */
   name?: string;
+  variant?: SpacerChartVariant;
 }
 
-export type Chart = TimeSeriesChart | HeatmapChart | LogStreamChart | PieChart | ScatterChart | TableChart | TopKChart | StatisticChart | NoteChart | MonitorListChart | SmartFilterChart | SpacerChart;
+export type VisualizeChartType = typeof VisualizeChartType[keyof typeof VisualizeChartType];
+
+
+export const VisualizeChartType = {
+  Visualize: 'Visualize',
+} as const;
+
+export type VisualizeConfigurationVersion = typeof VisualizeConfigurationVersion[keyof typeof VisualizeConfigurationVersion];
+
+
+export const VisualizeConfigurationVersion = {
+  NUMBER_1: 1,
+} as const;
+
+export type ScatterVisualizationType = typeof ScatterVisualizationType[keyof typeof ScatterVisualizationType];
+
+
+export const ScatterVisualizationType = {
+  scatter: 'scatter',
+} as const;
+
+export type VisualizeAxisFieldType = typeof VisualizeAxisFieldType[keyof typeof VisualizeAxisFieldType];
+
+
+export const VisualizeAxisFieldType = {
+  datetime: 'datetime',
+  integer: 'integer',
+  float: 'float',
+} as const;
+
+export interface VisualizeAxisColumnRef {
+  /**
+     * @minLength 1
+     * @maxLength 500
+     */
+  name: string;
+  type: VisualizeAxisFieldType;
+}
+
+export type VisualizeNumericFieldType = typeof VisualizeNumericFieldType[keyof typeof VisualizeNumericFieldType];
+
+
+export const VisualizeNumericFieldType = {
+  integer: 'integer',
+  float: 'float',
+} as const;
+
+export interface VisualizeNumericColumnRef {
+  /**
+     * @minLength 1
+     * @maxLength 500
+     */
+  name: string;
+  type: VisualizeNumericFieldType;
+}
+
+export type VisualizeCategoricalFieldType = typeof VisualizeCategoricalFieldType[keyof typeof VisualizeCategoricalFieldType];
+
+
+export const VisualizeCategoricalFieldType = {
+  string: 'string',
+  boolean: 'boolean',
+} as const;
+
+export interface VisualizeCategoricalColumnRef {
+  /**
+     * @minLength 1
+     * @maxLength 500
+     */
+  name: string;
+  type: VisualizeCategoricalFieldType;
+}
+
+export interface ScatterVisualizationBindings {
+  x: VisualizeAxisColumnRef;
+  y: VisualizeNumericColumnRef;
+  series?: VisualizeCategoricalColumnRef;
+}
+
+export type VisualizeColorSettingsPalette = typeof VisualizeColorSettingsPalette[keyof typeof VisualizeColorSettingsPalette];
+
+
+export const VisualizeColorSettingsPalette = {
+  axiom: 'axiom',
+  polychrome: 'polychrome',
+} as const;
+
+export type VisualizeColorSettingsAssignment = typeof VisualizeColorSettingsAssignment[keyof typeof VisualizeColorSettingsAssignment];
+
+
+export const VisualizeColorSettingsAssignment = {
+  'series-name': 'series-name',
+  'series-order': 'series-order',
+} as const;
+
+export interface VisualizeColorSettings {
+  palette: VisualizeColorSettingsPalette;
+  assignment: VisualizeColorSettingsAssignment;
+}
+
+export type VisualizeAxisSettingsScale = typeof VisualizeAxisSettingsScale[keyof typeof VisualizeAxisSettingsScale];
+
+
+export const VisualizeAxisSettingsScale = {
+  linear: 'linear',
+  log: 'log',
+} as const;
+
+export type VisualizeAxisSettingsRange = typeof VisualizeAxisSettingsRange[keyof typeof VisualizeAxisSettingsRange];
+
+
+export const VisualizeAxisSettingsRange = {
+  fit: 'fit',
+  includeZero: 'includeZero',
+} as const;
+
+export interface VisualizeAxisSettings {
+  scale: VisualizeAxisSettingsScale;
+  range: VisualizeAxisSettingsRange;
+}
+
+export type VisualizeLegendSettingsPosition = typeof VisualizeLegendSettingsPosition[keyof typeof VisualizeLegendSettingsPosition];
+
+
+export const VisualizeLegendSettingsPosition = {
+  none: 'none',
+  bottom: 'bottom',
+  right: 'right',
+} as const;
+
+export interface VisualizeLegendSettings {
+  position: VisualizeLegendSettingsPosition;
+}
+
+export interface ScatterVisualizationSettings {
+  colors?: VisualizeColorSettings;
+  xAxis?: VisualizeAxisSettings;
+  yAxis?: VisualizeAxisSettings;
+  legend?: VisualizeLegendSettings;
+}
+
+export interface ScatterVisualization {
+  version: VisualizeConfigurationVersion;
+  type: ScatterVisualizationType;
+  bindings: ScatterVisualizationBindings;
+  settings: ScatterVisualizationSettings;
+}
+
+export type BarVisualizationType = typeof BarVisualizationType[keyof typeof BarVisualizationType];
+
+
+export const BarVisualizationType = {
+  bar: 'bar',
+} as const;
+
+export interface BarVisualizationBindings {
+  category: VisualizeCategoricalColumnRef;
+  value: VisualizeNumericColumnRef;
+  series?: VisualizeCategoricalColumnRef;
+}
+
+export type VisualizeStandardAggregation = typeof VisualizeStandardAggregation[keyof typeof VisualizeStandardAggregation];
+
+
+export const VisualizeStandardAggregation = {
+  avg: 'avg',
+  sum: 'sum',
+  count: 'count',
+  min: 'min',
+  max: 'max',
+} as const;
+
+/**
+ * @minimum 1
+ * @maximum 100
+ */
+export type VisualizeCategoryLimit = number;
+
+export interface VisualizeStandardAggregationSettings {
+  aggregation: VisualizeStandardAggregation;
+  categoryLimit: VisualizeCategoryLimit;
+  colors?: VisualizeColorSettings;
+  yAxis?: VisualizeAxisSettings;
+  legend?: VisualizeLegendSettings;
+}
+
+export type VisualizePercentileAggregationSettingsAggregation = typeof VisualizePercentileAggregationSettingsAggregation[keyof typeof VisualizePercentileAggregationSettingsAggregation];
+
+
+export const VisualizePercentileAggregationSettingsAggregation = {
+  percentile: 'percentile',
+} as const;
+
+/**
+ * @minimum 0
+ * @maximum 100
+ */
+export type VisualizePercentile = number;
+
+export interface VisualizePercentileAggregationSettings {
+  aggregation: VisualizePercentileAggregationSettingsAggregation;
+  percentile: VisualizePercentile;
+  categoryLimit: VisualizeCategoryLimit;
+  colors?: VisualizeColorSettings;
+  yAxis?: VisualizeAxisSettings;
+  legend?: VisualizeLegendSettings;
+}
+
+export type VisualizeBarSettings = VisualizeStandardAggregationSettings | VisualizePercentileAggregationSettings;
+
+export interface BarVisualization {
+  version: VisualizeConfigurationVersion;
+  type: BarVisualizationType;
+  bindings: BarVisualizationBindings;
+  settings: VisualizeBarSettings;
+}
+
+export type HorizontalBarVisualizationType = typeof HorizontalBarVisualizationType[keyof typeof HorizontalBarVisualizationType];
+
+
+export const HorizontalBarVisualizationType = {
+  horizontalBar: 'horizontalBar',
+} as const;
+
+export interface HorizontalBarVisualizationBindings {
+  category: VisualizeCategoricalColumnRef;
+  value: VisualizeNumericColumnRef;
+  series?: VisualizeCategoricalColumnRef;
+}
+
+export interface HorizontalBarVisualization {
+  version: VisualizeConfigurationVersion;
+  type: HorizontalBarVisualizationType;
+  bindings: HorizontalBarVisualizationBindings;
+  settings: VisualizeBarSettings;
+}
+
+export type HistogramVisualizationType = typeof HistogramVisualizationType[keyof typeof HistogramVisualizationType];
+
+
+export const HistogramVisualizationType = {
+  histogram: 'histogram',
+} as const;
+
+export interface HistogramVisualizationBindings {
+  value: VisualizeNumericColumnRef;
+}
+
+/**
+ * @minimum 1
+ * @maximum 200
+ */
+export type VisualizeBinCount = number;
+
+export interface HistogramVisualizationSettings {
+  binCount: VisualizeBinCount;
+  colors?: VisualizeColorSettings;
+  yAxis?: VisualizeAxisSettings;
+}
+
+export interface HistogramVisualization {
+  version: VisualizeConfigurationVersion;
+  type: HistogramVisualizationType;
+  bindings: HistogramVisualizationBindings;
+  settings: HistogramVisualizationSettings;
+}
+
+export type FrequencyBarVisualizationType = typeof FrequencyBarVisualizationType[keyof typeof FrequencyBarVisualizationType];
+
+
+export const FrequencyBarVisualizationType = {
+  frequencyBar: 'frequencyBar',
+} as const;
+
+export interface FrequencyBarVisualizationBindings {
+  category: VisualizeCategoricalColumnRef;
+}
+
+export interface FrequencyBarVisualizationSettings {
+  categoryLimit: VisualizeCategoryLimit;
+  colors?: VisualizeColorSettings;
+  yAxis?: VisualizeAxisSettings;
+}
+
+export interface FrequencyBarVisualization {
+  version: VisualizeConfigurationVersion;
+  type: FrequencyBarVisualizationType;
+  bindings: FrequencyBarVisualizationBindings;
+  settings: FrequencyBarVisualizationSettings;
+}
+
+export type VisualizeHeatmapType = typeof VisualizeHeatmapType[keyof typeof VisualizeHeatmapType];
+
+
+export const VisualizeHeatmapType = {
+  heatmap: 'heatmap',
+} as const;
+
+export interface VisualizeHeatmapBindings {
+  x: VisualizeCategoricalColumnRef;
+  y: VisualizeCategoricalColumnRef;
+}
+
+export interface VisualizeHeatmapSettings {
+  categoryLimit: VisualizeCategoryLimit;
+}
+
+export interface VisualizeHeatmap {
+  version: VisualizeConfigurationVersion;
+  type: VisualizeHeatmapType;
+  bindings: VisualizeHeatmapBindings;
+  settings: VisualizeHeatmapSettings;
+}
+
+export type VisualizeConfiguration = ScatterVisualization | BarVisualization | HorizontalBarVisualization | HistogramVisualization | FrequencyBarVisualization | VisualizeHeatmap;
+
+export interface VisualizeChart {
+  id: ChartId;
+  sectionId?: SectionId;
+  type: VisualizeChartType;
+  /**
+     * @minLength 1
+     * @maxLength 500
+     */
+  name?: string;
+  query: SimpleChartQuery;
+  visualization: VisualizeConfiguration;
+}
+
+export type Chart = TimeSeriesChart | HeatmapChart | LogStreamChart | PieChart | ScatterChart | TableChart | TopKChart | StatisticChart | GaugeChart | NoteChart | MonitorListChart | SmartFilterChart | SpacerChart | VisualizeChart;
 
 export interface LayoutItem {
   i: ChartId;
@@ -1521,10 +1953,21 @@ export interface LayoutItem {
   static?: boolean;
 }
 
+export interface Section {
+  id: SectionId;
+  /**
+     * @minLength 1
+     * @maxLength 200
+     */
+  title: string;
+  defaultCollapsed?: boolean;
+}
+
 export type DashboardRefreshTime = typeof DashboardRefreshTime[keyof typeof DashboardRefreshTime];
 
 
 export const DashboardRefreshTime = {
+  NUMBER_0: 0,
   NUMBER_15: 15,
   NUMBER_60: 60,
   NUMBER_300: 300,
@@ -1598,6 +2041,8 @@ export interface Dashboard {
   charts: Chart[];
   /** @maxItems 200 */
   layout: LayoutItem[];
+  /** @maxItems 1000 */
+  sections?: Section[];
   refreshTime: DashboardRefreshTime;
   schemaVersion: SchemaVersion;
   /** Relative time comparison offset. Compares the current time window against a previous period offset by this duration. Mutually exclusive with `againstTimestamp` — setting one clears the other. Use an empty string or omit to disable comparison. */
@@ -1621,11 +2066,53 @@ export interface DashboardError {
 
 export type DashboardID = string;
 
+export type LabelID = string;
+
+export type LabelColorName = typeof LabelColorName[keyof typeof LabelColorName];
+
+
+export const LabelColorName = {
+  red: 'red',
+  coral: 'coral',
+  orange: 'orange',
+  amber: 'amber',
+  yellow: 'yellow',
+  lime: 'lime',
+  green: 'green',
+  teal: 'teal',
+  blue: 'blue',
+  iris: 'iris',
+  purple: 'purple',
+  pink: 'pink',
+} as const;
+
+export type LabelColorType = typeof LabelColorType[keyof typeof LabelColorType];
+
+
+export const LabelColorType = {
+  palette: 'palette',
+} as const;
+
+export interface LabelColor {
+  name: LabelColorName;
+  type: LabelColorType;
+}
+
+export interface Label {
+  color: LabelColor;
+  /** @nullable */
+  description?: string | null;
+  id: LabelID;
+  name: string;
+}
+
 export interface DashboardResource {
   createdAt: string;
   createdBy: string;
   dashboard: Dashboard;
   id: string;
+  labelIds: LabelID[];
+  labels?: Label[];
   uid: string;
   updatedAt: string;
   updatedBy: string;
@@ -1717,6 +2204,10 @@ export interface Dataset {
   id: string;
   /** The kind of the dataset */
   kind: DatasetKind;
+  /** IDs of labels assigned to this dataset. */
+  labelIds: LabelID[];
+  /** Resolved labels assigned to this dataset. */
+  labels?: Label[];
   mapFields?: string[];
   /** Unique dataset name */
   name: string;
@@ -1743,6 +2234,14 @@ export interface DatasetField {
   type: string;
   /** Unit of the field */
   unit?: string;
+}
+
+export interface DeleteDatasetFieldsRequest {
+  fields: string[];
+}
+
+export interface DeleteDatasetFieldsResult {
+  fields?: string[];
 }
 
 /**
@@ -1792,280 +2291,6 @@ export interface EmailConfig {
   emails?: string[];
 }
 
-export type FlowDestinationFailureMode = typeof FlowDestinationFailureMode[keyof typeof FlowDestinationFailureMode];
-
-
-export const FlowDestinationFailureMode = {
-  waitAndRetry: 'waitAndRetry',
-  abort: 'abort',
-  continue: 'continue',
-} as const;
-
-export type FlowDestinationKind = typeof FlowDestinationKind[keyof typeof FlowDestinationKind];
-
-
-export const FlowDestinationKind = {
-  axiom: 'axiom',
-  azureBlobStorageClientSecret: 'azureBlobStorageClientSecret',
-  gcs: 'gcs',
-  http: 'http',
-  httpAuthorization: 'httpAuthorization',
-  httpBasic: 'httpBasic',
-  s3Compat: 's3Compat',
-} as const;
-
-export interface AxiomProperties {
-  /** Name of the destination dataset */
-  dataset: string;
-  /** Axiom ingest API token */
-  token: string;
-  /** Axiom ingest API endpoint */
-  url?: string;
-}
-
-export type AzureBlobStorageClientSecretPropertiesFormat = typeof AzureBlobStorageClientSecretPropertiesFormat[keyof typeof AzureBlobStorageClientSecretPropertiesFormat];
-
-
-export const AzureBlobStorageClientSecretPropertiesFormat = {
-  ndjson: 'ndjson',
-  headerlessCsv: 'headerlessCsv',
-  csv: 'csv',
-  parquetFlat: 'parquetFlat',
-  sparseNdjson: 'sparseNdjson',
-} as const;
-
-export interface AzureBlobStorageClientSecretProperties {
-  /** Client ID of the service principal */
-  clientId: string;
-  /** Client secret of the service principal */
-  clientSecret: string;
-  format?: AzureBlobStorageClientSecretPropertiesFormat;
-  /** Maximum number of events to send in a single file */
-  maximumEvents?: number;
-  /** AD Tenant ID */
-  tenantID: string;
-  /** URL of the container */
-  url: string;
-}
-
-export type GcsPropertiesFormat = typeof GcsPropertiesFormat[keyof typeof GcsPropertiesFormat];
-
-
-export const GcsPropertiesFormat = {
-  ndjson: 'ndjson',
-  headerlessCsv: 'headerlessCsv',
-  csv: 'csv',
-  parquetFlat: 'parquetFlat',
-  sparseNdjson: 'sparseNdjson',
-} as const;
-
-export interface GcsProperties {
-  /** Name of the destination bucket */
-  bucket: string;
-  /** Service account or refresh token JSON credentials */
-  credentialsJson: string;
-  format?: GcsPropertiesFormat;
-}
-
-export type HttpPropertiesFormat = typeof HttpPropertiesFormat[keyof typeof HttpPropertiesFormat];
-
-
-export const HttpPropertiesFormat = {
-  ndjson: 'ndjson',
-  headerlessCsv: 'headerlessCsv',
-  csv: 'csv',
-  parquetFlat: 'parquetFlat',
-  sparseNdjson: 'sparseNdjson',
-  textTemplate: 'textTemplate',
-} as const;
-
-/**
- * HTTP headers to send with each request
- */
-export type HttpPropertiesHeaders = {[key: string]: string};
-
-export interface HttpProperties {
-  format?: HttpPropertiesFormat;
-  /** HTTP headers to send with each request */
-  headers?: HttpPropertiesHeaders;
-  /** Maximum number of connections to the target server */
-  maximumConnections?: number;
-  /** Maximum number of events to send in a single request */
-  maximumEvents?: number;
-  /** Text Encoder Template, only available if format is textTemplate */
-  textTemplateEncoderBody?: string;
-  /** URL of the destination endpoint */
-  url: string;
-}
-
-export type HttpAuthorizationPropertiesFormat = typeof HttpAuthorizationPropertiesFormat[keyof typeof HttpAuthorizationPropertiesFormat];
-
-
-export const HttpAuthorizationPropertiesFormat = {
-  ndjson: 'ndjson',
-  headerlessCsv: 'headerlessCsv',
-  csv: 'csv',
-  parquetFlat: 'parquetFlat',
-  sparseNdjson: 'sparseNdjson',
-  textTemplate: 'textTemplate',
-} as const;
-
-/**
- * HTTP headers to send with each request
- */
-export type HttpAuthorizationPropertiesHeaders = {[key: string]: string};
-
-export interface HttpAuthorizationProperties {
-  /** Authorization header value */
-  authorization: string;
-  format?: HttpAuthorizationPropertiesFormat;
-  /** HTTP headers to send with each request */
-  headers?: HttpAuthorizationPropertiesHeaders;
-  /** Maximum number of connections to the target server */
-  maximumConnections?: number;
-  /** Maximum number of events to send in a single request */
-  maximumEvents?: number;
-  /** Text Encoder Template, only available if format is textTemplate */
-  textTemplateEncoderBody?: string;
-  /** URL of the destination endpoint */
-  url: string;
-}
-
-export type HttpBasicPropertiesFormat = typeof HttpBasicPropertiesFormat[keyof typeof HttpBasicPropertiesFormat];
-
-
-export const HttpBasicPropertiesFormat = {
-  ndjson: 'ndjson',
-  headerlessCsv: 'headerlessCsv',
-  csv: 'csv',
-  parquetFlat: 'parquetFlat',
-  sparseNdjson: 'sparseNdjson',
-  textTemplate: 'textTemplate',
-} as const;
-
-/**
- * HTTP headers to send with each request
- */
-export type HttpBasicPropertiesHeaders = {[key: string]: string};
-
-export interface HttpBasicProperties {
-  format?: HttpBasicPropertiesFormat;
-  /** HTTP headers to send with each request */
-  headers?: HttpBasicPropertiesHeaders;
-  /** Maximum number of connections to the target server */
-  maximumConnections?: number;
-  /** Maximum number of events to send in a single request */
-  maximumEvents?: number;
-  /** Password of the destination endpoint */
-  password?: string;
-  /** Text Encoder Template, only available if format is textTemplate */
-  textTemplateEncoderBody?: string;
-  /** URL of the destination endpoint */
-  url: string;
-  /** Username of the destination endpoint */
-  username: string;
-}
-
-export type S3CompatPropertiesFormat = typeof S3CompatPropertiesFormat[keyof typeof S3CompatPropertiesFormat];
-
-
-export const S3CompatPropertiesFormat = {
-  ndjson: 'ndjson',
-  headerlessCsv: 'headerlessCsv',
-  csv: 'csv',
-  parquetFlat: 'parquetFlat',
-  sparseNdjson: 'sparseNdjson',
-} as const;
-
-export interface S3CompatProperties {
-  /** AWS access key identifier */
-  accessKeyId: string;
-  /** Name of the destination bucket */
-  bucket: string;
-  format?: S3CompatPropertiesFormat;
-  /** Hostname of the S3 compatible storage */
-  hostname: string;
-  /** Maximum number of events to send in a single file */
-  maximumEvents?: number;
-  /** Region of the destination bucket */
-  region?: string;
-  /** AWS secret access key */
-  secretAccessKey: string;
-}
-
-/**
- * Flow properties for the specific flow type.
- */
-export type FlowDestinationProperties = {
-  axiom?: AxiomProperties;
-  azureBlobStorageClientSecret?: AzureBlobStorageClientSecretProperties;
-  gcs?: GcsProperties;
-  http?: HttpProperties;
-  httpAuthorization?: HttpAuthorizationProperties;
-  httpBasic?: HttpBasicProperties;
-  s3Compat?: S3CompatProperties;
-};
-
-/**
- * Flow destination configuration schema.
- */
-export interface FlowDestination {
-  failureMode: FlowDestinationFailureMode;
-  readonly id?: string;
-  kind: FlowDestinationKind;
-  name: string;
-  /** Flow properties for the specific flow type. */
-  properties: FlowDestinationProperties;
-}
-
-/**
- * State
- */
-export type FlowExportState = typeof FlowExportState[keyof typeof FlowExportState];
-
-
-export const FlowExportState = {
-  requested: 'requested',
-  running: 'running',
-  stopped: 'stopped',
-  aborted: 'aborted',
-  finished: 'finished',
-  expired: 'expired',
-} as const;
-
-export interface FlowExport {
-  /** The APL of the export */
-  readonly apl?: string;
-  /** The RFC3339-formatted time the export was created at */
-  readonly createdAt?: string;
-  readonly createdBy?: string;
-  /** The destination ID */
-  readonly destinationId?: string;
-  /** The RFC3339-formatted time of the end of the export range */
-  readonly end?: string;
-  readonly errorMessages?: readonly string[];
-  /** Error Rate */
-  readonly errorRate?: number;
-  /** Number of events received */
-  readonly eventsIn?: number;
-  /** Number of events delivered */
-  readonly eventsOut?: number;
-  readonly id?: string;
-  /** The RFC3339-formatted time of the last activity */
-  readonly lastActivity?: string;
-  /** The name of the export */
-  readonly name?: string;
-  /** Progress */
-  readonly progress?: number;
-  /** The RFC3339-formatted time of the start of the export range */
-  readonly start?: string;
-  /** State */
-  readonly state?: FlowExportState;
-  /** The RFC3339-formatted time the export was stopped at */
-  readonly stoppedAt?: string;
-  readonly stoppedBy?: string;
-}
-
 /**
  * Defines a group of users for organizational purposes
  */
@@ -2103,6 +2328,88 @@ export interface IdentifyAPITokenResponse {
   /** Description of the token */
   description?: string;
   /** Name of the token */
+  name: string;
+}
+
+export type JobMetadata = { [key: string]: unknown };
+
+export interface Job {
+  createdAt?: string;
+  datasetCanonicalID?: string;
+  datasetID?: string;
+  error?: string;
+  jobID: string;
+  lastUpdatedAt?: string;
+  metadata?: JobMetadata;
+  numUpdates?: number;
+  orgID?: string;
+  progress?: number;
+  source?: string;
+  type?: string;
+}
+
+export interface JobCreateResponse {
+  jobID: string;
+}
+
+export type LabelAssignmentTargetType = typeof LabelAssignmentTargetType[keyof typeof LabelAssignmentTargetType];
+
+
+export const LabelAssignmentTargetType = {
+  dashboard: 'dashboard',
+  integration_dashboard: 'integration_dashboard',
+  dataset: 'dataset',
+  monitor: 'monitor',
+} as const;
+
+/**
+ * A resource that supports organization labels. The target type determines which identifier is required.
+ */
+export interface LabelAssignmentTarget {
+  /** Required for dataset targets, which reject id, uid, and templateId. Also required alongside templateId for frontend integration dashboards. Use the current dataset name. Assignments use the underlying dataset instance, so permanent deletion and recreation do not restore old labels. */
+  dataset?: string;
+  /** Required for monitor targets, using the ID returned by monitor APIs. Also identifies a backend-provided integration dashboard using the opaque ID returned by backend dashboard listing APIs. Mutually exclusive with uid, templateId, and dataset. */
+  id?: string;
+  /**
+     * Stable frontend-owned template key for an integration_dashboard target, such as k8s.stats. Requires dataset and rejects id and uid. The backend treats this key as opaque and does not validate a template registry. Whitespace and control characters are rejected.
+     * @maxLength 128
+     */
+  templateId?: string;
+  type: LabelAssignmentTargetType;
+  /** Required only for saved dashboard targets; rejected for other target types. */
+  uid?: string;
+}
+
+export interface LabelAssignmentResult {
+  labelIds: LabelID[];
+  target: LabelAssignmentTarget;
+}
+
+export interface LabelAssignmentsQuery {
+  /**
+     * @minItems 1
+     * @maxItems 500
+     */
+  targets: LabelAssignmentTarget[];
+}
+
+export interface LabelAssignmentsReplace {
+  /** @maxItems 500 */
+  labelIds: LabelID[];
+  target: LabelAssignmentTarget;
+}
+
+export interface LabelUpdate {
+  color?: LabelColor;
+  /**
+     * @maxLength 512
+     * @nullable
+     */
+  description?: string | null;
+  /**
+     * @minLength 1
+     * @maxLength 128
+     */
   name: string;
 }
 
@@ -2317,6 +2624,10 @@ export interface Monitor {
 export type MonitorWithId = Monitor & {
   /** Unique identifier for the monitor */
   id: string;
+  /** IDs of labels assigned to this monitor. */
+  labelIds: LabelID[];
+  /** Resolved labels assigned to this monitor. */
+  labels?: Label[];
 };
 
 export interface NewAnnotation {
@@ -2347,6 +2658,20 @@ export interface NewAnnotation {
      * @maxLength 512
      */
   url?: string;
+}
+
+export interface NewLabel {
+  color?: LabelColor;
+  /**
+     * @maxLength 512
+     * @nullable
+     */
+  description?: string | null;
+  /**
+     * @minLength 1
+     * @maxLength 128
+     */
+  name: string;
 }
 
 /**
@@ -2474,6 +2799,18 @@ export interface Org {
   role?: string;
 }
 
+export interface OrgPreview {
+  /** Number of datasets currently in the organization. */
+  datasetCount: number;
+  /** The edge deployment (region) the organization was created in. */
+  defaultEdgeDeployment: string;
+  /** When the temporary organization expires and becomes eligible for deletion. */
+  expiresAt: string;
+  /** Bytes ingested into the organization over the past 24 hours. */
+  ingestedBytes: number;
+  name: string;
+}
+
 export interface PostOrg {
   /** The default edge deployment of the organization. */
   edgeDeployment?: string;
@@ -2481,19 +2818,19 @@ export interface PostOrg {
 }
 
 export interface ProvisionOrg {
-  /** Optional display name for the organization. If omitted, a name is auto-generated and the owner can rename it later. */
-  name?: string;
   /** Optional edge deployment (region) the organization is created in. If omitted, the environment's default region is used. */
   edgeDeployment?: string;
+  /** Optional display name for the organization. If omitted, a name is auto-generated and the owner can rename it later. */
+  name?: string;
 }
 
 export interface ProvisionOrgResponse {
-  id: string;
-  name: string;
-  defaultEdgeDeployment: string;
-  expiresAt: string;
   /** URL a human follows to claim ownership of the temporary org. */
   claimUrl: string;
+  defaultEdgeDeployment: string;
+  expiresAt: string;
+  id: string;
+  name: string;
   /** Full-permission API token the agent uses to create datasets, ingest, and query. Returned once and never retrievable again. */
   token: string;
 }
@@ -2539,13 +2876,6 @@ export interface Repo {
   /** The type of the object. */
   type?: RepoType;
 }
-
-export type RoleDatasetCapabilitiesDataItem = typeof RoleDatasetCapabilitiesDataItem[keyof typeof RoleDatasetCapabilitiesDataItem];
-
-
-export const RoleDatasetCapabilitiesDataItem = {
-  delete: 'delete',
-} as const;
 
 export type RoleDatasetCapabilitiesIngestItem = typeof RoleDatasetCapabilitiesIngestItem[keyof typeof RoleDatasetCapabilitiesIngestItem];
 
@@ -2608,8 +2938,6 @@ export const RoleDatasetCapabilitiesVirtualFieldsItem = {
  * Defines the available permissions for dataset operations
  */
 export interface RoleDatasetCapabilities {[key: string]: {
-  /** Controls data management operations like deletion */
-  data?: RoleDatasetCapabilitiesDataItem[];
   /** Controls the ability to ingest data into datasets */
   ingest?: RoleDatasetCapabilitiesIngestItem[];
   /** Controls the ability to query and read data from datasets */
@@ -2618,7 +2946,7 @@ export interface RoleDatasetCapabilities {[key: string]: {
   share?: RoleDatasetCapabilitiesShareItem[];
   /** Controls the management of starred/saved queries */
   starredQueries?: RoleDatasetCapabilitiesStarredQueriesItem[];
-  /** Controls data trimming operations for storage optimization */
+  /** Controls data trimming and deletion operations */
   trim?: RoleDatasetCapabilitiesTrimItem[];
   /** Controls field vacuuming operations for storage optimization */
   vacuum?: RoleDatasetCapabilitiesVacuumItem[];
@@ -2691,20 +3019,20 @@ export const RoleOrgCapabilitiesEndpointsItem = {
   delete: 'delete',
 } as const;
 
-export type RoleOrgCapabilitiesFlowsItem = typeof RoleOrgCapabilitiesFlowsItem[keyof typeof RoleOrgCapabilitiesFlowsItem];
+export type RoleOrgCapabilitiesIntegrationsItem = typeof RoleOrgCapabilitiesIntegrationsItem[keyof typeof RoleOrgCapabilitiesIntegrationsItem];
 
 
-export const RoleOrgCapabilitiesFlowsItem = {
+export const RoleOrgCapabilitiesIntegrationsItem = {
   create: 'create',
   read: 'read',
   update: 'update',
   delete: 'delete',
 } as const;
 
-export type RoleOrgCapabilitiesIntegrationsItem = typeof RoleOrgCapabilitiesIntegrationsItem[keyof typeof RoleOrgCapabilitiesIntegrationsItem];
+export type RoleOrgCapabilitiesLabelsItem = typeof RoleOrgCapabilitiesLabelsItem[keyof typeof RoleOrgCapabilitiesLabelsItem];
 
 
-export const RoleOrgCapabilitiesIntegrationsItem = {
+export const RoleOrgCapabilitiesLabelsItem = {
   create: 'create',
   read: 'read',
   update: 'update',
@@ -2787,10 +3115,10 @@ export interface RoleOrgCapabilities {
   datasets?: RoleOrgCapabilitiesDatasetsItem[];
   /** Controls the management of API endpoints */
   endpoints?: RoleOrgCapabilitiesEndpointsItem[];
-  /** Controls the management of data flows and pipelines */
-  flows?: RoleOrgCapabilitiesFlowsItem[];
   /** Controls the management of third-party integrations */
   integrations?: RoleOrgCapabilitiesIntegrationsItem[];
+  /** Controls the management of labels */
+  labels?: RoleOrgCapabilitiesLabelsItem[];
   /** Controls the management of monitoring */
   monitors?: RoleOrgCapabilitiesMonitorsItem[];
   /** Controls the management of notification settings */
@@ -2977,19 +3305,6 @@ export interface TokenInfo {
   resourceId?: string;
   /** The type of the resource. */
   resourceType?: string;
-}
-
-export interface TransformRequest {
-  /** The APL query to apply for transformation */
-  apl: string;
-  /** List of block locator URLs to transform */
-  blocks: string[];
-  /** The end time for the transformation */
-  endTime: string;
-  /** List of URLs where transformation results should be uploaded */
-  resultURLs: string[];
-  /** The start time for the transformation */
-  startTime: string;
 }
 
 export interface TrimOptions {
@@ -3293,17 +3608,85 @@ export interface Overrides {
 
 export type DashboardOutput = DashboardResource;
 
-export type ForbiddenErrorResponse = {
-  code?: string;
-  message?: string;
-};
+/**
+ * An upstream service returned an invalid response.
+ */
+export type BadGatewayErrorResponse = APIError;
 
-export type NotFoundErrorResponse = {
-  code?: string;
-  message?: string;
-};
+/**
+ * The request is invalid or cannot be processed.
+ */
+export type BadRequestErrorResponse = APIError;
 
-export type FlowDestinationBody = FlowDestination;
+/**
+ * The requested mutation conflicts with existing state.
+ */
+export type ConflictErrorResponse = APIError;
+
+/**
+ * The dashboard request is invalid.
+ */
+export type DashboardBadRequestErrorResponse = DashboardError;
+
+/**
+ * The requested dashboard UID already exists.
+ */
+export type DashboardConflictErrorResponse = DashboardError;
+
+/**
+ * The dashboard or chart was not found.
+ */
+export type DashboardNotFoundErrorResponse = DashboardError;
+
+/**
+ * The supplied dashboard version does not match the current version.
+ */
+export type DashboardPreconditionFailedErrorResponse = DashboardError;
+
+/**
+ * The authenticated caller is not allowed to perform this operation.
+ */
+export type ForbiddenErrorResponse = APIError;
+
+/**
+ * A required upstream operation timed out.
+ */
+export type GatewayTimeoutErrorResponse = APIError;
+
+/**
+ * The server failed to complete the request.
+ */
+export type InternalServerErrorResponse = APIError;
+
+/**
+ * The requested resource was not found.
+ */
+export type NotFoundErrorResponse = APIError;
+
+/**
+ * A mutation precondition, such as a resource version, did not match.
+ */
+export type PreconditionFailedErrorResponse = APIError;
+
+/**
+ * A required service is temporarily unavailable.
+ */
+export type ServiceUnavailableErrorResponse = APIError;
+
+/**
+ * The request was rejected by a shared or operation-specific rate limit. The response body is empty.
+ */
+export type TooManyRequestsErrorResponse = void;
+
+/**
+ * Authentication is missing or invalid.
+ */
+export type UnauthorizedErrorResponse = APIError;
+
+/**
+ * Request binding or schema validation failed before the handler ran.
+ */
+export type UnprocessableEntityErrorResponse = APIError;
 
 export type RepoBody = Repo;
 
@@ -3336,12 +3719,80 @@ start?: string;
 end?: string;
 };
 
+export type GetDatasetsParams = {
+/**
+ * Exclude resolved label objects from each dataset response. The labelIds field is still returned.
+ */
+exclude?: GetDatasetsExclude;
+/**
+ * Return datasets assigned every specified label ID.
+ * @minItems 1
+ * @maxItems 500
+ */
+labelIds?: string[];
+};
+
+export type GetDatasetsExclude = typeof GetDatasetsExclude[keyof typeof GetDatasetsExclude];
+
+
+export const GetDatasetsExclude = {
+  labels: 'labels',
+} as const;
+
 export type CreateDatasetParams = {
 /**
  * Referrer slug
  */
 referrer?: string;
 };
+
+export type GetDatasetParams = {
+/**
+ * Exclude resolved label objects from the dataset response. The labelIds field is still returned.
+ */
+exclude?: GetDatasetExclude;
+};
+
+export type GetDatasetExclude = typeof GetDatasetExclude[keyof typeof GetDatasetExclude];
+
+
+export const GetDatasetExclude = {
+  labels: 'labels',
+} as const;
+
+export type GetMonitorsParams = {
+/**
+ * Exclude resolved label objects from each monitor response. The labelIds field is still returned.
+ */
+exclude?: GetMonitorsExclude;
+/**
+ * Return monitors assigned every specified label ID.
+ * @minItems 1
+ * @maxItems 500
+ */
+labelIds?: string[];
+};
+
+export type GetMonitorsExclude = typeof GetMonitorsExclude[keyof typeof GetMonitorsExclude];
+
+
+export const GetMonitorsExclude = {
+  labels: 'labels',
+} as const;
+
+export type GetMonitorParams = {
+/**
+ * Exclude resolved label objects from the monitor response. The labelIds field is still returned.
+ */
+exclude?: GetMonitorExclude;
+};
+
+export type GetMonitorExclude = typeof GetMonitorExclude[keyof typeof GetMonitorExclude];
+
+
+export const GetMonitorExclude = {
+  labels: 'labels',
+} as const;
 
 export type GetMonitorHistoryParams = {
 /**
@@ -3389,5 +3840,36 @@ limit?: LimitParameter;
  * @minimum 0
  */
 offset?: OffsetParameter;
+/**
+ * Exclude resolved label objects from each dashboard response. The labelIds field is still returned.
+ */
+exclude?: ListDashboardsExclude;
+/**
+ * Return dashboards assigned every specified label ID.
+ * @minItems 1
+ * @maxItems 500
+ */
+labelIds?: string[];
 };
+
+export type ListDashboardsExclude = typeof ListDashboardsExclude[keyof typeof ListDashboardsExclude];
+
+
+export const ListDashboardsExclude = {
+  labels: 'labels',
+} as const;
+
+export type GetDashboardParams = {
+/**
+ * Exclude resolved label objects from the dashboard response. The labelIds field is still returned.
+ */
+exclude?: GetDashboardExclude;
+};
+
+export type GetDashboardExclude = typeof GetDashboardExclude[keyof typeof GetDashboardExclude];
+
+
+export const GetDashboardExclude = {
+  labels: 'labels',
+} as const;
 

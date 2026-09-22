@@ -8,7 +8,9 @@ import {
 } from './generated/v2/monitors/monitors.js';
 import type {
   AlertHistory,
+  GetMonitorParams,
   GetMonitorHistoryParams,
+  GetMonitorsParams,
   MonitorBody,
   MonitorWithId,
   MonitorOperator as GeneratedMonitorOperator,
@@ -26,6 +28,8 @@ export namespace monitors {
 
   export type HistoryEntry = AlertHistory;
   export type HistoryOptions = GetMonitorHistoryParams;
+  export type ListOptions = GetMonitorsParams;
+  export type GetOptions = GetMonitorParams;
 
   export class Service extends HTTPClient {
     private readonly requestOptions = () => ({ axiomClient: this.client });
@@ -33,12 +37,13 @@ export namespace monitors {
     /**
      * @see https://axiom.co/docs/restapi/endpoints/getMonitors
      */
-    list = (): Promise<Monitor[]> => getMonitors(this.requestOptions());
+    list = (options?: ListOptions): Promise<Monitor[]> => getMonitors(options, this.requestOptions());
 
     /**
      * @see https://axiom.co/docs/restapi/endpoints/getMonitor
      */
-    get = (id: string): Promise<Monitor> => getMonitor(encodeURIComponent(id), this.requestOptions());
+    get = (id: string, options?: GetOptions): Promise<Monitor> =>
+      getMonitor(encodeURIComponent(id), options, this.requestOptions());
 
     /**
      * @see https://axiom.co/docs/restapi/endpoints/createMonitor

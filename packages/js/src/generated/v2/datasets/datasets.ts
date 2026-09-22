@@ -10,6 +10,11 @@ import type {
   CreateDatasetParams,
   Dataset,
   DatasetField,
+  DeleteDatasetFieldsRequest,
+  DeleteDatasetFieldsResult,
+  GetDatasetParams,
+  GetDatasetsParams,
+  JobCreateResponse,
   MapField,
   MapFields,
   TrimOptions,
@@ -18,21 +23,28 @@ import type {
 
 import { openapiRequest } from '../../../openapiRequest';
 
-export const getGetDatasetsUrl = () => {
+export const getGetDatasetsUrl = (params?: GetDatasetsParams,) => {
+  const normalizedParams = new URLSearchParams();
 
+  Object.entries(params || {}).forEach(([key, value]) => {
 
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
 
+  const stringifiedParams = normalizedParams.toString();
 
-  return `/datasets`
+  return stringifiedParams.length > 0 ? `/datasets?${stringifiedParams}` : `/datasets`
 }
 
 /**
  * Get list of datasets
  * @summary Get list of datasets
  */
-export const getDatasets = async ( options?: Parameters<typeof openapiRequest>[1]): Promise<Dataset[]> => {
+export const getDatasets = async (params?: GetDatasetsParams, options?: Parameters<typeof openapiRequest>[1]): Promise<Dataset[]> => {
 
-  return openapiRequest<Dataset[]>(getGetDatasetsUrl(),
+  return openapiRequest<Dataset[]>(getGetDatasetsUrl(params),
   {
     ...options,
     method: 'GET'
@@ -88,21 +100,30 @@ return openapiRequest<Dataset>(getCreateDatasetUrl(params),
 );}
 
 
-export const getGetDatasetUrl = (datasetId: string,) => {
+export const getGetDatasetUrl = (datasetId: string,
+    params?: GetDatasetParams,) => {
+  const normalizedParams = new URLSearchParams();
 
+  Object.entries(params || {}).forEach(([key, value]) => {
 
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
 
+  const stringifiedParams = normalizedParams.toString();
 
-  return `/datasets/${datasetId}`
+  return stringifiedParams.length > 0 ? `/datasets/${datasetId}?${stringifiedParams}` : `/datasets/${datasetId}`
 }
 
 /**
  * Get dataset by ID
  * @summary Get dataset by ID
  */
-export const getDataset = async (datasetId: string, options?: Parameters<typeof openapiRequest>[1]): Promise<Dataset> => {
+export const getDataset = async (datasetId: string,
+    params?: GetDatasetParams, options?: Parameters<typeof openapiRequest>[1]): Promise<Dataset> => {
 
-  return openapiRequest<Dataset>(getGetDatasetUrl(datasetId),
+  return openapiRequest<Dataset>(getGetDatasetUrl(datasetId,params),
   {
     ...options,
     method: 'GET'
@@ -163,9 +184,9 @@ export const getDeleteDatasetUrl = (datasetId: string,) => {
  * Delete dataset
  * @summary Delete dataset
  */
-export const deleteDataset = async (datasetId: string, options?: Parameters<typeof openapiRequest>[1]): Promise<void> => {
+export const deleteDataset = async (datasetId: string, options?: Parameters<typeof openapiRequest>[1]): Promise<JobCreateResponse> => {
 
-  return openapiRequest<void>(getDeleteDatasetUrl(datasetId),
+  return openapiRequest<JobCreateResponse>(getDeleteDatasetUrl(datasetId),
   {
     ...options,
     method: 'DELETE'
@@ -188,7 +209,7 @@ export const getTrimDatasetUrl = (datasetId: string,) => {
  * @summary Trim dataset by duration
  */
 export const trimDataset = async (datasetId: string,
-    trimOptions: TrimOptions, options?: Parameters<typeof openapiRequest>[1]): Promise<void> => {
+    trimOptions: TrimOptions, options?: Parameters<typeof openapiRequest>[1]): Promise<JobCreateResponse> => {
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
@@ -204,7 +225,7 @@ export const trimDataset = async (datasetId: string,
     }
     return headers;
   };
-return openapiRequest<void>(getTrimDatasetUrl(datasetId),
+return openapiRequest<JobCreateResponse>(getTrimDatasetUrl(datasetId),
   {
     ...options,
     method: 'POST',
@@ -230,6 +251,45 @@ export const vacuumDataset = async (datasetId: string, options?: Parameters<type
     method: 'POST'
 
 
+  }
+);}
+
+
+export const getDeleteDatasetFieldsUrl = (datasetId: string,) => {
+
+
+
+
+  return `/datasets/${datasetId}/delete-fields`
+}
+
+/**
+ * Deletes fields asynchronously. The field disappears from listings once the deletion pipeline finishes. Re-ingesting data with that field recreates it.
+ * @summary Delete fields from a dataset
+ */
+export const deleteDatasetFields = async (datasetId: string,
+    deleteDatasetFieldsRequest: DeleteDatasetFieldsRequest, options?: Parameters<typeof openapiRequest>[1]): Promise<DeleteDatasetFieldsResult> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return openapiRequest<DeleteDatasetFieldsResult>(getDeleteDatasetFieldsUrl(datasetId),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(deleteDatasetFieldsRequest)
   }
 );}
 
@@ -309,6 +369,32 @@ return openapiRequest<DatasetField>(getUpdateFieldForDatasetUrl(datasetId,fieldI
     method: 'PUT',
     headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
     body: JSON.stringify(datasetField)
+  }
+);}
+
+
+export const getDeleteFieldForDatasetUrl = (datasetId: string,
+    fieldId: string,) => {
+
+
+
+
+  return `/datasets/${datasetId}/fields/${fieldId}`
+}
+
+/**
+ * Deletes the field asynchronously. The field disappears from listings once the deletion pipeline finishes. Re-ingesting data with that field recreates it.
+ * @summary Delete a field from a dataset
+ */
+export const deleteFieldForDataset = async (datasetId: string,
+    fieldId: string, options?: Parameters<typeof openapiRequest>[1]): Promise<DeleteDatasetFieldsResult> => {
+
+  return openapiRequest<DeleteDatasetFieldsResult>(getDeleteFieldForDatasetUrl(datasetId,fieldId),
+  {
+    ...options,
+    method: 'DELETE'
+
+
   }
 );}
 

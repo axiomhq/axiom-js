@@ -10,6 +10,7 @@ import type {
   DashboardResource,
   DashboardUpsertRequest,
   DashboardWriteResponse,
+  GetDashboardParams,
   ListDashboardsParams
 } from '../client.schemas';
 
@@ -84,21 +85,30 @@ return openapiRequest<DashboardWriteResponse>(getCreateDashboardUrl(),
 );}
 
 
-export const getGetDashboardUrl = (uid: string,) => {
+export const getGetDashboardUrl = (uid: string,
+    params?: GetDashboardParams,) => {
+  const normalizedParams = new URLSearchParams();
 
+  Object.entries(params || {}).forEach(([key, value]) => {
 
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
 
+  const stringifiedParams = normalizedParams.toString();
 
-  return `/dashboards/uid/${uid}`
+  return stringifiedParams.length > 0 ? `/dashboards/uid/${uid}?${stringifiedParams}` : `/dashboards/uid/${uid}`
 }
 
 /**
- * Get a dashboard by UID.
+ * Get a dashboard by UID. Assigned labels are resolved by default.
  * @summary Get dashboard
  */
-export const getDashboard = async (uid: string, options?: Parameters<typeof openapiRequest>[1]): Promise<DashboardResource> => {
+export const getDashboard = async (uid: string,
+    params?: GetDashboardParams, options?: Parameters<typeof openapiRequest>[1]): Promise<DashboardResource> => {
 
-  return openapiRequest<DashboardResource>(getGetDashboardUrl(uid),
+  return openapiRequest<DashboardResource>(getGetDashboardUrl(uid,params),
   {
     ...options,
     method: 'GET'

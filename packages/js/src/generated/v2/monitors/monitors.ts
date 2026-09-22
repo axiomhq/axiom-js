@@ -8,6 +8,8 @@
 import type {
   AlertHistory,
   GetMonitorHistoryParams,
+  GetMonitorParams,
+  GetMonitorsParams,
   MonitorBody,
   MonitorWithId,
   Notifier,
@@ -43,20 +45,27 @@ type NonReadonly<T> = [T] extends [UnionToIntersection<T>] ? {
 } : DistributeReadOnlyOverUnions<T>;
 
 
-export const getGetMonitorsUrl = () => {
+export const getGetMonitorsUrl = (params?: GetMonitorsParams,) => {
+  const normalizedParams = new URLSearchParams();
 
+  Object.entries(params || {}).forEach(([key, value]) => {
 
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
 
+  const stringifiedParams = normalizedParams.toString();
 
-  return `/monitors`
+  return stringifiedParams.length > 0 ? `/monitors?${stringifiedParams}` : `/monitors`
 }
 
 /**
- * Lists all configured monitors. Returns an array of monitor configurations including their IDs and current status.
+ * Lists all configured monitors. Returns an array of monitor configurations including their IDs, current status, and labels.
  */
-export const getMonitors = async ( options?: Parameters<typeof openapiRequest>[1]): Promise<MonitorWithId[]> => {
+export const getMonitors = async (params?: GetMonitorsParams, options?: Parameters<typeof openapiRequest>[1]): Promise<MonitorWithId[]> => {
 
-  return openapiRequest<MonitorWithId[]>(getGetMonitorsUrl(),
+  return openapiRequest<MonitorWithId[]>(getGetMonitorsUrl(params),
   {
     ...options,
     method: 'GET'
@@ -103,20 +112,29 @@ return openapiRequest<MonitorWithId>(getCreateMonitorUrl(),
 );}
 
 
-export const getGetMonitorUrl = (id: string,) => {
+export const getGetMonitorUrl = (id: string,
+    params?: GetMonitorParams,) => {
+  const normalizedParams = new URLSearchParams();
 
+  Object.entries(params || {}).forEach(([key, value]) => {
 
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
 
+  const stringifiedParams = normalizedParams.toString();
 
-  return `/monitors/${id}`
+  return stringifiedParams.length > 0 ? `/monitors/${id}?${stringifiedParams}` : `/monitors/${id}`
 }
 
 /**
- * Retrieves detailed configuration for a specific monitor by its unique identifier
+ * Retrieves detailed configuration for a specific monitor by its unique identifier, including labels.
  */
-export const getMonitor = async (id: string, options?: Parameters<typeof openapiRequest>[1]): Promise<MonitorWithId> => {
+export const getMonitor = async (id: string,
+    params?: GetMonitorParams, options?: Parameters<typeof openapiRequest>[1]): Promise<MonitorWithId> => {
 
-  return openapiRequest<MonitorWithId>(getGetMonitorUrl(id),
+  return openapiRequest<MonitorWithId>(getGetMonitorUrl(id,params),
   {
     ...options,
     method: 'GET'

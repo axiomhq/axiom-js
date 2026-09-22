@@ -1,11 +1,5 @@
-import { createOrg, getOrg, getOrgs, provisionOrg, updateOrg } from './generated/v2/orgs/orgs.js';
-import type {
-  Org as GeneratedOrg,
-  PostOrg,
-  ProvisionOrg,
-  ProvisionOrgResponse,
-  UpdateOrg,
-} from './generated/v2/client.schemas.js';
+import { createOrg, getOrg, getOrgs, updateOrg } from './generated/v2/orgs/orgs.js';
+import type { Org as GeneratedOrg, PostOrg, UpdateOrg } from './generated/v2/client.schemas.js';
 import HTTPClient from './httpClient.js';
 
 export namespace orgs {
@@ -13,8 +7,6 @@ export namespace orgs {
   export type Org = Organization;
   export type CreateRequest = PostOrg;
   export type UpdateRequest = UpdateOrg;
-  export type ProvisionRequest = ProvisionOrg;
-  export type ProvisionResponse = ProvisionOrgResponse;
 
   const encodePath = (value: string): string => encodeURIComponent(value);
 
@@ -29,7 +21,5 @@ export namespace orgs {
 
     update = (id: string, request: UpdateRequest): Promise<Organization> =>
       updateOrg(encodePath(id), request, this.requestOptions());
-
-    provision = (request: ProvisionRequest): Promise<ProvisionResponse> => provisionOrg(request, this.requestOptions());
   }
 }
