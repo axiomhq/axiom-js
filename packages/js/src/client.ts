@@ -150,7 +150,22 @@ class BaseClient extends HTTPClient {
     }
 
     if (typeof data === 'string' || data instanceof Uint8Array) {
-      return new Blob([data]).stream();
+      /*
+       * Deliberately NOT `new Blob([data]).stream()`: on Node 24 every Blob
+       * read leaks a native BlobReader held by a V8 global handle while the
+       * process stays busy, and each leaked reader pins the AsyncContextFrame
+       * captured when the flush was scheduled. In AsyncLocalStorage-heavy
+       * hosts (e.g. self-hosted Next.js) that frame is the full request
+       * context, so every batch flush permanently retained one request until
+       * the process went fully idle. See #508 and #471.
+       */
+      const bytes = typeof data === 'string' ? new TextEncoder().encode(data) : data;
+      return new ReadableStream({
+        start(controller) {
+          controller.enqueue(bytes);
+          controller.close();
+        },
+      });
     }
 
     return null;
