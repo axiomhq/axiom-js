@@ -66,7 +66,7 @@ describe('ProxyTransport', () => {
     });
 
     it('should handle request errors gracefully', async () => {
-      const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
       server.use(
         http.post(PROXY_URL, () => {
           return HttpResponse.error();
@@ -80,8 +80,8 @@ describe('ProxyTransport', () => {
       transport.log([createLogEvent()]);
       await transport.flush();
 
-      expect(consoleErrorSpy).toHaveBeenCalled();
-      consoleErrorSpy.mockRestore();
+      expect(consoleWarnSpy).toHaveBeenCalledWith(expect.any(String), { 'network error': 1 });
+      consoleWarnSpy.mockRestore();
     });
   });
 });

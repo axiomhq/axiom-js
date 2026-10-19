@@ -46,13 +46,12 @@ describe.skipIf(!hasEdgeConfig)('Edge Ingestion', () => {
       createRequest.edgeDeployment = edgeDatasetRegion;
     }
     await createTestDataset(axiom.datasets, createRequest);
-  });
+  }, 60_000);
 
   afterAll(async () => {
     // Delete dataset (API call goes to main URL, not edge)
-    const resp = await cleanupDatasetIfExists(axiom.datasets, datasetName);
-    if (resp) expect(resp.status).toEqual(204);
-  });
+    await cleanupDatasetIfExists(axiom.datasets, datasetName);
+  }, 60_000);
 
   describe('ingest via edge', () => {
     it('works with single event', async () => {

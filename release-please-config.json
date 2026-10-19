@@ -14,32 +14,32 @@
   "packages": {
     "packages/js": {
       "release-type": "node",
-      "versioning-strategy": "always-bump-patch",
+      "versioning": "default",
       "include-v-in-tag": false
     },
     "packages/pino": {
       "release-type": "node",
-      "versioning-strategy": "always-bump-patch",
+      "versioning": "default",
       "include-v-in-tag": false
     },
     "packages/winston": {
       "release-type": "node",
-      "versioning-strategy": "always-bump-patch",
+      "versioning": "default",
       "include-v-in-tag": false
     },
     "packages/logging": {
       "release-type": "node",
-      "versioning-strategy": "always-bump-patch",
+      "versioning": "default",
       "include-v-in-tag": false
     },
     "packages/react": {
       "release-type": "node",
-      "versioning-strategy": "always-bump-patch",
+      "versioning": "default",
       "include-v-in-tag": false
     },
     "packages/nextjs": {
       "release-type": "node",
-      "versioning-strategy": "always-bump-patch",
+      "versioning": "default",
       "include-v-in-tag": false
     },
     "packages/tanstack-start": {

@@ -14,6 +14,7 @@ export default [
     plugins: [
       typescript({ outDir: 'dist/esm', declarationDir: 'dist/esm/types' }),
       replace({
+        preventAssignment: true,
         AXIOM_VERSION: process.env.npm_package_version,
       }),
     ],

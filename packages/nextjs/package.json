@@ -1,6 +1,6 @@
 {
   "name": "@axiomhq/nextjs",
-  "version": "0.3.0",
+  "version": "0.4.1",
   "author": "Axiom, Inc.",
   "license": "MIT",
   "description": "The official Next.js package for Axiom",
@@ -72,8 +72,8 @@
     "@edge-runtime/vm": "^5.0.0",
     "@repo/eslint-config": "workspace:*",
     "@tanstack/config": "^0.22.2",
-    "next": "^15.5.21",
-    "vite": "^7.3.5",
+    "next": "^15.5.25",
+    "vite": "^7.3.6",
     "vitest": "catalog:"
   },
   "peerDependencies": {

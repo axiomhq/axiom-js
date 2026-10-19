@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.0](https://github.com/axiomhq/axiom-js/compare/winston-1.8.0...winston-2.0.0) (2026-08-04)
+
+
+### Features
+
+* **js:** add custom fetch option to ClientOptions ([#412](https://github.com/axiomhq/axiom-js/issues/412)) ([19fa66f](https://github.com/axiomhq/axiom-js/commit/19fa66fe36078b41bd79d568f6971283b4d618ca))
+
 ## [1.8.0](https://github.com/axiomhq/axiom-js/compare/winston-1.7.0...winston-1.8.0) (2026-06-25)
 
 
