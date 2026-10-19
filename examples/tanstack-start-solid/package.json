@@ -19,7 +19,7 @@
     "@axiomhq/logging": "workspace:*",
     "@axiomhq/tanstack-start": "workspace:*",
     "@tanstack/solid-router": "^1.170.18",
-    "@tanstack/solid-start": "^1.167.61",
+    "@tanstack/solid-start": "^1.168.57",
     "solid-js": "^1.9.14"
   },
   "devDependencies": {
