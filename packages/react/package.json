@@ -70,7 +70,7 @@
     "@testing-library/react-hooks": "^8.0.1",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
-    "@vitejs/plugin-react": "^5.2.0",
+    "@vitejs/plugin-react": "^6.0.5",
     "happy-dom": "^20.9.0",
     "react": "^19.2.5",
     "react-dom": "^19.2.5",
