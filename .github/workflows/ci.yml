@@ -22,7 +22,7 @@ env:
   NEXT_PUBLIC_AXIOM_ORG_ID: ${{ vars.TESTING_ORG_ID }}
   TESTING_ENVIRONMENT: ${{ vars.TESTING_ENVIRONMENT }}
   AXIOM_DATASET_SUFFIX: ${{ github.run_id }}-${{ github.run_attempt }}
-  NODEVERSION: 22.x
+  NODEVERSION: 22.23.4
   PNPM_VERSION: 10.4.1
   TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
   TURBO_TEAM: ${{ vars.TURBO_TEAM }}
@@ -34,8 +34,8 @@ jobs:
     strategy:
       matrix:
         node:
-          - 24.x
-          - 26.x
+          - 24.22.1
+          - 26.12.1
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6
@@ -69,7 +69,7 @@ jobs:
           version: ${{ env.PNPM_VERSION }}
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v6
         with:
-          node-version: 20.x
+          node-version: 22.23.4
           cache: 'pnpm'
       - name: Cache turbo build setup
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
@@ -88,8 +88,8 @@ jobs:
     strategy:
       matrix:
         node:
-          - 24.x
-          - 26.x
+          - 24.22.1
+          - 26.12.1
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6
@@ -115,8 +115,8 @@ jobs:
       fail-fast: true
       matrix:
         node:
-          - 24.x
-          - 26.x
+          - 24.22.1
+          - 26.12.1
     env:
       AXIOM_TOKEN: ${{ secrets.TESTING_API_TOKEN }}
       AXIOM_URL: ${{ vars.TESTING_API_URL }}
@@ -215,8 +215,8 @@ jobs:
     strategy:
       matrix:
         node:
-          - 24.x
-          - 26.x
+          - 24.22.1
+          - 26.12.1
       max-parallel: 1
       fail-fast: true
     steps:
