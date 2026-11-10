@@ -90,6 +90,27 @@ describe('MonitorsService', () => {
     expect(response.threshold).toEqual(80);
   });
 
+  it('Create NewValues', async () => {
+    const request: monitors.CreateRequest = {
+      name: 'New Hosts',
+      type: 'NewValues',
+      aplQuery: "['app-logs'] | summarize count() by host",
+      notifierIds: ['notifier1'],
+      intervalMinutes: 1,
+      trackedValue: 'host',
+      lookbackDays: 14,
+      backfillDays: 7,
+    };
+
+    mockFetchResponse({ id: 'test4', createdAt: '2025-01-04T00:00:00Z', createdBy: 'user1', ...request });
+
+    const response = await client.create(request);
+    expect(response.type).toEqual('NewValues');
+    expect(response.trackedValue).toEqual('host');
+    expect(response.lookbackDays).toEqual(14);
+    expect(response.backfillDays).toEqual(7);
+  });
+
   it('Update', async () => {
     const req: monitors.UpdateRequest = {
       name: 'Updated CPU Monitor',
