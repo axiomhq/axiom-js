@@ -12,7 +12,7 @@ describe('AxiomJSTransport', () => {
 
   beforeEach(() => {
     mockAxiomWithoutBatching = Object.create(AxiomWithoutBatching.prototype, {
-      ingest: { value: vi.fn() },
+      ingest: { value: vi.fn().mockResolvedValue(undefined) },
       appendAxiomClient: { value: vi.fn() },
     });
     mockAxiom = Object.create(Axiom.prototype, {
@@ -91,7 +91,7 @@ describe('AxiomJSTransport', () => {
       await transport.flush();
 
       // @ts-expect-error - private property
-      expect(transport.promises).toHaveLength(0);
+      expect(transport.promises.size).toBe(0);
     });
   });
 });
