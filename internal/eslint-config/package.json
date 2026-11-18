@@ -15,7 +15,7 @@
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^5.0.0",
-    "eslint-plugin-tsdoc": "^0.4.0",
+    "eslint-plugin-tsdoc": "^0.5.4",
     "eslint-plugin-turbo": "^2.10.7",
     "globals": "^17.6.0",
     "typescript": "^5.3.3",
