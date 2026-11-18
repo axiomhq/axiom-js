@@ -29,13 +29,15 @@ env:
 
 jobs:
   build:
-    name: Build
+    name: Build (${{ matrix.node-label }})
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node:
-          - 24.22.1
-          - 26.12.1
+        include:
+          - node: 24.22.1
+            node-label: 24.x
+          - node: 26.12.1
+            node-label: 26.x
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6
@@ -104,7 +106,7 @@ jobs:
       - run: cd examples/winston && pnpm example
 
   test-integration:
-    name: Test (Integration)
+    name: Test (Integration) (${{ matrix.node-label }})
     runs-on: ubuntu-latest
     needs: build
     concurrency:
@@ -114,9 +116,11 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        node:
-          - 24.22.1
-          - 26.12.1
+        include:
+          - node: 24.22.1
+            node-label: 24.x
+          - node: 26.12.1
+            node-label: 26.x
     env:
       AXIOM_TOKEN: ${{ secrets.TESTING_API_TOKEN }}
       AXIOM_URL: ${{ vars.TESTING_API_URL }}
