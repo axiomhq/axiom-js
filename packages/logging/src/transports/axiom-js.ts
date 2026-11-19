@@ -24,7 +24,7 @@ export const axiomClient = `axiom-logging/${Version ?? 'unknown'}`;
 
 export class AxiomJSTransport implements Transport {
   private config: AxiomJSTransportConfig;
-  private promises: Promise<any>[] = [];
+  private promises = new Set<Promise<any>>();
 
   constructor(config: AxiomJSTransportConfig) {
     this.config = config;
@@ -48,7 +48,10 @@ export class AxiomJSTransport implements Transport {
     if (this.config.axiom instanceof Axiom) {
       this.config.axiom.ingest(this.config.dataset, filteredLogs);
     } else if (this.config.axiom instanceof AxiomWithoutBatching) {
-      this.promises.push(this.config.axiom.ingest(this.config.dataset, filteredLogs));
+      const promise = this.config.axiom.ingest(this.config.dataset, filteredLogs);
+      this.promises.add(promise);
+      const remove = () => this.promises.delete(promise);
+      void promise.then(remove, remove);
     }
   }
 
@@ -58,6 +61,5 @@ export class AxiomJSTransport implements Transport {
     } else {
       await Promise.allSettled(this.promises);
     }
-    this.promises = [];
   }
 }
