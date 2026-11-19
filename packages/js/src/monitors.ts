@@ -1,7 +1,7 @@
 import HTTPClient from './httpClient.js';
 
 export namespace monitors {
-  export type MonitorType = 'Threshold' | 'MatchEvent' | 'AnomalyDetection';
+  export type MonitorType = 'Threshold' | 'MatchEvent' | 'AnomalyDetection' | 'NewValues';
   export type MonitorOperator = 'Below' | 'BelowOrEqual' | 'Above' | 'AboveOrEqual' | 'AboveOrBelow';
 
   export interface Monitor {
@@ -27,6 +27,19 @@ export namespace monitors {
     rangeMinutes?: number;
     disabled?: boolean;
     disabledUntil?: string;
+    /**
+     * NewValues monitors only, and required for them. The column of the query result whose values are checked for new ones.
+     */
+    trackedValue?: string;
+    /**
+     * NewValues monitors only. A value counts as new when it was not seen in this many days.
+     */
+    lookbackDays?: number;
+    /**
+     * NewValues monitors only. The values the query returns over this many days are recorded as seen before the first run,
+     * so they do not alert. Must not exceed `lookbackDays`. 0 disables the backfill.
+     */
+    backfillDays?: number;
     [key: string]: unknown;
   }
 
