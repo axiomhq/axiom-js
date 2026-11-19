@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.0](https://github.com/axiomhq/axiom-js/compare/pino-2.0.0...pino-2.1.0) (2026-11-19)
+
+
+### Miscellaneous Chores
+
+* **pino:** Synchronize core versions
+
 ## [2.0.0](https://github.com/axiomhq/axiom-js/compare/pino-1.8.0...pino-2.0.0) (2026-08-04)
 
 

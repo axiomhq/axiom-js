@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.1](https://github.com/axiomhq/axiom-js/compare/tanstack-start-0.2.0...tanstack-start-0.2.1) (2026-11-19)
+
+
+### Bug Fixes
+
+* bump vite to 8.3.8 ([#562](https://github.com/axiomhq/axiom-js/issues/562)) ([a4de5a6](https://github.com/axiomhq/axiom-js/commit/a4de5a6ebb06b15f6163f46efb8b93c37c1038c0))
+
 ## [0.2.0](https://github.com/axiomhq/axiom-js/compare/tanstack-start-0.1.0...tanstack-start-0.2.0) (2026-06-25)
 
 
