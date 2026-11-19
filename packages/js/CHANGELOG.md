@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.0](https://github.com/axiomhq/axiom-js/compare/js-2.0.0...js-2.1.0) (2026-11-19)
+
+
+### Features
+
+* **js:** add new values monitor types ([#559](https://github.com/axiomhq/axiom-js/issues/559)) ([348234f](https://github.com/axiomhq/axiom-js/commit/348234fd72622e18bb5664cbea5fbb43b498cbdf))
+
 ## [2.0.0](https://github.com/axiomhq/axiom-js/compare/js-1.8.0...js-2.0.0) (2026-08-04)
 
 
