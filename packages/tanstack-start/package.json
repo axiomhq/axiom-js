@@ -11,7 +11,6 @@
     "Gabriel De Andrade <gabriel@axiom.co>"
   ],
   "type": "module",
-  "main": "dist/cjs/index.cjs",
   "module": "dist/esm/index.js",
   "types": "dist/esm/index.d.ts",
   "exports": {
@@ -19,50 +18,30 @@
       "import": {
         "types": "./dist/esm/index.d.ts",
         "default": "./dist/esm/index.js"
-      },
-      "require": {
-        "types": "./dist/cjs/index.d.cts",
-        "default": "./dist/cjs/index.cjs"
       }
     },
     "./router": {
       "import": {
         "types": "./dist/esm/router.d.ts",
         "default": "./dist/esm/router.js"
-      },
-      "require": {
-        "types": "./dist/cjs/router.d.cts",
-        "default": "./dist/cjs/router.cjs"
       }
     },
     "./react": {
       "import": {
         "types": "./dist/esm/react.d.ts",
         "default": "./dist/esm/react.js"
-      },
-      "require": {
-        "types": "./dist/cjs/react.d.cts",
-        "default": "./dist/cjs/react.cjs"
       }
     },
     "./solid": {
       "import": {
         "types": "./dist/esm/solid.d.ts",
         "default": "./dist/esm/solid.js"
-      },
-      "require": {
-        "types": "./dist/cjs/solid.d.cts",
-        "default": "./dist/cjs/solid.cjs"
       }
     },
     "./start": {
       "import": {
         "types": "./dist/esm/start.d.ts",
         "default": "./dist/esm/start.js"
-      },
-      "require": {
-        "types": "./dist/cjs/start.d.cts",
-        "default": "./dist/cjs/start.cjs"
       }
     },
     "./package.json": "./package.json"
